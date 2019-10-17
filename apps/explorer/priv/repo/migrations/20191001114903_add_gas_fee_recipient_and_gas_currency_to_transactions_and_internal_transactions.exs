@@ -7,8 +7,6 @@ defmodule Explorer.Repo.Migrations.AddGasFeeRecipientAndGasCurrencyToTransaction
   def up do
     # Add gas_currency_hash and gas_fee_recipient_hash
     alter table("transactions") do
-#      add(:gas_currency_hash, references(:addresses, column: :hash, on_delete: :delete_all, type: :bytea), null: true)
-#      add(:gas_fee_recipient_hash, references(:addresses, column: :hash, on_delete: :delete_all, type: :bytea), null: true)
       add(:gas_currency_hash, :bytea, null: true)
       add(:gas_fee_recipient_hash, :bytea, null: true)
     end

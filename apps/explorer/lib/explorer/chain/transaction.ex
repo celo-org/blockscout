@@ -97,8 +97,8 @@ defmodule Explorer.Chain.Transaction do
    * `from_address_hash` - foreign key of `from_address`
    * `gas` - Gas provided by the sender
    * `gas_price` - How much the sender is willing to pay for `gas`
-   * `gas_currency` -
-   * `gas_fee_recipient` -
+   * `gas_currency_hash` - Address of the token used for the transaction
+   * `gas_fee_recipient_hash` - Address of the recipient of the transaction fee
    * `gas_used` - the gas used for just `transaction`.  `nil` when transaction is pending or has only been collated into
      one of the `uncles` in one of the `forks`.
    * `hash` - hash of contents of this transaction
@@ -149,9 +149,7 @@ defmodule Explorer.Chain.Transaction do
           from_address_hash: Hash.Address.t(),
           gas: Gas.t(),
           gas_price: wei_per_gas,
-#          gas_currency: %Ecto.Association.NotLoaded{} | Address.t() | nil,
           gas_currency_hash: Hash.Address.t() | nil,
-#          gas_fee_recipient: %Ecto.Association.NotLoaded{} | Address.t() | nil,
           gas_fee_recipient_hash: Hash.Address.t() | nil,
           gas_used: Gas.t() | nil,
           hash: Hash.t(),
@@ -212,7 +210,6 @@ defmodule Explorer.Chain.Transaction do
     field(:status, Status)
     field(:v, :decimal)
     field(:value, Wei)
-
     field(:gas_currency_hash, Hash.Address)
     field(:gas_fee_recipient_hash, Hash.Address)
 
@@ -255,22 +252,6 @@ defmodule Explorer.Chain.Transaction do
       references: :hash,
       type: Hash.Address
     )
-
-#    belongs_to(
-#      :gas_currency,
-#      Address,
-#      foreign_key: :gas_currency_hash,
-#      references: :hash,
-#      type: Hash.Address
-#    )
-#
-#    belongs_to(
-#      :gas_fee_recipient,
-#      Address,
-#      foreign_key: :gas_fee_recipient_hash,
-#      references: :hash,
-#      type: Hash.Address
-#    )
 
   end
 
