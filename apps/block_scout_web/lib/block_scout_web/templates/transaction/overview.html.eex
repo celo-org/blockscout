@@ -101,7 +101,7 @@
                   @transaction.gas_currency_hash,
                   class: "address__link",
                   to: address_path(@conn, :show, @transaction.gas_currency_hash)
-                  ) %>
+                ) %>
               </dd>
             </dl>
           <% end %>
