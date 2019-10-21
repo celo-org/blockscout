@@ -74,6 +74,7 @@ defmodule Explorer.SmartContract.Publisher do
       optimization_runs: params["optimization_runs"],
       optimization: params["optimization"],
       contract_source_code: params["contract_source_code"],
+      proxy_address: params["proxy_address"],
       constructor_arguments: clean_constructor_arguments,
       external_libraries: prepared_external_libraries,
       abi: abi

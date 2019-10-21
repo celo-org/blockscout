@@ -246,6 +246,7 @@ defmodule Explorer.Chain.SmartContract do
       :contract_source_code,
       :address_hash,
       :abi,
+      :proxy_address,
       :constructor_arguments,
       :evm_version,
       :optimization_runs
