@@ -2628,22 +2628,27 @@ defmodule Explorer.Chain do
       |> Changeset.put_change(:external_libraries, external_libraries)
 
     address_hash = Changeset.get_field(smart_contract_changeset, :address_hash)
-    proxy_address =
+
+    #proxy_address =
 
     # Enforce ShareLocks tables order (see docs: sharelocks.md)
     insert_result =
       Multi.new()
       |> Multi.run(:set_address_verified, fn repo, _ -> set_address_verified(repo, address_hash) end)
       |> Multi.run(:clear_primary_address_names, fn repo, _ -> clear_primary_address_names(repo, address_hash) end)
-      |> Multi.run(:set_address_proxy, fn repo, _ -> set_address_proxy(repo, address_hash, proxy_address) end)
       |> Multi.run(:insert_address_name, fn repo, _ ->
         name = Changeset.get_field(smart_contract_changeset, :name)
         create_address_name(repo, name, address_hash)
+      end)
+      |> Multi.run(:proxy_contract_address, fn repo, _ ->
+        proxy_contract_address = Changeset.get_field(smart_contract_changeset, :proxy_address)
+        set_address_proxy(repo, address_hash, proxy_contract_address)
       end)
       |> Multi.insert(:smart_contract, smart_contract_changeset)
       |> Repo.transaction()
 
     case insert_result do
+
       {:ok, %{smart_contract: smart_contract}} ->
         {:ok, smart_contract}
 

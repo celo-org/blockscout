@@ -192,6 +192,8 @@ defmodule Explorer.Chain.SmartContract do
     produce `address` `t:Explorer.Chain.Address.t/0` `contract_code`.
   * `abi` - The [JSON ABI specification](https://solidity.readthedocs.io/en/develop/abi-spec.html#json) for this
     contract.
+  * `proxy_address` - if the contract is behind a proxy, the address of that proxy contract
+
   """
 
   @type t :: %Explorer.Chain.SmartContract{
@@ -202,7 +204,8 @@ defmodule Explorer.Chain.SmartContract do
           constructor_arguments: String.t() | nil,
           evm_version: String.t() | nil,
           optimization_runs: non_neg_integer() | nil,
-          abi: [function_description]
+          abi: [function_description]#,
+          #proxy_contract_address: Hash.Address.t() | nil
         }
 
   schema "smart_contracts" do
@@ -215,6 +218,14 @@ defmodule Explorer.Chain.SmartContract do
     field(:optimization_runs, :integer)
     embeds_many(:external_libraries, ExternalLibrary)
     field(:abi, {:array, :map})
+
+    # belongs_to(
+    #   :proxy_contract_address,
+    #   Explorer.Chain.ProxyContract,
+    #   foreign_key: :proxy_address,
+    #   references: :hash,
+    #   type: Hash.Address
+    # )
 
     has_many(
       :decompiled_smart_contracts,
@@ -246,7 +257,7 @@ defmodule Explorer.Chain.SmartContract do
       :contract_source_code,
       :address_hash,
       :abi,
-      :proxy_address,
+      #:proxy_address,
       :constructor_arguments,
       :evm_version,
       :optimization_runs
