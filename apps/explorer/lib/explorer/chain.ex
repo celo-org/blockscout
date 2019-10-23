@@ -1033,14 +1033,11 @@ defmodule Explorer.Chain do
       ) do
     necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
 
-    Logger.info("--->We are here 1")
-
     query =
       from(
         address in Address,
         where: address.hash == ^hash and not is_nil(address.contract_code)
       )
-    Logger.info("--->We are here 2")
 
     query
     |> join_associations(necessity_by_association)
@@ -2633,16 +2630,11 @@ defmodule Explorer.Chain do
       |> Changeset.put_change(:external_libraries, external_libraries)
 
     address_hash = Changeset.get_field(smart_contract_changeset, :address_hash)
-    #proxy_address = Map.get(attrs, "proxy_address", nil)
-    # Logger.info("-->chain.ex:create_smart_contract: ")
-    # Logger.info(Map.get(attrs, "proxy_address"))
-    # Logger.info("proxy_address #{proxy_address}")
-
 
     insert_result =
     if proxy_address != nil do
       proxy_address= attrs[:proxy_address]
-      Logger.info(fn -> "Adding Proxy Address Mapping: #{proxy_address}" end)
+      Logger.debug(fn -> "Adding Proxy Address Mapping: #{proxy_address}" end)
 
       Multi.new()
       |> Multi.run(:set_address_verified, fn repo, _ -> set_address_verified(repo, address_hash) end)

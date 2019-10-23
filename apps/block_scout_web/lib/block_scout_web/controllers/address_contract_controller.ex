@@ -25,12 +25,12 @@ defmodule BlockScoutWeb.AddressContractController do
          {:ok, address} <- Chain.find_contract_address(address_hash, address_options, true) do
       {transaction_count, validation_count} = transaction_and_validation_count(address_hash)
 
-      Logger.info("Address Found #{address_hash}")
-      Logger.info("Smart Contract #{address}")
+      Logger.debug("Address Found #{address_hash}")
+      Logger.debug("Smart Contract #{address}")
 
       with {:ok, implementation_address} <- Chain.get_proxied_address(address_hash),
            {:ok, implementation_contract} <- Chain.find_contract_address(implementation_address, address_options, true) do
-        Logger.info("Implementation address FOUND in proxy table #{implementation_address}")
+        Logger.debug("Implementation address FOUND in proxy table #{implementation_address}")
         render(
           conn,
           "index.html",
@@ -44,7 +44,7 @@ defmodule BlockScoutWeb.AddressContractController do
         )
       else
         {:error, :not_found} ->
-          Logger.info("Implementation address NOT found in proxy table")
+          Logger.debug("Implementation address NOT found in proxy table")
         render(
           conn,
           "index.html",
