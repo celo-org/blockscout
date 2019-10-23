@@ -204,8 +204,7 @@ defmodule Explorer.Chain.SmartContract do
           constructor_arguments: String.t() | nil,
           evm_version: String.t() | nil,
           optimization_runs: non_neg_integer() | nil,
-          abi: [function_description]#,
-          #proxy_contract_address: Hash.Address.t() | nil
+          abi: [function_description]
         }
 
   schema "smart_contracts" do

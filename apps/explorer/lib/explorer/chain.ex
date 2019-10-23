@@ -22,6 +22,8 @@ defmodule Explorer.Chain do
 
   import EthereumJSONRPC, only: [integer_to_quantity: 1]
 
+  require Logger
+
   alias ABI.TypeDecoder
   alias Ecto.Adapters.SQL
   alias Ecto.{Changeset, Multi}
@@ -1031,11 +1033,14 @@ defmodule Explorer.Chain do
       ) do
     necessity_by_association = Keyword.get(options, :necessity_by_association, %{})
 
+    Logger.info("--->We are here 1")
+
     query =
       from(
         address in Address,
         where: address.hash == ^hash and not is_nil(address.contract_code)
       )
+    Logger.info("--->We are here 2")
 
     query
     |> join_associations(necessity_by_association)
@@ -2619,7 +2624,7 @@ defmodule Explorer.Chain do
   naming the address for reference.
   """
   @spec create_smart_contract(map()) :: {:ok, SmartContract.t()} | {:error, Ecto.Changeset.t()}
-  def create_smart_contract(attrs \\ %{}, external_libraries \\ []) do
+  def create_smart_contract(attrs \\ %{}, external_libraries \\ [], proxy_address \\ nil) do
     new_contract = %SmartContract{}
 
     smart_contract_changeset =
@@ -2628,11 +2633,17 @@ defmodule Explorer.Chain do
       |> Changeset.put_change(:external_libraries, external_libraries)
 
     address_hash = Changeset.get_field(smart_contract_changeset, :address_hash)
+    #proxy_address = Map.get(attrs, "proxy_address", nil)
+    # Logger.info("-->chain.ex:create_smart_contract: ")
+    # Logger.info(Map.get(attrs, "proxy_address"))
+    # Logger.info("proxy_address #{proxy_address}")
 
-    #proxy_address =
 
-    # Enforce ShareLocks tables order (see docs: sharelocks.md)
     insert_result =
+    if proxy_address != nil do
+      proxy_address= attrs[:proxy_address]
+      Logger.info(fn -> "Adding Proxy Address Mapping: #{proxy_address}" end)
+
       Multi.new()
       |> Multi.run(:set_address_verified, fn repo, _ -> set_address_verified(repo, address_hash) end)
       |> Multi.run(:clear_primary_address_names, fn repo, _ -> clear_primary_address_names(repo, address_hash) end)
@@ -2640,12 +2651,22 @@ defmodule Explorer.Chain do
         name = Changeset.get_field(smart_contract_changeset, :name)
         create_address_name(repo, name, address_hash)
       end)
-      |> Multi.run(:proxy_contract_address, fn repo, _ ->
-        proxy_contract_address = Changeset.get_field(smart_contract_changeset, :proxy_address)
-        set_address_proxy(repo, address_hash, proxy_contract_address)
+      |> Multi.run(:proxy_address_contract, fn repo, _ -> set_address_proxy(repo, proxy_address, address_hash) end)
+      |> Multi.insert(:smart_contract, smart_contract_changeset)
+      |> Repo.transaction()
+
+    else
+      Multi.new()
+      |> Multi.run(:set_address_verified, fn repo, _ -> set_address_verified(repo, address_hash) end)
+      |> Multi.run(:clear_primary_address_names, fn repo, _ -> clear_primary_address_names(repo, address_hash) end)
+      |> Multi.run(:insert_address_name, fn repo, _ ->
+        name = Changeset.get_field(smart_contract_changeset, :name)
+        create_address_name(repo, name, address_hash)
       end)
       |> Multi.insert(:smart_contract, smart_contract_changeset)
       |> Repo.transaction()
+
+    end
 
     case insert_result do
 
@@ -2657,6 +2678,10 @@ defmodule Explorer.Chain do
 
       {:error, :set_address_verified, message, _} ->
         {:error, message}
+
+      #{:error, :proxy_contract_address, message, _} ->
+      #  {:error, message}
+
     end
   end
 
@@ -2691,6 +2716,8 @@ defmodule Explorer.Chain do
       proxy_address: proxy_address,
       implementation_address: implementation_address
     }
+
+    Logger.debug(fn -> "Setting Proxy Address Mapping: #{proxy_address} - #{implementation_address}" end)
 
     %ProxyContract{}
     |> ProxyContract.changeset(params)

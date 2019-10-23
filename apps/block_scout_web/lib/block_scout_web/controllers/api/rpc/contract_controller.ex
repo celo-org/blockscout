@@ -9,6 +9,9 @@ defmodule BlockScoutWeb.API.RPC.ContractController do
   alias Explorer.SmartContract.Publisher
 
   def verify(conn, %{"addressHash" => address_hash} = params) do
+    #Logger.info("-->contract_contrller.ex:Verify - Params: ")
+    #Logger.info(Map.get(params, "proxyAddress"))
+
     with {:params, {:ok, fetched_params}} <- {:params, fetch_verify_params(params)},
          {:format, {:ok, casted_address_hash}} <- to_address_hash(address_hash),
          {:params, external_libraries} <-
@@ -16,6 +19,9 @@ defmodule BlockScoutWeb.API.RPC.ContractController do
          {:publish, {:ok, _}} <-
            {:publish, Publisher.publish(address_hash, fetched_params, external_libraries)} do
       address = Chain.address_hash_to_address_with_source_code(casted_address_hash)
+      Logger.info("-->contract_contrller.ex:Verify.fetch_verify_params: ")
+      Logger.info(Map.get(fetched_params, "proxy_address"))
+
 
       render(conn, :verify, %{contract: address})
     else
@@ -204,7 +210,7 @@ defmodule BlockScoutWeb.API.RPC.ContractController do
     |> optional_param(params, "evmVersion", "evm_version")
     |> optional_param(params, "constructorArguments", "constructor_arguments")
     |> optional_param(params, "optimizationRuns", "optimization_runs")
-    |> optional_param(params, "proxyContract", "proxy_contract")
+    |> optional_param(params, "proxyAddress", "proxy_address")
     |> parse_optimization_runs()
   end
 

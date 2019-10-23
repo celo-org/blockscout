@@ -2,6 +2,7 @@ defmodule Explorer.SmartContract.Publisher do
   @moduledoc """
   Module responsible to control the contract verification.
   """
+  require Logger
 
   alias Explorer.Chain
   alias Explorer.Chain.SmartContract
@@ -26,6 +27,9 @@ defmodule Explorer.SmartContract.Publisher do
   def publish(address_hash, params, external_libraries \\ %{}) do
     params_with_external_libaries = add_external_libraries(params, external_libraries)
 
+    Logger.info("-->Publisher.publish: ")
+    Logger.info(Map.get(params_with_external_libaries, "proxy_address"))
+
     case Verifier.evaluate_authenticity(address_hash, params_with_external_libaries) do
       {:ok, %{abi: abi}} ->
         publish_smart_contract(address_hash, params_with_external_libaries, abi)
@@ -36,9 +40,16 @@ defmodule Explorer.SmartContract.Publisher do
   end
 
   defp publish_smart_contract(address_hash, params, abi) do
+    # Logger.info("-->BEFORE --- Publisher.publish_smart_contract: ")
+    proxy_address= Map.get(params, "proxy_address")
+    # Logger.info(proxy_address)
+
     attrs = address_hash |> attributes(params, abi)
 
-    Chain.create_smart_contract(attrs, attrs.external_libraries)
+    # Logger.info("-->Publisher.publish_smart_contract: ")
+    # Logger.info(Map.get(attrs, "proxy_address"))
+
+    Chain.create_smart_contract(attrs, attrs.external_libraries, proxy_address)
   end
 
   defp unverified_smart_contract(address_hash, params, error) do
@@ -65,6 +76,9 @@ defmodule Explorer.SmartContract.Publisher do
       end
 
     prepared_external_libraries = prepare_external_libraies(params["external_libraries"])
+
+    Logger.info("-->Attributes --- Publisher.attributes: ")
+    Logger.info(Map.get(params, "proxy_address"))
 
     %{
       address_hash: address_hash,
