@@ -218,14 +218,6 @@ defmodule Explorer.Chain.SmartContract do
     embeds_many(:external_libraries, ExternalLibrary)
     field(:abi, {:array, :map})
 
-    # belongs_to(
-    #   :proxy_contract_address,
-    #   Explorer.Chain.ProxyContract,
-    #   foreign_key: :proxy_address,
-    #   references: :hash,
-    #   type: Hash.Address
-    # )
-
     has_many(
       :decompiled_smart_contracts,
       DecompiledSmartContract,
@@ -256,7 +248,6 @@ defmodule Explorer.Chain.SmartContract do
       :contract_source_code,
       :address_hash,
       :abi,
-      #:proxy_address,
       :constructor_arguments,
       :evm_version,
       :optimization_runs

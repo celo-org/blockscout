@@ -2671,9 +2671,6 @@ defmodule Explorer.Chain do
       {:error, :set_address_verified, message, _} ->
         {:error, message}
 
-      #{:error, :proxy_contract_address, message, _} ->
-      #  {:error, message}
-
     end
   end
 

@@ -10,7 +10,6 @@ defmodule BlockScoutWeb.API.RPC.ContractController do
 
   def verify(conn, %{"addressHash" => address_hash} = params) do
 
-
     with {:params, {:ok, fetched_params}} <- {:params, fetch_verify_params(params)},
          {:format, {:ok, casted_address_hash}} <- to_address_hash(address_hash),
          {:params, external_libraries} <-
@@ -19,7 +18,6 @@ defmodule BlockScoutWeb.API.RPC.ContractController do
            {:publish, Publisher.publish(address_hash, fetched_params, external_libraries)} do
       address = Chain.address_hash_to_address_with_source_code(casted_address_hash)
       Logger.debug(Map.get(fetched_params, "proxy_address"))
-
 
       render(conn, :verify, %{contract: address})
     else
