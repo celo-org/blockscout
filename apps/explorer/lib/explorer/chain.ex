@@ -2712,7 +2712,7 @@ defmodule Explorer.Chain do
     |> ProxyContract.changeset(params)
     |> repo.insert(
          on_conflict: :replace_all,
-         conflict_target: [:proxy_address, :implementation_address])
+         conflict_target: [:proxy_address])
 
   end
 
