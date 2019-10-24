@@ -17,7 +17,6 @@ defmodule BlockScoutWeb.API.RPC.ContractController do
          {:publish, {:ok, _}} <-
            {:publish, Publisher.publish(address_hash, fetched_params, external_libraries)} do
       address = Chain.address_hash_to_address_with_source_code(casted_address_hash)
-      Logger.debug(Map.get(fetched_params, "proxy_address"))
 
       render(conn, :verify, %{contract: address})
     else

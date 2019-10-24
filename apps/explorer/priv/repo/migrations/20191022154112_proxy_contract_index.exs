@@ -3,7 +3,7 @@ defmodule Explorer.Repo.Migrations.CreateProxyContractIndex do
 
   def change do
     drop_if_exists index("proxy_contract", [:id])
-	  create(unique_index(:proxy_contract, [:proxy_address, :implementation_address]))
+	create(unique_index(:proxy_contract, [:proxy_address, :implementation_address]))
   end
 end
 

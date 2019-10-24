@@ -27,8 +27,6 @@ defmodule Explorer.SmartContract.Publisher do
   def publish(address_hash, params, external_libraries \\ %{}) do
     params_with_external_libaries = add_external_libraries(params, external_libraries)
 
-    Logger.debug(Map.get(params_with_external_libaries, "proxy_address"))
-
     case Verifier.evaluate_authenticity(address_hash, params_with_external_libaries) do
       {:ok, %{abi: abi}} ->
         publish_smart_contract(address_hash, params_with_external_libaries, abi)
