@@ -73,7 +73,7 @@ defmodule Indexer.MixProject do
       {:spandex_datadog, "~> 0.4.0"},
       # Log json format
       {:logger_json, "~> 3.2"}
-      #{:jason, "~> 1.1"}
+      # {:jason, "~> 1.1"}
     ]
   end
 

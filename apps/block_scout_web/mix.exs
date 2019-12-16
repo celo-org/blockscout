@@ -53,7 +53,7 @@ defmodule BlockScoutWeb.Mixfile do
       :logger,
       :runtime_tools,
       :jason,
-      :logger_json,
+      :logger_json
     ]
 
   # Specifies your project dependencies.
@@ -136,7 +136,7 @@ defmodule BlockScoutWeb.Mixfile do
       {:ex_json_schema, "~> 0.6.2"},
       # Log json format
       {:logger_json, "~> 3.2"}
-      #{:jason, "~> 1.1"}
+      # {:jason, "~> 1.1"}
     ]
   end
 

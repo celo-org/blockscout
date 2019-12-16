@@ -116,7 +116,7 @@ defmodule Explorer.Mixfile do
       {:con_cache, "~> 0.13"},
       # Log json format
       {:logger_json, "~> 3.2"}
-      #{:jason, "~> 1.1"}
+      # {:jason, "~> 1.1"}
     ]
   end
 
