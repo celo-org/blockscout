@@ -10,10 +10,11 @@ use Mix.Config
 import_config "../apps/*/config/config.exs"
 
 config :logger,
+  levels: :warn,
   backends: [
     # all applications and all levels
 #    :console,
-    LoggerJSON,
+    {LoggerJSON, level: :warn},
     # all applications, but only errors
     {LoggerFileBackend, :error},
     # only :ecto, but all levels
