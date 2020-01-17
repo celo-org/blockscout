@@ -62,8 +62,8 @@ defmodule Explorer.Chain.Import.Runner.CeloAccounts do
     {:ok, accounts}
   end
 
-  defp handle_dedup([head | lst]) do
-    Enum.reduce(lst, head, fn %{attestations_requested: req, attestations_fulfilled: full}, acc ->
+  defp handle_dedup(lst) do
+    Enum.reduce(lst, fn %{attestations_requested: req, attestations_fulfilled: full}, acc ->
       acc
       |> Map.put(:attestations_requested, req + acc.attestations_requested)
       |> Map.put(:attestations_fulfilled, full + acc.attestations_fulfilled)
@@ -79,9 +79,7 @@ defmodule Explorer.Chain.Import.Runner.CeloAccounts do
       |> Enum.sort_by(& &1.address)
       |> Enum.group_by(& &1.address)
       |> Map.values()
-      |> Enum.map(fn a ->
-        handle_dedup(a)
-      end)
+      |> Enum.map(&handle_dedup/1)
 
     {:ok, _} =
       Import.insert_changes_list(
