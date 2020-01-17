@@ -62,7 +62,7 @@ defmodule Explorer.Chain.Import.Runner.CeloAccounts do
     {:ok, accounts}
   end
 
-  defp handle_dedup([head|lst]) do
+  defp handle_dedup([head | lst]) do
     Enum.reduce(lst, head, fn %{attestations_requested: req, attestations_fulfilled: full}, acc ->
       acc
       |> Map.put(:attestations_requested, req + acc.attestations_requested)
