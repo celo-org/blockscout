@@ -23,7 +23,6 @@ config :explorer,
     ),
   index_internal_transactions_for_token_transfers:
     if(System.get_env("INTERNAL_TRANSACTIONOS_FOR_TOKEN_TRANSFERS") == "true", do: true, else: false)
->>>>>>>>> Temporary merge branch 2
 
 average_block_period =
   case Integer.parse(System.get_env("AVERAGE_BLOCK_CACHE_PERIOD", "")) do
