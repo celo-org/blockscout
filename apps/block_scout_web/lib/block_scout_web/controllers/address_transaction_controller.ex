@@ -3,8 +3,11 @@ defmodule BlockScoutWeb.AddressTransactionController do
     Display all the Transactions that terminate at this Address.
   """
 
+  require Logger
+
   use BlockScoutWeb, :controller
 
+  import BlockScoutWeb.AddressController, only: [transaction_and_validation_count: 1]
   import BlockScoutWeb.Chain, only: [current_filter: 1, paging_options: 1, next_page_params: 3, split_list_by_page: 1]
 
   alias BlockScoutWeb.TransactionView
@@ -19,6 +22,10 @@ defmodule BlockScoutWeb.AddressTransactionController do
       [created_contract_address: :names] => :optional,
       [from_address: :names] => :optional,
       [to_address: :names] => :optional,
+      [token_transfers: :token] => :optional,
+      [token_transfers: :to_address] => :optional,
+      [token_transfers: :from_address] => :optional,
+      [token_transfers: :token_contract_address] => :optional,
       :block => :required
     }
   ]
@@ -93,6 +100,11 @@ defmodule BlockScoutWeb.AddressTransactionController do
   def index(conn, %{"address_id" => address_hash_string} = params) do
     with {:ok, address_hash} <- Chain.string_to_address_hash(address_hash_string),
          {:ok, address} <- Chain.hash_to_address(address_hash) do
+      {transaction_count, validation_count} = transaction_and_validation_count(address_hash)
+
+      Logger.warn("---> TRANSACTION COUNT #{transaction_count}")
+      Logger.warn("---> VALIDATION COUNT #{validation_count}")
+
       render(
         conn,
         "index.html",
@@ -100,6 +112,8 @@ defmodule BlockScoutWeb.AddressTransactionController do
         coin_balance_status: CoinBalanceOnDemand.trigger_fetch(address),
         exchange_rate: Market.get_exchange_rate(Explorer.coin()) || Token.null(),
         filter: params["filter"],
+        transaction_count: transaction_count,
+        validation_count: validation_count,
         counters_path: address_path(conn, :address_counters, %{"id" => address_hash_string}),
         current_path: current_path(conn)
       )
@@ -120,6 +134,8 @@ defmodule BlockScoutWeb.AddressTransactionController do
               coin_balance_status: nil,
               exchange_rate: Market.get_exchange_rate(Explorer.coin()) || Token.null(),
               filter: params["filter"],
+#              transaction_count: 0,
+#              validation_count: 0,
               counters_path: address_path(conn, :address_counters, %{"id" => address_hash_string}),
               current_path: current_path(conn)
             )

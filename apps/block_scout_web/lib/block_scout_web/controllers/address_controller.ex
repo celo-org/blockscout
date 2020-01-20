@@ -5,6 +5,7 @@ defmodule BlockScoutWeb.AddressController do
 
   alias BlockScoutWeb.AddressView
   alias Explorer.{Chain, Market}
+  alias Explorer.Chain.Hash
   alias Explorer.ExchangeRates.Token
   alias Phoenix.View
 
@@ -78,19 +79,20 @@ defmodule BlockScoutWeb.AddressController do
     end
   end
 
-  def transaction_and_validation_count(address) do
+  #  def transaction_and_validation_count(address) do
+  def transaction_and_validation_count(%Hash{byte_count: unquote(Hash.Address.byte_count())} = address_hash) do
     transaction_count_task =
       Task.async(fn ->
-        transaction_count(address)
+        transaction_count(address_hash)
       end)
 
     validation_count_task =
       Task.async(fn ->
-        validation_count(address)
+        validation_count(address_hash)
       end)
 
     [transaction_count_task, validation_count_task]
-    |> Task.yield_many(:timer.seconds(60))
+    |> Task.yield_many(:timer.seconds(30))
     |> Enum.map(fn {_task, res} ->
       case res do
         {:ok, result} ->
@@ -106,25 +108,11 @@ defmodule BlockScoutWeb.AddressController do
     |> List.to_tuple()
   end
 
-  defp transaction_count(address) do
-    if contract?(address) do
-      incoming_transaction_count = Chain.address_to_incoming_transaction_count(address.hash)
-
-      if incoming_transaction_count == 0 do
-        Chain.total_transactions_sent_by_address(address.hash)
-      else
-        incoming_transaction_count
-      end
-    else
-      Chain.total_transactions_sent_by_address(address.hash)
-    end
+  def transaction_count(%Hash{byte_count: unquote(Hash.Address.byte_count())} = address_hash) do
+    Chain.total_transactions_sent_by_address(address_hash)
   end
 
-  defp validation_count(address) do
-    Chain.address_to_validation_count(address.hash)
+  def validation_count(%Hash{byte_count: unquote(Hash.Address.byte_count())} = address_hash) do
+    Chain.address_to_validation_count(address_hash)
   end
-
-  defp contract?(%{contract_code: nil}), do: false
-
-  defp contract?(%{contract_code: _}), do: true
 end
