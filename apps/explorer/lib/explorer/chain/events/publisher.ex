@@ -2,7 +2,6 @@ defmodule Explorer.Chain.Events.Publisher do
   @moduledoc """
   Publishes events related to the Chain context.
   """
-  @sender Application.get_env(:explorer, :realtime_events_sender)
 
   @allowed_events ~w(addresses address_coin_balances blocks block_rewards internal_transactions token_transfers transactions contract_verification_result)a
 
@@ -20,14 +19,12 @@ defmodule Explorer.Chain.Events.Publisher do
     :ok
   end
 
-  @max_payload 7500
-
   defp send_data(event_type) do
-    payload = encode_payload({:chain_event, event_type})
+    sender().send_data(event_type)
+  end
 
-    if byte_size(payload) < @max_payload do
-      @sender.send_notify(payload)
-    end
+  defp sender do
+    Application.get_env(:explorer, :realtime_events_sender)
   end
 
   # The :catchup type of event is not being consumed right now.
@@ -36,16 +33,6 @@ defmodule Explorer.Chain.Events.Publisher do
   defp send_data(_event_type, :catchup, _event_data), do: :ok
 
   defp send_data(event_type, broadcast_type, event_data) do
-    payload = encode_payload({:chain_event, event_type, broadcast_type, event_data})
-
-    if byte_size(payload) < @max_payload do
-      @sender.send_notify(payload)
-    end
-  end
-
-  defp encode_payload(payload) do
-    payload
-    |> :erlang.term_to_binary([:compressed])
-    |> Base.encode64()
+    sender().send_data(event_type, broadcast_type, event_data)
   end
 end

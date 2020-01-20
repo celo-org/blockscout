@@ -1,6 +1,17 @@
 ## Current
 
 ### Features
+- [#2449](https://github.com/poanetwork/blockscout/pull/2449) - add ability to send notification events through postgres notify
+
+### Fixes
+
+### Chore
+- [#2801](https://github.com/poanetwork/blockscout/pull/2801) - remove unused clause in address_to_unique_tokens query
+
+
+## 2.1.0-beta
+
+### Features
 - [#2776](https://github.com/poanetwork/blockscout/pull/2776) - fetch token counters async
 - [#2772](https://github.com/poanetwork/blockscout/pull/2772) - add token instance images to the token inventory tab
 - [#2733](https://github.com/poanetwork/blockscout/pull/2733) - Add cache for first page of uncles
