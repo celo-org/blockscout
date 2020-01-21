@@ -134,8 +134,8 @@ defmodule BlockScoutWeb.AddressTransactionController do
               coin_balance_status: nil,
               exchange_rate: Market.get_exchange_rate(Explorer.coin()) || Token.null(),
               filter: params["filter"],
-#              transaction_count: 0,
-#              validation_count: 0,
+              #              transaction_count: 0,
+              #              validation_count: 0,
               counters_path: address_path(conn, :address_counters, %{"id" => address_hash_string}),
               current_path: current_path(conn)
             )

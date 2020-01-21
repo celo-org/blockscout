@@ -58,6 +58,7 @@ defmodule BlockScoutWeb.AddressTokenController do
     with {:ok, address_hash} <- Chain.string_to_address_hash(address_hash_string),
          {:ok, address} <- Chain.hash_to_address(address_hash) do
       {transaction_count, validation_count} = transaction_and_validation_count(address_hash)
+
       render(
         conn,
         "index.html",

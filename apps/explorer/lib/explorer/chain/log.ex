@@ -30,21 +30,21 @@ defmodule Explorer.Chain.Log do
    * `type` - type of event.  *Parity-only*
   """
   @type t :: %__MODULE__{
-               address: %Ecto.Association.NotLoaded{} | Address.t(),
-               address_hash: Hash.Address.t(),
-               block_hash: Hash.Full.t(),
-               block_number: non_neg_integer() | nil,
-               data: Data.t(),
-               first_topic: String.t(),
-               second_topic: String.t(),
-               third_topic: String.t(),
-               fourth_topic: String.t(),
-               transaction: %Ecto.Association.NotLoaded{} | Transaction.t(),
-               transaction_hash: Hash.Full.t(),
-               # block: %Ecto.Association.NotLoaded{} | Block.t(),
-               index: non_neg_integer(),
-               type: String.t() | nil
-             }
+          address: %Ecto.Association.NotLoaded{} | Address.t(),
+          address_hash: Hash.Address.t(),
+          block_hash: Hash.Full.t(),
+          block_number: non_neg_integer() | nil,
+          data: Data.t(),
+          first_topic: String.t(),
+          second_topic: String.t(),
+          third_topic: String.t(),
+          fourth_topic: String.t(),
+          transaction: %Ecto.Association.NotLoaded{} | Transaction.t(),
+          transaction_hash: Hash.Full.t(),
+          # block: %Ecto.Association.NotLoaded{} | Block.t(),
+          index: non_neg_integer(),
+          type: String.t() | nil
+        }
 
   @primary_key false
   schema "logs" do
@@ -181,12 +181,12 @@ defmodule Explorer.Chain.Log do
            abi
            |> ABI.parse_specification(include_events?: true)
            |> Event.find_and_decode(
-                decode16!(log.first_topic),
-                decode16!(log.second_topic),
-                decode16!(log.third_topic),
-                decode16!(log.fourth_topic),
-                log.data.bytes
-              ) do
+             decode16!(log.first_topic),
+             decode16!(log.second_topic),
+             decode16!(log.third_topic),
+             decode16!(log.fourth_topic),
+             log.data.bytes
+           ) do
       {:ok, selector, mapping}
     end
   rescue

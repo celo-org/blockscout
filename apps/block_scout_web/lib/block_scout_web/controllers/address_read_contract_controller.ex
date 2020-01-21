@@ -29,6 +29,7 @@ defmodule BlockScoutWeb.AddressReadContractController do
          {:ok, address} <- Chain.find_contract_address(address_hash, address_options, true),
          false <- is_nil(address.smart_contract) do
       {transaction_count, validation_count} = transaction_and_validation_count(address_hash)
+
       render(
         conn,
         "index.html",
