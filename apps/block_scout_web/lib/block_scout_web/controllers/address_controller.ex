@@ -80,7 +80,9 @@ defmodule BlockScoutWeb.AddressController do
   end
 
   def transaction_and_validation_count(address) do
-    transaction_and_validation_count_hash(Chain.string_to_address_hash(address))
+    with {:ok, address_hash} <- Chain.string_to_address_hash(address) do
+      transaction_and_validation_count_hash(address_hash)
+    end
   end
 
   def transaction_and_validation_count_hash(%Hash{byte_count: unquote(Hash.Address.byte_count())} = address_hash) do
