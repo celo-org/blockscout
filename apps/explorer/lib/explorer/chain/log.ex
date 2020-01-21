@@ -9,10 +9,10 @@ defmodule Explorer.Chain.Log do
   alias Explorer.Chain.{Address, Block, ContractMethod, Data, Hash, Transaction}
   alias Explorer.Repo
 
-  # @required_attrs ~w(address_hash data index transaction_hash)a
-  # @optional_attrs ~w(first_topic second_topic third_topic fourth_topic type block_number)a
-  @required_attrs ~w(address_hash data index block_number block_hash)a
-  @optional_attrs ~w(first_topic second_topic third_topic fourth_topic type transaction_hash)a
+  @required_attrs ~w(address_hash data block_hash index )a
+  @optional_attrs ~w(first_topic second_topic third_topic fourth_topic type block_number transaction_hash)a
+  # @required_attrs ~w(address_hash data index block_number block_hash)a
+  # @optional_attrs ~w(first_topic second_topic third_topic fourth_topic type transaction_hash)a
 
   @typedoc """
    * `address` - address of contract that generate the event
@@ -30,21 +30,21 @@ defmodule Explorer.Chain.Log do
    * `type` - type of event.  *Parity-only*
   """
   @type t :: %__MODULE__{
-          address: %Ecto.Association.NotLoaded{} | Address.t(),
-          address_hash: Hash.Address.t(),
-          block_hash: Hash.Full.t(),
-          block_number: non_neg_integer() | nil,
-          data: Data.t(),
-          first_topic: String.t(),
-          second_topic: String.t(),
-          third_topic: String.t(),
-          fourth_topic: String.t(),
-          transaction: %Ecto.Association.NotLoaded{} | Transaction.t(),
-          transaction_hash: Hash.Full.t(),
-          block: %Ecto.Association.NotLoaded{} | Block.t(),
-          index: non_neg_integer(),
-          type: String.t() | nil
-        }
+               address: %Ecto.Association.NotLoaded{} | Address.t(),
+               address_hash: Hash.Address.t(),
+               block_hash: Hash.Full.t(),
+               block_number: non_neg_integer() | nil,
+               data: Data.t(),
+               first_topic: String.t(),
+               second_topic: String.t(),
+               third_topic: String.t(),
+               fourth_topic: String.t(),
+               transaction: %Ecto.Association.NotLoaded{} | Transaction.t(),
+               transaction_hash: Hash.Full.t(),
+               # block: %Ecto.Association.NotLoaded{} | Block.t(),
+               index: non_neg_integer(),
+               type: String.t() | nil
+             }
 
   @primary_key false
   schema "logs" do
@@ -53,9 +53,9 @@ defmodule Explorer.Chain.Log do
     field(:second_topic, :string)
     field(:third_topic, :string)
     field(:fourth_topic, :string)
-    field(:block_number, :integer)
     field(:index, :integer, primary_key: true)
     field(:type, :string)
+    field(:block_number, :integer)
 
     timestamps()
 
@@ -181,12 +181,12 @@ defmodule Explorer.Chain.Log do
            abi
            |> ABI.parse_specification(include_events?: true)
            |> Event.find_and_decode(
-             decode16!(log.first_topic),
-             decode16!(log.second_topic),
-             decode16!(log.third_topic),
-             decode16!(log.fourth_topic),
-             log.data.bytes
-           ) do
+                decode16!(log.first_topic),
+                decode16!(log.second_topic),
+                decode16!(log.third_topic),
+                decode16!(log.fourth_topic),
+                log.data.bytes
+              ) do
       {:ok, selector, mapping}
     end
   rescue
