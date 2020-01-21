@@ -1,4 +1,4 @@
-<section class="address-overview" data-page="address-details" data-page-address-hash="<%= @address.hash %>">
+<section class="address-overview" data-page="address-details" data-page-address-hash="<%= @address.hash %>" data-async-counters="<%= @counters_path %>">
   <div class="row">
     <!-- Address details -->
     <div class="card-section col-md-12 col-lg-8 pr-0-md">
