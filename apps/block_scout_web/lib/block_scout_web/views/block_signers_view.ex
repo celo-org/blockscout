@@ -11,6 +11,7 @@ defmodule BlockScoutWeb.BlockSignersView do
          member.celo_delegator != nil and
          member.celo_delegator.celo_account != nil and
          Ecto.assoc_loaded?(member.celo_delegator.celo_account) do
+      IO.inspect(member.celo_delegator.celo_account)
       named = %Address.Name{
         address: member.celo_delegator.celo_account.account_address,
         address_hash: member.celo_delegator.celo_account.address,
