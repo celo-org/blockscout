@@ -10,7 +10,7 @@ defmodule BlockScoutWeb.BlockSignersView do
          Ecto.assoc_loaded?(member.celo_delegator) and
          member.celo_delegator != nil and
          member.celo_delegator.celo_account != nil and
-         Ecto.assoc_loaded?(member.celo_delegator.celo_account) and 
+         Ecto.assoc_loaded?(member.celo_delegator.celo_account) and
          member.celo_delegator.celo_account.name != nil do
       named = %Address.Name{
         address: member.celo_delegator.celo_account.account_address,

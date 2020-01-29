@@ -31,7 +31,7 @@ defmodule BlockScoutWeb.BlockView do
          Ecto.assoc_loaded?(block.celo_delegator) and
          block.celo_delegator != nil and
          block.celo_delegator.celo_account != nil and
-         Ecto.assoc_loaded?(block.celo_delegator.celo_account) and 
+         Ecto.assoc_loaded?(block.celo_delegator.celo_account) and
          block.celo_delegator.celo_account.name != nil do
       named = %Address.Name{
         address: block.celo_delegator.celo_account.account_address,
