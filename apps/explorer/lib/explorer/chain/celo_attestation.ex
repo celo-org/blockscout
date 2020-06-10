@@ -7,7 +7,7 @@ defmodule Explorer.Chain.CeloAttestation do
 
   use Explorer.Schema
 
-  alias Explorer.Chain.{Address, CeloAccount, CeloAttestationStats, CeloValidator, Hash}
+  alias Explorer.Chain.{Address, Hash}
 
   @typedoc """
   * `address` - address of the validator.
@@ -15,26 +15,26 @@ defmodule Explorer.Chain.CeloAttestation do
   """
 
   @type t :: %__MODULE__{
-          attestor: Hash.Address.t(),
-          attestee: Hash.Address.t(),
+          attestor_hash: Hash.Address.t(),
+          attestee_hash: Hash.Address.t(),
           status: String.t(),
           block_number: Integer.t(),
           identifier: String.t()
         }
 
   @attrs ~w(
-        attestor attestee identifier status block_number
+        attestor_hash attestee_hash identifier status block_number
       )a
 
   @required_attrs ~w(
-        attestor attestee identifier status block_number
+        attestor_hash attestee_hash identifier status block_number
       )a
 
   schema "celo_attestations" do
     belongs_to(
       :attestor,
       Address,
-      foreign_key: :attestor,
+      foreign_key: :attestor_hash,
       references: :hash,
       type: Hash.Address
     )
@@ -42,7 +42,7 @@ defmodule Explorer.Chain.CeloAttestation do
     belongs_to(
       :attestee,
       Address,
-      foreign_key: :attestee,
+      foreign_key: :attestee_hash,
       references: :hash,
       type: Hash.Address
     )

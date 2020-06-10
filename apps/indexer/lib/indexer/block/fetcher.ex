@@ -209,7 +209,7 @@ defmodule Indexer.Block.Fetcher do
            account_names: account_names,
            voter_rewards: celo_voter_rewards
          } = CeloAccounts.parse(logs, oracle_address),
-         attestation_events = Attestation.parse(logs),
+         %{attestation_events: attestation_events} = Attestation.parse(logs),
          market_history =
            exchange_rates
            |> Enum.filter(fn el -> el.token == stable_token end)

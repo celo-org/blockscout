@@ -22,7 +22,7 @@ defmodule Explorer.Chain.Import.Runner.CeloAttestations do
   def ecto_schema_module, do: CeloAttestation
 
   @impl Import.Runner
-  def option_key, do: :celo_voters
+  def option_key, do: :attestation_events
 
   @impl Import.Runner
   def imported_table_row do
@@ -54,7 +54,7 @@ defmodule Explorer.Chain.Import.Runner.CeloAttestations do
       from(
         account in CeloAttestation,
         # Enforce ShareLocks order (see docs: sharelocks.md)
-        order_by: [account.group_address_hash, account.voter_address_hash],
+        order_by: [account.attestor_hash, account.attestee_hash, account.identifier],
         lock: "FOR UPDATE"
       )
 
@@ -70,16 +70,16 @@ defmodule Explorer.Chain.Import.Runner.CeloAttestations do
     # Enforce ShareLocks order (see docs: sharelocks.md)
     uniq_changes_list =
       changes_list
-      |> Enum.sort_by(&{&1.group_address_hash, &1.voter_address_hash})
-      |> Enum.uniq_by(&{&1.group_address_hash, &1.voter_address_hash})
+      |> Enum.sort_by(&{&1.attestor_hash, &1.attestee_hash, &1.identifier})
+      |> Enum.uniq_by(&{&1.attestor_hash, &1.attestee_hash, &1.identifier})
 
     Import.insert_changes_list(
       repo,
       uniq_changes_list,
-      conflict_target: [:group_address_hash, :voter_address_hash],
+      conflict_target: [:attestor_hash, :attestee_hash, :identifier],
       on_conflict: on_conflict,
       for: CeloAttestation,
-      returning: [:group_address_hash, :voter_address_hash],
+      returning: [:attestor_hash, :attestee_hash, :identifier],
       timeout: timeout,
       timestamps: timestamps
     )
@@ -90,9 +90,8 @@ defmodule Explorer.Chain.Import.Runner.CeloAttestations do
       account in CeloAttestation,
       update: [
         set: [
-          total: fragment("EXCLUDED.total"),
-          pending: fragment("EXCLUDED.pending"),
-          active: fragment("EXCLUDED.active"),
+          status: fragment("EXCLUDED.status"),
+          block_number: fragment("EXCLUDED.block_number"),
           inserted_at: fragment("LEAST(?, EXCLUDED.inserted_at)", account.inserted_at),
           updated_at: fragment("GREATEST(?, EXCLUDED.updated_at)", account.updated_at)
         ]
