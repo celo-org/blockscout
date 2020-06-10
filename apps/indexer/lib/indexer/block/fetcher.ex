@@ -40,10 +40,10 @@ defmodule Indexer.Block.Fetcher do
   alias Indexer.Tracer
 
   alias Indexer.Transform.{
-    Attestation,
     AddressCoinBalances,
     Addresses,
     AddressTokenBalances,
+    Attestation,
     CeloAccounts,
     MintTransfers,
     TokenTransfers

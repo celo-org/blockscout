@@ -18,7 +18,7 @@ defmodule Explorer.Chain.CeloAttestation do
           attestor_hash: Hash.Address.t(),
           attestee_hash: Hash.Address.t(),
           status: String.t(),
-          block_number: Integer.t(),
+          block_number: integer,
           identifier: String.t()
         }
 
