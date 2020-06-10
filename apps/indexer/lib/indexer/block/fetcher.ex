@@ -40,6 +40,7 @@ defmodule Indexer.Block.Fetcher do
   alias Indexer.Tracer
 
   alias Indexer.Transform.{
+    Attestation,
     AddressCoinBalances,
     Addresses,
     AddressTokenBalances,
@@ -208,6 +209,7 @@ defmodule Indexer.Block.Fetcher do
            account_names: account_names,
            voter_rewards: celo_voter_rewards
          } = CeloAccounts.parse(logs, oracle_address),
+         attestation_events = Attestation.parse(logs),
          market_history =
            exchange_rates
            |> Enum.filter(fn el -> el.token == stable_token end)
@@ -282,6 +284,7 @@ defmodule Indexer.Block.Fetcher do
                addresses: %{params: addresses},
                address_coin_balances: %{params: coin_balances_params_set},
                address_token_balances: %{params: address_token_balances},
+               attestation_events: %{params: attestation_events},
                blocks: %{params: blocks},
                block_second_degree_relations: %{params: block_second_degree_relations_params},
                block_rewards: %{errors: beneficiaries_errors, params: beneficiaries_with_gas_payment},
