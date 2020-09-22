@@ -189,12 +189,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
       })
 
     # Gold token special updates
-    with true <- Application.get_env(:indexer, Indexer.Block.Fetcher, [])[:enable_gold_token],
-         {:ok, gold_token} <- Util.get_address("GoldToken") do
-      set = add_gold_token_balances(gold_token, addresses_params, MapSet.new())
-      TokenBalance.async_fetch(MapSet.to_list(set))
-    end
-
     token_transfers =
       with true <- Application.get_env(:indexer, Indexer.Block.Fetcher, [])[:enable_gold_token],
            {:ok, gold_token} <- Util.get_address("GoldToken") do
