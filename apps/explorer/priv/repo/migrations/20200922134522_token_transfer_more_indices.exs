@@ -1,4 +1,4 @@
-defmodule Explorer.Repo.Migrations.CreateInternalTxIndex do
+defmodule Explorer.Repo.Migrations.TokenTransferMoreIndices do
   use Ecto.Migration
 
   def change do
