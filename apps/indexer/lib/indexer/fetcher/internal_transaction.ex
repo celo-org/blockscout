@@ -18,7 +18,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
   alias Explorer.Chain.Cache.{Accounts, Blocks}
   alias Indexer.{BufferedTask, Tracer}
   alias Indexer.Fetcher.TokenBalance
-  alias Indexer.Transform.{Addresses,TokenTransfers}
+  alias Indexer.Transform.{Addresses, TokenTransfers}
 
   @behaviour BufferedTask
 
@@ -83,7 +83,8 @@ defmodule Indexer.Fetcher.InternalTransaction do
     final
   end
 
-  defp params(%{block_number: block_number, hash: hash, index: index, block_hash: block_hash}) when is_integer(block_number) do
+  defp params(%{block_number: block_number, hash: hash, index: index, block_hash: block_hash})
+       when is_integer(block_number) do
     %{block_number: block_number, hash_data: to_string(hash), transaction_index: index, block_hash: block_hash}
   end
 
@@ -146,15 +147,18 @@ defmodule Indexer.Fetcher.InternalTransaction do
         |> Chain.get_transactions_of_block_number()
         |> Enum.map(&params(&1))
         |> case do
-          [] -> {nil, {:ok, []}}
-          [%{block_hash: block_hash}|_] = transactions ->
-            # IO.inspect(%{tx: transactions})
+          [] ->
+            {nil, {:ok, []}}
+
+          [%{block_hash: block_hash} | _] = transactions ->
             {block_hash, EthereumJSONRPC.fetch_internal_transactions(transactions, json_rpc_named_arguments)}
         end
         |> case do
           {block_hash, {:ok, internal_transactions}} ->
-              {:ok, Enum.map(internal_transactions, fn a -> Map.put(a, :block_hash, block_hash) end) ++ acc_list}
-          {_, error_or_ignore} -> error_or_ignore
+            {:ok, Enum.map(internal_transactions, fn a -> Map.put(a, :block_hash, block_hash) end) ++ acc_list}
+
+          {_, error_or_ignore} ->
+            error_or_ignore
         end
 
       _, error_or_ignore ->
@@ -193,10 +197,13 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
     token_transfers =
       with true <- Application.get_env(:indexer, Indexer.Block.Fetcher, [])[:enable_gold_token],
-        {:ok, gold_token} <- Util.get_address("GoldToken") do
+           {:ok, gold_token} <- Util.get_address("GoldToken") do
         set = add_gold_token_balances(gold_token, addresses_params, MapSet.new())
         TokenBalance.async_fetch(MapSet.to_list(set))
-        %{token_transfers: celo_token_transfers} = TokenTransfers.parse_itx(internal_transactions_params_without_failed_creations, gold_token)
+
+        %{token_transfers: celo_token_transfers} =
+          TokenTransfers.parse_itx(internal_transactions_params_without_failed_creations, gold_token)
+
         celo_token_transfers
       else
         _ -> []

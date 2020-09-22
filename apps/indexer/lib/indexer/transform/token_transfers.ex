@@ -24,20 +24,18 @@ defmodule Indexer.Transform.TokenTransfers do
 
   def parse_tx(txs, gold_token) do
     initial_acc = %{token_transfers: [], gold_token: gold_token}
+
     txs
-#    |> Enum.filter(fn a -> a.value > 0 end)
+    |> Enum.filter(fn a -> a.value > 0 end)
     |> Enum.reduce(initial_acc, &do_parse_tx/2)
   end
 
   defp do_parse_tx(tx, %{token_transfers: token_transfers, gold_token: gold_token}) do
-    
-    # IO.inspect(tx)
-
     token_transfer = %{
       amount: Decimal.new(tx.value),
       block_number: tx.block_number,
       block_hash: tx.block_hash,
-      log_index: tx.index*1000 + 1000000,
+      log_index: tx.index * 1000 + 1_000_000,
       from_address_hash: tx.from_address_hash,
       to_address_hash: tx.to_address_hash,
       token_contract_address_hash: gold_token,
@@ -45,27 +43,24 @@ defmodule Indexer.Transform.TokenTransfers do
       token_type: "ERC-20"
     }
 
-  %{token_transfers: [token_transfer|token_transfers], gold_token: gold_token}
-
+    %{token_transfers: [token_transfer | token_transfers], gold_token: gold_token}
   end
 
   def parse_itx(txs, gold_token) do
     initial_acc = %{token_transfers: [], gold_token: gold_token}
+
     txs
-#    |> Enum.filter(fn a -> a.value > 0 end)
-     |> Enum.filter(fn a -> a.call_type != "delegatecall" end)
-     |> Enum.reduce(initial_acc, &do_parse_itx/2)
+    |> Enum.filter(fn a -> a.value > 0 end)
+    |> Enum.filter(fn a -> a.call_type != "delegatecall" end)
+    |> Enum.reduce(initial_acc, &do_parse_itx/2)
   end
 
   defp do_parse_itx(tx, %{token_transfers: token_transfers, gold_token: gold_token}) do
-    
-    # IO.inspect(tx)
-
     token_transfer = %{
       amount: Decimal.new(tx.value),
       block_number: tx.block_number,
       block_hash: tx.block_hash,
-      log_index: tx.index + tx.transaction_index*1000 + 1000000,
+      log_index: tx.index + tx.transaction_index * 1000 + 1_000_000,
       from_address_hash: tx.from_address_hash,
       to_address_hash: tx.to_address_hash,
       token_contract_address_hash: gold_token,
@@ -73,8 +68,7 @@ defmodule Indexer.Transform.TokenTransfers do
       token_type: "ERC-20"
     }
 
-    %{token_transfers: [token_transfer|token_transfers], gold_token: gold_token}
-
+    %{token_transfers: [token_transfer | token_transfers], gold_token: gold_token}
   end
 
   defp combine_comments([a | [b | tl]]) do

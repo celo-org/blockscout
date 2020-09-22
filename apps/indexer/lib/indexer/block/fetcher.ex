@@ -226,7 +226,7 @@ defmodule Indexer.Block.Fetcher do
          %FetchedBeneficiaries{params_set: beneficiary_params_set, errors: beneficiaries_errors} =
            fetch_beneficiaries(blocks, json_rpc_named_arguments),
          tokens =
-             normal_tokens ++
+           normal_tokens ++
              (if gold_token_enabled do
                 [%{contract_address_hash: gold_token, type: "ERC-20"}]
               else
