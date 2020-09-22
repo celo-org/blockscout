@@ -93,7 +93,6 @@ defmodule Explorer.Application do
 
   defp configure(process) do
     if should_start?(process) do
-      IO.inspect(%{going_to_start: process})
       process
     else
       []
