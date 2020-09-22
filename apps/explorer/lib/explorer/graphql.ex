@@ -396,116 +396,47 @@ defmodule Explorer.GraphQL do
   end
 
   def celo_tx_transfers_query do
-    tt_query =
+    query =
       from(
         tt in TokenTransfer,
         join: t in CeloParams,
         where: tt.token_contract_address_hash == t.address_value,
-        where: t.name == "goldToken",
+        where: t.name == "goldToken" or t.name == "stableToken",
         select: %{
           transaction_hash: tt.transaction_hash,
           from_address_hash: tt.from_address_hash,
           to_address_hash: tt.to_address_hash,
           log_index: tt.log_index,
-          tx_index: -1,
-          index: -1,
           value: tt.amount,
-          usd_value: 0,
           comment: tt.comment,
+          token: fragment("(case when ? = 'stableToken' then 'cUSD' else 'cGLD' end)", t.name),
           block_number: tt.block_number
         }
       )
 
-    usd_query =
-      from(
-        tt in TokenTransfer,
-        join: t in CeloParams,
-        where: tt.token_contract_address_hash == t.address_value,
-        where: t.name == "stableToken",
-        select: %{
-          transaction_hash: tt.transaction_hash,
-          from_address_hash: tt.from_address_hash,
-          to_address_hash: tt.to_address_hash,
-          log_index: tt.log_index,
-          tx_index: 0 - tt.log_index,
-          index: 0 - tt.log_index,
-          value: 0 - tt.amount,
-          usd_value: tt.amount,
-          comment: tt.comment,
-          block_number: 0 - tt.block_number
-        }
-      )
-
-    tx_query =
-      from(
-        tx in Transaction,
-        where: tx.value > ^0,
-        select: %{
-          transaction_hash: tx.hash,
-          from_address_hash: tx.from_address_hash,
-          to_address_hash: tx.to_address_hash,
-          log_index: 0 - tx.index,
-          tx_index: tx.index,
-          index: 0 - tx.index,
-          value: tx.value,
-          usd_value: 0 - tx.value,
-          comment: fragment("encode(?::bytea, 'hex')", tx.hash),
-          block_number: tx.block_number
-        }
-      )
-
-    internal_query =
-      from(
-        tx in InternalTransaction,
-        where: tx.value > ^0,
-        where: tx.call_type != fragment("'delegatecall'"),
-        where: tx.index != 0,
-        select: %{
-          transaction_hash: tx.transaction_hash,
-          from_address_hash: tx.from_address_hash,
-          to_address_hash: tx.to_address_hash,
-          log_index: 0 - tx.index,
-          tx_index: 0 - tx.index,
-          index: tx.index,
-          value: tx.value,
-          usd_value: 0 - tx.value,
-          comment: fragment("encode(?::bytea, 'hex')", tx.transaction_hash),
-          block_number: tx.block_number
-        }
-      )
-
-    query =
-      tt_query
-      |> union_all(^usd_query)
-      |> union_all(^tx_query)
-      |> union_all(^internal_query)
-
     result =
       from(tt in subquery(query),
-        inner_join: tx in Transaction,
-        on: tx.hash == tt.transaction_hash,
-        inner_join: b in Block,
-        on: tx.block_hash == b.hash,
+#        inner_join: tx in Transaction,
+#        on: tx.hash == tt.transaction_hash,
+#        inner_join: b in Block,
+#        on: tt.block_number == b.number,
         select: %{
-          gas_used: tx.gas_used,
-          gas_price: tx.gas_price,
-          timestamp: b.timestamp,
-          input: tx.input,
+#          gas_used: tx.gas_used,
+#          gas_price: tx.gas_price,
+#          timestamp: b.timestamp,
+#          input: tx.input,
           transaction_hash: tt.transaction_hash,
           from_address_hash: tt.from_address_hash,
           to_address_hash: tt.to_address_hash,
           log_index: tt.log_index,
-          tx_index: tt.tx_index,
-          index: tt.index,
           comment: tt.comment,
-          value: fragment("greatest(?, ?)", tt.value, tt.usd_value),
-          token: fragment("(case when ? < 0 then 'cUSD' else 'cGLD' end)", tt.block_number),
-          block_number: fragment("abs(?)", tt.block_number)
+          value: tt.value,
+          token: tt.token,
+          block_number: tt.block_number
         }
       )
-
     from(tt in subquery(result),
-      order_by: [desc: tt.block_number, desc: tt.value, desc: tt.tx_index, desc: tt.log_index, desc: tt.index]
+      order_by: [desc: tt.block_number, desc: tt.value, desc: tt.log_index]
     )
   end
 
