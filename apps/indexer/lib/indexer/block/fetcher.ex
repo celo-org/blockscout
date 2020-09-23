@@ -179,7 +179,12 @@ defmodule Indexer.Block.Fetcher do
             else
               {:ok, nil}
             end},
-         %{token_transfers: celo_token_transfers} = TokenTransfers.parse_tx(transactions_with_receipts, gold_token),
+         %{token_transfers: celo_token_transfers} =
+           (if gold_token_enabled do
+              TokenTransfers.parse_tx(transactions_with_receipts, gold_token)
+            else
+              %{token_transfers: []}
+            end),
          {:read_stable_token_address, {:ok, stable_token}} <-
            {:read_stable_token_address,
             if gold_token_enabled do
