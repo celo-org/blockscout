@@ -1,7 +1,11 @@
 defmodule Explorer.Repo.Migrations.TokenTransferMoreIndices do
   use Ecto.Migration
 
-  def change do
+  def up do
+    execute("""
+    DELETE FROM token_transfers WHERE log_index >= 1000000;
+    """)
+
     create(index(:token_transfers, ["block_number DESC, amount DESC, log_index DESC"]))
 
     create(
@@ -43,5 +47,17 @@ defmodule Explorer.Repo.Migrations.TokenTransferMoreIndices do
       WHERE value > 0 AND call_type <> 'delegatecall' AND index > 0 AND to_address_hash IS NULL
     );
     """)
+  end
+
+  def down do
+    execute("""
+    DELETE FROM token_transfers WHERE log_index >= 1000000;
+    """)
+
+    drop(index(:token_transfers, ["block_number DESC, amount DESC, log_index DESC"]))
+
+    drop(
+      index(:token_transfers, ["block_number DESC, transaction_hash DESC, from_address_hash DESC, to_address_hash DESC"])
+    )
   end
 end
