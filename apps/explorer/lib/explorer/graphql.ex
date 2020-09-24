@@ -256,7 +256,7 @@ defmodule Explorer.GraphQL do
   def txtransfers_query_for_address(address_hash) do
     txtransfers_query()
     |> where([t], t.to_address_hash == ^address_hash or t.from_address_hash == ^address_hash)
-    |> order_by([t], desc: t.block_number, asc: t.nonce)
+    |> order_by([t, _, tx], desc: t.block_number, asc: tx.nonce)
   end
 
   def celo_tx_transfers_query_by_txhash(tx_hash) do
@@ -272,7 +272,7 @@ defmodule Explorer.GraphQL do
   def celo_tx_transfers_query_by_address(address_hash) do
     celo_tx_transfers_query()
     |> where([t], t.from_address_hash == ^address_hash or t.to_address_hash == ^address_hash)
-    |> order_by([t], desc: t.block_number, asc: t.nonce)
+    |> order_by([t, _, tx], desc: t.block_number, asc: tx.nonce)
   end
 
   def txtransfers_query do
