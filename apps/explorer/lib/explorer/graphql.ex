@@ -299,7 +299,6 @@ defmodule Explorer.GraphQL do
         gateway_fee_recipient: tx.gas_fee_recipient_hash,
         timestamp: b.timestamp,
         input: tx.input,
-        nonce: tx.nonce,
         block_number: tt.block_number
       },
       distinct: [desc: tt.block_number, desc: tt.transaction_hash],
@@ -330,6 +329,7 @@ defmodule Explorer.GraphQL do
         value: tt.amount,
         comment: tt.comment,
         token: fragment("(case when ? = 'stableToken' then 'cUSD' else 'cGLD' end)", t.name),
+        nonce: tx.nonce,
         block_number: tt.block_number
       },
       order_by: [desc: tt.block_number, desc: tt.amount, desc: tt.log_index]
