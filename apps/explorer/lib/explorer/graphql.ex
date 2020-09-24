@@ -301,9 +301,9 @@ defmodule Explorer.GraphQL do
         input: tx.input,
         block_number: tt.block_number
       },
-      distinct: [desc: tt.block_number, desc: tt.transaction_hash, desc: tt.from_address_hash, desc: tt.to_address_hash],
+      distinct: [desc: tt.block_number, desc: tt.transaction_hash],
       # to get the ordering from distinct clause, something is needed here too
-      order_by: [desc: tt.block_number]
+      order_by: [desc: tt.from_address_hash, desc: tt.to_address_hash]
     )
   end
 
