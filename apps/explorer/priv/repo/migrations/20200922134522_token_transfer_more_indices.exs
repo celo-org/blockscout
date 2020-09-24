@@ -3,7 +3,7 @@ defmodule Explorer.Repo.Migrations.TokenTransferMoreIndices do
 
   def up do
     execute("""
-    DELETE FROM token_transfers WHERE log_index >= 1000000;
+    DELETE FROM token_transfers WHERE log_index <= -1000000;
     """)
 
     create(index(:token_transfers, ["block_number DESC, amount DESC, log_index DESC"]))
@@ -51,7 +51,7 @@ defmodule Explorer.Repo.Migrations.TokenTransferMoreIndices do
 
   def down do
     execute("""
-    DELETE FROM token_transfers WHERE log_index >= 1000000;
+    DELETE FROM token_transfers WHERE log_index <= -1000000;
     """)
 
     drop(index(:token_transfers, ["block_number DESC, amount DESC, log_index DESC"]))
