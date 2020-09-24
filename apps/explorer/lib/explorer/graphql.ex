@@ -256,6 +256,7 @@ defmodule Explorer.GraphQL do
   def txtransfers_query_for_address(address_hash) do
     txtransfers_query()
     |> where([t], t.to_address_hash == ^address_hash or t.from_address_hash == ^address_hash)
+    |> order_by([t], desc: t.block_number, asc: t.nonce)
   end
 
   def celo_tx_transfers_query_by_txhash(tx_hash) do
@@ -299,6 +300,7 @@ defmodule Explorer.GraphQL do
         gateway_fee_recipient: tx.gas_fee_recipient_hash,
         timestamp: b.timestamp,
         input: tx.input,
+        nonce: tx.nonce,
         block_number: tt.block_number
       },
       distinct: [desc: tt.block_number, desc: tt.transaction_hash],
