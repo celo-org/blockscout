@@ -16,6 +16,6 @@ Also you can add new input parameters for those queries in the `input` folder.
 
 ```bash
 yarn build
-yarn load-testing
+yarn load-testing [-e <environment:alfajores|baklava|mainnet>]
 ```
 
