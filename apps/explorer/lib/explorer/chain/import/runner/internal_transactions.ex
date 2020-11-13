@@ -71,6 +71,13 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
                                                   } ->
       valid_internal_transactions(transactions, internal_transactions_params, invalid_block_numbers)
     end)
+    |> Multi.run(:valid_internal_transactions_without_first_traces_of_trivial_transactions, fn _,
+                                                                                               %{
+                                                                                                 valid_internal_transactions:
+                                                                                                   valid_internal_transactions
+                                                                                               } ->
+      valid_internal_transactions_without_first_trace(valid_internal_transactions)
+    end)
     |> Multi.run(:remove_left_over_internal_transactions, fn repo,
                                                              %{valid_internal_transactions: valid_internal_transactions} ->
       remove_left_over_internal_transactions(repo, valid_internal_transactions)
@@ -257,26 +264,58 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
   end
 
   defp valid_internal_transactions(transactions, internal_transactions_params, invalid_block_numbers) do
-    blocks_map = Map.new(transactions, &{&1.block_number, &1.block_hash})
+    if Enum.count(transactions) > 0 do
+      blocks_map = Map.new(transactions, &{&1.block_number, &1.block_hash})
 
-    valid_internal_txs =
-      internal_transactions_params
-      |> Enum.group_by(& &1.block_number)
-      |> Map.drop(invalid_block_numbers)
-      |> Enum.flat_map(fn {block_number, entries} ->
-        block_hash = Map.fetch!(blocks_map, block_number)
+      valid_internal_txs =
+        internal_transactions_params
+        |> Enum.group_by(& &1.block_number)
+        |> Map.drop(invalid_block_numbers)
+        |> Enum.flat_map(fn item ->
+          case item do
+            {block_number, entries} ->
+              if Map.has_key?(blocks_map, block_number) do
+                block_hash = Map.fetch!(blocks_map, block_number)
 
-        entries
-        |> Enum.sort_by(&{&1.transaction_hash, &1.index})
-        |> Enum.with_index()
-        |> Enum.map(fn {entry, index} ->
-          entry
-          |> Map.put(:block_hash, block_hash)
-          |> Map.put(:block_index, index)
+                entries
+                |> Enum.sort_by(&{&1.transaction_hash, &1.index})
+                |> Enum.with_index()
+                |> Enum.map(fn {entry, index} ->
+                  entry
+                  |> Map.put(:block_hash, block_hash)
+                  |> Map.put(:block_index, index)
+                end)
+              else
+                []
+              end
+
+            _ ->
+              []
+          end
         end)
-      end)
 
-    {:ok, valid_internal_txs}
+      {:ok, valid_internal_txs}
+    else
+      {:ok, []}
+    end
+  end
+
+  defp valid_internal_transactions_without_first_trace(valid_internal_transactions) do
+    json_rpc_named_arguments = Application.fetch_env!(:indexer, :json_rpc_named_arguments)
+    variant = Keyword.fetch!(json_rpc_named_arguments, :variant)
+
+    # we exclude first traces from storing in the DB only in case of Parity variant (Parity/Nethermind). Todo: implement the same for Geth
+    if variant == EthereumJSONRPC.Parity do
+      valid_internal_transactions_without_first_trace =
+        valid_internal_transactions
+        |> Enum.reject(fn trace ->
+          trace[:index] == 0
+        end)
+
+      {:ok, valid_internal_transactions_without_first_trace}
+    else
+      {:ok, valid_internal_transactions}
+    end
   end
 
   def defer_internal_transactions_primary_key(repo) do
@@ -372,17 +411,18 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
   end
 
   defp remove_consensus_of_invalid_blocks(repo, invalid_block_numbers) do
-    update_query =
-      from(
-        b in Block,
-        where: b.number in ^invalid_block_numbers and b.consensus,
-        select: b.hash,
-        # ShareLocks order already enforced by `acquire_blocks` (see docs: sharelocks.md)
-        update: [set: [consensus: false, update_count: b.update_count + 1]]
-      )
+    if Enum.count(invalid_block_numbers) > 0 do
+      update_query =
+        from(
+          b in Block,
+          where: b.number in ^invalid_block_numbers and b.consensus,
+          select: b.hash,
+          # ShareLocks order already enforced by `acquire_blocks` (see docs: sharelocks.md)
+          update: [set: [consensus: false, update_count: b.update_count + 1]]
+        )
 
-    try do
-      {_num, result} = repo.update_all(update_query, [])
+      try do
+        {_num, result} = repo.update_all(update_query, [])
 
       if Enum.count(invalid_block_numbers) > 0 do
         Logger.info(fn ->
@@ -394,10 +434,13 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
         end)
       end
 
-      {:ok, result}
-    rescue
-      postgrex_error in Postgrex.Error ->
-        {:error, %{exception: postgrex_error, invalid_block_numbers: invalid_block_numbers}}
+        {:ok, result}
+      rescue
+        postgrex_error in Postgrex.Error ->
+          {:error, %{exception: postgrex_error, invalid_block_numbers: invalid_block_numbers}}
+      end
+    else
+      {:ok, []}
     end
   end
 
