@@ -3,13 +3,15 @@ defmodule Indexer.Health do
   Check various health attributes of the application
   """
 
+  alias Ecto.Adapters.SQL
 
   @doc """
   Check if app is alive and working, by making a simple
   request to the DB
   """
-  def is_alive? do
-    !!Ecto.Adapters.SQL.query!(Explorer.Repo, "SELECT 1")
+  def alive? do
+    SQL.query!(Explorer.Repo, "SELECT 1")
+    true
   rescue
     _e -> false
   end

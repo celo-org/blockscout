@@ -1,11 +1,14 @@
 defmodule Indexer.Health.Plug do
+  @moduledoc """
+  Plug that exposes health checks as web endpoints.
+  """
+
   import Plug.Conn
   alias Indexer.Health
 
   @behaviour Plug
 
-  @path_liveness  "/health/liveness"
-
+  @path_liveness "/health/liveness"
 
   # Plug Callbacks
   @impl true
@@ -14,8 +17,8 @@ defmodule Indexer.Health.Plug do
   @impl true
   def call(%Plug.Conn{} = conn, _opts) do
     case conn.request_path do
-      @path_liveness  -> health_response(conn, Health.is_alive?())
-      _other          -> not_found_response(conn)
+      @path_liveness -> health_response(conn, Health.alive?())
+      _other -> not_found_response(conn)
     end
   end
 
