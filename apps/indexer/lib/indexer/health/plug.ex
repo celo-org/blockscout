@@ -8,6 +8,7 @@ defmodule Indexer.Health.Plug do
 
   @behaviour Plug
 
+  @path_readiness "/health/readiness"
   @path_liveness "/health/liveness"
 
   # Plug Callbacks
@@ -18,6 +19,7 @@ defmodule Indexer.Health.Plug do
   def call(%Plug.Conn{} = conn, _opts) do
     case conn.request_path do
       @path_liveness -> health_response(conn, Health.alive?())
+      @path_readiness -> health_response(conn, Health.ready?())
       _other -> not_found_response(conn)
     end
   end
