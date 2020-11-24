@@ -98,7 +98,11 @@ defmodule BlockScoutWeb.API.RPC.AddressView do
       "contractAddress" => "#{transaction.created_contract_address_hash}",
       "cumulativeGasUsed" => "#{transaction.cumulative_gas_used}",
       "gasUsed" => "#{transaction.gas_used}",
-      "confirmations" => "#{transaction.confirmations}"
+      "confirmations" => "#{transaction.confirmations}",
+      "gatewayFeeRecipient" =>
+        if(transaction.gas_fee_recipient_hash !== nil, do: "#{transaction.gas_fee_recipient_hash}", else: nil),
+      "gatewayFee" => "#{transaction.gateway_fee}",
+      "feeCurrency" => if(transaction.fee_currency == "stableToken", do: "cUSD", else: "CELO")
     }
   end
 
