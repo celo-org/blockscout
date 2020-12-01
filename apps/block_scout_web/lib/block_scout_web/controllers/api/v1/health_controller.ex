@@ -1,8 +1,7 @@
 defmodule BlockScoutWeb.API.V1.HealthController do
   use BlockScoutWeb, :controller
 
-  alias Explorer.Chain
-  alias Explorer.Health
+  alias Explorer.{Chain, Health}
 
   def health(conn, _) do
     with {:ok, number, timestamp} <- Chain.last_db_block_status(),
