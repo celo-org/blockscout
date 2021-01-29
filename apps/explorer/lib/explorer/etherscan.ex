@@ -8,7 +8,7 @@ defmodule Explorer.Etherscan do
   alias Explorer.Etherscan.Logs
   alias Explorer.{Chain, Repo}
   alias Explorer.Chain.Address.TokenBalance
-  alias Explorer.Chain.{Block, CeloParams, Hash, InternalTransaction, TokenTransfer, Transaction}
+  alias Explorer.Chain.{Block, CeloParams, Hash, InternalTransaction, Log, TokenTransfer, Transaction}
 
   @default_options %{
     order_by_direction: :desc,
@@ -230,6 +230,65 @@ defmodule Explorer.Etherscan do
     end
   end
 
+  @token_transfer_fields ~w(
+    token_contract_address_hash
+    transaction_hash
+    from_address_hash
+    to_address_hash
+    amount
+  )a
+
+  @token_transfer_log_fields ~w(
+    data
+    first_topic
+    second_topic
+    third_topic
+    fourth_topic
+    index
+  )a
+
+  @doc """
+  Gets a list of token transfers within a given block range.
+
+  """
+  @spec list_token_transfers(map()) :: [map()]
+  def list_token_transfers(params) do
+    query =
+      from(
+        t in Transaction,
+        inner_join: tt in TokenTransfer,
+        on: tt.transaction_hash == t.hash and tt.block_number == t.block_number and tt.block_hash == t.block_hash,
+        inner_join: b in assoc(t, :block),
+        left_join: l in Log,
+        on: l.transaction_hash == tt.transaction_hash and l.index == tt.log_index,
+        where:
+          tt.block_number >= ^params.from_block and tt.block_number <= ^params.to_block and
+            tt.token_contract_address_hash == ^params.address_hash,
+        order_by: [
+          {:asc, tt.block_number},
+          {:asc, t.index}
+        ],
+        select: %{
+          block_timestamp: b.timestamp,
+          transaction_index: t.index,
+          log_index: l.index
+        },
+        select_merge: map(l, ^@token_transfer_log_fields),
+        select_merge: map(tt, ^@token_transfer_fields),
+        select_merge:
+          map(t, [
+            :block_number,
+            :gas_price,
+            :gas_currency_hash,
+            :gas_fee_recipient_hash,
+            :gas_used,
+            :gateway_fee
+          ])
+      )
+
+    Repo.all(query)
+  end
+
   @doc """
   Gets a list of blocks mined by `t:Explorer.Chain.Hash.Address.t/0`.
 
@@ -378,14 +437,6 @@ defmodule Explorer.Etherscan do
     |> or_where([t], t.from_address_hash == ^address_hash)
     |> or_where([t], t.created_contract_address_hash == ^address_hash)
   end
-
-  @token_transfer_fields ~w(
-    token_contract_address_hash
-    transaction_hash
-    from_address_hash
-    to_address_hash
-    amount
-  )a
 
   defp list_token_transfers(address_hash, contract_address_hash, block_height, options) do
     query =
