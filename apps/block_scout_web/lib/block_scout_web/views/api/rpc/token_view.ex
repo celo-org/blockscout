@@ -49,6 +49,7 @@ defmodule BlockScoutWeb.API.RPC.TokenView do
     }
   end
 
+  defp integer_to_hex(nil), do: ""
   defp integer_to_hex(integer), do: Integer.to_string(integer, 16)
 
   defp decimal_to_hex(decimal) do
