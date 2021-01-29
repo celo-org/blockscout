@@ -5,14 +5,14 @@ defmodule BlockScoutWeb.API.RPC.TokenController do
 
   def gettoken(conn, params) do
     with {:contractaddress_param, {:ok, contractaddress_param}} <- fetch_contractaddress(params),
-         {:format, {:ok, address_hash}} <- to_address_hash(contractaddress_param),
+         {:format, {:ok, address_hash}} <- {:format, to_address_hash(contractaddress_param)},
          {:token, {:ok, token}} <- {:token, Chain.token_from_address_hash(address_hash)} do
       render(conn, "gettoken.json", %{token: token})
     else
       {:contractaddress_param, :error} ->
         render(conn, :error, error: "Query parameter contractaddress is required")
 
-      {:format, :error} ->
+      {:format, {:error, "address"}} ->
         render(conn, :error, error: "Invalid contractaddress hash")
 
       {:token, {:error, :not_found}} ->
@@ -36,6 +36,9 @@ defmodule BlockScoutWeb.API.RPC.TokenController do
 
       {:token, {:error, :not_found}} ->
         render(conn, :error, error: "contractaddress not found")
+
+      {:error, :not_found} ->
+        render(conn, :error, error: "No transfers found", data: [])
     end
   end
 
@@ -60,25 +63,12 @@ defmodule BlockScoutWeb.API.RPC.TokenController do
     end
   end
 
-  defp get_missing_required_params(fetched_params) do
-    fetched_keys = fetched_params |> Map.keys() |> MapSet.new()
-
-    @required_params.all_of
-    |> MapSet.new()
-    |> MapSet.difference(fetched_keys)
-    |> MapSet.to_list()
-  end
-
-  defp all_of_required_keys_found?(fetched_params) do
-    Enum.all?(@required_params.all_of, &Map.has_key?(fetched_params, &1))
-  end
-
   @doc """
   Prepares params for processing. Returns error tuple if invalid format is
   found.
 
   """
-  @spec to_valid_format(map()) :: {:format, {:ok, map()} | {:error, String.t()}}
+  # @spec to_valid_format(map()) :: {:format, {:ok, map()} | {:error, String.t()}}
   def to_valid_format(params) do
     result =
       with {:ok, from_block} <- to_block_number(params, "fromBlock"),
@@ -97,6 +87,19 @@ defmodule BlockScoutWeb.API.RPC.TokenController do
       end
 
     {:format, result}
+  end
+
+  defp get_missing_required_params(fetched_params) do
+    fetched_keys = fetched_params |> Map.keys() |> MapSet.new()
+
+    @required_params.all_of
+    |> MapSet.new()
+    |> MapSet.difference(fetched_keys)
+    |> MapSet.to_list()
+  end
+
+  defp all_of_required_keys_found?(fetched_params) do
+    Enum.all?(@required_params.all_of, &Map.has_key?(fetched_params, &1))
   end
 
   defp to_block_number(params, param_key) do
