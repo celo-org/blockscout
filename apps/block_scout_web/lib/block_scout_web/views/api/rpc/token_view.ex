@@ -30,6 +30,9 @@ defmodule BlockScoutWeb.API.RPC.TokenView do
 
   defp prepare_token_transfer(token_transfer) do
     %{
+      "amount" => "#{token_transfer.amount}",
+      "fromAddressHash" => "#{token_transfer.from_address_hash}",
+      "toAddressHash" => "#{token_transfer.to_address_hash}",
       "blockNumber" => integer_to_hex(token_transfer.block_number),
       "timeStamp" => datetime_to_hex(token_transfer.block_timestamp),
       "transactionHash" => "#{token_transfer.transaction_hash}",

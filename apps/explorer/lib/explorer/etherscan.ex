@@ -255,14 +255,15 @@ defmodule Explorer.Etherscan do
   def list_token_transfers(params) do
     query =
       from(
-        t in Transaction,
-        inner_join: tt in TokenTransfer,
-        on: tt.transaction_hash == t.hash and tt.block_number == t.block_number and tt.block_hash == t.block_hash,
-        inner_join: b in assoc(t, :block),
+        b in Block,
+        left_join: t in Transaction,
+        on: t.block_number == b.number,
         left_join: l in Log,
-        on: l.transaction_hash == tt.transaction_hash and l.index == tt.log_index,
+        on: l.transaction_hash == t.hash and l.address_hash == ^params.address_hash,
+        inner_join: tt in TokenTransfer,
+        on: tt.transaction_hash == t.hash,
         where:
-          tt.block_number >= ^params.from_block and tt.block_number <= ^params.to_block and
+          b.number >= ^params.from_block and b.number <= ^params.to_block and
             tt.token_contract_address_hash == ^params.address_hash,
         order_by: [
           {:asc, tt.block_number},
