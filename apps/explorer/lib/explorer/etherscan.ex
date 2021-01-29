@@ -230,23 +230,6 @@ defmodule Explorer.Etherscan do
     end
   end
 
-  @token_transfer_fields ~w(
-    token_contract_address_hash
-    transaction_hash
-    from_address_hash
-    to_address_hash
-    amount
-  )a
-
-  @token_transfer_log_fields ~w(
-    data
-    first_topic
-    second_topic
-    third_topic
-    fourth_topic
-    index
-  )a
-
   @doc """
   Gets a list of token transfers within a given block range.
 
@@ -258,10 +241,10 @@ defmodule Explorer.Etherscan do
         b in Block,
         left_join: t in Transaction,
         on: t.block_number == b.number,
+        left_join: tt in TokenTransfer,
+        on: tt.transaction_hash == t.hash,
         left_join: l in Log,
         on: l.transaction_hash == t.hash and l.address_hash == ^params.address_hash,
-        inner_join: tt in TokenTransfer,
-        on: tt.transaction_hash == t.hash,
         where:
           b.number >= ^params.from_block and b.number <= ^params.to_block and
             tt.token_contract_address_hash == ^params.address_hash,
@@ -270,12 +253,20 @@ defmodule Explorer.Etherscan do
           {:asc, t.index}
         ],
         select: %{
+          token_contract_address_hash: tt.token_contract_address_hash,
+          transaction_hash: tt.transaction_hash,
+          from_address_hash: tt.from_address_hash,
+          to_address_hash: tt.to_address_hash,
+          amount: tt.amount,
           block_timestamp: b.timestamp,
           transaction_index: t.index,
-          log_index: l.index
+          log_index: l.index,
+          data: l.data,
+          first_topic: l.first_topic,
+          second_topic: l.second_topic,
+          third_topic: l.third_topic,
+          fourth_topic: l.fourth_topic
         },
-        select_merge: map(l, ^@token_transfer_log_fields),
-        select_merge: map(tt, ^@token_transfer_fields),
         select_merge:
           map(t, [
             :block_number,
@@ -438,6 +429,14 @@ defmodule Explorer.Etherscan do
     |> or_where([t], t.from_address_hash == ^address_hash)
     |> or_where([t], t.created_contract_address_hash == ^address_hash)
   end
+
+  @token_transfer_fields ~w(
+    token_contract_address_hash
+    transaction_hash
+    from_address_hash
+    to_address_hash
+    amount
+  )a
 
   defp list_token_transfers(address_hash, contract_address_hash, block_height, options) do
     query =
