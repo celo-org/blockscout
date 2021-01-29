@@ -115,9 +115,9 @@ defmodule BlockScoutWeb.API.RPC.TokenControllerTest do
       }
 
       assert response =
-              conn
-              |> get("/api", params)
-              |> json_response(200)
+               conn
+               |> get("/api", params)
+               |> json_response(200)
 
       assert response["message"] =~ "Invalid address format"
       assert response["status"] == "0"
@@ -135,9 +135,9 @@ defmodule BlockScoutWeb.API.RPC.TokenControllerTest do
       }
 
       assert response =
-              conn
-              |> get("/api", params)
-              |> json_response(200)
+               conn
+               |> get("/api", params)
+               |> json_response(200)
 
       assert response["message"] =~ "Invalid fromBlock format"
       assert response["status"] == "0"
@@ -155,9 +155,9 @@ defmodule BlockScoutWeb.API.RPC.TokenControllerTest do
       }
 
       assert response =
-              conn
-              |> get("/api", params)
-              |> json_response(200)
+               conn
+               |> get("/api", params)
+               |> json_response(200)
 
       assert response["message"] =~ "Invalid toBlock format"
       assert response["status"] == "0"
@@ -175,9 +175,9 @@ defmodule BlockScoutWeb.API.RPC.TokenControllerTest do
       }
 
       assert response =
-              conn
-              |> get("/api", params)
-              |> json_response(200)
+               conn
+               |> get("/api", params)
+               |> json_response(200)
 
       assert response["message"] =~ "contractaddress not found"
       assert response["status"] == "0"
@@ -237,9 +237,9 @@ defmodule BlockScoutWeb.API.RPC.TokenControllerTest do
       ]
 
       assert response =
-              conn
-              |> get("/api", params)
-              |> json_response(200)
+               conn
+               |> get("/api", params)
+               |> json_response(200)
 
       assert response["result"] == expected_result
       assert response["status"] == "1"
@@ -296,9 +296,9 @@ defmodule BlockScoutWeb.API.RPC.TokenControllerTest do
       ]
 
       assert response =
-              conn
-              |> get("/api", params)
-              |> json_response(200)
+               conn
+               |> get("/api", params)
+               |> json_response(200)
 
       assert response["result"] == expected_result
       assert response["status"] == "1"
@@ -307,11 +307,11 @@ defmodule BlockScoutWeb.API.RPC.TokenControllerTest do
   end
 
   defp get_topics(%Log{
-      first_topic: first_topic,
-      second_topic: second_topic,
-      third_topic: third_topic,
-      fourth_topic: fourth_topic
-    }) do
+         first_topic: first_topic,
+         second_topic: second_topic,
+         third_topic: third_topic,
+         fourth_topic: fourth_topic
+       }) do
     [first_topic, second_topic, third_topic, fourth_topic]
   end
 
