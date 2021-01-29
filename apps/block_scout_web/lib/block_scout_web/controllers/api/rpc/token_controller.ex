@@ -68,7 +68,7 @@ defmodule BlockScoutWeb.API.RPC.TokenController do
   found.
 
   """
-  # @spec to_valid_format(map()) :: {:format, {:ok, map()} | {:error, String.t()}}
+  @spec to_valid_format(map()) :: {:format, {:ok, map()} | {:error, String.t()}}
   def to_valid_format(params) do
     result =
       with {:ok, from_block} <- to_block_number(params, "fromBlock"),
