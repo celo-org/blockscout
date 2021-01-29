@@ -28,11 +28,6 @@ defmodule BlockScoutWeb.API.RPC.TokenView do
     }
   end
 
-  # {
-
-  #     "data": "0x0000000000000000000000000000000000000000000000000000000000000001",
-  #   }
-
   defp prepare_token_transfer(token_transfer) do
     %{
       "blockNumber" => integer_to_hex(token_transfer.block_number),
