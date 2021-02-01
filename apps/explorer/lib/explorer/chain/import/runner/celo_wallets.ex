@@ -41,7 +41,7 @@ defmodule Explorer.Chain.Import.Runner.CeloWallets do
     |> Multi.run(:acquire_all_items, fn repo, _ ->
       acquire_all_items(repo)
     end)
-    |> Multi.run(:insert_items, fn repo, _ ->
+    |> Multi.run(:insert_wallets, fn repo, _ ->
       insert(repo, changes_list, insert_options)
     end)
   end
