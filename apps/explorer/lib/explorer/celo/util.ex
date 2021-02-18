@@ -79,4 +79,12 @@ defmodule Explorer.Celo.Util do
       _ -> :error
     end
   end
+
+  def contract_name_to_symbol(name) do
+    case name do
+      "stableToken" -> "cUSD"
+      "stableTokenEUR" -> "cEUR"
+      _ -> "CELO"
+    end
+  end
 end
