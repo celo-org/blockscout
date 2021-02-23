@@ -13,6 +13,8 @@ defmodule Explorer.GraphQL do
       where: 3
     ]
 
+  alias Explorer.Celo.Util
+
   alias Explorer.Chain.{
     Address,
     Block,
@@ -29,7 +31,6 @@ defmodule Explorer.GraphQL do
   }
 
   alias Explorer.{Chain, Repo}
-  alias Explorer.Celo.Util
 
   alias Explorer.Chain.Address.CoinBalance
 
@@ -327,15 +328,18 @@ defmodule Explorer.GraphQL do
       join: t in CeloParams,
       where: tt.token_contract_address_hash == t.address_value,
       where: t.name in ^token_contract_names,
-      inner_join: tkn in fragment("""
-        (
-          WITH token_names AS (
-            SELECT contract_name, token_symbol FROM unnest(?::text[], ?::text[]) t (contract_name, token_symbol)
-          ) SELECT * FROM token_names
-        )
-        """,
-        ^token_contract_names, ^token_symbols
-      ),
+      inner_join:
+        tkn in fragment(
+          """
+          (
+            WITH token_names AS (
+              SELECT contract_name, token_symbol FROM unnest(?::text[], ?::text[]) t (contract_name, token_symbol)
+            ) SELECT * FROM token_names
+          )
+          """,
+          ^token_contract_names,
+          ^token_symbols
+        ),
       on: t.name == tkn.contract_name,
       inner_join: tx in Transaction,
       on: tx.hash == tt.transaction_hash,

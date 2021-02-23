@@ -16,8 +16,8 @@ defmodule BlockScoutWeb.Resolvers.CeloParameters do
        %{
          celo_token: celo,
          stable_tokens: %{
-            cusd: usd,
-            ceur: eur
+           cusd: usd,
+           ceur: eur
          },
          total_locked_gold: locked,
          min_electable_validators: min_validators.value,

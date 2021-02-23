@@ -10,7 +10,8 @@ defmodule Explorer.Celo.Util do
   @celo_token_contract_symbols %{
     stableToken: "cUSD",
     stableTokenEUR: "cEUR",
-    goldToken: "cGLD" # old symbol, needs to be updated to CELO
+    # old symbol, needs to be updated to CELO
+    goldToken: "cGLD"
   }
 
   def call_methods(methods) do
