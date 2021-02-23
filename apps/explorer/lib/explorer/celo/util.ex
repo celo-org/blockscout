@@ -7,6 +7,12 @@ defmodule Explorer.Celo.Util do
   alias Explorer.Celo.AbiHandler
   alias Explorer.SmartContract.Reader
 
+  @celo_token_contract_symbols %{
+    stableToken: "cUSD",
+    stableTokenEUR: "cEUR",
+    goldToken: "cGLD" # old symbol, needs to be updated to CELO
+  }
+
   def call_methods(methods) do
     contract_abi = AbiHandler.get_abi()
 
@@ -79,6 +85,14 @@ defmodule Explorer.Celo.Util do
       {:ok, [address]} -> {:ok, address}
       _ -> :error
     end
+  end
+
+  def get_token_contract_names do
+    Enum.map(Map.keys(@celo_token_contract_symbols), &Atom.to_string/1)
+  end
+
+  def get_token_contract_symbols do
+    Map.values(@celo_token_contract_symbols)
   end
 
   def contract_name_to_symbol(name) do
