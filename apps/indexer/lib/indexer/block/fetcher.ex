@@ -193,16 +193,16 @@ defmodule Indexer.Block.Fetcher do
          %{token_transfers: normal_token_transfers, tokens: normal_tokens} = TokenTransfers.parse(logs),
          try_celo_token_enabled = config(:enable_gold_token),
          {:ok,
-          tokens = %{
+          %{
             celo: celo_token,
             cusd: stable_token_usd,
-            ceur: stable_token_eur
+            ceur: _
           }, oracle_address,
           celo_token_enabled} <-
            (if try_celo_token_enabled do
               read_addresses()
             else
-              {:ok, nil, nil, false}
+              {:ok, %{celo: nil, cusd: nil, ceur: nil}, nil, false}
             end),
          %{token_transfers: celo_token_transfers} =
            (if celo_token_enabled do
