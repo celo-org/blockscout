@@ -8,10 +8,10 @@ defmodule Explorer.Celo.Util do
   alias Explorer.SmartContract.Reader
 
   @celo_token_contract_symbols %{
-    stableToken: "cUSD",
-    stableTokenEUR: "cEUR",
-    # old symbol, needs to be updated to CELO
-    goldToken: "cGLD"
+    "stableToken" => "cUSD",
+    "stableTokenEUR" => "cEUR",
+    # cGLD is the old symbol, needs to be updated to CELO
+    "goldToken" => "cGLD"
   }
 
   def call_methods(methods) do
@@ -89,18 +89,20 @@ defmodule Explorer.Celo.Util do
   end
 
   def get_token_contract_names do
-    Enum.map(Map.keys(@celo_token_contract_symbols), &Atom.to_string/1)
+    Map.keys(@celo_token_contract_symbols)
   end
 
   def get_token_contract_symbols do
     Map.values(@celo_token_contract_symbols)
   end
 
-  def contract_name_to_symbol(name) do
+  def contract_name_to_symbol(name, use_celo_instead_cgld?) do
     case name do
-      "stableToken" -> "cUSD"
-      "stableTokenEUR" -> "cEUR"
-      _ -> "CELO"
+      n when n in [nil, "goldToken"] ->
+        if(use_celo_instead_cgld?, do: "CELO", else: "cGLD")
+
+      _ ->
+        @celo_token_contract_symbols[name]
     end
   end
 end

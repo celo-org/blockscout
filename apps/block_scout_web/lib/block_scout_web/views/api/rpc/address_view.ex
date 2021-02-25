@@ -123,7 +123,7 @@ defmodule BlockScoutWeb.API.RPC.AddressView do
       "confirmations" => "#{transaction.confirmations}",
       "gatewayFeeRecipient" => "#{transaction.gas_fee_recipient_hash}",
       "gatewayFee" => "#{transaction.gateway_fee}",
-      "feeCurrency" => Util.contract_name_to_symbol(transaction.fee_currency)
+      "feeCurrency" => Util.contract_name_to_symbol(transaction.fee_currency, true)
     }
   end
 
