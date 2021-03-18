@@ -2542,7 +2542,7 @@ defmodule Explorer.Chain do
       )
 
     query
-    |> Repo.all()
+    |> Repo.all(timeout: :infinity)
   end
 
   @doc """
