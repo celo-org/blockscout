@@ -4,6 +4,7 @@ defmodule Explorer.Chain.Import.Runner.Blocks do
   """
 
   require Ecto.Query
+  require Logger
 
   import Ecto.Query, only: [from: 2, subquery: 1]
 
@@ -47,10 +48,20 @@ defmodule Explorer.Chain.Import.Runner.Blocks do
     hashes = Enum.map(changes_list, & &1.hash)
     consensus_block_numbers = consensus_block_numbers(changes_list)
 
+    if Enum.count(consensus_block_numbers) > 0 do
+      Logger.info(fn -> ["Adding blocks ", inspect(consensus_block_numbers)] end)
+    end
+
     # Enforce ShareLocks tables order (see docs: sharelocks.md)
     multi
     |> Multi.run(:lose_consensus, fn repo, _ ->
-      lose_consensus(repo, hashes, consensus_block_numbers, changes_list, insert_options)
+      {:ok, res} = lose_consensus(repo, hashes, consensus_block_numbers, changes_list, insert_options)
+
+      if Enum.count(res) > 0 do
+        Logger.info(fn -> ["Losing consensus", inspect(res)] end)
+      end
+
+      {:ok, res}
     end)
     |> Multi.run(:blocks, fn repo, _ ->
       # Note, needs to be executed after `lose_consensus` for lock acquisition
