@@ -250,7 +250,7 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
       |> MapSet.difference(common_tuples)
       |> MapSet.new(fn {_hash, block_number} -> block_number end)
       |> MapSet.to_list()
-    
+
     if Enum.count(invalid_numbers) > 0 do
       Logger.info(fn -> ["Found invalid from ", inspect({transactions, internal_transactions_params})] end)
     end
