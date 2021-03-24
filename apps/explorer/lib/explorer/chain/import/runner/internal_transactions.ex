@@ -233,29 +233,27 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
     # Finds all mistmatches between transactions and internal transactions
     # for a block number:
     # - there are no internal txs for some transactions
-    # - there are no transactions for some internal transactions
     # - there are internal txs with a different block number than their transactions
     # Returns block numbers where any of these issues is found
 
-    required_tuples = MapSet.new(transactions, &{&1.hash, &1.block_number})
+    # Note: the case "# - there are no transactions for some internal transactions" was removed because it caused the issue https://github.com/poanetwork/blockscout/issues/3367
+    # when the last block with transactions loses consensus in endless loop. In order to return this case:
+    # common_tuples = MapSet.intersection(required_tuples, candidate_tuples) #should be added
+    # |> MapSet.difference(internal_transactions_tuples) should be replaced with |> MapSet.difference(common_tuples)
 
-    candidate_tuples = MapSet.new(internal_transactions_params, &{&1.transaction_hash, &1.block_number})
+    transactions_tuples = MapSet.new(transactions, &{&1.hash, &1.block_number})
 
-    all_tuples = MapSet.union(required_tuples, candidate_tuples)
+    internal_transactions_tuples = MapSet.new(internal_transactions_params, &{&1.transaction_hash, &1.block_number})
 
-    common_tuples = MapSet.intersection(required_tuples, candidate_tuples)
+    all_tuples = MapSet.union(transactions_tuples, internal_transactions_tuples)
 
-    invalid_numbers =
+    invalid_block_numbers =
       all_tuples
-      |> MapSet.difference(common_tuples)
+      |> MapSet.difference(internal_transactions_tuples)
       |> MapSet.new(fn {_hash, block_number} -> block_number end)
       |> MapSet.to_list()
 
-    if Enum.count(invalid_numbers) > 0 do
-      Logger.info(fn -> ["Found invalid from ", inspect({transactions, internal_transactions_params})] end)
-    end
-
-    {:ok, invalid_numbers}
+    {:ok, invalid_block_numbers}
   end
 
   defp valid_internal_transactions(transactions, internal_transactions_params, invalid_block_numbers) do
