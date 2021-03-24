@@ -121,41 +121,56 @@ defmodule Indexer.Fetcher.InternalTransaction do
           error_count: unique_numbers_count
         )
 
-        errored =
-          reason
-          |> Enum.map(fn
-            %{data: %{block_number: num}} -> num
-            %{data: %{"blockNumber" => num}} -> num
-          end)
+        # errored =
+        #  reason
+        #  |> Enum.map(fn
+        #    %{data: %{block_number: num}} -> num
+        #    %{data: %{"blockNumber" => num}} -> num
+        #  end)
 
-        result = Chain.bump_pending_blocks(errored)
+        # result = Chain.bump_pending_blocks(errored)
 
-        Logger.error(fn -> ["Bumping", inspect(result)] end)
+        # Logger.error(fn -> ["Bumping", inspect(result)] end)
         # re-queue the de-duped entries
-        # {:retry, unique_numbers}
-        :ok
+        {:retry, unique_numbers}
+
+      # :ok
 
       :ignore ->
         :ok
     end
   end
 
+  defp check_db(num, used_gas, res) do
+    if num != 0 || Decimal.to_integer(used_gas) do
+      {:ok, res}
+    else
+      {:error, :block_not_indexed_properly}
+    end
+  end
+
+  defp add_block_hash(block_hash, internal_transactions) do
+    Enum.map(internal_transactions, fn a -> Map.put(a, :block_hash, block_hash) end)
+  end
+
   defp fetch_block_internal_transactions_by_transactions(unique_numbers, json_rpc_named_arguments) do
     Enum.reduce(unique_numbers, {:ok, []}, fn
       block_number, {:ok, acc_list} ->
+        block = Chain.number_to_block(block_number)
+
         block_number
         |> Chain.get_transactions_of_block_number()
         |> Enum.map(&params(&1))
         |> case do
           [] ->
-            {nil, {:ok, []}, 0}
+            {nil, {:ok, []}, 0, block}
 
           [%{block_hash: block_hash} | _] = transactions ->
             res = EthereumJSONRPC.fetch_internal_transactions(transactions, json_rpc_named_arguments)
-            {block_hash, res, Enum.count(transactions)}
+            {block_hash, res, Enum.count(transactions), block}
         end
         |> case do
-          {block_hash, {:ok, internal_transactions}, num} ->
+          {block_hash, {:ok, internal_transactions}, num, {:ok, %{gas_used: used_gas}}} ->
             Logger.info(fn ->
               [
                 "Found ",
@@ -163,13 +178,17 @@ defmodule Indexer.Fetcher.InternalTransaction do
                 " internal tx for block ",
                 inspect(block_number),
                 " had txs: ",
-                inspect(num)
+                inspect(num),
+                " used gas ",
+                inspect(used_gas)
               ]
             end)
 
-            {:ok, Enum.map(internal_transactions, fn a -> Map.put(a, :block_hash, block_hash) end) ++ acc_list}
+            res = add_block_hash(block_hash, internal_transactions) ++ acc_list
 
-          {_, error_or_ignore, _} ->
+            check_db(num, used_gas, res)
+
+          {_, error_or_ignore, _, _} ->
             error_or_ignore
         end
 
