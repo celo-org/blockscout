@@ -142,7 +142,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
   end
 
   defp check_db(num, used_gas, res) do
-    if num != 0 || Decimal.to_integer(used_gas) do
+    if num != 0 || Decimal.to_integer(used_gas) == 0 do
       {:ok, res}
     else
       {:error, :block_not_indexed_properly}
@@ -186,7 +186,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
             res = add_block_hash(block_hash, internal_transactions) ++ acc_list
 
-            check_db(num, used_gas, res)
+            check_db(num, Decimal.new(used_gas), res)
 
           {_, error_or_ignore, _, _} ->
             error_or_ignore
