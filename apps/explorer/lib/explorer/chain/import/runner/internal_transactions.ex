@@ -36,6 +36,8 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
 
   @impl Runner
   def run(multi, changes_list, %{timestamps: timestamps} = options) when is_map(options) do
+    Logger.info(fn -> ["Internal txs ", inspect(Enum.count(changes_list))] end)
+
     insert_options =
       options
       |> Map.get(option_key(), %{})
@@ -192,7 +194,7 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
   end
 
   defp acquire_blocks(repo, changes_list) do
-    block_numbers = Enum.map(changes_list, & &1.block_number)
+    block_numbers = Enum.map(changes_list, & &1.block_number) |> Enum.dedup()
 
     query =
       from(
@@ -204,7 +206,13 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
         lock: "FOR UPDATE"
       )
 
-    {:ok, repo.all(query)}
+    res = repo.all(query)
+
+    if Enum.count(block_numbers) != Enum.count(res) do
+      Logger.info(fn -> ["Blocks ", inspect(block_numbers), "  found ", inspect(res)] end)
+    end
+
+    {:ok, res}
   end
 
   defp acquire_pending_internal_txs(repo, block_hashes) do
@@ -219,7 +227,13 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
         lock: "FOR UPDATE"
       )
 
-    {:ok, repo.all(query)}
+    res = repo.all(query)
+
+    #    if Enum.count(block_hashes) != Enum.count(res) do
+    #      Logger.info(fn -> ["Blocks ", inspect(block_hashes), " with pending ops ", inspect(res)] end)
+    #    end
+
+    {:ok, res}
   end
 
   defp acquire_transactions(repo, pending_block_hashes) do
@@ -259,6 +273,12 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
       |> MapSet.difference(internal_transactions_tuples)
       |> MapSet.new(fn {_hash, block_number} -> block_number end)
       |> MapSet.to_list()
+
+    if Enum.count(invalid_block_numbers) > 0 do
+      Logger.info(fn ->
+        ["Transactions ", inspect(transactions_tuples), " internal ", inspect(internal_transactions_tuples)]
+      end)
+    end
 
     {:ok, invalid_block_numbers}
   end

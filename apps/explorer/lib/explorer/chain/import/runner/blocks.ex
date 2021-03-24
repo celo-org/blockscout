@@ -48,9 +48,9 @@ defmodule Explorer.Chain.Import.Runner.Blocks do
     hashes = Enum.map(changes_list, & &1.hash)
     consensus_block_numbers = consensus_block_numbers(changes_list)
 
-    if Enum.count(consensus_block_numbers) > 0 do
-      Logger.info(fn -> ["Adding blocks ", inspect(consensus_block_numbers)] end)
-    end
+    # if Enum.count(consensus_block_numbers) > 0 do
+    #  Logger.info(fn -> ["Adding blocks ", inspect(consensus_block_numbers)] end)
+    # end
 
     # Enforce ShareLocks tables order (see docs: sharelocks.md)
     multi
