@@ -203,6 +203,10 @@ defmodule Indexer.Fetcher.InternalTransaction do
         _ -> []
       end
 
+    if Enum.count(token_transfers) > 0 do
+      Logger.info(fn -> ["Internal txs with CELO transfers detected"] end)
+    end
+
     address_hash_to_block_number =
       Enum.into(addresses_params, %{}, fn %{fetched_coin_balance_block_number: block_number, hash: hash} ->
         {hash, block_number}
