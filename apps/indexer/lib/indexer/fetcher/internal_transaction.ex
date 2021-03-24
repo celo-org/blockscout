@@ -155,6 +155,10 @@ defmodule Indexer.Fetcher.InternalTransaction do
         end
         |> case do
           {block_hash, {:ok, internal_transactions}} ->
+            Logger.info(fn ->
+              ["Found ", inspect(Enum.count(internal_transactions)), " internal tx for block ", inspect(block_number)]
+            end)
+
             {:ok, Enum.map(internal_transactions, fn a -> Map.put(a, :block_hash, block_hash) end) ++ acc_list}
 
           {_, error_or_ignore} ->
