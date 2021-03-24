@@ -148,20 +148,28 @@ defmodule Indexer.Fetcher.InternalTransaction do
         |> Enum.map(&params(&1))
         |> case do
           [] ->
-            {nil, {:ok, []}}
+            {nil, {:ok, []}, 0}
 
           [%{block_hash: block_hash} | _] = transactions ->
-            {block_hash, EthereumJSONRPC.fetch_internal_transactions(transactions, json_rpc_named_arguments)}
+            res = EthereumJSONRPC.fetch_internal_transactions(transactions, json_rpc_named_arguments)
+            {block_hash, res, Enum.count(transactions)}
         end
         |> case do
-          {block_hash, {:ok, internal_transactions}} ->
+          {block_hash, {:ok, internal_transactions}, num} ->
             Logger.info(fn ->
-              ["Found ", inspect(Enum.count(internal_transactions)), " internal tx for block ", inspect(block_number)]
+              [
+                "Found ",
+                inspect(Enum.count(internal_transactions)),
+                " internal tx for block ",
+                inspect(block_number),
+                " had txs: ",
+                inspect(num)
+              ]
             end)
 
             {:ok, Enum.map(internal_transactions, fn a -> Map.put(a, :block_hash, block_hash) end) ++ acc_list}
 
-          {_, error_or_ignore} ->
+          {_, error_or_ignore, _} ->
             error_or_ignore
         end
 
