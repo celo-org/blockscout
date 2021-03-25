@@ -36,7 +36,7 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
 
   @impl Runner
   def run(multi, changes_list, %{timestamps: timestamps} = options) when is_map(options) do
-    Logger.info(fn -> ["Internal txs ", inspect(Enum.count(changes_list))] end)
+    Logger.debug(fn -> ["Internal txs ", inspect(Enum.count(changes_list))] end)
 
     insert_options =
       options
@@ -209,7 +209,7 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
     res = repo.all(query)
 
     if Enum.count(block_numbers) != Enum.count(res) do
-      Logger.info(fn -> ["Blocks ", inspect(block_numbers), "  found ", inspect(res)] end)
+      Logger.debug(fn -> ["Blocks ", inspect(block_numbers), "  found ", inspect(res)] end)
     end
 
     {:ok, res}
@@ -228,10 +228,6 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
       )
 
     res = repo.all(query)
-
-    #    if Enum.count(block_hashes) != Enum.count(res) do
-    #      Logger.info(fn -> ["Blocks ", inspect(block_hashes), " with pending ops ", inspect(res)] end)
-    #    end
 
     {:ok, res}
   end
@@ -275,7 +271,7 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
       |> MapSet.to_list()
 
     if Enum.count(invalid_block_numbers) > 0 do
-      Logger.info(fn ->
+      Logger.debug(fn ->
         ["Transactions ", inspect(transactions_tuples), " internal ", inspect(internal_transactions_tuples)]
       end)
     end
@@ -445,7 +441,7 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
         {_num, result} = repo.update_all(update_query, [])
 
         if Enum.count(invalid_block_numbers) > 0 do
-          Logger.info(fn ->
+          Logger.debug(fn ->
             [
               "consensus removed from blocks with numbers: ",
               inspect(invalid_block_numbers),

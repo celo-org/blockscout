@@ -171,7 +171,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
         end
         |> case do
           {block_hash, {:ok, internal_transactions}, num, {:ok, %{gas_used: used_gas}}} ->
-            Logger.info(fn ->
+            Logger.debug(fn ->
               [
                 "Found ",
                 inspect(Enum.count(internal_transactions)),
@@ -233,10 +233,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
       else
         _ -> []
       end
-
-    if Enum.count(token_transfers) > 0 do
-      Logger.info(fn -> ["Internal txs with CELO transfers detected"] end)
-    end
 
     address_hash_to_block_number =
       Enum.into(addresses_params, %{}, fn %{fetched_coin_balance_block_number: block_number, hash: hash} ->
