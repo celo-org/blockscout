@@ -75,8 +75,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
   @impl BufferedTask
   def init(initial, reducer, _json_rpc_named_arguments) do
-    IO.inspect("Initialize stream")
-
     {:ok, final} =
       Chain.stream_blocks_with_unfetched_internal_transactions(initial, fn block_number, acc ->
         reducer.(block_number, acc)
@@ -98,7 +96,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
               tracer: Tracer
             )
   def run(block_numbers, json_rpc_named_arguments) do
-    IO.inspect({:blocks, block_numbers})
     unique_numbers = Enum.uniq(block_numbers)
 
     unique_numbers_count = Enum.count(unique_numbers)
