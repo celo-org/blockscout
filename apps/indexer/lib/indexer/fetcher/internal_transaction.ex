@@ -158,7 +158,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
         end
         |> case do
           {block_hash, {:ok, internal_transactions}, num, {:ok, %{gas_used: used_gas}}} ->
-            Logger.debug(fn ->
+            Logger.info(fn ->
               [
                 "Found ",
                 inspect(Enum.count(internal_transactions)),
