@@ -281,6 +281,10 @@ defmodule Indexer.BufferedTask do
     {:noreply, drop_task_and_retry(state, ref)}
   end
 
+  def handle_info({:retry_delay, batch}, state) do
+    {:noreply, push_back(state, batch)}
+  end
+
   def handle_call({:buffer, entries}, _from, state) do
     {:reply, :ok, buffer_entries(state, entries)}
   end
@@ -332,10 +336,10 @@ defmodule Indexer.BufferedTask do
 
   defp drop_task_and_retry(%BufferedTask{task_ref_to_batch: task_ref_to_batch} = state, ref, new_batch \\ nil) do
     batch = Map.fetch!(task_ref_to_batch, ref)
+#    Process.send_after(self(), {:retry_delay, new_batch || batch}, :timer.seconds(1))
 
     state
     |> drop_task(ref)
-    |> push_back(new_batch || batch)
   end
 
   defp buffer_entries(state, []), do: state
