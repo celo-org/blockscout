@@ -76,6 +76,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
   @impl BufferedTask
   def init(initial, reducer, _json_rpc_named_arguments) do
     IO.inspect("Initialize stream")
+
     {:ok, final} =
       Chain.stream_blocks_with_unfetched_internal_transactions(initial, fn block_number, acc ->
         reducer.(block_number, acc)
@@ -123,7 +124,8 @@ defmodule Indexer.Fetcher.InternalTransaction do
           error_count: unique_numbers_count
         )
 
-        :ok # {:retry, unique_numbers}
+        # {:retry, unique_numbers}
+        :ok
 
       :ignore ->
         :ok
@@ -131,7 +133,8 @@ defmodule Indexer.Fetcher.InternalTransaction do
   end
 
   defp check_db(num, used_gas, res) do
-    if Enum.random(0..3) != 0 && (num != 0 || Decimal.to_integer(used_gas) == 0) do
+    # if Enum.random(0..10) != 0 && (num != 0 || Decimal.to_integer(used_gas) == 0) do
+    if num != 0 || Decimal.to_integer(used_gas) == 0 do
       {:ok, res}
     else
       {:error, :block_not_indexed_properly}
