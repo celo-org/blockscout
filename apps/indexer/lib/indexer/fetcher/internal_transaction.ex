@@ -116,7 +116,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
       {:ok, internal_transactions_params} ->
         import_internal_transaction(internal_transactions_params, unique_numbers)
 
-      {:error, :block_not_indexed_properly} ->
+      {:error, :block_not_indexed_properly = reason} ->
         Logger.debug(fn -> ["failed to fetch internal transactions for blocks: ", inspect(reason)] end,
           error_count: unique_numbers_count
         )
