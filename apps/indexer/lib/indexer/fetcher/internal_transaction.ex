@@ -116,6 +116,14 @@ defmodule Indexer.Fetcher.InternalTransaction do
       {:ok, internal_transactions_params} ->
         import_internal_transaction(internal_transactions_params, unique_numbers)
 
+      {:error, :block_not_indexed_properly} ->
+        Logger.debug(fn -> ["failed to fetch internal transactions for blocks: ", inspect(reason)] end,
+          error_count: unique_numbers_count
+        )
+
+        # {:retry, unique_numbers}
+        :ok
+
       {:error, reason} ->
         Logger.error(fn -> ["failed to fetch internal transactions for blocks: ", inspect(reason)] end,
           error_count: unique_numbers_count
@@ -160,7 +168,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
         end
         |> case do
           {{:ok, internal_transactions}, num, {:ok, %{gas_used: used_gas, hash: block_hash}}} ->
-            Logger.info(fn ->
+            Logger.debug(fn ->
               [
                 "Found ",
                 inspect(Enum.count(internal_transactions)),
