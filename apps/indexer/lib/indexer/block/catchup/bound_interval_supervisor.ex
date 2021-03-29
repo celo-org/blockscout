@@ -237,6 +237,10 @@ defmodule Indexer.Block.Catchup.BoundIntervalSupervisor do
       Repo.query!("refresh materialized view celo_attestation_stats;")
       Repo.query!("refresh materialized view celo_wallet_accounts;")
 
+      Repo.query!(
+        "delete from blocks as b where number < (select max(number) from blocks) and b.gas_used > 0 and (select count(*) from transactions where b.hash = block_hash) = 0"
+      )
+
       Logger.info(fn ->
         ["Refreshed material views."]
       end)
