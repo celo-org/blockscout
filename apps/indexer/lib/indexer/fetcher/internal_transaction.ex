@@ -121,7 +121,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
           error_count: unique_numbers_count
         )
 
-        # {:retry, unique_numbers}
         :ok
 
       {:error, reason} ->
@@ -129,7 +128,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
           error_count: unique_numbers_count
         )
 
-        # {:retry, unique_numbers}
         :ok
 
       :ignore ->
@@ -138,7 +136,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
   end
 
   defp check_db(num, used_gas, res) do
-    # if Enum.random(0..10) != 0 && (num != 0 || Decimal.to_integer(used_gas) == 0) do
     if num != 0 || Decimal.to_integer(used_gas) == 0 do
       {:ok, res}
     else
