@@ -14,7 +14,7 @@ defmodule Indexer.PendingTransactionsSanitizer do
   alias Explorer.{Chain, Repo}
   alias Explorer.Chain.Import.Runner.Blocks
 
-  @interval :timer.hours(3)
+  @interval :timer.minutes(10)
 
   defstruct interval: @interval,
             json_rpc_named_arguments: []
