@@ -5,12 +5,10 @@ defmodule Indexer.Supervisor do
 
   use Supervisor
 
-  alias Explorer.Chain
-
   alias Indexer.{
     Block,
     PendingOpsCleaner,
-    PendingTransactionsSanitizer,
+    PendingTransactionsSanitizer
   }
 
   alias Indexer.Block.{Catchup, Realtime}
@@ -154,8 +152,8 @@ defmodule Indexer.Supervisor do
          [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
         {BlocksTransactionsMismatch.Supervisor,
          [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
-        {PendingOpsCleaner, [[], []]}
-        {PendingTransactionsSanitizer, [[json_rpc_named_arguments: json_rpc_named_arguments]]},
+        {PendingOpsCleaner, [[], []]},
+        {PendingTransactionsSanitizer, [[json_rpc_named_arguments: json_rpc_named_arguments]]}
       ],
       max_restarts: 10,
       strategy: :one_for_one
