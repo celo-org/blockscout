@@ -1292,7 +1292,7 @@ defmodule Explorer.Chain do
       |> Keyword.get(:necessity_by_association, %{})
       |> Map.merge(%{
         smart_contract_additional_sources: :optional,
-        smart_contract: :required,
+        smart_contract: :required
       })
 
     query =
