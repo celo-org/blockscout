@@ -16,8 +16,6 @@ defmodule BlockScoutWeb.SmartContractController do
       |> render(
         "_functions.html",
         read_only_functions: read_only_functions,
-        action: "write",
-        contract_type: "normal",
         address: address
       )
     else

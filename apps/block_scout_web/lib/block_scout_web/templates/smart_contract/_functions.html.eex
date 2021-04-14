@@ -18,7 +18,7 @@ to: address_contract_path(@conn, :index, metadata_for_verification.address_hash)
     </div>
   <% end %>
 <% end %>
-<%= if @action == "write" do %>
+<%= if @action== "write" do %>
   <div connect-to class="connect-container">
     <span style="margin-top: -2px;" class="mr-2">
       <%= render BlockScoutWeb.IconsView, "_inactive_icon.html" %>
