@@ -6,9 +6,7 @@
 # Environment variables being set for this command are repsentative
 # and are not the complete list of variables available
 
-mix compile
-
-PORT=4001 \
+    PORT=4001 \
     NETWORK=Celo \
     ETHEREUM_JSONRPC_VARIANT=geth \
     ETHEREUM_JSONRPC_HTTP_URL=http://localhost:8545 \
@@ -19,4 +17,5 @@ PORT=4001 \
     SOURCIFY_SERVER_URL=https://sourcify.dev/server \
     SOURCIFY_REPO_URL=https://repo.sourcify.dev/contracts/full_match/ \
     CHAIN_ID=44787 \
+    mix compile \
     mix cmd --app block_scout_web "mix phx.server"
