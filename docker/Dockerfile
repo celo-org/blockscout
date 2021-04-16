@@ -23,6 +23,10 @@ ARG COIN
 ARG DISABLE_WRITE_API="false"
 ARG DISABLE_INDEXER="false"
 ARG DISABLE_WEBAPP="false"
+ARG ENABLE_SOURCIFY_INTEGRATION="true"
+ARG SOURCIFY_SERVER_URL="https://sourcify.dev/server"
+ARG SOURCIFY_REPO_URL="https://repo.sourcify.dev/contracts/full_match/"
+
 RUN if [ "$COIN" != "" ]; then sed -i s/"POA"/"${COIN}"/g apps/block_scout_web/priv/gettext/en/LC_MESSAGES/default.po; fi
 
 # Run forderground build and phoenix digest
