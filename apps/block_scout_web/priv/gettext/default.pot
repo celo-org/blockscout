@@ -2075,3 +2075,7 @@ msgstr ""
 #: lib/block_scout_web/views/address_contract_view.ex:22
 msgid "true"
 msgstr ""
+
+# From templates/transaction/_token_transfer.html.eex#L29
+msgid "cGLD"
+msgstr "CELO"
