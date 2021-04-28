@@ -187,7 +187,7 @@ defmodule Indexer.Block.Fetcher do
            (if try_gold_token_enabled do
               read_addresses()
             else
-              {:ok, nil, nil, nil}
+              {:ok, nil, nil, nil, false}
             end),
          %{token_transfers: celo_token_transfers} =
            (if gold_token_enabled do
