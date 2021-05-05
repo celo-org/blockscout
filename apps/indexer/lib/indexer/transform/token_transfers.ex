@@ -64,12 +64,7 @@ defmodule Indexer.Transform.TokenTransfers do
   end
 
   defp do_parse_itx(tx, %{token_transfers: token_transfers, gold_token: gold_token}) do
-    to_hash =
-      if not Map.has_key?(tx, :to_address_hash) || tx.to_address_hash == nil do
-        tx.created_contract_address_hash
-      else
-        tx.to_address_hash
-      end
+    to_hash = Map.get(tx, :to_address_hash, tx.created_contract_address_hash)
 
     token_transfer = %{
       amount: Decimal.new(tx.value),
