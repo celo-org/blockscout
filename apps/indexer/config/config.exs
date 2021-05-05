@@ -98,6 +98,6 @@ config :prometheus, Indexer.Prometheus.Instrumenter,
        registry: :default
 
 config :prometheus, Indexer.Prometheus.Exporter,
-       path: "/metrics",
+       path: "/metrics/indexer",
        format: :text,
        registry: :default
