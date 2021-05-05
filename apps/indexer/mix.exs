@@ -80,7 +80,8 @@ defmodule Indexer.MixProject do
       # Metrics
       {:prometheus_ex, "~> 3.0"},
       {:prometheus_plugs, "~> 1.1"},
-      {:prometheus_process_collector, "~> 1.1"}
+      {:prometheus_process_collector, "~> 1.1"},
+      {:telemetry, "~> 0.4.0"}
     ]
   end
 

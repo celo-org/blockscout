@@ -16,7 +16,7 @@ defmodule Indexer.Application do
       end
 
     memory_monitor_name = Memory.Monitor
-    Indexer.Prometheus.Exporter.setup()
+    Indexer.Prometheus.Setup.setup()
     base_children = [
       {Memory.Monitor, [memory_monitor_options, [name: memory_monitor_name]]},
       {Plug.Cowboy,
