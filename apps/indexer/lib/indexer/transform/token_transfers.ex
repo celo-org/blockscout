@@ -65,7 +65,7 @@ defmodule Indexer.Transform.TokenTransfers do
 
   defp do_parse_itx(tx, %{token_transfers: token_transfers, gold_token: gold_token}) do
     to_hash =
-      if tx.to_address_hash == nil do
+      if not Map.has_key?(tx, :to_address_hash) || tx.to_address_hash == nil do
         tx.created_contract_address_hash
       else
         tx.to_address_hash
