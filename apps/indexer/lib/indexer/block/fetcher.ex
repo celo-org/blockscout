@@ -354,6 +354,7 @@ defmodule Indexer.Block.Fetcher do
   defp update_block_cache(_), do: :ok
 
   defp update_transactions_cache(transactions) do
+    :telemetry.execute([:indexer, :transactions, :pending], %{count: 1})
     Transactions.update(transactions)
   end
 
