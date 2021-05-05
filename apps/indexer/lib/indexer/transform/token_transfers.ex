@@ -64,7 +64,7 @@ defmodule Indexer.Transform.TokenTransfers do
   end
 
   defp do_parse_itx(tx, %{token_transfers: token_transfers, gold_token: gold_token}) do
-    to_hash = Map.get(tx, :to_address_hash, tx.created_contract_address_hash)
+    to_hash = Map.get(tx, :to_address_hash, nil) || Map.get(tx, :created_contract_address_hash, nil)
 
     token_transfer = %{
       amount: Decimal.new(tx.value),
