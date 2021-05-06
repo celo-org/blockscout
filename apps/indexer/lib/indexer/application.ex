@@ -5,7 +5,8 @@ defmodule Indexer.Application do
 
   use Application
 
-  alias Indexer.{Health, Memory}
+  alias Indexer.{Health, Memory, Prometheus}
+  alias Prometheus.Setup
 
   @impl Application
   def start(_type, _args) do
@@ -16,7 +17,8 @@ defmodule Indexer.Application do
       end
 
     memory_monitor_name = Memory.Monitor
-    Indexer.Prometheus.Setup.setup()
+    Setup.setup()
+
     base_children = [
       {Memory.Monitor, [memory_monitor_options, [name: memory_monitor_name]]},
       {Plug.Cowboy,

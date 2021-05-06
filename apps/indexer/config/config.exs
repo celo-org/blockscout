@@ -84,13 +84,7 @@ config :indexer, Indexer.Block.Fetcher, enable_gold_token: true
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
 
-config :prometheus, Indexer.Prometheus.Instrumenter,
-       labels: [:status_class, :method, :host, :scheme],
-       duration_buckets: [10, 100, 1_000, 10_000, 100_000,
-         300_000, 500_000, 750_000, 1_000_000],
-       registry: :default
-
 config :prometheus, Indexer.Prometheus.Exporter,
-       path: "/metrics/indexer",
-       format: :text,
-       registry: :default
+  path: "/metrics/indexer",
+  format: :text,
+  registry: :default

@@ -1,7 +1,13 @@
 defmodule Indexer.Prometheus.Setup do
-  def setup() do
-    Prometheus.TransactionInstrumenter.setup()
+  @moduledoc """
+  Set up instrumenters and exporter here to keep application.ex clean
+  """
 
-    Indexer.Prometheus.Exporter.setup()
+  alias Indexer.Prometheus.{Exporter, TransactionInstrumenter}
+
+  def setup do
+    TransactionInstrumenter.setup()
+
+    Exporter.setup()
   end
 end
