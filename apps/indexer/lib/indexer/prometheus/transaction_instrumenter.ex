@@ -1,7 +1,10 @@
-defmodule Prometheus.TransactionInstrumenter do
+defmodule Indexer.Prometheus.TransactionInstrumenter do
+  @moduledoc """
+  Instrument transaction related metrics.
+  """
   use Prometheus.Metric
 
-  def setup() do
+  def setup do
     events = [
       [:pending]
     ]
@@ -10,17 +13,17 @@ defmodule Prometheus.TransactionInstrumenter do
   end
 
   defp setup_event(event) do
-    name = Enum.join(event, "_")
-    name = "indexer_transactions_#{name}"
+    name = "indexer_transactions_#{Enum.join(event, "_")}"
 
     Counter.declare(
       name: String.to_atom("#{name}_total"),
       help: "Total count of tracking for transaction event #{name}"
-      )
-     :telemetry.attach(name, [:indexer, :transactions | event], &handle_event/4, nil)
-    end
+    )
 
-    def handle_event([:indexer, :transactions, :pending], _value, _metadata, _config) do
-     Counter.inc(name: :indexer_transactions_pending_total)
-    end
+    :telemetry.attach(name, [:indexer, :transactions | event], &handle_event/4, nil)
+  end
+
+  def handle_event([:indexer, :transactions, :pending], _value, _metadata, _config) do
+    Counter.inc(name: :indexer_transactions_pending_total)
+  end
 end
