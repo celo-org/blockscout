@@ -562,6 +562,7 @@ defmodule Indexer.Block.Fetcher do
               "). A reorg has occurred."
             ]
           end)
+          :telemetry.execute([:indexer, :blocks, :reorgs], %{count: 1})
 
           false
       end
