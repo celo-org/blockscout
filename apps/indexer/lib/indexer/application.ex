@@ -5,7 +5,7 @@ defmodule Indexer.Application do
 
   use Application
 
-  alias Indexer.{Health, Memory, Prometheus}
+  alias Indexer.{Health, LoggerBackend, Memory, Prometheus}
   alias Prometheus.Setup
 
   @impl Application
@@ -37,6 +37,8 @@ defmodule Indexer.Application do
       strategy: :rest_for_one,
       name: Indexer.Application
     ]
+
+    Logger.add_backend(LoggerBackend)
 
     Supervisor.start_link(children, opts)
   end

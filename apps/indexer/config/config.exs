@@ -4,6 +4,8 @@ use Mix.Config
 
 import Bitwise
 
+alias Indexer.LoggerBackend
+
 block_transformers = %{
   "clique" => Indexer.Transform.Blocks.Clique,
   "celo" => Indexer.Transform.Blocks.Celo,
@@ -68,8 +70,9 @@ config :logger_json, :indexer,
        block_number step count error_count shrunk import_id transaction_id)a,
   metadata_filter: [application: :indexer]
 
-config :logger, :indexer, backends: [LoggerJSON]
+config :logger, :indexer, backends: [LoggerJSON, {LoggerBackend, :logger_backend}]
 
+config :logger, :logger_backend, level: :error
 # config :logger, :indexer,
 #  # keep synced with `config/config.exs`
 #  format: "$dateT$time $metadata[$level] $message\n",
