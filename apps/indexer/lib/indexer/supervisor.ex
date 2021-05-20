@@ -46,6 +46,8 @@ defmodule Indexer.Supervisor do
     UnclesWithoutIndex
   }
 
+  alias Indexer.Prometheus.MetricsCron
+
   def child_spec([]) do
     child_spec([[]])
   end
