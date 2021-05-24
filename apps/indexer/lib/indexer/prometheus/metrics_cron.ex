@@ -21,6 +21,9 @@ defmodule Indexer.Prometheus.MetricsCron do
     pending_transactions_list_from_db = Chain.pending_transactions_list()
     :telemetry.execute([:indexer, :transactions, :pending], %{value: Enum.count(pending_transactions_list_from_db)})
 
+    last_n_blocks_count = Chain.fetch_last_n_blocks_count(1000)
+    :telemetry.execute([:indexer, :blocks, :pending], %{value: 1000 - last_n_blocks_count})
+
     reschedule()
 
     {:noreply, state}
