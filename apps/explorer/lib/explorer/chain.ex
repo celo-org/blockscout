@@ -1713,6 +1713,32 @@ defmodule Explorer.Chain do
     Repo.one(query) || 0
   end
 
+  @spec fetch_last_n_blocks_count(integer | nil) :: non_neg_integer
+  def fetch_last_n_blocks_count(n) do
+    last_block_query =
+      from(block in Block,
+        select: {block.number},
+        where: block.consensus == true,
+        order_by: [desc: block.number],
+        limit: 1
+      )
+
+    last_block = last_block_query
+    |> Repo.one()
+
+    range_start = elem(last_block, 0) - n
+
+      last_n_blocks_query =
+    from(block in Block,
+      order_by: [desc: block.number],
+      where: block.number > ^range_start
+    )
+
+    last_n_blocks = last_n_blocks_query
+                 |> Repo.all()
+    Enum.count(last_n_blocks)
+  end
+
   @spec fetch_count_consensus_block() :: non_neg_integer
   def fetch_count_consensus_block do
     query =
