@@ -41,7 +41,7 @@ Verification does not make any claims to the _function_, security, or fitness fo
 * Verification requires the generated JSON artifact created during the build process (e.g. `/build/Contract.json`) _and_ the source Solidity file (e.g. `./contracts/Contract.sol`)
 * However, if you set the `solc` metadata option `useLiteralSources`, you can skip providing the Solidity file and simply upload the JSON artifact, as the source code is already embedded in the build output file. 
 
-A sample build configuration snippet for Celo (from `truffle-config.json`):
+A sample build configuration snippet for Celo (from `truffle-config.js`):
 ```
 compilers: {
     solc: {
