@@ -125,9 +125,9 @@ main()
     process.exit(1)
   });
 ```
-3. Celo (and testnets) have been added to Sourcify as a monitored EVM compatible source chain,and when you view the contract on Sourcify it should appear as already verified. However, to appear as verified on Blockscout (we need to at least once set a flag in the Blockscout database) you must upload the build metadata via the file uploader on Blockscout (see below).
+3. Celo (and testnets) have been added to Sourcify as a monitored EVM compatible source chain, and when you view the contract on Sourcify it should appear as already verified. However, to appear as verified on Blockscout (we need to at least once set a flag in the Blockscout database) you must upload the build metadata via the file uploader on Blockscout (see below).
 
-_Note: an enhancement is planned so that you do not need to visit the Blockscout page and upload the JSON after posting to IPFS during the migration process. The enhancement will query the Sourcify API the first time anyone navigates to the address for the smart contract and update it in the backend automatically. This would mean you can verification to your remote CI tooling like GitHub Actions or CircleCI without human intervention._ 
+_Note: an enhancement is planned so that you do not need to visit the Blockscout page and upload the JSON after posting to IPFS during the migration process. The enhancement will query the Sourcify API the first time anyone navigates to the address for the smart contract and update it in the backend automatically. This would mean you can add verification to your remote CI tooling like GitHub Actions or CircleCI without human intervention._ 
 
 ## Publishing via Blockscout
 
