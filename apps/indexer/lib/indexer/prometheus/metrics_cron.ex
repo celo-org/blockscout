@@ -3,7 +3,9 @@ defmodule Indexer.Prometheus.MetricsCron do
   module to periodically retrieve and update prometheus metrics
   """
   use GenServer
+  alias Timex.Duration
   alias Explorer.Chain
+  alias Explorer.Counters.AverageBlockTime
   require Logger
 
   def start_link(_) do
@@ -23,6 +25,9 @@ defmodule Indexer.Prometheus.MetricsCron do
 
     {last_n_blocks_count, last_block} = Chain.fetch_last_n_blocks_count_and_last_block(1000)
     :telemetry.execute([:indexer, :blocks, :pending], %{value: 1000 - last_n_blocks_count})
+
+    average_block_time = AverageBlockTime.average_block_time()
+    :telemetry.execute([:indexer, :blocks, :average_time], %{value: Duration.to_seconds(average_block_time)})
 
     reschedule()
 
