@@ -34,7 +34,7 @@ defmodule Indexer.LoggerBackend do
     {:ok, state}
   end
 
-  def handle_event({level, _gl, {Logger, msg, _ts, meta}}, state) do
+  def handle_event({level, _gl, {Logger, _msg, _ts, _meta}}, state) do
     if Logger.compare_levels(level, state.level) != :lt do
       :telemetry.execute([:indexer, :generics, :error], %{count: 1})
     end

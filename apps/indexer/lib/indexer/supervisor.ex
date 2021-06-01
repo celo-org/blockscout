@@ -158,7 +158,7 @@ defmodule Indexer.Supervisor do
         {PendingTransactionsSanitizer, [[json_rpc_named_arguments: json_rpc_named_arguments]]},
 
         # Prometheus Metrics
-       {MetricsCron, [[]]},
+        {MetricsCron, [[]]}
       ],
       max_restarts: 10,
       strategy: :one_for_one

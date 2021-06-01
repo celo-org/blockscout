@@ -1587,7 +1587,7 @@ defmodule Explorer.Chain do
     Repo.one(query) || 0
   end
 
-  @spec fetch_last_n_blocks_count_and_last_block(integer | nil) :: non_neg_integer
+  @spec fetch_last_n_blocks_count_and_last_block(integer | nil) :: {non_neg_integer, tuple()}
   def fetch_last_n_blocks_count_and_last_block(n) do
     last_block_query =
       from(block in Block,
@@ -1597,20 +1597,28 @@ defmodule Explorer.Chain do
         limit: 1
       )
 
-    last_block = last_block_query
-    |> Repo.one()
+    last_block =
+      last_block_query
+      |> Repo.one()
 
     last_block_number = elem(last_block, 0)
     range_start = last_block_number - n + 1
 
-    last_n_blocks_count_result = Ecto.Adapters.SQL.query!(
-      Repo, "SELECT COUNT(*) FROM blocks WHERE number BETWEEN $1 and $2;", [range_start, last_block_number]
-    )
+    last_n_blocks_count_result =
+      SQL.query!(
+        Repo,
+        "SELECT COUNT(*) FROM blocks WHERE number BETWEEN $1 and $2;",
+        [range_start, last_block_number]
+      )
+
     {:ok, last_n_blocks_count_rows} = Map.fetch(last_n_blocks_count_result, :rows)
-    last_n_blocks_count = last_n_blocks_count_rows
-    |> Enum.at(0)
-    |> Enum.at(0)
-    Logger.info(inspect last_n_blocks_count)
+
+    last_n_blocks_count =
+      last_n_blocks_count_rows
+      |> Enum.at(0)
+      |> Enum.at(0)
+
+    Logger.info(inspect(last_n_blocks_count))
 
     {last_n_blocks_count, last_block}
   end

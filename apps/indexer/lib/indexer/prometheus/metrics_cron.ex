@@ -3,9 +3,9 @@ defmodule Indexer.Prometheus.MetricsCron do
   module to periodically retrieve and update prometheus metrics
   """
   use GenServer
-  alias Timex.Duration
   alias Explorer.Chain
   alias Explorer.Counters.AverageBlockTime
+  alias Timex.Duration
   require Logger
 
   def start_link(_) do
