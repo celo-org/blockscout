@@ -1713,8 +1713,8 @@ defmodule Explorer.Chain do
     Repo.one(query) || 0
   end
 
-  @spec fetch_last_n_blocks_count(integer | nil) :: non_neg_integer
-  def fetch_last_n_blocks_count(n) do
+  @spec fetch_last_n_blocks_count_and_last_block(integer | nil) :: non_neg_integer
+  def fetch_last_n_blocks_count_and_last_block(n) do
     last_block_query =
       from(block in Block,
         select: {block.number},
@@ -1726,17 +1726,19 @@ defmodule Explorer.Chain do
     last_block = last_block_query
     |> Repo.one()
 
-    range_start = elem(last_block, 0) - n
+    last_block_number = elem(last_block, 0)
+    range_start = last_block_number - n + 1
 
-      last_n_blocks_query =
-    from(block in Block,
-      order_by: [desc: block.number],
-      where: block.number > ^range_start
+    last_n_blocks_count_result = Ecto.Adapters.SQL.query!(
+      Repo, "SELECT COUNT(*) FROM blocks WHERE number BETWEEN $1 and $2;", [range_start, last_block_number]
     )
+    {:ok, last_n_blocks_count_rows} = Map.fetch(last_n_blocks_count_result, :rows)
+    last_n_blocks_count = last_n_blocks_count_rows
+    |> Enum.at(0)
+    |> Enum.at(0)
+    Logger.info(inspect last_n_blocks_count)
 
-    last_n_blocks = last_n_blocks_query
-                 |> Repo.all()
-    Enum.count(last_n_blocks)
+    {last_n_blocks_count, last_block}
   end
 
   @spec fetch_count_consensus_block() :: non_neg_integer
