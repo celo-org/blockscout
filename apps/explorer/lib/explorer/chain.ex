@@ -1717,7 +1717,7 @@ defmodule Explorer.Chain do
   def fetch_last_n_blocks_count_and_last_block(n) do
     last_block_query =
       from(block in Block,
-        select: {block.number},
+        select: {block.number, block.timestamp},
         where: block.consensus == true,
         order_by: [desc: block.number],
         limit: 1
@@ -1730,7 +1730,8 @@ defmodule Explorer.Chain do
       {0, 0}
     else
       last_block_number = elem(last_block, 0)
-      range_start = last_block_number - n + 1
+      last_block_timestamp = elem(last_block, 1)
+    range_start = last_block_number - n + 1
 
       last_n_blocks_count_result =
         SQL.query!(
