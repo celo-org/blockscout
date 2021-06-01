@@ -10,7 +10,8 @@ defmodule Indexer.Prometheus.BlockInstrumenter do
     ]
 
     gauge_events = [
-      [:missing]
+      [:pending],
+      [:average_time]
     ]
 
     Enum.each(counter_events, &setup_counter/1)
@@ -45,5 +46,9 @@ defmodule Indexer.Prometheus.BlockInstrumenter do
 
   def handle_set_event([:indexer, :blocks, :pending], %{value: val}, _metadata, _config) do
     Gauge.set([name: :indexer_blocks_pending_current], val)
+  end
+
+  def handle_set_event([:indexer, :blocks, :average_time], %{value: val}, _metadata, _config) do
+    Gauge.set([name: :indexer_blocks_average_time_current], val)
   end
 end
