@@ -1723,7 +1723,8 @@ defmodule Explorer.Chain do
         limit: 1
       )
 
-    last_block = Repo.one(last_block_query)
+    last_block =
+       Repo.one(last_block_query)
 
     if is_nil(last_block) do
       {0, 0}
