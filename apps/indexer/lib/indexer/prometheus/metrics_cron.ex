@@ -35,6 +35,9 @@ defmodule Indexer.Prometheus.MetricsCron do
     average_block_time = AverageBlockTime.average_block_time()
     :telemetry.execute([:indexer, :blocks, :average_time], %{value: Duration.to_seconds(average_block_time)})
 
+    number_of_locks = Chain.fetch_number_of_locks()
+    :telemetry.execute([:indexer, :db, :locks], %{value: number_of_locks})
+
     reschedule()
 
     {:noreply, state}
