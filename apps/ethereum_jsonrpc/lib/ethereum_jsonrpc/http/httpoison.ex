@@ -4,11 +4,12 @@ defmodule EthereumJSONRPC.HTTP.HTTPoison do
   """
 
   alias EthereumJSONRPC.HTTP
+  alias Indexer.Prometheus.ResponseETS
 
   @behaviour HTTP
 
   @impl HTTP
-  def json_rpc(url, json, options) when is_binary(url) and is_list(options) do
+  def json_rpc(url, json, options, method) when is_binary(url) and is_list(options) do
     case HTTPoison.post(url, json, [{"Content-Type", "application/json"}], options) do
       {:ok, %HTTPoison.Response{body: body, status_code: status_code}} ->
         {:ok, %{body: body, status_code: status_code}}
