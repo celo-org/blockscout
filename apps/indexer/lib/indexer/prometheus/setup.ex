@@ -3,10 +3,11 @@ defmodule Indexer.Prometheus.Setup do
   Set up instrumenters and exporter here to keep application.ex clean
   """
 
-  alias Indexer.Prometheus.{BlockInstrumenter, Exporter, GenericInstrumenter, TransactionInstrumenter}
+  alias Indexer.Prometheus.{BlockInstrumenter, DBInstrumenter, Exporter, GenericInstrumenter, TransactionInstrumenter}
 
   def setup do
     BlockInstrumenter.setup()
+    DBInstrumenter.setup()
     GenericInstrumenter.setup()
     TransactionInstrumenter.setup()
 

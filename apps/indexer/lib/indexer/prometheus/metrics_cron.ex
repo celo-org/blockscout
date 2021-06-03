@@ -5,6 +5,7 @@ defmodule Indexer.Prometheus.MetricsCron do
   use GenServer
   alias Explorer.Chain
   alias Explorer.Counters.AverageBlockTime
+  alias Indexer.Prometheus.ResponseETS
   alias Timex.Duration
 
   require DateTime
@@ -37,6 +38,9 @@ defmodule Indexer.Prometheus.MetricsCron do
 
     number_of_locks = Chain.fetch_number_of_locks()
     :telemetry.execute([:indexer, :db, :locks], %{value: number_of_locks})
+
+    longest_query_duration = Chain.fetch_name_and_duration_of_longest_query()
+    :telemetry.execute([:indexer, :db, :longest_query_duration], %{value: longest_query_duration.secs})
 
     reschedule()
 
