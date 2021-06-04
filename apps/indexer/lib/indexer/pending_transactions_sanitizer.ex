@@ -156,7 +156,7 @@ defmodule Indexer.PendingTransactionsSanitizer do
         timestamps: %{updated_at: DateTime.utc_now()}
       }
 
-      Blocks.lose_consensus(Repo, [], [number], [], opts)
+      # Blocks.lose_consensus(Repo, [], [number], [], opts)
     end
   end
 end
