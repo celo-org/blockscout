@@ -105,9 +105,10 @@ defmodule Explorer.Chain.Import.Runner.Blocks do
     |> Multi.run(:derive_address_current_token_balances, fn repo,
                                                             %{
                                                               delete_address_current_token_balances:
-                                                                deleted_address_current_token_balances
+                                                                deleted_address_current_token_balances,
+                                                                acquire_contract_address_tokens: acquire_contract_address_tokens
                                                             } ->
-      derive_address_current_token_balances(repo, deleted_address_current_token_balances, insert_options)
+      derive_address_current_token_balances(repo, deleted_address_current_token_balances, insert_options, acquire_contract_address_tokens)
     end)
     |> Multi.run(:blocks_update_token_holder_counts, fn repo,
                                                         %{
@@ -132,7 +133,10 @@ defmodule Explorer.Chain.Import.Runner.Blocks do
 
     contract_address_hashes = repo.all(query)
 
+    # IO.inspect({:acquired, contract_address_hashes})
     Tokens.acquire_contract_address_tokens(repo, contract_address_hashes)
+
+     {:ok, contract_address_hashes}
   end
 
   defp fork_transactions(%{
@@ -426,9 +430,9 @@ defmodule Explorer.Chain.Import.Runner.Blocks do
     end
   end
 
-  defp derive_address_current_token_balances(_, [], _), do: {:ok, []}
+  defp derive_address_current_token_balances(_, [], _, _), do: {:ok, []}
 
-  defp derive_address_current_token_balances(repo, deleted_address_current_token_balances, %{timeout: timeout})
+  defp derive_address_current_token_balances(repo, deleted_address_current_token_balances, %{timeout: timeout}, acquired_tokens)
        when is_list(deleted_address_current_token_balances) do
     initial_query =
       from(tb in Address.TokenBalance,
@@ -479,6 +483,14 @@ defmodule Explorer.Chain.Import.Runner.Blocks do
       |> repo.all()
       # Enforce CurrentTokenBalance ShareLocks order (see docs: sharelocks.md)
       |> Enum.sort_by(&{&1.token_contract_address_hash, &1.address_hash})
+
+    needed_tokens = ordered_current_token_balance |> Enum.map(& &1.token_contract_address_hash) |> Enum.uniq()
+    
+    if Enum.count(needed_tokens) != Enum.count(Enum.uniq(needed_tokens ++ acquired_tokens)) do
+        Logger.warn(["Needed: ", inspect(needed_tokens), " Acquired: ", inspect(acquired_tokens)])
+    end
+    # Logger.warn(["Needed: ", inspect(needed_tokens), "Acquired: ", inspect(acquired_tokens)])
+    # IO.inspect({:insert,})
 
     {_total, result} =
       repo.insert_all(
