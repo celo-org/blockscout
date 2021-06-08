@@ -99,8 +99,9 @@ defmodule EthereumJsonrpc.MixProject do
       {:hackney, "~> 1.15.2"},
       {:poolboy, "~> 1.5.2"},
       # Log json format
-      {:logger_json, "~> 3.2"}
-      # {:jason, "~> 1.1"}
+      {:logger_json, "~> 3.2"},
+      # Uuid
+      { :uuid, "~> 1.1" }
     ]
   end
 end

@@ -41,7 +41,7 @@ defmodule Indexer.Supervisor do
     UnclesWithoutIndex
   }
 
-  alias Indexer.Prometheus.MetricsCron
+  alias Indexer.Prometheus.{MetricsCron, ResponseETS}
 
   def child_spec([]) do
     child_spec([[]])
@@ -158,7 +158,8 @@ defmodule Indexer.Supervisor do
         {PendingTransactionsSanitizer, [[json_rpc_named_arguments: json_rpc_named_arguments]]},
 
         # Prometheus Metrics
-        {MetricsCron, [[]]}
+        {MetricsCron, [[]]},
+        {ResponseETS, [[]]}
       ],
       max_restarts: 10,
       strategy: :one_for_one

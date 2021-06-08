@@ -5,7 +5,7 @@ defmodule Indexer.Prometheus.MetricsCron do
   use GenServer
   alias Explorer.Chain
   alias Explorer.Counters.AverageBlockTime
-  alias Indexer.Prometheus.ResponseETS
+  alias Indexer.Prometheus.{ResponseETS, RPCInstrumenter}
   alias Timex.Duration
 
   require DateTime
@@ -42,12 +42,25 @@ defmodule Indexer.Prometheus.MetricsCron do
     longest_query_duration = Chain.fetch_name_and_duration_of_longest_query()
     :telemetry.execute([:indexer, :db, :longest_query_duration], %{value: longest_query_duration.secs})
 
-    reschedule()
+    response_times = ResponseETS.get()
+    response_times
+    |> Enum.filter(&Map.has_key?(elem(&1, 1), :finish))
+    |> Enum.map(&elem(&1, 0))
+    |> Enum.map(&calculate_and_add_response_metrics(&1, :proplists.get_all_values(&1, response_times)))
+
+    repeat()
 
     {:noreply, state}
   end
 
-  defp reschedule do
+  defp calculate_and_add_response_metrics(id, req_times) do
+    start = Enum.at(req_times, 0)
+    finish = Enum.at(req_times, 1)
+    RPCInstrumenter.instrument(%{time: Map.get(finish, :finish) - Map.get(start, :start), method: Map.get(start, :method)})
+    ResponseETS.delete(id)
+  end
+
+  defp repeat do
     Process.send_after(self(), :import_and_reschedule, :timer.seconds(2))
   end
 end
