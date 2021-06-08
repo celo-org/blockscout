@@ -4,7 +4,7 @@ defmodule Indexer.Prometheus.RPCInstrumenter do
 
   def setup do
     Histogram.new([name: :http_request_duration_milliseconds,
-      buckets: [500, 1000, 1500, 2000, 3000],
+      buckets: [100, 300, 500, 750, 1000, 3000],
       duration_unit: false,
       labels: [:method],
       help: "Http Request execution time."])
