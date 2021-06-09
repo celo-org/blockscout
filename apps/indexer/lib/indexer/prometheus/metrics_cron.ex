@@ -53,6 +53,9 @@ defmodule Indexer.Prometheus.MetricsCron do
     total_transaction_count = Chain.transaction_estimated_count()
     :telemetry.execute([:indexer, :transactions, :total], %{value: total_transaction_count})
 
+    total_address_count = Chain.address_estimated_count()
+    :telemetry.execute([:indexer, :tokens, :address_count], %{value: total_address_count})
+
     repeat()
 
     {:noreply, state}

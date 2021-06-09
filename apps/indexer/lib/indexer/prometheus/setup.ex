@@ -9,6 +9,7 @@ defmodule Indexer.Prometheus.Setup do
     Exporter,
     GenericInstrumenter,
     RPCInstrumenter,
+    TokenInstrumenter,
     TransactionInstrumenter
     }
 
@@ -17,6 +18,7 @@ defmodule Indexer.Prometheus.Setup do
     DBInstrumenter.setup()
     GenericInstrumenter.setup()
     RPCInstrumenter.setup()
+    TokenInstrumenter.setup()
     TransactionInstrumenter.setup()
 
     Exporter.setup()
