@@ -1587,7 +1587,7 @@ defmodule Explorer.Chain do
     Repo.one(query) || 0
   end
 
-  @spec fetch_last_n_blocks_count_and_last_block(integer | nil) :: {non_neg_integer, Elixir.DateTime.t()}
+  @spec fetch_last_n_blocks_count_and_last_block(integer | nil) :: {non_neg_integer, Elixir.DateTime.t(), non_neg_integer}
   def fetch_last_n_blocks_count_and_last_block(n) do
     last_block_query =
       from(block in Block,
@@ -1619,7 +1619,7 @@ defmodule Explorer.Chain do
       |> Enum.at(0)
       |> Enum.at(0)
 
-    {last_n_blocks_count, last_block_timestamp}
+    {last_n_blocks_count, last_block_timestamp, last_block_number}
   end
 
   @spec fetch_count_consensus_block() :: non_neg_integer

@@ -26,12 +26,14 @@ defmodule Indexer.Prometheus.MetricsCron do
     pending_transactions_list_from_db = Chain.pending_transactions_list()
     :telemetry.execute([:indexer, :transactions, :pending], %{value: Enum.count(pending_transactions_list_from_db)})
 
-    {last_n_blocks_count, last_block_timestamp} = Chain.fetch_last_n_blocks_count_and_last_block(1000)
+    {last_n_blocks_count, last_block_timestamp, last_block_number} = Chain.fetch_last_n_blocks_count_and_last_block(1000)
     :telemetry.execute([:indexer, :blocks, :pending], %{value: 1000 - last_n_blocks_count})
 
     :telemetry.execute([:indexer, :blocks, :last_block_age], %{
       value: DateTime.diff(DateTime.utc_now(), last_block_timestamp)
     })
+
+    :telemetry.execute([:indexer, :blocks, :last_block_number], %{value: last_block_number})
 
     average_block_time = AverageBlockTime.average_block_time()
     :telemetry.execute([:indexer, :blocks, :average_time], %{value: Duration.to_seconds(average_block_time)})
