@@ -46,14 +46,14 @@ defmodule Indexer.Prometheus.MetricsCron do
     response_times
     |> Enum.filter(&Map.has_key?(elem(&1, 1), :finish))
     |> Enum.map(&elem(&1, 0))
-    |> Enum.map(&calculate_and_add_response_metrics(&1, :proplists.get_all_values(&1, response_times)))
+    |> Enum.map(&calculate_and_add_rpc_response_metrics(&1, :proplists.get_all_values(&1, response_times)))
 
     repeat()
 
     {:noreply, state}
   end
 
-  defp calculate_and_add_response_metrics(id, req_times) do
+  defp calculate_and_add_rpc_response_metrics(id, req_times) do
     start = Enum.at(req_times, 0)
     finish = Enum.at(req_times, 1)
     RPCInstrumenter.instrument(%{time: Map.get(finish, :finish) - Map.get(start, :start), method: Map.get(start, :method)})
