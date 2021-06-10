@@ -11,7 +11,7 @@ defmodule Indexer.Prometheus.Setup do
     RPCInstrumenter,
     TokenInstrumenter,
     TransactionInstrumenter
-    }
+  }
 
   def setup do
     BlockInstrumenter.setup()

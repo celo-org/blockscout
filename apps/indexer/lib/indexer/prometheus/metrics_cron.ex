@@ -26,8 +26,10 @@ defmodule Indexer.Prometheus.MetricsCron do
     pending_transactions_list_from_db = Chain.pending_transactions_list()
     :telemetry.execute([:indexer, :transactions, :pending], %{value: Enum.count(pending_transactions_list_from_db)})
 
-    {last_n_blocks_count, last_block_timestamp, last_block_number} = Chain.fetch_last_n_blocks_count_and_last_block(1000)
+    {last_n_blocks_count, last_block_timestamp, last_block_number, average_gas_used} = Chain.metrics_fetcher(1000)
+
     :telemetry.execute([:indexer, :blocks, :pending], %{value: 1000 - last_n_blocks_count})
+    :telemetry.execute([:indexer, :tokens, :average_gas], %{value: average_gas_used})
 
     :telemetry.execute([:indexer, :blocks, :last_block_age], %{
       value: DateTime.diff(DateTime.utc_now(), last_block_timestamp)
@@ -45,6 +47,7 @@ defmodule Indexer.Prometheus.MetricsCron do
     :telemetry.execute([:indexer, :db, :longest_query_duration], %{value: longest_query_duration.secs})
 
     response_times = ResponseETS.get()
+
     response_times
     |> Enum.filter(&Map.has_key?(elem(&1, 1), :finish))
     |> Enum.map(&elem(&1, 0))
@@ -67,7 +70,12 @@ defmodule Indexer.Prometheus.MetricsCron do
   defp calculate_and_add_rpc_response_metrics(id, req_times) do
     start = Enum.at(req_times, 0)
     finish = Enum.at(req_times, 1)
-    RPCInstrumenter.instrument(%{time: Map.get(finish, :finish) - Map.get(start, :start), method: Map.get(start, :method)})
+
+    RPCInstrumenter.instrument(%{
+      time: Map.get(finish, :finish) - Map.get(start, :start),
+      method: Map.get(start, :method)
+    })
+
     ResponseETS.delete(id)
   end
 

@@ -1587,19 +1587,33 @@ defmodule Explorer.Chain do
     Repo.one(query) || 0
   end
 
-  @spec fetch_last_n_blocks_count_and_last_block(integer | nil) :: {non_neg_integer, Elixir.DateTime.t(), non_neg_integer}
-  def fetch_last_n_blocks_count_and_last_block(n) do
+  @doc """
+  Fetches count of last n blocks, last block timestamp, last block number and average gas used in the last minute.
+  Using a single method to fetch and calculate these values for performance reasons (only 2 queries used).
+  """
+  @spec metrics_fetcher(integer | nil) ::
+          {non_neg_integer, Elixir.DateTime.t(), non_neg_integer, float}
+  def metrics_fetcher(n) do
     last_block_query =
       from(block in Block,
-        select: {block.number, block.timestamp},
+        select: {block.number, block.timestamp, block.gas_limit, block.gas_used},
         where: block.consensus == true,
         order_by: [desc: block.number],
-        limit: 1
+        limit: 12
       )
 
-    last_block =
+    last_twelve_blocks =
       last_block_query
-      |> Repo.one()
+      |> Repo.all()
+
+    [last_block | _rest] = last_twelve_blocks
+
+    gas_percentage_sum =
+      Enum.reduce(last_twelve_blocks, 0, fn block, gas_percentage_sum ->
+        gas_percentage_sum + Decimal.to_float(Decimal.div(elem(block, 3), elem(block, 2))) * 100
+      end)
+
+    average_gas_used = gas_percentage_sum / 12
 
     last_block_number = elem(last_block, 0)
     last_block_timestamp = elem(last_block, 1)
@@ -1619,7 +1633,7 @@ defmodule Explorer.Chain do
       |> Enum.at(0)
       |> Enum.at(0)
 
-    {last_n_blocks_count, last_block_timestamp, last_block_number}
+    {last_n_blocks_count, last_block_timestamp, last_block_number, average_gas_used}
   end
 
   @spec fetch_count_consensus_block() :: non_neg_integer
