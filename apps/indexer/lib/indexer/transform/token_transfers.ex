@@ -255,7 +255,7 @@ defmodule Indexer.Transform.TokenTransfers do
           token
           |> Repo.preload([:contract_address])
 
-        # {:ok, _} = Chain.update_token(%{token_to_update | updated_at: DateTime.utc_now()}, token_params)
+        {:ok, _} = Chain.update_token(%{token_to_update | updated_at: DateTime.utc_now()}, token_params)
       end
     end
 
