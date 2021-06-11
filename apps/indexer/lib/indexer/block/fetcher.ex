@@ -157,7 +157,7 @@ defmodule Indexer.Block.Fetcher do
       {:ok, tokens, oracle_address, true}
     else
       _err ->
-        {:ok, nil, nil, false}
+        {:ok, %{celo: nil, cusd: nil, ceur: nil}, nil, false}
     end
   end
 
