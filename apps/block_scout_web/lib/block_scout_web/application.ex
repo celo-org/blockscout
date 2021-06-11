@@ -13,6 +13,7 @@ defmodule BlockScoutWeb.Application do
     import Supervisor.Spec
 
     Prometheus.Instrumenter.setup()
+    Prometheus.GenericInstrumenter.setup()
     Prometheus.Exporter.setup()
 
     # Define workers and child supervisors to be supervised
