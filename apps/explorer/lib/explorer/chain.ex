@@ -81,6 +81,8 @@ defmodule Explorer.Chain do
 
   alias Dataloader.Ecto, as: DataloaderEcto
 
+  alias Timex.Duration
+
   @default_paging_options %PagingOptions{page_size: 50}
 
   @max_incoming_transactions_count 10_000
@@ -3443,7 +3445,7 @@ defmodule Explorer.Chain do
   @doc """
   The current total number of coins minted minus verifiably burned coins.
   """
-  @spec total_supply :: non_neg_integer() | nil
+  @spec total_supply :: Decimal.t() | nil
   def total_supply do
     supply_module().total() || 0
   end
@@ -4845,8 +4847,8 @@ defmodule Explorer.Chain do
 
   defp boolean_to_check_result(false), do: :not_found
 
-  @spec fetch_number_of_locks() :: non_neg_integer()
-  def fetch_number_of_locks() do
+  @spec fetch_number_of_locks :: non_neg_integer()
+  def fetch_number_of_locks do
     result =
       SQL.query(Repo, """
       select count(*) from (SELECT blocked_locks.pid     AS blocked_pid,
@@ -4881,8 +4883,8 @@ defmodule Explorer.Chain do
     |> Enum.at(0)
   end
 
-  @spec fetch_number_of_dead_locks() :: non_neg_integer()
-  def fetch_number_of_dead_locks() do
+  @spec fetch_number_of_dead_locks :: non_neg_integer()
+  def fetch_number_of_dead_locks do
     result =
       SQL.query(Repo, """
       select deadlocks from pg_stat_database where datname = 'explorer';
@@ -4896,8 +4898,8 @@ defmodule Explorer.Chain do
     |> Enum.at(0)
   end
 
-  @spec fetch_name_and_duration_of_longest_query() :: non_neg_integer()
-  def fetch_name_and_duration_of_longest_query() do
+  @spec fetch_name_and_duration_of_longest_query :: Timex.Duration.t()
+  def fetch_name_and_duration_of_longest_query do
     result =
       SQL.query(Repo, """
         SELECT query, now() - xact_start AS duration FROM pg_stat_activity
@@ -4910,5 +4912,6 @@ defmodule Explorer.Chain do
     longest_query_rows
     |> Enum.at(0)
     |> Enum.at(1)
+    |> Duration.from_erl()
   end
 end

@@ -1,4 +1,7 @@
 defmodule Indexer.Prometheus.ResponseETS do
+  @moduledoc """
+  Create and manage an ETS table that keeps the start and end time of json-rpc requests
+  """
   use GenServer
 
   def init(arg) do
@@ -17,7 +20,7 @@ defmodule Indexer.Prometheus.ResponseETS do
     GenServer.start_link(__MODULE__, arg, name: __MODULE__)
   end
 
-  def get() do
+  def get do
     :ets.tab2list(:wrapper)
   end
 

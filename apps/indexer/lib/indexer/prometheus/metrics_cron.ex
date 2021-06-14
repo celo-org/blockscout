@@ -1,6 +1,6 @@
 defmodule Indexer.Prometheus.MetricsCron do
   @moduledoc """
-  module to periodically retrieve and update prometheus metrics
+  Periodically retrieves and updates prometheus metrics
   """
   use GenServer
   alias Explorer.Chain
@@ -47,14 +47,14 @@ defmodule Indexer.Prometheus.MetricsCron do
     :telemetry.execute([:indexer, :db, :deadlocks], %{value: number_of_dead_locks})
 
     longest_query_duration = Chain.fetch_name_and_duration_of_longest_query()
-    :telemetry.execute([:indexer, :db, :longest_query_duration], %{value: longest_query_duration.secs})
+    :telemetry.execute([:indexer, :db, :longest_query_duration], %{value: longest_query_duration.seconds})
 
     response_times = ResponseETS.get()
 
     response_times
     |> Enum.filter(&Map.has_key?(elem(&1, 1), :finish))
     |> Enum.map(&elem(&1, 0))
-    |> Enum.map(&calculate_and_add_rpc_response_metrics(&1, :proplists.get_all_values(&1, response_times)))
+    |> Enum.each(&calculate_and_add_rpc_response_metrics(&1, :proplists.get_all_values(&1, response_times)))
 
     total_transaction_count = Chain.transaction_estimated_count()
     :telemetry.execute([:indexer, :transactions, :total], %{value: total_transaction_count})
@@ -62,8 +62,9 @@ defmodule Indexer.Prometheus.MetricsCron do
     total_address_count = Chain.address_estimated_count()
     :telemetry.execute([:indexer, :tokens, :address_count], %{value: total_address_count})
 
-    total_supply = Chain.total_supply()
-    :telemetry.execute([:indexer, :tokens, :total_supply], %{value: Decimal.to_float(total_supply)})
+    with total_supply when not is_nil(total_supply) <- Chain.total_supply() do
+      :telemetry.execute([:indexer, :tokens, :total_supply], %{value: Decimal.to_float(total_supply)})
+    end
 
     repeat()
 

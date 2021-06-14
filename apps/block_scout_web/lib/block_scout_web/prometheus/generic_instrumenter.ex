@@ -16,7 +16,7 @@ defmodule BlockScoutWeb.Prometheus.GenericInstrumenter do
     name = "block_scout_web_generics_#{Enum.join(event, "_")}"
 
     Counter.declare(
-      name: String.to_atom("#{name}_total"),
+      name: :block_scout_web_generics_error_total,
       help: "Total count of tracking for generic event #{name}"
     )
 

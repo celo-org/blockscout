@@ -1,4 +1,7 @@
 defmodule Indexer.Prometheus.RPCInstrumenter do
+  @moduledoc """
+  Instrument histogram for json-rpc response times
+  """
   use Prometheus.Metric
   require Logger
 
