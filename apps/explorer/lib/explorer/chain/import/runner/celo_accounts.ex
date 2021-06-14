@@ -46,19 +46,6 @@ defmodule Explorer.Chain.Import.Runner.CeloAccounts do
   @impl Import.Runner
   def timeout, do: @timeout
 
-  defp acquire_all_celo_accounts(repo) do
-    query =
-      from(
-        account in CeloAccount,
-        order_by: account.address,
-        lock: "FOR UPDATE"
-      )
-
-    accounts = repo.all(query)
-
-    {:ok, accounts}
-  end
-
   defp handle_dedup(lst) do
     Enum.reduce(lst, fn %{attestations_requested: req, attestations_fulfilled: full}, acc ->
       acc
@@ -78,7 +65,6 @@ defmodule Explorer.Chain.Import.Runner.CeloAccounts do
       |> Map.values()
       |> Enum.map(&handle_dedup/1)
 
-    {:ok, _} =
       Import.insert_changes_list(
         repo,
         uniq_changes_list,

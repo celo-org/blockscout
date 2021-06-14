@@ -46,20 +46,6 @@ defmodule Explorer.Chain.Import.Runner.CeloWallets do
   @impl Import.Runner
   def timeout, do: @timeout
 
-  defp acquire_all_items(repo) do
-    query =
-      from(
-        account in CeloWallet,
-        # Enforce ShareLocks order (see docs: sharelocks.md)
-        order_by: [account.wallet_address_hash, account.account_address_hash],
-        lock: "FOR UPDATE"
-      )
-
-    accounts = repo.all(query)
-
-    {:ok, accounts}
-  end
-
   @spec insert(Repo.t(), [map()], Util.insert_options()) :: {:ok, [CeloWallet.t()]} | {:error, [Changeset.t()]}
   defp insert(repo, changes_list, %{timeout: timeout, timestamps: timestamps} = options) when is_list(changes_list) do
     on_conflict = Map.get_lazy(options, :on_conflict, &default_on_conflict/0)
