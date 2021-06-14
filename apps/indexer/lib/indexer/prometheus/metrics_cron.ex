@@ -43,6 +43,9 @@ defmodule Indexer.Prometheus.MetricsCron do
     number_of_locks = Chain.fetch_number_of_locks()
     :telemetry.execute([:indexer, :db, :locks], %{value: number_of_locks})
 
+    number_of_dead_locks = Chain.fetch_number_of_dead_locks()
+    :telemetry.execute([:indexer, :db, :deadlocks], %{value: number_of_dead_locks})
+
     longest_query_duration = Chain.fetch_name_and_duration_of_longest_query()
     :telemetry.execute([:indexer, :db, :longest_query_duration], %{value: longest_query_duration.secs})
 

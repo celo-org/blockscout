@@ -4881,6 +4881,21 @@ defmodule Explorer.Chain do
     |> Enum.at(0)
   end
 
+  @spec fetch_number_of_dead_locks() :: non_neg_integer()
+  def fetch_number_of_dead_locks() do
+    result =
+      SQL.query(Repo, """
+      select deadlocks from pg_stat_database where datname = 'explorer';
+      """)
+
+    {:ok, number_of_dead_locks_map} = result
+    {:ok, number_of_dead_locks_rows} = Map.fetch(number_of_dead_locks_map, :rows)
+
+    number_of_dead_locks_rows
+    |> Enum.at(0)
+    |> Enum.at(0)
+  end
+
   @spec fetch_name_and_duration_of_longest_query() :: non_neg_integer()
   def fetch_name_and_duration_of_longest_query() do
     result =
