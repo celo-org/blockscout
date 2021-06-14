@@ -38,9 +38,6 @@ defmodule Explorer.Chain.Import.Runner.CeloAccounts do
 
     # Enforce ShareLocks tables order (see docs: sharelocks.md)
     multi
-#    |> Multi.run(:acquire_all_celo_accounts, fn repo, _ ->
-#      acquire_all_celo_accounts(repo)
-#    end)
     |> Multi.run(:insert_celo_accounts, fn repo, _ ->
       insert(repo, changes_list, insert_options)
     end)
@@ -88,7 +85,6 @@ defmodule Explorer.Chain.Import.Runner.CeloAccounts do
         conflict_target: :address,
         on_conflict: on_conflict,
         for: CeloAccount,
-#        returning: [:address],
         timeout: timeout,
         timestamps: timestamps
       )

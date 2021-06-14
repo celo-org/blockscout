@@ -10,7 +10,7 @@ defmodule Explorer.Chain.Import.Runner.Address.CurrentTokenBalances do
   alias Ecto.{Changeset, Multi, Repo}
   alias Explorer.Chain.Address.CurrentTokenBalance
   alias Explorer.Chain.{Hash, Import}
-#  alias Explorer.Chain.Import.Runner.Tokens
+  #  alias Explorer.Chain.Import.Runner.Tokens
 
   @behaviour Import.Runner
 
@@ -108,27 +108,28 @@ defmodule Explorer.Chain.Import.Runner.Address.CurrentTokenBalances do
 
     # Enforce ShareLocks tables order (see docs: sharelocks.md)
     multi
-#    |> Multi.run(:acquire_contract_address_tokens, fn repo, _ ->
-#      contract_address_hashes = changes_list |> Enum.map(& &1.token_contract_address_hash) |> Enum.uniq()
-#      Tokens.acquire_contract_address_tokens(repo, contract_address_hashes)
-#    end)
+    #    |> Multi.run(:acquire_contract_address_tokens, fn repo, _ ->
+    #      contract_address_hashes = changes_list |> Enum.map(& &1.token_contract_address_hash) |> Enum.uniq()
+    #      Tokens.acquire_contract_address_tokens(repo, contract_address_hashes)
+    #    end)
     |> Multi.run(:address_current_token_balances, fn repo, _ ->
       insert(repo, changes_list, insert_options)
     end)
-#    |> Multi.run(:address_current_token_balances_update_token_holder_counts, fn repo,
-#                                                                                %{
-#                                                                                  address_current_token_balances:
-#                                                                                    upserted_balances
-#                                                                                } ->
-#      token_holder_count_deltas = upserted_balances_to_holder_count_deltas(upserted_balances)
 
-      # ShareLocks order already enforced by `acquire_contract_address_tokens` (see docs: sharelocks.md)
-#      Tokens.update_holder_counts_with_deltas(
-#        repo,
-#        token_holder_count_deltas,
-#        insert_options
-#      )
-#    end)
+    #    |> Multi.run(:address_current_token_balances_update_token_holder_counts, fn repo,
+    #                                                                                %{
+    #                                                                                  address_current_token_balances:
+    #                                                                                    upserted_balances
+    #                                                                                } ->
+    #      token_holder_count_deltas = upserted_balances_to_holder_count_deltas(upserted_balances)
+
+    # ShareLocks order already enforced by `acquire_contract_address_tokens` (see docs: sharelocks.md)
+    #      Tokens.update_holder_counts_with_deltas(
+    #        repo,
+    #        token_holder_count_deltas,
+    #        insert_options
+    #      )
+    #    end)
   end
 
   @impl Import.Runner
