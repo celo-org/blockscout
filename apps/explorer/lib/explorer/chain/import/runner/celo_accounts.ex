@@ -65,15 +65,15 @@ defmodule Explorer.Chain.Import.Runner.CeloAccounts do
       |> Map.values()
       |> Enum.map(&handle_dedup/1)
 
-      Import.insert_changes_list(
-        repo,
-        uniq_changes_list,
-        conflict_target: :address,
-        on_conflict: on_conflict,
-        for: CeloAccount,
-        timeout: timeout,
-        timestamps: timestamps
-      )
+    Import.insert_changes_list(
+      repo,
+      uniq_changes_list,
+      conflict_target: :address,
+      on_conflict: on_conflict,
+      for: CeloAccount,
+      timeout: timeout,
+      timestamps: timestamps
+    )
   end
 
   defp default_on_conflict do
