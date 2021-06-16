@@ -1713,7 +1713,7 @@ defmodule Explorer.Chain do
     Repo.one(query) || 0
   end
 
-  @spec fetch_last_n_blocks_count_and_last_block(integer | nil) :: non_neg_integer
+  @spec fetch_last_n_blocks_count_and_last_block(integer | nil) :: {non_neg_integer, non_neg_integer}
   def fetch_last_n_blocks_count_and_last_block(n) do
     last_block_query =
       from(block in Block,
@@ -1723,22 +1723,30 @@ defmodule Explorer.Chain do
         limit: 1
       )
 
-    last_block = last_block_query
-    |> Repo.one()
+    last_block = Repo.one(last_block_query)
 
-    last_block_number = elem(last_block, 0)
-    range_start = last_block_number - n + 1
+    if is_nil(last_block) do
+      {0, 0}
+    else
+      last_block_number = elem(last_block, 0)
+      range_start = last_block_number - n + 1
 
-    last_n_blocks_count_result = Ecto.Adapters.SQL.query!(
-      Repo, "SELECT COUNT(*) FROM blocks WHERE number BETWEEN $1 and $2;", [range_start, last_block_number]
-    )
-    {:ok, last_n_blocks_count_rows} = Map.fetch(last_n_blocks_count_result, :rows)
-    last_n_blocks_count = last_n_blocks_count_rows
-    |> Enum.at(0)
-    |> Enum.at(0)
-    Logger.info(inspect last_n_blocks_count)
+      last_n_blocks_count_result =
+        SQL.query!(
+          Repo,
+          "SELECT COUNT(*) FROM blocks WHERE number BETWEEN $1 and $2;",
+          [range_start, last_block_number]
+        )
 
-    {last_n_blocks_count, last_block}
+      {:ok, last_n_blocks_count_rows} = Map.fetch(last_n_blocks_count_result, :rows)
+
+      last_n_blocks_count =
+        last_n_blocks_count_rows
+        |> Enum.at(0)
+        |> Enum.at(0)
+
+      {last_n_blocks_count, last_block}
+    end
   end
 
   @spec fetch_count_consensus_block() :: non_neg_integer
@@ -2747,7 +2755,7 @@ defmodule Explorer.Chain do
         right_join:
           missing_range in fragment(
             """
-              (SELECT distinct b1.number 
+              (SELECT distinct b1.number
               FROM generate_series((?)::integer, (?)::integer) AS b1(number)
               WHERE NOT EXISTS
                 (SELECT 1 FROM blocks b2 WHERE b2.number=b1.number AND b2.consensus))
@@ -4396,7 +4404,7 @@ defmodule Explorer.Chain do
 
   # Fetches custom metadata for bridged tokens from the node.
   # Currently, gets Balancer token composite tokens with their weights
-  # from foreign chain 
+  # from foreign chain
   defp get_bridged_token_custom_metadata(foreign_token_address_hash, json_rpc_named_arguments, foreign_json_rpc)
        when not is_nil(foreign_json_rpc) and foreign_json_rpc !== "" do
     eth_call_foreign_json_rpc_named_arguments =

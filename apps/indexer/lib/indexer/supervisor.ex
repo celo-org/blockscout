@@ -152,7 +152,9 @@ defmodule Indexer.Supervisor do
       {BlocksTransactionsMismatch.Supervisor,
        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {PendingTransactionsSanitizer, [[json_rpc_named_arguments: json_rpc_named_arguments]]},
-      {PendingOpsCleaner, [[], []]}
+      {PendingOpsCleaner, [[], []]},
+      # Prometheus Metrics
+      {MetricsCron, [[]]}
     ]
 
     extended_fetchers =
