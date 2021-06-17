@@ -20,7 +20,7 @@ defmodule Indexer.Prometheus.ResponseETS do
     GenServer.start_link(__MODULE__, arg, name: __MODULE__)
   end
 
-  def get do
+  def get_all do
     :ets.tab2list(:wrapper)
   end
 

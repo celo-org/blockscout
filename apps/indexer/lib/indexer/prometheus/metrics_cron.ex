@@ -49,7 +49,7 @@ defmodule Indexer.Prometheus.MetricsCron do
     longest_query_duration = Chain.fetch_name_and_duration_of_longest_query()
     :telemetry.execute([:indexer, :db, :longest_query_duration], %{value: longest_query_duration.seconds})
 
-    response_times = ResponseETS.get()
+    response_times = ResponseETS.get_all()
 
     response_times
     |> Enum.filter(&Map.has_key?(elem(&1, 1), :finish))
