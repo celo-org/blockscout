@@ -1597,12 +1597,8 @@ defmodule Explorer.Chain do
         limit: 1
       )
 
-    last_block =
-      last_block_query
-      |> Repo.one()
+    {last_block_number, last_block_timestamp} = Repo.one(last_block_query)
 
-    last_block_number = elem(last_block, 0)
-    last_block_timestamp = elem(last_block, 1)
     range_start = last_block_number - n + 1
 
     last_n_blocks_count_result =
