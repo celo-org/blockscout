@@ -10,7 +10,6 @@ defmodule Indexer.Prometheus.DBInstrumenter do
     gauge_events = [
       [:deadlocks],
       [:locks],
-      [:longest_query_name],
       [:longest_query_duration]
     ]
 
@@ -34,10 +33,6 @@ defmodule Indexer.Prometheus.DBInstrumenter do
 
   def handle_set_event([:indexer, :db, :locks], %{value: val}, _metadata, _config) do
     Gauge.set([name: :indexer_db_locks_current], val)
-  end
-
-  def handle_set_event([:indexer, :db, :longest_query_name], %{value: val}, _metadata, _config) do
-    Gauge.set([name: :indexer_db_longest_query_name_current], val)
   end
 
   def handle_set_event([:indexer, :db, :longest_query_duration], %{value: val}, _metadata, _config) do
