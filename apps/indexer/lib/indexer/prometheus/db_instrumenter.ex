@@ -5,8 +5,6 @@ defmodule Indexer.Prometheus.DBInstrumenter do
   use Prometheus.Metric
 
   def setup do
-    counter_events = []
-
     gauge_events = [
       [:deadlocks],
       [:locks],

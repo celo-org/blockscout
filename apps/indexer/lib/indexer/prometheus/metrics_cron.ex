@@ -47,7 +47,7 @@ defmodule Indexer.Prometheus.MetricsCron do
     :telemetry.execute([:indexer, :db, :deadlocks], %{value: number_of_dead_locks})
 
     longest_query_duration = Chain.fetch_name_and_duration_of_longest_query()
-    :telemetry.execute([:indexer, :db, :longest_query_duration], %{value: longest_query_duration.seconds})
+    :telemetry.execute([:indexer, :db, :longest_query_duration], %{value: longest_query_duration})
 
     response_times = ResponseETS.get_all()
 
@@ -71,10 +71,7 @@ defmodule Indexer.Prometheus.MetricsCron do
     {:noreply, state}
   end
 
-  defp calculate_and_add_rpc_response_metrics(id, req_times) do
-    start = Enum.at(req_times, 0)
-    finish = Enum.at(req_times, 1)
-
+  defp calculate_and_add_rpc_response_metrics(id, [start, finish]) do
     RPCInstrumenter.instrument(%{
       time: Map.get(finish, :finish) - Map.get(start, :start),
       method: Map.get(start, :method)

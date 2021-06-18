@@ -4891,11 +4891,11 @@ defmodule Explorer.Chain do
       """)
 
     {:ok, number_of_dead_locks_map} = result
-    {:ok, number_of_dead_locks_rows} = Map.fetch(number_of_dead_locks_map, :rows)
 
-    number_of_dead_locks_rows
-    |> Enum.at(0)
-    |> Enum.at(0)
+    case Map.fetch(number_of_dead_locks_map, :rows) do
+      {:ok, [[deadlocks_count]]} -> deadlocks_count
+      _ -> 0
+    end
   end
 
   @spec fetch_name_and_duration_of_longest_query :: Timex.Duration.t()
@@ -4907,11 +4907,10 @@ defmodule Explorer.Chain do
       """)
 
     {:ok, longest_query_map} = result
-    {:ok, longest_query_rows} = Map.fetch(longest_query_map, :rows)
 
-    longest_query_rows
-    |> Enum.at(0)
-    |> Enum.at(1)
-    |> Duration.from_erl()
+    case Map.fetch(longest_query_map, :rows) do
+      {:ok, [[_, longest_query_duration]]} -> longest_query_duration.secs
+      _ -> 0
+    end
   end
 end
