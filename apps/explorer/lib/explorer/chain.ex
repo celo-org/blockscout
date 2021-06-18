@@ -1608,7 +1608,7 @@ defmodule Explorer.Chain do
       last_block_query
       |> Repo.all()
 
-    [last_block | _rest] = last_twelve_blocks
+    [{last_block_number, last_block_timestamp, _, _} | _rest] = last_twelve_blocks
 
     gas_percentage_sum =
       Enum.reduce(last_twelve_blocks, 0, fn block, gas_percentage_sum ->
@@ -4874,11 +4874,11 @@ defmodule Explorer.Chain do
       """)
 
     {:ok, number_of_locks_map} = result
-    {:ok, number_of_locks_rows} = Map.fetch(number_of_locks_map, :rows)
 
-    number_of_locks_rows
-    |> Enum.at(0)
-    |> Enum.at(0)
+    case Map.fetch(number_of_locks_map, :rows) do
+      {:ok, [[locks_count]]} -> locks_count
+      _ -> 0
+    end
   end
 
   @spec fetch_number_of_dead_locks :: non_neg_integer()
@@ -4896,7 +4896,7 @@ defmodule Explorer.Chain do
     end
   end
 
-  @spec fetch_name_and_duration_of_longest_query :: Timex.Duration.t()
+  @spec fetch_name_and_duration_of_longest_query :: non_neg_integer()
   def fetch_name_and_duration_of_longest_query do
     result =
       SQL.query(Repo, """
