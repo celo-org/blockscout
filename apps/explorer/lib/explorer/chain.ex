@@ -95,6 +95,8 @@ defmodule Explorer.Chain do
 
   alias Dataloader.Ecto, as: DataloaderEcto
 
+  alias Timex.Duration
+
   @default_paging_options %PagingOptions{page_size: 50}
 
   @max_incoming_transactions_count 10_000
@@ -1713,18 +1715,33 @@ defmodule Explorer.Chain do
     Repo.one(query) || 0
   end
 
-  @spec fetch_last_n_blocks_count_and_last_block(integer | nil) :: {non_neg_integer, non_neg_integer}
-  def fetch_last_n_blocks_count_and_last_block(n) do
+  @doc """
+  Fetches count of last n blocks, last block timestamp, last block number and average gas used in the last minute.
+  Using a single method to fetch and calculate these values for performance reasons (only 2 queries used).
+  """
+  @spec metrics_fetcher(integer | nil) ::
+          {non_neg_integer, Elixir.DateTime.t(), non_neg_integer, float}
+  def metrics_fetcher(n) do
     last_block_query =
       from(block in Block,
-        select: {block.number, block.timestamp},
+        select: {block.number, block.timestamp, block.gas_limit, block.gas_used},
         where: block.consensus == true,
         order_by: [desc: block.number],
-        limit: 1
+        limit: 12
       )
 
-    last_block =
-       Repo.one(last_block_query)
+    last_twelve_blocks =
+      last_block_query
+      |> Repo.all()
+
+    [{last_block_number, last_block_timestamp, _, _} | _rest] = last_twelve_blocks
+
+    gas_percentage_sum =
+      Enum.reduce(last_twelve_blocks, 0, fn block, gas_percentage_sum ->
+        gas_percentage_sum + Decimal.to_float(Decimal.div(elem(block, 3), elem(block, 2))) * 100
+      end)
+
+    average_gas_used = gas_percentage_sum / 12
 
     if is_nil(last_block) do
       {0, 0}
@@ -1747,7 +1764,7 @@ defmodule Explorer.Chain do
         |> Enum.at(0)
         |> Enum.at(0)
 
-      {last_n_blocks_count, last_block}
+      {last_n_blocks_count, last_block_timestamp, last_block_number, average_gas_used}
     end
   end
 
@@ -3974,7 +3991,7 @@ defmodule Explorer.Chain do
   @doc """
   The current total number of coins minted minus verifiably burned coins.
   """
-  @spec total_supply :: non_neg_integer() | nil
+  @spec total_supply :: Decimal.t() | nil
   def total_supply do
     supply_module().total() || 0
   end
@@ -6111,6 +6128,73 @@ defmodule Explorer.Chain do
   defp boolean_to_check_result(true), do: :ok
 
   defp boolean_to_check_result(false), do: :not_found
+
+  @spec fetch_number_of_locks :: non_neg_integer()
+  def fetch_number_of_locks do
+    result =
+      SQL.query(Repo, """
+      select count(*) from (SELECT blocked_locks.pid     AS blocked_pid,
+           blocked_activity.usename  AS blocked_user,
+           blocking_locks.pid     AS blocking_pid,
+           blocking_activity.usename AS blocking_user,
+           blocked_activity.query    AS blocked_statement,
+           blocking_activity.query   AS current_statement_in_blocking_process
+      FROM  pg_catalog.pg_locks         blocked_locks
+      JOIN pg_catalog.pg_stat_activity blocked_activity  ON blocked_activity.pid = blocked_locks.pid
+      JOIN pg_catalog.pg_locks         blocking_locks
+          ON blocking_locks.locktype = blocked_locks.locktype
+          AND blocking_locks.DATABASE IS NOT DISTINCT FROM blocked_locks.DATABASE
+          AND blocking_locks.relation IS NOT DISTINCT FROM blocked_locks.relation
+          AND blocking_locks.page IS NOT DISTINCT FROM blocked_locks.page
+          AND blocking_locks.tuple IS NOT DISTINCT FROM blocked_locks.tuple
+          AND blocking_locks.virtualxid IS NOT DISTINCT FROM blocked_locks.virtualxid
+          AND blocking_locks.transactionid IS NOT DISTINCT FROM blocked_locks.transactionid
+          AND blocking_locks.classid IS NOT DISTINCT FROM blocked_locks.classid
+          AND blocking_locks.objid IS NOT DISTINCT FROM blocked_locks.objid
+          AND blocking_locks.objsubid IS NOT DISTINCT FROM blocked_locks.objsubid
+          AND blocking_locks.pid != blocked_locks.pid
+      JOIN pg_catalog.pg_stat_activity blocking_activity ON blocking_activity.pid = blocking_locks.pid
+      WHERE NOT blocked_locks.GRANTED) a;
+      """)
+
+    {:ok, number_of_locks_map} = result
+
+    case Map.fetch(number_of_locks_map, :rows) do
+      {:ok, [[locks_count]]} -> locks_count
+      _ -> 0
+    end
+  end
+
+  @spec fetch_number_of_dead_locks :: non_neg_integer()
+  def fetch_number_of_dead_locks do
+    result =
+      SQL.query(Repo, """
+      select deadlocks from pg_stat_database where datname = 'explorer';
+      """)
+
+    {:ok, number_of_dead_locks_map} = result
+
+    case Map.fetch(number_of_dead_locks_map, :rows) do
+      {:ok, [[deadlocks_count]]} -> deadlocks_count
+      _ -> 0
+    end
+  end
+
+  @spec fetch_name_and_duration_of_longest_query :: non_neg_integer()
+  def fetch_name_and_duration_of_longest_query do
+    result =
+      SQL.query(Repo, """
+        SELECT query, now() - xact_start AS duration FROM pg_stat_activity
+        WHERE state IN ('idle in transaction', 'active') order by now() - xact_start DESC LIMIT 1;
+      """)
+
+    {:ok, longest_query_map} = result
+
+    case Map.fetch(longest_query_map, :rows) do
+      {:ok, [[_, longest_query_duration]]} -> longest_query_duration.secs
+      _ -> 0
+    end
+  end
 
   def extract_db_name(db_url) do
     if db_url == nil do

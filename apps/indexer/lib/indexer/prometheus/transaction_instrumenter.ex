@@ -6,7 +6,8 @@ defmodule Indexer.Prometheus.TransactionInstrumenter do
 
   def setup do
     events = [
-      [:pending]
+      [:pending],
+      [:total]
     ]
 
     Enum.each(events, &setup_event/1)
@@ -25,5 +26,9 @@ defmodule Indexer.Prometheus.TransactionInstrumenter do
 
   def handle_event([:indexer, :transactions, :pending], %{value: val}, _metadata, _config) do
     Gauge.set([name: :indexer_transactions_pending_current], val)
+  end
+
+  def handle_event([:indexer, :transactions, :total], %{value: val}, _metadata, _config) do
+    Gauge.set([name: :indexer_transactions_total_current], val)
   end
 end
