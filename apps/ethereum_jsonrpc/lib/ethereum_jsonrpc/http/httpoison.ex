@@ -26,5 +26,5 @@ defmodule EthereumJSONRPC.HTTP.HTTPoison do
     end
   end
 
-  def json_rpc(url, _json, _options) when is_nil(url), do: {:error, "URL is nil"}
+  def json_rpc(url, _json, _options, _method) when is_nil(url), do: {:error, "URL is nil"}
 end

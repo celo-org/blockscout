@@ -1734,21 +1734,21 @@ defmodule Explorer.Chain do
       last_block_query
       |> Repo.all()
 
-    [{last_block_number, last_block_timestamp, _, _} | _rest] = last_twelve_blocks
-
-    gas_percentage_sum =
-      Enum.reduce(last_twelve_blocks, 0, fn block, gas_percentage_sum ->
-        gas_percentage_sum + Decimal.to_float(Decimal.div(elem(block, 3), elem(block, 2))) * 100
-      end)
-
-    average_gas_used = gas_percentage_sum / 12
-
-    if is_nil(last_block) do
-      {0, 0}
+    if is_nil(last_twelve_blocks) do
+      {0, 0, 0, 0}
     else
-      last_block_number = elem(last_block, 0)
-      last_block_timestamp = elem(last_block, 1)
-    range_start = last_block_number - n + 1
+      [{last_block_number, last_block_timestamp, _, _} | _rest] = last_twelve_blocks
+
+      gas_percentage_sum =
+        Enum.reduce(last_twelve_blocks, 0, fn block, gas_percentage_sum ->
+          gas_percentage_sum + Decimal.to_float(Decimal.div(elem(block, 3), elem(block, 2))) * 100
+        end)
+
+      average_gas_used = gas_percentage_sum / 12
+
+      last_block_age = DateTime.diff(DateTime.utc_now(), last_block_timestamp)
+
+      range_start = last_block_number - n + 1
 
       last_n_blocks_count_result =
         SQL.query!(
@@ -1757,14 +1757,13 @@ defmodule Explorer.Chain do
           [range_start, last_block_number]
         )
 
-      {:ok, last_n_blocks_count_rows} = Map.fetch(last_n_blocks_count_result, :rows)
-
       last_n_blocks_count =
-        last_n_blocks_count_rows
-        |> Enum.at(0)
-        |> Enum.at(0)
+        case Map.fetch(last_n_blocks_count_result, :rows) do
+          {:ok, [[last_n_blocks_count]]} -> last_n_blocks_count
+          _ -> 0
+        end
 
-      {last_n_blocks_count, last_block_timestamp, last_block_number, average_gas_used}
+      {last_n_blocks_count, last_block_age, last_block_number, average_gas_used}
     end
   end
 
