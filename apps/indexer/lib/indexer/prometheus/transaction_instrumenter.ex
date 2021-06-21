@@ -6,7 +6,8 @@ defmodule Indexer.Prometheus.TransactionInstrumenter do
 
   def setup do
     events = [
-      [:pending]
+      [:pending],
+      [:total]
     ]
 
     Enum.each(events, &setup_event/1)
@@ -15,15 +16,19 @@ defmodule Indexer.Prometheus.TransactionInstrumenter do
   defp setup_event(event) do
     name = "indexer_transactions_#{Enum.join(event, "_")}"
 
-    Counter.declare(
-      name: String.to_atom("#{name}_total"),
-      help: "Total count of tracking for transaction event #{name}"
+    Gauge.declare(
+      name: String.to_atom("#{name}_current"),
+      help: "Current number of tracking for transaction event #{name}"
     )
 
     :telemetry.attach(name, [:indexer, :transactions | event], &handle_event/4, nil)
   end
 
-  def handle_event([:indexer, :transactions, :pending], _value, _metadata, _config) do
-    Counter.inc(name: :indexer_transactions_pending_total)
+  def handle_event([:indexer, :transactions, :pending], %{value: val}, _metadata, _config) do
+    Gauge.set([name: :indexer_transactions_pending_current], val)
+  end
+
+  def handle_event([:indexer, :transactions, :total], %{value: val}, _metadata, _config) do
+    Gauge.set([name: :indexer_transactions_total_current], val)
   end
 end

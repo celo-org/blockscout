@@ -1,4 +1,4 @@
-defmodule Indexer.LoggerBackend do
+defmodule BlockScoutWeb.LoggerBackend do
   @moduledoc """
   Custom logger backend that increments the error metric whenever Logger.error is called.
   """
@@ -36,7 +36,7 @@ defmodule Indexer.LoggerBackend do
 
   def handle_event({level, _gl, {Logger, _msg, _ts, _meta}}, state) do
     if Logger.compare_levels(level, state.level) != :lt do
-      :telemetry.execute([:indexer, :generics, :error], %{count: 1})
+      :telemetry.execute([:block_scout_web, :generics, :error], %{count: 1})
     end
 
     {:ok, state}

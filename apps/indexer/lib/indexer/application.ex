@@ -5,7 +5,7 @@ defmodule Indexer.Application do
 
   use Application
 
-  alias Indexer.{Health, LoggerBackend, Memory, Prometheus}
+  alias Indexer.{LoggerBackend, Memory, Prometheus}
   alias Prometheus.Setup
 
   @impl Application
