@@ -5,7 +5,7 @@ defmodule Indexer.Prometheus.MetricsCron do
   use GenServer
   alias Explorer.Chain
   alias Explorer.Counters.AverageBlockTime
-  alias Indexer.Prometheus.{RpcResponseEts, RPCInstrumenter}
+  alias Indexer.Prometheus.{RPCInstrumenter, RpcResponseEts}
   alias Timex.Duration
 
   require DateTime

@@ -1720,7 +1720,7 @@ defmodule Explorer.Chain do
   Using a single method to fetch and calculate these values for performance reasons (only 2 queries used).
   """
   @spec metrics_fetcher(integer | nil) ::
-          {non_neg_integer, Elixir.DateTime.t(), non_neg_integer, float}
+          {non_neg_integer, non_neg_integer, non_neg_integer, float}
   def metrics_fetcher(n) do
     last_block_query =
       from(block in Block,
