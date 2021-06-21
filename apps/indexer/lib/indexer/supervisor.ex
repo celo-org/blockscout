@@ -46,7 +46,7 @@ defmodule Indexer.Supervisor do
     UnclesWithoutIndex
   }
 
-  alias Indexer.Prometheus.{MetricsCron, ResponseETS}
+  alias Indexer.Prometheus.{MetricsCron, RpcResponseEts}
 
   def child_spec([]) do
     child_spec([[]])
@@ -157,7 +157,7 @@ defmodule Indexer.Supervisor do
       {PendingOpsCleaner, [[], []]},
         # Prometheus Metrics
         {MetricsCron, [[]]},
-        {ResponseETS, [[]]}
+        {RpcResponseEts, [[]]}
       ]
 
     extended_fetchers =

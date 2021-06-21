@@ -5,7 +5,7 @@ defmodule Indexer.Prometheus.MetricsCron do
   use GenServer
   alias Explorer.Chain
   alias Explorer.Counters.AverageBlockTime
-  alias Indexer.Prometheus.{ResponseETS, RPCInstrumenter}
+  alias Indexer.Prometheus.{RpcResponseEts, RPCInstrumenter}
   alias Timex.Duration
 
   require DateTime
@@ -47,7 +47,7 @@ defmodule Indexer.Prometheus.MetricsCron do
     longest_query_duration = Chain.fetch_name_and_duration_of_longest_query()
     :telemetry.execute([:indexer, :db, :longest_query_duration], %{value: longest_query_duration})
 
-    response_times = ResponseETS.get_all()
+    response_times = RpcResponseEts.get_all()
 
     response_times
     |> Enum.filter(&Map.has_key?(elem(&1, 1), :finish))
@@ -75,7 +75,7 @@ defmodule Indexer.Prometheus.MetricsCron do
       method: Map.get(start, :method)
     })
 
-    ResponseETS.delete(id)
+    RpcResponseEts.delete(id)
   end
 
   defp repeat do

@@ -1,4 +1,4 @@
-defmodule Indexer.Prometheus.ResponseETS do
+defmodule Indexer.Prometheus.RpcResponseEts do
   @moduledoc """
   Create and manage an ETS table that keeps the start and end time of json-rpc requests
   """
