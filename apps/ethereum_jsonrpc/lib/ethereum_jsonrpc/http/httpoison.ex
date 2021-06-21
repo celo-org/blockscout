@@ -12,7 +12,6 @@ defmodule EthereumJSONRPC.HTTP.HTTPoison do
 
   @impl HTTP
   def json_rpc(url, json, options, method) when is_binary(url) and is_list(options) do
-    IO.inspect :application.get_key(:indexer, :modules)
     id = UUID.uuid4()
     RpcResponseEts.put(id, %{:method => method, :start => :os.system_time(:millisecond)})
 
