@@ -2,7 +2,7 @@ defmodule BlockScoutWeb.Resolvers.CeloUtil do
   @moduledoc false
 
   alias Explorer.Chain
-  alias Explorer.Chain.{CeloValidator}
+  alias Explorer.Chain.CeloValidator
 
   def get_elected(%CeloValidator{address: hash}, _, _) do
     case Chain.get_latest_validating_block(hash) do
