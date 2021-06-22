@@ -4,7 +4,7 @@ defmodule EthereumJSONRPC.HTTP.HTTPoison do
   """
 
   alias EthereumJSONRPC.HTTP
-  alias Indexer.Prometheus.RpcResponseEts
+  alias HTTP.RpcResponseEts
 
   require UUID
 

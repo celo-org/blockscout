@@ -1,6 +1,7 @@
-defmodule Indexer.Prometheus.RpcResponseEts do
+defmodule EthereumJSONRPC.HTTP.RpcResponseEts do
   @moduledoc """
-  Create and manage an ETS table that keeps the start and end time of json-rpc requests
+  Create and manage an ETS table that keeps the start and end time of json-rpc requests and deletes them after they've
+  been processed for metrics or in case of error.
   """
   use GenServer
 

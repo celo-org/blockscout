@@ -3,9 +3,10 @@ defmodule Indexer.Prometheus.MetricsCron do
   Periodically retrieves and updates prometheus metrics
   """
   use GenServer
+  alias EthereumJSONRPC.HTTP.RpcResponseEts
   alias Explorer.Chain
   alias Explorer.Counters.AverageBlockTime
-  alias Indexer.Prometheus.{RPCInstrumenter, RpcResponseEts}
+  alias Indexer.Prometheus.RPCInstrumenter
   alias Timex.Duration
 
   require DateTime
