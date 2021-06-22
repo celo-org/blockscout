@@ -95,8 +95,6 @@ defmodule Explorer.Chain do
 
   alias Dataloader.Ecto, as: DataloaderEcto
 
-  alias Timex.Duration
-
   @default_paging_options %PagingOptions{page_size: 50}
 
   @max_incoming_transactions_count 10_000
@@ -1722,48 +1720,44 @@ defmodule Explorer.Chain do
   @spec metrics_fetcher(integer | nil) ::
           {non_neg_integer, non_neg_integer, non_neg_integer, float}
   def metrics_fetcher(n) do
-    last_block_query =
-      from(block in Block,
-        select: {block.number, block.timestamp, block.gas_limit, block.gas_used},
-        where: block.consensus == true,
-        order_by: [desc: block.number],
-        limit: 12
+    {last_block_number} =
+      Repo.one(
+        from(block in Block,
+          select: {block.number},
+          where: block.consensus == true,
+          order_by: [desc: block.number],
+          limit: 1
+        )
       )
 
-    last_twelve_blocks =
-      last_block_query
-      |> Repo.all()
-
-    if is_nil(last_twelve_blocks) do
+    if is_nil(last_block_number) do
       {0, 0, 0, 0}
     else
-      [{last_block_number, last_block_timestamp, _, _} | _rest] = last_twelve_blocks
-
-      gas_percentage_sum =
-        Enum.reduce(last_twelve_blocks, 0, fn block, gas_percentage_sum ->
-          gas_percentage_sum + Decimal.to_float(Decimal.div(elem(block, 3), elem(block, 2))) * 100
-        end)
-
-      average_gas_used = gas_percentage_sum / 12
-
-      last_block_age = DateTime.diff(DateTime.utc_now(), last_block_timestamp)
-
       range_start = last_block_number - n + 1
 
-      last_n_blocks_count_result =
+      last_n_blocks_result =
         SQL.query!(
           Repo,
-          "SELECT COUNT(*) FROM blocks WHERE number BETWEEN $1 and $2;",
+          """
+          SELECT
+          COUNT(*) AS last_n_blocks_count,
+          EXTRACT(EPOCH FROM (DATE_TRUNC('second', NOW()::timestamp) - MAX(timestamp))) AS last_block_age,
+          AVG((gas_used/gas_limit)*100) AS average_gas_used
+          FROM blocks
+          WHERE number BETWEEN $1 AND $2;
+          """,
           [range_start, last_block_number]
         )
 
-      last_n_blocks_count =
-        case Map.fetch(last_n_blocks_count_result, :rows) do
-          {:ok, [[last_n_blocks_count]]} -> last_n_blocks_count
-          _ -> 0
+      {last_n_blocks_count, last_block_age, average_gas_used} =
+        case Map.fetch(last_n_blocks_result, :rows) do
+          {:ok, [[last_n_blocks_count, last_block_age, average_gas_used]]} ->
+            {last_n_blocks_count, last_block_age, average_gas_used}
+          _ ->
+            0
         end
 
-      {last_n_blocks_count, last_block_age, last_block_number, average_gas_used}
+      {last_n_blocks_count, last_block_age, last_block_number, Decimal.to_float(average_gas_used)}
     end
   end
 
