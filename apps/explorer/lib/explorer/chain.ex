@@ -6132,7 +6132,7 @@ defmodule Explorer.Chain do
   def fetch_number_of_locks do
     result =
       SQL.query(Repo, """
-      select count(*) from (SELECT blocked_locks.pid     AS blocked_pid,
+      SELECT COUNT(*) FROM (SELECT blocked_locks.pid     AS blocked_pid,
            blocked_activity.usename  AS blocked_user,
            blocking_locks.pid     AS blocking_pid,
            blocking_activity.usename AS blocking_user,
@@ -6168,7 +6168,7 @@ defmodule Explorer.Chain do
   def fetch_number_of_dead_locks do
     result =
       SQL.query(Repo, """
-      select deadlocks from pg_stat_database where datname = 'explorer';
+      SELECT deadlocks FROM pg_stat_database where datname = 'explorer';
       """)
 
     {:ok, number_of_dead_locks_map} = result
@@ -6184,7 +6184,7 @@ defmodule Explorer.Chain do
     result =
       SQL.query(Repo, """
         SELECT query, now() - xact_start AS duration FROM pg_stat_activity
-        WHERE state IN ('idle in transaction', 'active') order by now() - xact_start DESC LIMIT 1;
+        WHERE state IN ('idle in transaction', 'active') ORDER BY now() - xact_start DESC LIMIT 1;
       """)
 
     {:ok, longest_query_map} = result
