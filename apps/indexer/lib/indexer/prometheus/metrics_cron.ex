@@ -34,7 +34,7 @@ defmodule Indexer.Prometheus.MetricsCron do
     {last_n_blocks_count, last_block_age, last_block_number, average_gas_used} =
       Chain.metrics_fetcher(config(:metrics_fetcher_blocks_count))
 
-    :telemetry.execute([:indexer, :blocks, :pending], %{value: last_n_blocks_count})
+    :telemetry.execute([:indexer, :blocks, :pending], %{value: config(:metrics_fetcher_blocks_count) - last_n_blocks_count})
     :telemetry.execute([:indexer, :tokens, :average_gas], %{value: average_gas_used})
 
     :telemetry.execute([:indexer, :blocks, :last_block_age], %{value: last_block_age})
