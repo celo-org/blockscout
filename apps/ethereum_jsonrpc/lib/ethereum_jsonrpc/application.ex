@@ -5,7 +5,7 @@ defmodule EthereumJSONRPC.Application do
 
   use Application
 
-  alias EthereumJSONRPC.{IPC, RequestCoordinator, RollingWindow, HTTP}
+  alias EthereumJSONRPC.{HTTP, IPC, RequestCoordinator, RollingWindow}
   alias HTTP.RpcResponseEts
 
   @impl Application

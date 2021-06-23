@@ -1753,6 +1753,7 @@ defmodule Explorer.Chain do
         case Map.fetch(last_n_blocks_result, :rows) do
           {:ok, [[last_n_blocks_count, last_block_age, average_gas_used]]} ->
             {last_n_blocks_count, last_block_age, average_gas_used}
+
           _ ->
             0
         end
