@@ -82,6 +82,8 @@ config :logger, :logger_backend, level: :error
 #  metadata_filter: [application: :indexer]
 
 config :indexer, Indexer.Block.Fetcher, enable_gold_token: true
+config :indexer, Indexer.Prometheus.MetricsCron, metrics_fetcher_blocks_count: 1000
+config :indexer, Indexer.Prometheus.MetricsCron, metrics_cron_interval: 2
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

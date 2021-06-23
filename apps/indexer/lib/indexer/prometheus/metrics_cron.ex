@@ -22,12 +22,16 @@ defmodule Indexer.Prometheus.MetricsCron do
     {:ok, args}
   end
 
+  defp config(key) do
+    Application.get_env(:indexer, __MODULE__, [])[key]
+  end
+
   @impl true
   def handle_info(:import_and_reschedule, state) do
     pending_transactions_list_from_db = Chain.pending_transactions_list()
     :telemetry.execute([:indexer, :transactions, :pending], %{value: Enum.count(pending_transactions_list_from_db)})
 
-    {last_n_blocks_count, last_block_age, last_block_number, average_gas_used} = Chain.metrics_fetcher(1000)
+    {last_n_blocks_count, last_block_age, last_block_number, average_gas_used} = Chain.metrics_fetcher(config(:metrics_fetcher_blocks_count))
 
     :telemetry.execute([:indexer, :blocks, :pending], %{value: last_n_blocks_count})
     :telemetry.execute([:indexer, :tokens, :average_gas], %{value: average_gas_used})
@@ -81,6 +85,6 @@ defmodule Indexer.Prometheus.MetricsCron do
   end
 
   defp repeat do
-    Process.send_after(self(), :import_and_reschedule, :timer.seconds(2))
+    Process.send_after(self(), :import_and_reschedule, :timer.seconds(config(:metrics_cron_interval)))
   end
 end
