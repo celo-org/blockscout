@@ -8,14 +8,14 @@ defmodule BlockScoutWeb.Application do
   alias BlockScoutWeb.Counters.BlocksIndexedCounter
   alias BlockScoutWeb.{Endpoint, Prometheus}
   alias BlockScoutWeb.{RealtimeEventHandler, StakingEventHandler}
-  alias Prometheus.{Exporter, GenericInstrumenter, Instrumenter}
+  alias Prometheus.{Exporter, GenericInstrumenter}
 
   def start(_type, _args) do
     import Supervisor
 
     Exporter.setup()
     GenericInstrumenter.setup()
-    Instrumenter.setup()
+    PrometheusPhx.setup()
 
     # Define workers and child supervisors to be supervised
     children = [
