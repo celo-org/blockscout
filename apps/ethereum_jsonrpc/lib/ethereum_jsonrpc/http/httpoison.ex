@@ -17,7 +17,7 @@ defmodule EthereumJSONRPC.HTTP.HTTPoison do
 
     case HTTPoison.post(url, json, [{"Content-Type", "application/json"}], options) do
       {:ok, %HTTPoison.Response{body: body, status_code: status_code}} ->
-        RpcResponseEts.put(id, %{:method => method, :finish => :os.system_time(:millisecond)})
+        RpcResponseEts.put(id, %{:finish => :os.system_time(:millisecond), :status_code => status_code})
         {:ok, %{body: body, status_code: status_code}}
 
       {:error, %HTTPoison.Error{reason: reason}} ->

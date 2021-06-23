@@ -73,7 +73,8 @@ defmodule Indexer.Prometheus.MetricsCron do
   defp calculate_and_add_rpc_response_metrics(id, [start, finish]) do
     RPCInstrumenter.instrument(%{
       time: Map.get(finish, :finish) - Map.get(start, :start),
-      method: Map.get(start, :method)
+      method: Map.get(start, :method),
+      status_code: Map.get(finish, :status_code)
     })
 
     RpcResponseEts.delete(id)
