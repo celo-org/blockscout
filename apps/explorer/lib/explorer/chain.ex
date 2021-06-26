@@ -2713,7 +2713,7 @@ defmodule Explorer.Chain do
           right_join:
             missing_range in fragment(
               """
-                (SELECT b1.number 
+                (SELECT b1.number
                 FROM generate_series(0, (?)::integer) AS b1(number)
                 WHERE NOT EXISTS
                   (SELECT 1 FROM blocks b2 WHERE b2.number=b1.number AND b2.consensus))
@@ -6642,7 +6642,7 @@ defmodule Explorer.Chain do
   def fetch_name_and_duration_of_longest_query do
     result =
       SQL.query(Repo, """
-        SELECT query, now() - xact_start AS duration FROM pg_stat_activity
+        SELECT query, NOW() - xact_start AS duration FROM pg_stat_activity
         WHERE state IN ('idle in transaction', 'active') ORDER BY now() - xact_start DESC LIMIT 1;
       """)
 
