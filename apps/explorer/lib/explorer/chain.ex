@@ -4143,7 +4143,7 @@ defmodule Explorer.Chain do
   @doc """
   The current total number of coins minted minus verifiably burned coins.
   """
-  @spec total_supply :: Decimal.t() | nil
+  @spec total_supply :: Decimal.t() | 0 | nil
   def total_supply do
     supply_module().total() || 0
   end
