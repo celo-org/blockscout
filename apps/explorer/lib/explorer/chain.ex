@@ -6615,10 +6615,8 @@ defmodule Explorer.Chain do
       WHERE NOT blocked_locks.GRANTED) a;
       """)
 
-    {:ok, number_of_locks_map} = result
-
-    case Map.fetch(number_of_locks_map, :rows) do
-      {:ok, [[locks_count]]} -> locks_count
+    case result do
+      {:ok, %Postgrex.Result{rows: [[rows]]}} -> rows
       _ -> 0
     end
   end
@@ -6631,10 +6629,8 @@ defmodule Explorer.Chain do
       SELECT deadlocks FROM pg_stat_database where datname = $1;
       """, [database])
 
-    {:ok, number_of_dead_locks_map} = result
-
-    case Map.fetch(number_of_dead_locks_map, :rows) do
-      {:ok, [[deadlocks_count]]} -> deadlocks_count
+    case result do
+      {:ok, %Postgrex.Result{rows: [[rows]]}} -> rows
       _ -> 0
     end
   end
