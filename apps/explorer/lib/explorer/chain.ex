@@ -1733,17 +1733,9 @@ defmodule Explorer.Chain do
   @spec metrics_fetcher(integer | nil) ::
           {non_neg_integer, non_neg_integer, non_neg_integer, float}
   def metrics_fetcher(n) do
-    {last_block_number} =
-      Repo.one(
-        from(block in Block,
-          select: {block.number},
-          where: block.consensus == true,
-          order_by: [desc: block.number],
-          limit: 1
-        )
-      )
+    last_block_number = fetch_max_block_number()
 
-    if is_nil(last_block_number) do
+    if last_block_number == 0 do
       {0, 0, 0, 0}
     else
       range_start = last_block_number - n + 1
