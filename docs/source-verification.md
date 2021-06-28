@@ -127,7 +127,7 @@ main()
 ```
 3. Celo (and testnets) have been added to Sourcify as a monitored EVM compatible source chain, and when you view the contract on Sourcify it should appear as already verified. However, to appear as verified on Blockscout (we need to at least once set a flag in the Blockscout database) you must upload the build metadata via the file uploader on Blockscout (see below).
 
-_Note: an enhancement is planned so that you do not need to visit the Blockscout page and upload the JSON after posting to IPFS during the migration process. The enhancement will query the Sourcify API the first time anyone navigates to the address for the smart contract and update it in the backend automatically. This would mean you can add verification to your remote CI tooling like GitHub Actions or CircleCI without human intervention._ 
+_Note: if your contract is verified on Sourcify via posting to IPFS during the migration process, Blockscout queries the Sourcify API the first time anyone navigates to the address for the smart contract and updates it in the backend automatically. This means you can add verification to your remote CI tooling like GitHub Actions or CircleCI without human intervention._
 
 ## Publishing via Blockscout
 
@@ -143,7 +143,7 @@ After you click the _Verify & Publish_ button to post the files and the source i
 
 Head to https://sourcify.dev, select the target network, enter the contract address, and drop the file(s) required. 
 
-_Note: this approach will post the data to the Sourcify repository for the first time if it doesn't already exist, but Blockscout will not yet know that is it verified. You must publish through Blockscout as described above to have the contract verified in the Blockscout database permanently (there is currently no "scraper" process performing this automatically)_
+_Note: this approach will post the data to the Sourcify repository for the first time if it doesn't already exist, but Blockscout will not yet know that is it verified. Blockscout queries the Sourcify API the first time anyone navigates to the address for the smart contract and updates it in the backend automatically._
 
 ## Troubleshooting
 
