@@ -14,17 +14,18 @@ defmodule Explorer.Chain.CeloTokenTransferTest do
 
       token = insert(:token, contract_address: token_contract_address)
 
-      transaction = :transaction
-      |> insert()
-      |> with_block()
+      transaction =
+        :transaction
+        |> insert()
+        |> with_block()
 
       %{
-          to_address: build(:address),
-          transaction: transaction,
-          token_contract_address: token_contract_address,
-          block: transaction.block,
-          token: token,
-          comment: comment
+        to_address: build(:address),
+        transaction: transaction,
+        token_contract_address: token_contract_address,
+        block: transaction.block,
+        token: token,
+        comment: comment
       }
     end
 
