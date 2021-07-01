@@ -63,6 +63,7 @@ defmodule Explorer.Celo.Telemetry do
   defmacro wrap(event_name, call) do
     quote do
       start = Explorer.Celo.Telemetry.start(unquote(event_name))
+
       try do
         unquote(call)
         Explorer.Celo.Telemetry.stop(unquote(event_name), start)

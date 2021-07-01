@@ -155,8 +155,7 @@ defmodule Indexer.Supervisor do
       {CeloVoterRewards.Supervisor,
        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {CeloVoters.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
-      {CeloMaterializedViewRefresh, [[], []]},
-
+      {CeloMaterializedViewRefresh, [[], []]}
     ]
 
     extended_fetchers =
