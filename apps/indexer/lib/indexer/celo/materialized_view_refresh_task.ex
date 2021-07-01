@@ -4,8 +4,9 @@ defmodule Indexer.Fetcher.CeloMaterializedViewRefresh do
   require Logger
 
   alias Explorer.Repo
+  require Explorer.Celo.Telemetry, as: Telemetry
 
-  @refresh_interval :timer.seconds(200)
+  @refresh_interval :timer.seconds(2)
   @timeout :timer.seconds(120)
 
   def start_link([init_opts, gen_server_opts]) do
@@ -26,9 +27,7 @@ defmodule Indexer.Fetcher.CeloMaterializedViewRefresh do
   end
 
   def handle_info(:refresh_views, %{refresh_interval: refresh_interval, timeout: timeout} = state) do
-    # start telemetry
-
-    refresh_views(timeout)
+    Telemetry.wrap(:refresh_materialized_views, refresh_views(timeout))
 
     Process.send_after(self(), :refresh_views, refresh_interval)
 
@@ -36,12 +35,8 @@ defmodule Indexer.Fetcher.CeloMaterializedViewRefresh do
   end
 
   defp refresh_views(timeout) do
-    # https://wiki.postgresql.org/wiki/Refresh_All_Materialized_Views
-
-    Repo.query!("refresh materialized view celo_wallet_accounts;", timeout: timeout)
-    Repo.query!("refresh materialized view celo_accumulated_rewards;", timeout: timeout)
-    Repo.query!("refresh materialized view celo_attestation_stats;", timeout: timeout)
-
-    Logger.info(fn -> "Refreshed material views." end)
+    Repo.query!("refresh materialized view celo_wallet_accounts;", [], timeout: timeout)
+    Repo.query!("refresh materialized view celo_accumulated_rewards;", [], timeout: timeout)
+    Repo.query!("refresh materialized view celo_attestation_stats;", [], timeout: timeout)
   end
 end
