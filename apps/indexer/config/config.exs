@@ -47,7 +47,8 @@ config :indexer,
   memory_limit: 1 <<< 30,
   health_check_port: port || 4001,
   first_block: System.get_env("FIRST_BLOCK") || "",
-  last_block: System.get_env("LAST_BLOCK") || ""
+  last_block: System.get_env("LAST_BLOCK") || "",
+  metrics_enabled: System.get_env("METRICS_ENABLED") || false
 
 config :indexer, Indexer.Fetcher.PendingTransaction.Supervisor,
   disabled?: System.get_env("ETHEREUM_JSONRPC_VARIANT") == "besu"
@@ -95,7 +96,7 @@ config :logger, :logger_backend, level: :error
 
 config :indexer, Indexer.Block.Fetcher, enable_gold_token: true
 config :indexer, Indexer.Prometheus.MetricsCron, metrics_fetcher_blocks_count: 1000
-config :indexer, Indexer.Prometheus.MetricsCron, metrics_cron_interval: 2
+config :indexer, Indexer.Prometheus.MetricsCron, metrics_cron_interval: System.get_env("METRICS_CRON_INTERVAL") || "2"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

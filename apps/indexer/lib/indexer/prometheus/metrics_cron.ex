@@ -70,7 +70,10 @@ defmodule Indexer.Prometheus.MetricsCron do
     :telemetry.execute([:indexer, :tokens, :address_count], %{value: total_address_count})
 
     with total_supply when not is_nil(total_supply) <- Chain.total_supply() do
-      :telemetry.execute([:indexer, :tokens, :total_supply], %{value: Decimal.to_float(total_supply)})
+      case total_supply do
+        0 -> :telemetry.execute([:indexer, :tokens, :total_supply], %{value: 0})
+        _ -> :telemetry.execute([:indexer, :tokens, :total_supply], %{value: Decimal.to_float(total_supply)})
+      end
     end
 
     repeat()
@@ -89,6 +92,7 @@ defmodule Indexer.Prometheus.MetricsCron do
   end
 
   defp repeat do
-    Process.send_after(self(), :import_and_reschedule, :timer.seconds(config(:metrics_cron_interval)))
+    {interval, _} = Integer.parse(config(:metrics_cron_interval))
+    Process.send_after(self(), :import_and_reschedule, :timer.seconds(interval))
   end
 end
