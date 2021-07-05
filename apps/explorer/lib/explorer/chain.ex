@@ -6623,11 +6623,17 @@ defmodule Explorer.Chain do
 
   @spec fetch_number_of_dead_locks :: non_neg_integer()
   def fetch_number_of_dead_locks do
-    database = if System.get_env("DATABASE_URL"), do: extract_db_name(System.get_env("DATABASE_URL")), else: "explorer_dev"
+    database =
+      if System.get_env("DATABASE_URL"), do: extract_db_name(System.get_env("DATABASE_URL")), else: "explorer_dev"
+
     result =
-      SQL.query(Repo, """
-      SELECT deadlocks FROM pg_stat_database where datname = $1;
-      """, [database])
+      SQL.query(
+        Repo,
+        """
+        SELECT deadlocks FROM pg_stat_database where datname = $1;
+        """,
+        [database]
+      )
 
     case result do
       {:ok, %Postgrex.Result{rows: [[rows]]}} -> rows
