@@ -2,6 +2,9 @@ defmodule Explorer.Celo.Telemetry do
   @moduledoc """
     Common telemetry module for Celo Blockscout
   """
+
+  alias __MODULE__
+
   @doc false
   def start(name, meta \\ %{}, measurements \\ %{}) do
     time = System.monotonic_time()
@@ -50,26 +53,26 @@ defmodule Explorer.Celo.Telemetry do
 
   will be expanded to
 
-      start = Explorer.Celo.Telemetry.start(:event_name)
+      start = Telemetry.start(:event_name)
       try do
         call_function()
-        Explorer.Celo.Telemetry.stop(:event_name, start)
+        Telemetry.stop(:event_name, start)
       rescue
         e ->
-          Explorer.Celo.Telemetry.exception(:event_name, start, :exception, e, __STACKTRACE__)
+          Telemetry.exception(:event_name, start, :exception, e, __STACKTRACE__)
           reraise e, __STACKTRACE__
       end
   """
   defmacro wrap(event_name, call) do
     quote do
-      start = Explorer.Celo.Telemetry.start(unquote(event_name))
+      start_time = Telemetry.start(unquote(event_name))
 
       try do
         unquote(call)
-        Explorer.Celo.Telemetry.stop(unquote(event_name), start)
+        Telemetry.stop(unquote(event_name), start_time)
       rescue
         e ->
-          Explorer.Celo.Telemetry.exception(unquote(event_name), start, :exception, e, __STACKTRACE__)
+          Telemetry.exception(unquote(event_name), start_time, :exception, e, __STACKTRACE__)
           reraise e, __STACKTRACE__
       end
     end

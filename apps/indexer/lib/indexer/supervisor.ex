@@ -21,12 +21,12 @@ defmodule Indexer.Supervisor do
   alias Indexer.Fetcher.{
     BlockReward,
     CeloAccount,
+    CeloMaterializedViewRefresh,
     CeloValidator,
     CeloValidatorGroup,
     CeloValidatorHistory,
     CeloVoterRewards,
     CeloVoters,
-    CeloMaterializedViewRefresh,
     CoinBalance,
     CoinBalanceOnDemand,
     ContractCode,
