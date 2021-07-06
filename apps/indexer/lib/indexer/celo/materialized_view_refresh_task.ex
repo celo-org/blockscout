@@ -9,7 +9,7 @@ defmodule Indexer.Fetcher.CeloMaterializedViewRefresh do
   alias Explorer.Repo
   require Explorer.Celo.Telemetry, as: Telemetry
 
-  @refresh_interval :timer.seconds(2)
+  @refresh_interval :timer.seconds(150)
   @timeout :timer.seconds(120)
 
   def start_link([init_opts, gen_server_opts]) do
@@ -41,6 +41,6 @@ defmodule Indexer.Fetcher.CeloMaterializedViewRefresh do
   defp refresh_views(timeout) do
     Repo.query!("refresh materialized view celo_wallet_accounts;", [], timeout: timeout)
     Repo.query!("refresh materialized view celo_accumulated_rewards;", [], timeout: timeout)
-    Repo.query!("refresh materialized view celo_attestation_stats;",  [],timeout: timeout)
+    Repo.query!("refresh materialized view celo_attestation_stats;",  [], timeout: timeout)
   end
 end
