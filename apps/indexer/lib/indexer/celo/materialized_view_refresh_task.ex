@@ -30,8 +30,7 @@ defmodule Indexer.Fetcher.CeloMaterializedViewRefresh do
   end
 
   def handle_info(:refresh_views, %{refresh_interval: refresh_interval, timeout: timeout} = state) do
-
-    Telemetry.wrap :refresh_materialized_views, refresh_views(timeout)
+    Telemetry.wrap(:refresh_materialized_views, refresh_views(timeout))
 
     Process.send_after(self(), :refresh_views, refresh_interval)
 
@@ -41,6 +40,6 @@ defmodule Indexer.Fetcher.CeloMaterializedViewRefresh do
   defp refresh_views(timeout) do
     Repo.query!("refresh materialized view celo_wallet_accounts;", [], timeout: timeout)
     Repo.query!("refresh materialized view celo_accumulated_rewards;", [], timeout: timeout)
-    Repo.query!("refresh materialized view celo_attestation_stats;",  [], timeout: timeout)
+    Repo.query!("refresh materialized view celo_attestation_stats;", [], timeout: timeout)
   end
 end
