@@ -79,20 +79,12 @@ defmodule Explorer.Etherscan.Logs do
 
     logs_query = where_topic_match(Log, prepared_filter)
 
-    query_to_address_hash_wrapped =
-      logs_query
-      |> internal_transaction_query(:to_address_hash, prepared_filter, address_hash)
-      |> Chain.wrapped_union_subquery()
-
-    query_from_address_hash_wrapped =
-      logs_query
-      |> internal_transaction_query(:from_address_hash, prepared_filter, address_hash)
-      |> Chain.wrapped_union_subquery()
-
-    query_created_contract_address_hash_wrapped =
-      logs_query
-      |> internal_transaction_query(:created_contract_address_hash, prepared_filter, address_hash)
-      |> Chain.wrapped_union_subquery()
+    [query_to_address_hash_wrapped, query_from_address_hash_wrapped, query_created_contract_address_hash_wrapped] =
+      Enum.map([:to_address_hash, :from_address_hash, :created_contract_address_hash], fn hash ->
+        logs_query
+        |> internal_transaction_query(hash, prepared_filter, address_hash)
+        |> Chain.wrapped_union_subquery()
+      end)
 
     internal_transaction_log_query =
       query_to_address_hash_wrapped
