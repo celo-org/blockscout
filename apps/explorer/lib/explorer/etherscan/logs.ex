@@ -106,10 +106,10 @@ defmodule Explorer.Etherscan.Logs do
           gas_price: transaction.gas_price,
           gas_currency_hash: transaction.gas_currency_hash,
           gas_fee_recipient_hash: transaction.gas_fee_recipient_hash,
-          gateway_fee: transaction.gateway_fee,
           gas_used: transaction.gas_used,
-          transaction_index: transaction.index,
-          block_number: transaction.block_number
+          gateway_fee: transaction.gateway_fee,
+          block_number: transaction.block_number,
+          transaction_index: transaction.index
         },
         union: ^internal_transaction_log_query
       )
