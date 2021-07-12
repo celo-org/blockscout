@@ -113,9 +113,10 @@ defmodule Explorer.Repo do
     url = opts[:url] || System.get_env("DATABASE_URL")
 
     extract_parameters(url)
+    |> take_postgrex_params()
   end
 
-  defp extract_parameters(""), do: []
+  defp extract_parameters(empty) when empty == nil or empty == "", do: []
 
   # sobelow_skip ["DOS.StringToAtom"]
   defp extract_parameters(database_url) do
@@ -130,4 +131,13 @@ defmodule Explorer.Repo do
     end)
   end
 
+  # take params that are applied directly to postgrex (e.g. PGUSER) and pull them into the config
+  defp take_postgrex_params(opts) do
+    Enum.reduce([username: "PGUSER", password: "PGPASSWORD"], opts, fn {name, var}, opts ->
+      case System.get_env(var) do
+        nil -> opts
+        env_value -> Keyword.put(opts, name, env_value)
+      end
+    end)
+  end
 end
