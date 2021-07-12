@@ -1171,6 +1171,8 @@ defmodule Explorer.Chain do
       word
       |> String.replace(~r/[^a-zA-Z0-9]/, " ")
       |> String.replace(~r/ +/, " & ")
+      |> String.replace_leading(" & ", "")
+      |> String.replace_trailing(" & ", "")
 
     term_final = term <> ":*"
 
@@ -1200,6 +1202,8 @@ defmodule Explorer.Chain do
       word
       |> String.replace(~r/[^a-zA-Z0-9]/, " ")
       |> String.replace(~r/ +/, " & ")
+      |> String.replace_leading(" & ", "")
+      |> String.replace_trailing(" & ", "")
 
     term_final = term <> ":*"
 
