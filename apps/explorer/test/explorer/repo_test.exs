@@ -70,7 +70,7 @@ defmodule Explorer.RepoTest do
       result = Repo.get_db_config(%{url: database_url})
 
       assert result[:username] == "test_username"
-      assert result[:password] == ""
+      refute result[:password]
       assert result[:hostname] == "127.8.8.1"
       assert result[:port] == "7777"
       assert result[:database] == "test_database"
@@ -82,7 +82,7 @@ defmodule Explorer.RepoTest do
       result = Repo.get_db_config(%{url: database_url})
 
       assert result[:username] == "test_username"
-      assert result[:password] == ""
+      refute result[:password]
       assert result[:hostname] == "cooltesthost"
       assert result[:port] == "7777"
       assert result[:database] == "test_database"

@@ -120,5 +120,9 @@ defmodule Explorer.Repo do
     |> Regex.named_captures(database_url)
     |> Keyword.new(fn {k, v} -> {String.to_atom(k), v} end)
     |> Keyword.put(:url, database_url)
+    |> Enum.filter(fn
+      {_,""} -> false #don't include keys with empty values
+      _ -> true
+    end)
   end
 end
