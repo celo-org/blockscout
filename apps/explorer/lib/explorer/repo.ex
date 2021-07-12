@@ -11,9 +11,9 @@ defmodule Explorer.Repo do
   """
   def init(_, opts) do
     # overwrite extracted database parameters with opts values if they exist
-    config = Keyword.merge(get_db_config(opts), opts)
+    _ = Keyword.merge(get_db_config(opts), opts)
 
-    {:ok, config}
+    {:ok, opts}
   end
 
   def logged_transaction(fun_or_multi, opts \\ []) do
