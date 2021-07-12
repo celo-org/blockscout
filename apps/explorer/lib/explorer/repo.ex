@@ -115,13 +115,15 @@ defmodule Explorer.Repo do
     extract_parameters(url)
   end
 
+  # sobelow_skip ["DOS.StringToAtom"]
   defp extract_parameters(database_url) do
     ~r/\w*:\/\/(?<username>\w+):(?<password>\w*)?@(?<hostname>[a-zA-Z\d\.]+):(?<port>\d+)\/(?<database>\w+)/
     |> Regex.named_captures(database_url)
     |> Keyword.new(fn {k, v} -> {String.to_atom(k), v} end)
     |> Keyword.put(:url, database_url)
     |> Enum.filter(fn
-      {_,""} -> false #don't include keys with empty values
+      # don't include keys with empty values
+      {_, ""} -> false
       _ -> true
     end)
   end
