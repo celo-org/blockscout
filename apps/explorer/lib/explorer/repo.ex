@@ -115,6 +115,8 @@ defmodule Explorer.Repo do
     extract_parameters(url)
   end
 
+  defp extract_parameters(""), do: []
+
   # sobelow_skip ["DOS.StringToAtom"]
   defp extract_parameters(database_url) do
     ~r/\w*:\/\/(?<username>\w+):(?<password>\w*)?@(?<hostname>[a-zA-Z\d\.]+):(?<port>\d+)\/(?<database>\w+)/
@@ -127,4 +129,5 @@ defmodule Explorer.Repo do
       _ -> true
     end)
   end
+
 end
