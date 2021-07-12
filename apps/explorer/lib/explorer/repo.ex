@@ -10,7 +10,10 @@ defmodule Explorer.Repo do
   DATABASE_URL environment variable.
   """
   def init(_, opts) do
-    {:ok, Keyword.put(opts, :url, System.get_env("DATABASE_URL"))}
+    # overwrite extracted database parameters with opts values if they exist
+    config = Keyword.merge(get_db_config(opts), opts)
+
+    {:ok, config}
   end
 
   def logged_transaction(fun_or_multi, opts \\ []) do
@@ -104,5 +107,18 @@ defmodule Explorer.Repo do
 
   def stream_reduce(query, initial, reducer) when is_function(reducer, 2) do
     stream_in_transaction(query, &Enum.reduce(&1, initial, reducer))
+  end
+
+  def get_db_config(opts) do
+    url = opts[:url] || System.get_env("DATABASE_URL")
+
+    extract_parameters(url)
+  end
+
+  defp extract_parameters(database_url) do
+    ~r/\w*:\/\/(?<username>\w+):(?<password>\w*)?@(?<hostname>[a-zA-Z\d\.]+):(?<port>\d+)\/(?<database>\w+)/
+    |> Regex.named_captures(database_url)
+    |> Keyword.new(fn {k, v} -> {String.to_atom(k), v} end)
+    |> Keyword.put(:url, database_url)
   end
 end
