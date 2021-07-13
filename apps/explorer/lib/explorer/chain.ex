@@ -2647,7 +2647,10 @@ defmodule Explorer.Chain do
         select: last_fetched_counter.value
       )
 
-    Repo.one!(query) || Decimal.new(0)
+    case Repo.one(query) do
+      {:ok, result} -> result
+      _ -> Decimal.new(0)
+    end
   end
 
   defp block_status({number, timestamp}) do
