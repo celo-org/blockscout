@@ -5,15 +5,24 @@ defmodule Explorer.Repo do
 
   require Logger
 
+  alias Explorer.Repo.ConfigHelper
+
   @doc """
   Dynamically loads the repository url from the
   DATABASE_URL environment variable.
   """
   def init(_, opts) do
-    # overwrite extracted database parameters with opts values if they exist
-    _ = Keyword.merge(get_db_config(opts), opts)
+    db_url = System.get_env("DATABASE_URL")
 
-    {:ok, opts}
+    ConfigHelper.get_db_config(db_url)
+    |> Enum.each(fn {key, value} ->
+      case Application.get_env(:explorer, Explorer.Repo, key) do
+        nil -> Application.put_env(:explorer, Explorer.Repo, key, value)
+        _ -> nil
+      end
+    end)
+
+    {:ok, Keyword.put(opts, :url, db_url)}
   end
 
   def logged_transaction(fun_or_multi, opts \\ []) do
@@ -107,37 +116,5 @@ defmodule Explorer.Repo do
 
   def stream_reduce(query, initial, reducer) when is_function(reducer, 2) do
     stream_in_transaction(query, &Enum.reduce(&1, initial, reducer))
-  end
-
-  def get_db_config(opts) do
-    url = opts[:url] || System.get_env("DATABASE_URL")
-
-    extract_parameters(url)
-    |> take_postgrex_params()
-  end
-
-  defp extract_parameters(empty) when empty == nil or empty == "", do: []
-
-  # sobelow_skip ["DOS.StringToAtom"]
-  defp extract_parameters(database_url) do
-    ~r/\w*:\/\/(?<username>\w+):(?<password>\w*)?@(?<hostname>[a-zA-Z\d\.]+):(?<port>\d+)\/(?<database>\w+)/
-    |> Regex.named_captures(database_url)
-    |> Keyword.new(fn {k, v} -> {String.to_atom(k), v} end)
-    |> Keyword.put(:url, database_url)
-    |> Enum.filter(fn
-      # don't include keys with empty values
-      {_, ""} -> false
-      _ -> true
-    end)
-  end
-
-  # take params that are applied directly to postgrex (e.g. PGUSER) and pull them into the config
-  defp take_postgrex_params(opts) do
-    Enum.reduce([username: "PGUSER", password: "PGPASSWORD"], opts, fn {name, var}, opts ->
-      case System.get_env(var) do
-        nil -> opts
-        env_value -> Keyword.put(opts, name, env_value)
-      end
-    end)
   end
 end

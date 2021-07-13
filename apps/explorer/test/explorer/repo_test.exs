@@ -50,42 +50,4 @@ defmodule Explorer.RepoTest do
                "Exception:\n\n** (Postgrex.Error) ERROR 21000 (cardinality_violation) ON CONFLICT DO UPDATE command cannot affect row a second time\n"
     end
   end
-
-  describe "get_db_config/1" do
-    test "parse params from database url" do
-      database_url = "postgresql://test_username:test_password@127.8.8.1:7777/test_database"
-
-      result = Repo.get_db_config(%{url: database_url})
-
-      assert result[:username] == "test_username"
-      assert result[:password] == "test_password"
-      assert result[:hostname] == "127.8.8.1"
-      assert result[:port] == "7777"
-      assert result[:database] == "test_database"
-    end
-
-    test "get username without password" do
-      database_url = "postgresql://test_username:@127.8.8.1:7777/test_database"
-
-      result = Repo.get_db_config(%{url: database_url})
-
-      assert result[:username] == "test_username"
-      refute result[:password]
-      assert result[:hostname] == "127.8.8.1"
-      assert result[:port] == "7777"
-      assert result[:database] == "test_database"
-    end
-
-    test "get hostname instead of ip" do
-      database_url = "postgresql://test_username:@cooltesthost:7777/test_database"
-
-      result = Repo.get_db_config(%{url: database_url})
-
-      assert result[:username] == "test_username"
-      refute result[:password]
-      assert result[:hostname] == "cooltesthost"
-      assert result[:port] == "7777"
-      assert result[:database] == "test_database"
-    end
-  end
 end
