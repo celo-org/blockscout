@@ -1174,7 +1174,6 @@ defmodule Explorer.Chain do
     |> Kernel.<>(":*")
   end
 
-
   @spec search_token(String.t()) :: [Token.t()]
   def search_token(word) do
     term = build_tsvector_term(word)
