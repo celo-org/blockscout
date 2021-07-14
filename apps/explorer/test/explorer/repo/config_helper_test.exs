@@ -7,7 +7,7 @@ defmodule Explorer.Repo.ConfigHelperTest do
     test "parse params from database url" do
       database_url = "postgresql://test_username:test_password@127.8.8.1:7777/test_database"
 
-      result = ConfigHelper.get_db_config(%{url: database_url})
+      result = ConfigHelper.get_db_config(%{url: database_url, env_func: fn _ -> nil end})
 
       assert result[:username] == "test_username"
       assert result[:password] == "test_password"
@@ -19,7 +19,7 @@ defmodule Explorer.Repo.ConfigHelperTest do
     test "get username without password" do
       database_url = "postgresql://test_username:@127.8.8.1:7777/test_database"
 
-      result = ConfigHelper.get_db_config(%{url: database_url})
+      result = ConfigHelper.get_db_config(%{url: database_url, env_func: fn _ -> nil end})
 
       assert result[:username] == "test_username"
       refute result[:password]
@@ -31,7 +31,7 @@ defmodule Explorer.Repo.ConfigHelperTest do
     test "get hostname instead of ip" do
       database_url = "postgresql://test_username:@cooltesthost:7777/test_database"
 
-      result = ConfigHelper.get_db_config(%{url: database_url})
+      result = ConfigHelper.get_db_config(%{url: database_urlenv_func: fn _ -> nil end})
 
       assert result[:username] == "test_username"
       refute result[:password]
