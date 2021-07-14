@@ -14,7 +14,8 @@ defmodule Explorer.Repo do
   def init(_, opts) do
     db_url = System.get_env("DATABASE_URL")
 
-    ConfigHelper.get_db_config(db_url)
+    %{url: db_url}
+    |> ConfigHelper.get_db_config()
     |> Enum.each(fn {key, value} ->
       case Application.get_env(:explorer, Explorer.Repo, key) do
         nil -> Application.put_env(:explorer, Explorer.Repo, key, value)

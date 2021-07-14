@@ -12,11 +12,10 @@ defmodule Explorer.Chain.Events.Listener do
   end
 
   def init(channel) do
-    explorer_repo =
+    {:ok, pid} =
       :explorer
       |> Application.get_env(Explorer.Repo)
-
-    {:ok, pid} = Notifications.start_link(explorer_repo)
+      |> Notifications.start_link()
 
     ref = Notifications.listen!(pid, channel)
 
