@@ -27,11 +27,12 @@ defmodule Explorer.Repo.ConfigHelper do
 
   def get_db_config(opts) do
     url = opts[:url] || System.get_env("DATABASE_URL")
+    env_function = opts[:env_func] || (&System.get_env/1)
 
     url
     |> extract_parameters()
-    |> Keyword.merge(get_env_vars(@postgrex_env_vars))
-    |> Keyword.merge(get_env_vars(@app_env_vars))
+    |> Keyword.merge(get_env_vars(@postgrex_env_vars, env_function))
+    |> Keyword.merge(get_env_vars(@app_env_vars, env_function))
   end
 
   defp extract_parameters(empty) when empty == nil or empty == "", do: []
@@ -49,9 +50,9 @@ defmodule Explorer.Repo.ConfigHelper do
     end)
   end
 
-  defp get_env_vars(vars) do
+  defp get_env_vars(vars, env_function) do
     Enum.reduce(vars, [], fn {name, var}, opts ->
-      case System.get_env(var) do
+      case env_function.(var) do
         nil -> opts
         "" -> opts
         env_value -> Keyword.put(opts, name, env_value)
