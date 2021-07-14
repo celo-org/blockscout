@@ -31,7 +31,7 @@ defmodule Explorer.Repo.ConfigHelperTest do
     test "get hostname instead of ip" do
       database_url = "postgresql://test_username:@cooltesthost:7777/test_database"
 
-      result = ConfigHelper.get_db_config(%{url: database_urlenv_func: fn _ -> nil end})
+      result = ConfigHelper.get_db_config(%{url: database_url, env_func: fn _ -> nil end})
 
       assert result[:username] == "test_username"
       refute result[:password]
