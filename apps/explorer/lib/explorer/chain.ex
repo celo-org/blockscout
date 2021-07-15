@@ -1165,18 +1165,22 @@ defmodule Explorer.Chain do
     end
   end
 
+  @spec build_tsvector_term(String.t()) :: String.t()
+  defp build_tsvector_term(word) do
+    word
+    |> String.replace(~r/[^a-zA-Z0-9]/, " ")
+    |> String.trim()
+    |> String.replace(~r/ +/, " & ")
+    |> Kernel.<>(":*")
+  end
+
   @spec search_token(String.t()) :: [Token.t()]
   def search_token(word) do
-    term =
-      word
-      |> String.replace(~r/[^a-zA-Z0-9]/, " ")
-      |> String.replace(~r/ +/, " & ")
-
-    term_final = term <> ":*"
+    term = build_tsvector_term(word)
 
     query =
       from(token in Token,
-        where: fragment("to_tsvector('english', symbol || ' ' || name ) @@ to_tsquery(?)", ^term_final),
+        where: fragment("to_tsvector('english', symbol || ' ' || name ) @@ to_tsquery(?)", ^term),
         select: %{
           contract_address_hash: token.contract_address_hash,
           symbol: token.symbol,
@@ -1196,16 +1200,11 @@ defmodule Explorer.Chain do
 
   @spec search_contract(String.t()) :: [SmartContract.t()]
   def search_contract(word) do
-    term =
-      word
-      |> String.replace(~r/[^a-zA-Z0-9]/, " ")
-      |> String.replace(~r/ +/, " & ")
-
-    term_final = term <> ":*"
+    term = build_tsvector_term(word)
 
     query =
       from(smart_contract in SmartContract,
-        where: fragment("to_tsvector('english', name ) @@ to_tsquery(?)", ^term_final),
+        where: fragment("to_tsvector('english', name ) @@ to_tsquery(?)", ^term),
         select: %{contract_address_hash: smart_contract.address_hash, name: smart_contract.name}
       )
 
@@ -2688,7 +2687,10 @@ defmodule Explorer.Chain do
         select: last_fetched_counter.value
       )
 
-    Repo.one!(query) || Decimal.new(0)
+    case Repo.one(query) do
+      {:ok, result} -> result
+      _ -> Decimal.new(0)
+    end
   end
 
   defp block_status({number, timestamp}) do
