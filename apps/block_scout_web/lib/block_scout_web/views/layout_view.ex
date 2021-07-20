@@ -114,11 +114,12 @@ defmodule BlockScoutWeb.LayoutView do
           nil
 
         release_link_env_var == "" || release_link_env_var == nil ->
-          if String.length(version) == 40 do 
+          if String.length(version) == 40 do
             "https://github.com/celo-org/blockscout/commit/" <> version
-          else 
+          else
             "https://github.com/celo-org/blockscout/releases/tag/" <> version
           end
+
         true ->
           release_link_env_var
       end
