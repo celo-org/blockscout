@@ -6654,7 +6654,7 @@ defmodule Explorer.Chain do
     {:ok, longest_query_map} = result
 
     case Map.fetch(longest_query_map, :rows) do
-      {:ok, [[_, longest_query_duration]]} -> longest_query_duration.secs
+      {:ok, [[_, longest_query_duration]]} when not is_nil(longest_query_duration) -> longest_query_duration.secs
       _ -> 0
     end
   end
