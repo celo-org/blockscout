@@ -974,12 +974,12 @@ defmodule Explorer.Chain do
   defp augment_celo_address(nil), do: {:error, :not_found}
   defp augment_celo_address(orig_address) do
     augmented =
-      if Ecto.assoc_loaded?(address.celo_delegator) and address.celo_delegator != nil do
-        address
-        |> Map.put(:celo_account, address.celo_delegator.celo_account)
-        |> Map.put(:celo_account, address.celo_delegator.celo_validator)
+      if Ecto.assoc_loaded?(orig_address.celo_delegator) and orig_address.celo_delegator != nil do
+        orig_address
+        |> Map.put(:celo_account, orig_address.celo_delegator.celo_account)
+        |> Map.put(:celo_account, orig_address.celo_delegator.celo_validator)
       else
-        address
+        orig_address
       end
 
       {:ok, augmented}
