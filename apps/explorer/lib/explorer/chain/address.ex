@@ -86,7 +86,6 @@ defmodule Explorer.Chain.Address do
              :__meta__,
              :smart_contract,
              :celo_account,
-             :celo_attestation_stats,
              :celo_validator,
              :celo_validator_group,
              :celo_delegator,
