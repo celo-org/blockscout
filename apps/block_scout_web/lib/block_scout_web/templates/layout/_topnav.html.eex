@@ -4,6 +4,7 @@
 <script src="<%= static_path(@conn, "/js/awesomplete-util.min.js") %>"></script>
 <% staking_enabled_in_menu = Application.get_env(:block_scout_web, BlockScoutWeb.Chain)[:staking_enabled_in_menu] %>
 <% apps_menu = Application.get_env(:block_scout_web, :apps_menu) %>
+<% celo_network = Application.get_env(:explorer, :network) == "celo" %>
 <nav class="navbar navbar-dark navbar-expand-lg navbar-primary" data-selector="navbar" id="top-navbar">
   <script>
     if (localStorage.getItem("current-color-mode") === "dark") {
@@ -39,11 +40,13 @@
               <%= link to: block_path(@conn, :index), class: "dropdown-item #{tab_status("blocks", @conn.request_path)}" do %>
                 <%= gettext("Blocks") %>
               <% end %>
-              <%= link to: uncle_path(@conn, :uncle), class: "dropdown-item #{tab_status("uncles", @conn.request_path)}" do %>
-                <%= gettext("Uncles") %>
-              <% end %>
-              <%= link to: reorg_path(@conn, :reorg), class: "dropdown-item #{tab_status("reorgs", @conn.request_path)}" do %>
-                <%= gettext("Forked Blocks (Reorgs)") %>
+              <%= unless celo_network do %>
+                <%= link to: uncle_path(@conn, :uncle), class: "dropdown-item #{tab_status("uncles", @conn.request_path)}" do %>
+                  <%= gettext("Uncles") %>
+                <% end %>
+                <%= link to: reorg_path(@conn, :reorg), class: "dropdown-item #{tab_status("reorgs", @conn.request_path)}" do %>
+                  <%= gettext("Forked Blocks (Reorgs)") %>
+                <% end %>
               <% end %>
             </div>
           </li>
