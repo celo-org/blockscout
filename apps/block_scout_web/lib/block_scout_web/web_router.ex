@@ -39,9 +39,11 @@ defmodule BlockScoutWeb.WebRouter do
       resources("/signers", BlockSignersController, only: [:index], as: :signers)
     end
 
-    get("/reorgs", BlockController, :reorg, as: :reorg)
-
-    get("/uncles", BlockController, :uncle, as: :uncle)
+    #Celo protocol does not include reorgs or uncle blocks
+    unless Application.get_env(:explorer, :network) == "celo" do
+      get("/reorgs", BlockController, :reorg, as: :reorg)
+      get("/uncles", BlockController, :uncle, as: :uncle)
+    end
 
     get("/validators", StakesController, :index, as: :validators, assigns: %{filter: :validator})
     get("/active-pools", StakesController, :index, as: :active_pools, assigns: %{filter: :active})
