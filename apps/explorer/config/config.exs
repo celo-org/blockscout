@@ -9,7 +9,6 @@ use Mix.Config
 config :explorer,
   ecto_repos: [Explorer.Repo],
   coin: System.get_env("COIN") || "POA",
-  network: System.get_env("NETWORK") |> String.downcase,
   coingecko_coin_id: System.get_env("COINGECKO_COIN_ID"),
   token_functions_reader_max_retries: 3,
   allowed_evm_versions:
