@@ -12,6 +12,8 @@ defmodule Explorer.Chain.Events.Listener do
   end
 
   def init(channel) do
+    repo = Application.get_env(:explorer, Explorer.Repo)
+    IO.inspect(repo)
     {:ok, pid} =
       :explorer
       |> Application.get_env(Explorer.Repo)

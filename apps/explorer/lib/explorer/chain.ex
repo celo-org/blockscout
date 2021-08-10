@@ -6625,8 +6625,9 @@ defmodule Explorer.Chain do
 
   @spec fetch_number_of_dead_locks :: non_neg_integer()
   def fetch_number_of_dead_locks do
-    database =
-      if System.get_env("DATABASE_URL"), do: extract_db_name(System.get_env("DATABASE_URL")), else: "explorer_dev"
+  database =
+      Application.get_env(:explorer, Explorer.Repo)
+      |> Keyword.get(:database)
 
     result =
       SQL.query(
