@@ -33,9 +33,15 @@ defmodule BlockScoutWeb.SmartContractController do
           end
         else
           if contract_type == "proxy" do
-            Reader.read_only_functions_proxy(address_hash, implementation_address_hash_string)
+            functions_proxy = Reader.read_only_functions_proxy(address_hash, implementation_address_hash_string)
+            if functions_proxy == [] do
+              IO.inspect(Reader.read_only_functions(address_hash))
+              Reader.read_only_functions(address_hash)
+            else
+              functions_proxy
+            end
           else
-            Reader.read_only_functions(address_hash)
+            [hd(Reader.read_only_functions(address_hash))]
           end
         end
 
