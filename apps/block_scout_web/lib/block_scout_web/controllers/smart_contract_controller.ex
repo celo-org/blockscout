@@ -16,6 +16,9 @@ defmodule BlockScoutWeb.SmartContractController do
     with true <- ajax?(conn),
          {:ok, address_hash} <- Chain.string_to_address_hash(address_hash_string),
          {:ok, address} <- Chain.find_contract_address(address_hash, address_options, true) do
+      
+      contract_type_from_address = if Chain.proxy_contract?(address.hash, address.smart_contract.abi), do: :proxy, else: :regular
+
       implementation_address_hash_string =
         if contract_type == "proxy" do
           Chain.get_implementation_address_hash(address.hash, address.smart_contract.abi) ||
@@ -35,13 +38,16 @@ defmodule BlockScoutWeb.SmartContractController do
           if contract_type == "proxy" do
             functions_proxy = Reader.read_only_functions_proxy(address_hash, implementation_address_hash_string)
             if functions_proxy == [] do
-              IO.inspect(Reader.read_only_functions(address_hash))
               Reader.read_only_functions(address_hash)
             else
               functions_proxy
             end
           else
-            [hd(Reader.read_only_functions(address_hash))]
+            if contract_type_from_address == :regular do
+              Reader.read_only_functions(address_hash)
+            else
+              [hd(Reader.read_only_functions(address_hash))]
+            end
           end
         end
 
