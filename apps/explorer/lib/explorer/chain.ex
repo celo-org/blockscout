@@ -972,6 +972,7 @@ defmodule Explorer.Chain do
   end
 
   defp augment_celo_address(nil), do: {:error, :not_found}
+
   defp augment_celo_address(orig_address) do
     augmented =
       if Ecto.assoc_loaded?(orig_address.celo_delegator) and orig_address.celo_delegator != nil do
@@ -982,7 +983,7 @@ defmodule Explorer.Chain do
         orig_address
       end
 
-      {:ok, augmented}
+    {:ok, augmented}
   end
 
   @doc """

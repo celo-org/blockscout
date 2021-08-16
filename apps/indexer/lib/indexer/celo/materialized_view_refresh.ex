@@ -46,9 +46,6 @@ defmodule Indexer.Fetcher.CeloMaterializedViewRefresh do
     end)
   end
 
-  @attestation_issuer_selected "0xaf7f470b643316cf44c1f2898328a075e7602945b4f8584f48ba4ad2d8a2ea9d"
-  @attestation_completed "0x414ff2c18c092697c4b8de49f515ac44f8bebc19b24553cf58ace913a6ac639d"
-
   def rebuild_attestation_stats(timeout) do
     query = """
       update celo_account
