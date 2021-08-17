@@ -6,7 +6,6 @@ defmodule Indexer.Transform.CeloAccounts do
   require Logger
 
   alias ABI.TypeDecoder
-  alias Explorer.Chain.{CeloAccount, CeloSigners, CeloVoters}
   alias Explorer.Celo.Events
 
   @doc """
