@@ -8,17 +8,17 @@ defmodule BlockScoutWeb.BlockController do
   alias Phoenix.View
 
   def index(conn, params) do
-      [
-        necessity_by_association: %{
-          :transactions => :optional,
-          [miner: :names] => :optional,
-          :celo_delegator => :optional,
-          [celo_delegator: :celo_account] => :optional,
-          :rewards => :optional
-        },
-        block_type: "Block"
-      ]
-      |> handle_render(conn, params)
+    [
+      necessity_by_association: %{
+        :transactions => :optional,
+        [miner: :names] => :optional,
+        :celo_delegator => :optional,
+        [celo_delegator: :celo_account] => :optional,
+        :rewards => :optional
+      },
+      block_type: "Block"
+    ]
+    |> handle_render(conn, params)
   end
 
   def show(conn, %{"hash_or_number" => hash_or_number}) do
