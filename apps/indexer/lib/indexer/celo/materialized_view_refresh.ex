@@ -45,5 +45,4 @@ defmodule Indexer.Fetcher.CeloMaterializedViewRefresh do
       ["Refreshed material views."]
     end)
   end
-
 end

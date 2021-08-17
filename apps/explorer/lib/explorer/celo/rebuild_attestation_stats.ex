@@ -8,11 +8,12 @@ defmodule Explorer.Celo.RebuildAttestationStats do
   def run(timeout) do
     {:ok, pid} = Task.Supervisor.start_link()
 
-    stats = Task.Supervisor.async(pid, fn ->
-      Telemetry.wrap(:rebuild_attestation_stats, fn ->
-        rebuild_attestation_stats(timeout)
+    stats =
+      Task.Supervisor.async(pid, fn ->
+        Telemetry.wrap(:rebuild_attestation_stats, fn ->
+          rebuild_attestation_stats(timeout)
+        end)
       end)
-    end)
 
     Task.await(stats)
   end

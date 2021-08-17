@@ -8,15 +8,17 @@ defmodule Explorer.Celo.RebuildAttestationStatsTest do
 
   def address_topic(%CeloAccount{address: address}) do
     address
-    |> Explorer.Chain.Hash.to_string
+    |> Explorer.Chain.Hash.to_string()
     |> address_topic
   end
+
   def address_topic("0x" <> rest), do: "0x000000000000000000000000" <> rest
 
   def insert_attestation_selected_log(account) do
     insert(:log,
       first_topic: @attestation_issuer_selected,
-      fourth_topic: address_topic(account))
+      fourth_topic: address_topic(account)
+    )
 
     account
   end
@@ -24,14 +26,15 @@ defmodule Explorer.Celo.RebuildAttestationStatsTest do
   def insert_attestation_completed_log(account) do
     insert(:log,
       first_topic: @attestation_completed,
-      fourth_topic: address_topic(account))
+      fourth_topic: address_topic(account)
+    )
 
     account
-end
+  end
 
   describe "rebuild_attestation_stats/1" do
     setup do
-     [account: insert(:celo_account)]
+      [account: insert(:celo_account)]
     end
 
     test "updates attestation stats for a given account", %{account: account} do
@@ -66,7 +69,7 @@ end
       RebuildAttestationStats.rebuild_attestation_stats(15)
 
       with updated <- CeloAccount |> Repo.get(account.id),
-            updated2 <- CeloAccount |> Repo.get(account2.id) do
+           updated2 <- CeloAccount |> Repo.get(account2.id) do
         assert updated.attestations_requested == 2
         assert updated.attestations_fulfilled == 1
         assert updated2.attestations_requested == nil
@@ -75,4 +78,3 @@ end
     end
   end
 end
-
