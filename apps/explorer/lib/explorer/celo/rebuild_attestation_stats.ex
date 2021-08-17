@@ -1,4 +1,10 @@
 defmodule Explorer.Celo.RebuildAttestationStats do
+  @moduledoc """
+  A task to calculate attestation stats for each CeloAccount and update each row in the database.
+
+  Note: This query is very expensive and should not be needed under normal usage, as the values are calculated
+incrementally upon processing of each event.
+"""
   alias Explorer.Repo
   require Explorer.Celo.Telemetry, as: Telemetry
   require Logger
