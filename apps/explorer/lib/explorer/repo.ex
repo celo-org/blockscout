@@ -15,13 +15,14 @@ defmodule Explorer.Repo do
     db_url = System.get_env("DATABASE_URL")
     repo_conf = Application.get_env(:explorer, Explorer.Repo)
 
-    merged = %{url: db_url}
-    |> ConfigHelper.get_db_config()
-    |> Keyword.merge(repo_conf, fn
-               _key, v1, nil -> v1
-               _key, nil, v2 -> v2
-               _, _, v2 -> v2
-    end)
+    merged =
+      %{url: db_url}
+      |> ConfigHelper.get_db_config()
+      |> Keyword.merge(repo_conf, fn
+        _key, v1, nil -> v1
+        _key, nil, v2 -> v2
+        _, _, v2 -> v2
+      end)
 
     Application.put_env(:explorer, Explorer.Repo, merged)
 

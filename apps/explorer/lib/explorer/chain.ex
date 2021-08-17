@@ -6625,8 +6625,9 @@ defmodule Explorer.Chain do
 
   @spec fetch_number_of_dead_locks :: non_neg_integer()
   def fetch_number_of_dead_locks do
-  database =
-      Application.get_env(:explorer, Explorer.Repo)
+    database =
+      :explorer
+      |> Application.get_env(Explorer.Repo)
       |> Keyword.get(:database)
 
     result =
@@ -6659,7 +6660,6 @@ defmodule Explorer.Chain do
       _ -> 0
     end
   end
-
 
   @doc """
   Fetches the first trace from the Parity trace URL.
