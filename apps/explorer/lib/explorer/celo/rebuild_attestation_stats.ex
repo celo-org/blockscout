@@ -20,8 +20,7 @@ defmodule Explorer.Celo.RebuildAttestationStats do
   def rebuild_attestation_stats(timeout) do
     query = """
       update celo_account
-      set celo_account.attestations_requested = stats.requested, celo_account.attestations_fulfilled = stats.fulfilled
-      where celo_account.address = stats.address
+      set attestations_requested = stats.requested, attestations_fulfilled = stats.fulfilled
       from (
           select r.address, r.requested, f.fulfilled
           from (
@@ -34,10 +33,11 @@ defmodule Explorer.Celo.RebuildAttestationStats do
               select address, count(*) as fulfilled
               from logs, celo_account
               where first_topic='#{@attestation_completed}'
-              and fourth_topic='0x000000000000000000000000'||		encode(address::bytea, 'hex') group by address
+              and fourth_topic='0x000000000000000000000000'||encode(address::bytea, 'hex') group by address
           ) f
           on r.address = f.address
-      ) stats;
+      ) stats
+      where celo_account.address = stats.address;
     """
 
     Repo.query!(query, [], timeout: timeout)

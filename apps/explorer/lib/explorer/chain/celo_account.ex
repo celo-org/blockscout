@@ -6,7 +6,6 @@ defmodule Explorer.Chain.CeloAccount do
   require Logger
 
   use Explorer.Schema
-  use Explorer.Celo.EventTypes
 
   alias Explorer.Chain.{Address, CeloClaims, Hash, Wei}
 
