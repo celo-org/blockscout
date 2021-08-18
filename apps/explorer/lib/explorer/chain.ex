@@ -978,7 +978,7 @@ defmodule Explorer.Chain do
       if Ecto.assoc_loaded?(orig_address.celo_delegator) and orig_address.celo_delegator != nil do
         orig_address
         |> Map.put(:celo_account, orig_address.celo_delegator.celo_account)
-        |> Map.put(:celo_account, orig_address.celo_delegator.celo_validator)
+        |> Map.put(:celo_validator, orig_address.celo_delegator.celo_validator)
       else
         orig_address
       end
