@@ -229,7 +229,10 @@ defmodule Explorer.SmartContract.Reader do
   """
   @spec read_only_functions(Hash.t()) :: [%{}]
   def read_only_functions(contract_address_hash) do
-    abi = get_contract_abi(contract_address_hash)
+    abi =
+      contract_address_hash
+      |> Chain.address_hash_to_smart_contract()
+      |> Map.get(:abi)
 
     case abi do
       nil ->
