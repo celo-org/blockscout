@@ -50,12 +50,6 @@ defmodule Indexer.Transform.CeloAccounts do
     |> Enum.filter(fn %{name: name} -> String.length(name) > 0 end)
   end
 
-  #    defp get_rates(logs) do
-  #    logs
-  #    |> Enum.filter(fn log -> log.first_topic == CeloAccount.median_updated_event() end)
-  #    |> Enum.reduce([], fn log, rates -> do_parse_rate(log, rates) end)
-  #  end
-
   defp get_addresses(logs, topics, get_topic \\ fn a -> a.second_topic end) do
     logs
     |> Enum.filter(fn log -> Enum.member?(topics, log.first_topic) end)
