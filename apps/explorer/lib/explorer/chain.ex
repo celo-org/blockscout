@@ -6838,11 +6838,15 @@ defmodule Explorer.Chain do
 
   def get_implementation_abi_from_proxy(proxy_address_hash, abi)
       when not is_nil(proxy_address_hash) and not is_nil(abi) do
-    if proxy_contract?(proxy_address_hash, abi) do
-      implementation_address_hash_string = get_implementation_address_hash(proxy_address_hash, abi)
+    if length(abi) > 0 do
+      if proxy_contract?(proxy_address_hash, abi) do
+        implementation_address_hash_string = get_implementation_address_hash(proxy_address_hash, abi)
 
-      if implementation_address_hash_string do
-        get_implementation_abi(implementation_address_hash_string)
+        if implementation_address_hash_string do
+          get_implementation_abi(implementation_address_hash_string)
+        else
+          []
+        end
       else
         []
       end
