@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - master
+      - feature/optimise_github_actions
   pull_request:
     branches:
       - master
@@ -13,7 +14,7 @@ env:
   MIX_ENV: test
 
 jobs:
-  build:
+  build-and-cache:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -21,13 +22,34 @@ jobs:
         with:
           otp-version: '23.3.4.1'
           elixir-version: '1.11.4'
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
+
       - name: "ELIXIR_VERSION.lock"
         run: echo "${ELIXIR_VERSION}" > ELIXIR_VERSION.lock
+
       - name: "OTP_VERSION.lock"
         run: echo "${OTP_VERSION}" > OTP_VERSION.lock
-      - run: mix deps.get
+
+      - name: Mix Deps Cache
+        uses: actions/cache@v2
+        id: deps-cache
+        with:
+          path: | 
+            deps
+            _build
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-mixlockhash-${{ hashFiles(format('{0}{1}', github.workspace, 'mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-
+
+      - name: Install and Compile Mix deps
+        if: steps.deps-cache.outputs.cache-hit != 'true'
+        run: |
+          mix local.hex --force
+          mix local.rebar --force
+          mix deps.get
+          mix deps.compile
+          cd deps/libsecp256k1
+          make
+
       - run: npm install
         working-directory: apps/explorer
       - run: npm install
@@ -35,55 +57,74 @@ jobs:
       - run: npm rebuild node-sass
         working-directory: apps/block_scout_web/assets
       - run: mix compile
-      - run: make
-        working-directory: "deps/libsecp256k1"
       - name: Build assets
         run: node node_modules/webpack/bin/webpack.js --mode development
         working-directory: "apps/block_scout_web/assets"
   credo:
     runs-on: ubuntu-18.04
+    needs: build-and-cache
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
           otp-version: '23.3.4.1'
           elixir-version: '1.11.4'
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-      - run: mix deps.get
-      - run: mix compile
-      - run: make
-        working-directory: "deps/libsecp256k1"
+      
+      - name: Mix Deps Cache
+        uses: actions/cache@v2
+        id: deps-cache
+        with:
+          path: | 
+            deps
+            _build
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-mixlockhash-${{ hashFiles(format('{0}{1}', github.workspace, 'mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-"
+
       - run: mix credo
   check_formatted:
     runs-on: ubuntu-18.04
+    needs: build-and-cache
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
           otp-version: '23.3.4.1'
           elixir-version: '1.11.4'
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-      - run: mix deps.get
-      - run: mix compile
-      - run: make
-        working-directory: "deps/libsecp256k1"
+
+      - name: Mix Deps Cache
+        uses: actions/cache@v2
+        id: deps-cache
+        with:
+          path: | 
+            deps
+            _build
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-mixlockhash-${{ hashFiles(format('{0}{1}', github.workspace, 'mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-"
+
       - run: mix format --check-formatted
   dialyzer:
     runs-on: ubuntu-18.04
+    needs: build-and-cache
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
           otp-version: '23.3.4.1'
           elixir-version: '1.11.4'
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-      - run: mix deps.get
-      - run: mix compile
-      - run: make
-        working-directory: "deps/libsecp256k1"
+
+      - name: Mix Deps Cache
+        uses: actions/cache@v2
+        id: deps-cache
+        with:
+          path: | 
+            deps
+            _build
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-mixlockhash-${{ hashFiles(format('{0}{1}', github.workspace, 'mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-"
+
       - name: Unpack PLT cache
         run: |
           mkdir -p _build/test
@@ -99,37 +140,50 @@ jobs:
       - run: mix dialyzer --halt-exit-status
   gettext:
     runs-on: ubuntu-18.04
+    needs: build-and-cache
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
           otp-version: '23.3.4.1'
           elixir-version: '1.11.4'
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-      - run: mix deps.get
-      - run: mix compile
-      - run: make
-        working-directory: "deps/libsecp256k1"
+
+      - name: Mix Deps Cache
+        uses: actions/cache@v2
+        id: deps-cache
+        with:
+          path: | 
+            deps
+            _build
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-mixlockhash-${{ hashFiles(format('{0}{1}', github.workspace, 'mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-"
+
       - run: |
           mix gettext.extract --merge | tee stdout.txt
           ! grep "Wrote " stdout.txt
         working-directory: "apps/block_scout_web"
   sobelow:
     runs-on: ubuntu-18.04
+    needs: build-and-cache
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
           otp-version: '23.3.4.1'
           elixir-version: '1.11.4'
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-      - run: mix deps.get
-      - run: mix deps.compile
-      - run: mix compile
-      - run: make
-        working-directory: "deps/libsecp256k1"
+
+      - name: Mix Deps Cache
+        uses: actions/cache@v2
+        id: deps-cache
+        with:
+          path: | 
+            deps
+            _build
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-mixlockhash-${{ hashFiles(format('{0}{1}', github.workspace, 'mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-"
+
       - name: Scan explorer for vulnerabilities
         run: mix sobelow --config
         working-directory: "apps/explorer"
@@ -138,24 +192,31 @@ jobs:
         working-directory: "apps/block_scout_web"
   eslint:
     runs-on: ubuntu-18.04
+    needs: build-and-cache
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
           otp-version: '23.3.4.1'
           elixir-version: '1.11.4'
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-      - run: mix deps.get
+
+      - name: Mix Deps Cache
+        uses: actions/cache@v2
+        id: deps-cache
+        with:
+          path: | 
+            deps
+            _build
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-mixlockhash-${{ hashFiles(format('{0}{1}', github.workspace, 'mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-"
+
       - run: npm install
         working-directory: apps/explorer
       - run: npm install
         working-directory: apps/block_scout_web/assets
       - run: npm rebuild node-sass
         working-directory: apps/block_scout_web/assets
-      - run: mix compile
-      - run: make
-        working-directory: "deps/libsecp256k1"
       - name: Build assets
         run: node node_modules/webpack/bin/webpack.js --mode development
         working-directory: "apps/block_scout_web/assets"
@@ -163,24 +224,31 @@ jobs:
         working-directory: apps/block_scout_web/assets
   jest:
     runs-on: ubuntu-18.04
+    needs: build-and-cache
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
           otp-version: '23.3.4.1'
           elixir-version: '1.11.4'
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-      - run: mix deps.get
+
+      - name: Mix Deps Cache
+        uses: actions/cache@v2
+        id: deps-cache
+        with:
+          path: | 
+            deps
+            _build
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-mixlockhash-${{ hashFiles(format('{0}{1}', github.workspace, 'mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-"
+
       - run: npm install
         working-directory: apps/explorer
       - run: npm install
         working-directory: apps/block_scout_web/assets
       - run: npm rebuild node-sass
         working-directory: apps/block_scout_web/assets
-      - run: mix compile
-      - run: make
-        working-directory: "deps/libsecp256k1"
       - name: Build assets
         run: node node_modules/webpack/bin/webpack.js --mode development
         working-directory: "apps/block_scout_web/assets"
@@ -188,6 +256,7 @@ jobs:
         working-directory: apps/block_scout_web/assets
   test_parity_mox_ethereum_jsonrpc:
     runs-on: ubuntu-18.04
+    needs: build-and-cache
     services:
       postgres:
         image: postgres
@@ -215,18 +284,24 @@ jobs:
           elixir-version: '1.11.4'
       - run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
       - run: echo 'export PATH=~/.cargo/bin/:$PATH' >> $GITHUB_ENV
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-      - run: mix deps.get
+
+      - name: Mix Deps Cache
+        uses: actions/cache@v2
+        id: deps-cache
+        with:
+          path: | 
+            deps
+            _build
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-mixlockhash-${{ hashFiles(format('{0}{1}', github.workspace, 'mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-"
+
       - run: npm install
         working-directory: apps/explorer
       - run: npm install
         working-directory: apps/block_scout_web/assets
       - run: npm rebuild node-sass
         working-directory: apps/block_scout_web/assets
-      - run: mix compile
-      - run: make
-        working-directory: "deps/libsecp256k1"
       - name: Build assets
         run: node node_modules/webpack/bin/webpack.js --mode development
         working-directory: "apps/block_scout_web/assets"
@@ -245,6 +320,7 @@ jobs:
           ETHEREUM_JSONRPC_WEB_SOCKET_CASE: "EthereumJSONRPC.WebSocket.Case.Mox"
   test_parity_mox_explorer:
     runs-on: ubuntu-18.04
+    needs: build-and-cache
     services:
       postgres:
         image: postgres
@@ -272,9 +348,18 @@ jobs:
           elixir-version: '1.11.4'
       - run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
       - run: echo 'export PATH=~/.cargo/bin/:$PATH' >> $GITHUB_ENV
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-      - run: mix deps.get
+
+      - name: Mix Deps Cache
+        uses: actions/cache@v2
+        id: deps-cache
+        with:
+          path: | 
+            deps
+            _build
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-mixlockhash-${{ hashFiles(format('{0}{1}', github.workspace, 'mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-"
+
       - run: npm install
         working-directory: apps/explorer
       - run: npm install
@@ -282,8 +367,6 @@ jobs:
       - run: npm rebuild node-sass
         working-directory: apps/block_scout_web/assets
       - run: mix compile
-      - run: make
-        working-directory: "deps/libsecp256k1"
       - name: Build assets
         run: node node_modules/webpack/bin/webpack.js --mode development
         working-directory: "apps/block_scout_web/assets"
@@ -304,6 +387,7 @@ jobs:
           ETHEREUM_JSONRPC_WEB_SOCKET_CASE: "EthereumJSONRPC.WebSocket.Case.Mox"
   test_parity_mox_indexer:
     runs-on: ubuntu-18.04
+    needs: build-and-cache
     services:
       postgres:
         image: postgres
@@ -331,9 +415,18 @@ jobs:
           elixir-version: '1.11.4'
       - run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
       - run: echo 'export PATH=~/.cargo/bin/:$PATH' >> $GITHUB_ENV
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-      - run: mix deps.get
+
+      - name: Mix Deps Cache
+        uses: actions/cache@v2
+        id: deps-cache
+        with:
+          path: | 
+            deps
+            _build
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-mixlockhash-${{ hashFiles(format('{0}{1}', github.workspace, 'mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-"
+
       - run: npm install
         working-directory: apps/explorer
       - run: npm install
@@ -341,8 +434,6 @@ jobs:
       - run: npm rebuild node-sass
         working-directory: apps/block_scout_web/assets
       - run: mix compile
-      - run: make
-        working-directory: "deps/libsecp256k1"
       - name: Build assets
         run: node node_modules/webpack/bin/webpack.js --mode development
         working-directory: "apps/block_scout_web/assets"
@@ -363,6 +454,7 @@ jobs:
           ETHEREUM_JSONRPC_WEB_SOCKET_CASE: "EthereumJSONRPC.WebSocket.Case.Mox"
   test_parity_mox_block_scout_web:
     runs-on: ubuntu-18.04
+    needs: build-and-cache
     services:
       postgres:
         image: postgres
@@ -390,9 +482,18 @@ jobs:
           elixir-version: '1.11.4'
       - run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
       - run: echo 'export PATH=~/.cargo/bin/:$PATH' >> $GITHUB_ENV
-      - run: mix local.hex --force
-      - run: mix local.rebar --force
-      - run: mix deps.get
+
+      - name: Mix Deps Cache
+        uses: actions/cache@v2
+        id: deps-cache
+        with:
+          path: | 
+            deps
+            _build
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-mixlockhash-${{ hashFiles(format('{0}{1}', github.workspace, 'mix.lock')) }}
+          restore-keys: |
+            ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-"
+
       - run: npm install
         working-directory: apps/explorer
       - run: npm install
@@ -400,8 +501,6 @@ jobs:
       - run: npm rebuild node-sass
         working-directory: apps/block_scout_web/assets
       - run: mix compile
-      - run: make
-        working-directory: "deps/libsecp256k1"
       - name: Build assets
         run: node node_modules/webpack/bin/webpack.js --mode development
         working-directory: "apps/block_scout_web/assets"
