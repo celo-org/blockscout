@@ -379,9 +379,6 @@ defmodule Explorer.SmartContract.Reader do
 
     %{outputs: outputs, method_id: method_id} =
       case parsed_final_abi do
-        nil ->
-          nil
-
         _ ->
           function_object = find_function_by_method(parsed_final_abi, method_id)
 

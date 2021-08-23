@@ -49,6 +49,11 @@ defmodule Explorer.ChainSpec.Geth.ImporterTest do
 
       {:ok, %{address_coin_balances: address_coin_balances}} = Importer.import_genesis_accounts(@genesis)
 
+      expect(EthereumJSONRPC.Mox, :json_rpc, fn _,
+          _options ->
+        {:ok, "0x0000000000000000000000000000000000000000000000000000000000000000"}
+      end)
+
       assert Enum.count(address_coin_balances) == 3
       assert CoinBalance |> Repo.all() |> Enum.count() == 3
       assert CoinBalanceDaily |> Repo.all() |> Enum.count() == 3
