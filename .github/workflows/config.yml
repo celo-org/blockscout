@@ -79,22 +79,7 @@ jobs:
         if: steps.blockscoutweb-npm-cache.outputs.cache-hit != 'true'
         run: npm install
         working-directory: apps/block_scout_web/assets
-
-      - name: Restore Dialyzer Cache
-        uses: actions/cache@v2
-        id: dialyzer-cache
-        with:
-          path: priv/plts
-          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-dialyzer-mixlockhash-${{ hashFiles('mix.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-dialyzer-"
-
-      - name: Conditionally build Dialyzer Cache
-        if: steps.dialyzer-cache.output.cache-hit != 'true'
-        run: |
-          mkdir -p priv/plts
-          mix dialyzer --plt
-
+        
   credo:
     runs-on: ubuntu-18.04
     needs: build-and-cache
@@ -169,6 +154,12 @@ jobs:
           key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-dialyzer-mixlockhash-${{ hashFiles('mix.lock') }}
           restore-keys: |
             ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-dialyzer-"
+
+      - name: Conditionally build Dialyzer Cache
+        if: steps.dialyzer-cache.output.cache-hit != 'true'
+        run: |
+          mkdir -p priv/plts
+          mix dialyzer --plt
 
       - run: mix dialyzer --halt-exit-status
         name: Run Dialyzer
