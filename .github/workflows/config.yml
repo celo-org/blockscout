@@ -12,6 +12,8 @@ on:
 
 env:
   MIX_ENV: test
+  OTP_VERSION: '23.3.4.1'
+  ELIXIR_VERSION: '1.11.4'
 
 jobs:
   build-and-cache:
@@ -68,8 +70,8 @@ jobs:
         uses: actions/cache@v2
         id: blockscoutweb-npm-cache
         with:
-          path: apps/block_scout_web/node_modules
-          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-blockscoutweb-npm-${{ hashFiles('apps/block_scout_web/package-lock.json') }}
+          path: apps/block_scout_web/assets/node_modules
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-blockscoutweb-npm-${{ hashFiles('apps/block_scout_web/assets/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-blockscoutweb-npm-
 
@@ -248,8 +250,8 @@ jobs:
         uses: actions/cache@v2
         id: blockscoutweb-npm-cache
         with:
-          path: apps/block_scout_web/node_modules
-          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-blockscoutweb-npm-${{ hashFiles('apps/block_scout_web/package-lock.json') }}
+          path: apps/block_scout_web/assets/node_modules
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-blockscoutweb-npm-${{ hashFiles('apps/block_scout_web/assets/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-blockscoutweb-npm-
 
@@ -287,8 +289,8 @@ jobs:
         uses: actions/cache@v2
         id: blockscoutweb-npm-cache
         with:
-          path: apps/block_scout_web/node_modules
-          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-blockscoutweb-npm-${{ hashFiles('apps/block_scout_web/package-lock.json') }}
+          path: apps/block_scout_web/assets/node_modules
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-blockscoutweb-npm-${{ hashFiles('apps/block_scout_web/assets/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-blockscoutweb-npm-
 
@@ -539,8 +541,8 @@ jobs:
         uses: actions/cache@v2
         id: blockscoutweb-npm-cache
         with:
-          path: apps/block_scout_web/node_modules
-          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-blockscoutweb-npm-${{ hashFiles('apps/block_scout_web/package-lock.json') }}
+          path: apps/block_scout_web/assets/node_modules
+          key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-blockscoutweb-npm-${{ hashFiles('apps/block_scout_web/assets/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-blockscoutweb-npm-
 
