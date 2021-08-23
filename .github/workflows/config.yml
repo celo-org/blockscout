@@ -145,7 +145,7 @@ jobs:
             ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-"
 
       - name: Restore Dialyzer Cache
-      - uses: actions/cache@v2
+        uses: actions/cache@v2
         id: dialyzer-cache
         with:
           path: priv/plts
