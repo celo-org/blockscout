@@ -165,6 +165,10 @@ defmodule BlockScoutWeb.TransactionTokenTransferControllerTest do
 
       transaction = insert(:transaction_to_verified_contract)
 
+      expect(EthereumJSONRPC.Mox, :json_rpc, fn _, _options ->
+        {:ok, "0x0000000000000000000000000000000000000000000000000000000000000000"}
+      end)
+
       conn = get(conn, transaction_token_transfer_path(BlockScoutWeb.Endpoint, :index, transaction.hash))
 
       assert html_response(conn, 200)

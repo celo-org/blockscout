@@ -271,11 +271,9 @@ defmodule Explorer.Chain.TransactionTest do
         |> insert()
         |> Repo.preload(to_address: :smart_contract)
 
-      expect(EthereumJSONRPC.Mox, :json_rpc, fn _,
-        _options ->
+      expect(EthereumJSONRPC.Mox, :json_rpc, fn _, _options ->
         {:ok, "0x0000000000000000000000000000000000000000000000000000000000000000"}
       end)
-
 
       assert Transaction.decoded_input_data(transaction) == {:ok, "60fe47b1", "set(uint256 x)", [{"x", "uint256", 50}]}
     end
@@ -285,8 +283,7 @@ defmodule Explorer.Chain.TransactionTest do
       |> insert()
       |> Repo.preload(to_address: :smart_contract)
 
-      expect(EthereumJSONRPC.Mox, :json_rpc, fn _,
-        _options ->
+      expect(EthereumJSONRPC.Mox, :json_rpc, fn _, _options ->
         {:ok, "0x0000000000000000000000000000000000000000000000000000000000000000"}
       end)
 
