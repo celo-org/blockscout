@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - feature/optimise_github_actions
   pull_request:
     branches:
       - master
