@@ -88,8 +88,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
-          otp-version: ${{ env.OTP_VERSION }
-          elixir-version: ${{ env.ELIXIR_VERSION }
+          otp-version: ${{ env.OTP_VERSION }}
+          elixir-version: ${{ env.ELIXIR_VERSION }}
       
       - name: Restore Mix Deps Cache
         uses: actions/cache@v2
@@ -112,8 +112,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
-          otp-version: ${{ env.OTP_VERSION }
-          elixir-version: ${{ env.ELIXIR_VERSION }
+          otp-version: ${{ env.OTP_VERSION }}
+          elixir-version: ${{ env.ELIXIR_VERSION }}
 
       - name: Restore Mix Deps Cache
         uses: actions/cache@v2
@@ -135,8 +135,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
-          otp-version: ${{ env.OTP_VERSION }
-          elixir-version: ${{ env.ELIXIR_VERSION }
+          otp-version: ${{ env.OTP_VERSION }}
+          elixir-version: ${{ env.ELIXIR_VERSION }}
 
       - name: Restore Mix Deps Cache
         uses: actions/cache@v2
@@ -175,8 +175,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
-          otp-version: ${{ env.OTP_VERSION }
-          elixir-version: ${{ env.ELIXIR_VERSION }
+          otp-version: ${{ env.OTP_VERSION }}
+          elixir-version: ${{ env.ELIXIR_VERSION }}
 
       - name: Restore Mix Deps Cache
         uses: actions/cache@v2
@@ -201,8 +201,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
-          otp-version: ${{ env.OTP_VERSION }
-          elixir-version: ${{ env.ELIXIR_VERSION }
+          otp-version: ${{ env.OTP_VERSION }}
+          elixir-version: ${{ env.ELIXIR_VERSION }}
 
       - name: Mix Deps Cache
         uses: actions/cache@v2
@@ -229,8 +229,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
-          otp-version: ${{ env.OTP_VERSION }
-          elixir-version: ${{ env.ELIXIR_VERSION }
+          otp-version: ${{ env.OTP_VERSION }}
+          elixir-version: ${{ env.ELIXIR_VERSION }}
 
       - name: Mix Deps Cache
         uses: actions/cache@v2
@@ -278,8 +278,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
-          otp-version: ${{ env.OTP_VERSION }
-          elixir-version: ${{ env.ELIXIR_VERSION }
+          otp-version: ${{ env.OTP_VERSION }}
+          elixir-version: ${{ env.ELIXIR_VERSION }}
 
       - name: Mix Deps Cache
         uses: actions/cache@v2
@@ -338,8 +338,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
-          otp-version: ${{ env.OTP_VERSION }
-          elixir-version: ${{ env.ELIXIR_VERSION }
+          otp-version: ${{ env.OTP_VERSION }}
+          elixir-version: ${{ env.ELIXIR_VERSION }}
       - run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
       - run: echo 'export PATH=~/.cargo/bin/:$PATH' >> $GITHUB_ENV
 
@@ -394,8 +394,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
-          otp-version: ${{ env.OTP_VERSION }
-          elixir-version: ${{ env.ELIXIR_VERSION }
+          otp-version: ${{ env.OTP_VERSION }}
+          elixir-version: ${{ env.ELIXIR_VERSION }}
       - run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
       - run: echo 'export PATH=~/.cargo/bin/:$PATH' >> $GITHUB_ENV
 
@@ -461,8 +461,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
-          otp-version: ${{ env.OTP_VERSION }
-          elixir-version: ${{ env.ELIXIR_VERSION }
+          otp-version: ${{ env.OTP_VERSION }}
+          elixir-version: ${{ env.ELIXIR_VERSION }}
       - run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
       - run: echo 'export PATH=~/.cargo/bin/:$PATH' >> $GITHUB_ENV
 
@@ -522,8 +522,8 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-elixir@v1
         with:
-          otp-version: ${{ env.OTP_VERSION }
-          elixir-version: ${{ env.ELIXIR_VERSION }
+          otp-version: ${{ env.OTP_VERSION }}
+          elixir-version: ${{ env.ELIXIR_VERSION }}
       - run: curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
       - run: echo 'export PATH=~/.cargo/bin/:$PATH' >> $GITHUB_ENV
 
