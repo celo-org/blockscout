@@ -6851,13 +6851,14 @@ defmodule Explorer.Chain do
 
   def combine_proxy_implementation_abi(proxy_address_hash, abi) when not is_nil(abi) do
     implementation_abi = get_implementation_abi_from_proxy(proxy_address_hash, abi)
-
     if Enum.empty?(implementation_abi), do: abi, else: implementation_abi ++ abi
   end
 
   def combine_proxy_implementation_abi(_, abi) when is_nil(abi) do
     []
   end
+
+  def proxy_contract?(_address_hash, abi) when abi in [nil, false, []], do: false
 
   def proxy_contract?(address_hash, abi) when not is_nil(abi) do
     implementation_method_abi =
@@ -6872,8 +6873,6 @@ defmodule Explorer.Chain do
        do: true,
        else: false
   end
-
-  def proxy_contract?(_address_hash, abi) when abi in [nil, false, []], do: false
 
   def gnosis_safe_contract?(abi) when not is_nil(abi) do
     implementation_method_abi =

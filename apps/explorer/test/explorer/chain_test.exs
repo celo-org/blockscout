@@ -5802,11 +5802,6 @@ defmodule Explorer.ChainTest do
 
     test "combine_proxy_implementation_abi/2 returns [] abi for unverified proxy" do
       proxy_contract_address = insert(:contract_address)
-
-      expect(EthereumJSONRPC.Mox, :json_rpc, fn _, _options ->
-        {:ok, "0x0000000000000000000000000000000000000000000000000000000000000000"}
-      end)
-
       assert Chain.combine_proxy_implementation_abi(proxy_contract_address, []) == []
     end
 
@@ -5856,11 +5851,6 @@ defmodule Explorer.ChainTest do
 
     test "get_implementation_abi_from_proxy/2 returns [] abi for unverified proxy" do
       proxy_contract_address = insert(:contract_address)
-
-      expect(EthereumJSONRPC.Mox, :json_rpc, fn _, _options ->
-        {:ok, "0x0000000000000000000000000000000000000000000000000000000000000000"}
-      end)
-
       assert Chain.combine_proxy_implementation_abi(proxy_contract_address, []) == []
     end
 
