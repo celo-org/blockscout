@@ -128,6 +128,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
         Logger.debug(
           fn ->
             block_numbers = unique_numbers |> inspect(charlists: :as_lists)
+
             [
               "failed to fetch internal transactions for #{unique_numbers_count} blocks: #{block_numbers} reason: ",
               inspect(reason)
@@ -142,6 +143,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
         Logger.error(
           fn ->
             block_numbers = unique_numbers |> inspect(charlists: :as_lists)
+
             [
               "failed to fetch internal transactions for #{unique_numbers_count} blocks: #{block_numbers} reason: ",
               inspect(reason)
