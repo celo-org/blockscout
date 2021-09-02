@@ -14,16 +14,18 @@ defmodule Indexer.Celo.Util do
   end
 
   def get_internal_transaction_state() do
-     internal_transaction_fetcher_pid
-     |> :sys.get_state
+    internal_transaction_fetcher_pid
+    |> :sys.get_state()
   end
 
   defp internal_transaction_fetcher_pid do
     {_child_id, pid, _, _} =
       Supervisor.which_children(Indexer.Fetcher.InternalTransaction.Supervisor)
-      |> Enum.find(fn {Indexer.Fetcher.InternalTransaction,_, _,_} -> true
+      |> Enum.find(fn
+        {Indexer.Fetcher.InternalTransaction, _, _, _} -> true
         _ -> false
       end)
+
     pid
   end
 end
