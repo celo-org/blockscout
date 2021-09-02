@@ -1,8 +1,9 @@
+# credo:disable-for-this-file
 defmodule Explorer.Celo.Metrics.BlockchainMetrics do
   @moduledoc "A context to collect blockchain metric functions"
 
-  alias Explorer.Repo
   alias Ecto.Adapters.SQL
+  alias Explorer.Repo
 
   def pending_blockcount do
     # todo: use ecto

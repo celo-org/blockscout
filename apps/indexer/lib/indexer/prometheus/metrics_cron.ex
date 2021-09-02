@@ -4,9 +4,9 @@ defmodule Indexer.Prometheus.MetricsCron do
   """
   use GenServer
   alias EthereumJSONRPC.HTTP.RpcResponseEts
+  alias Explorer.Celo.Metrics.BlockchainMetrics
   alias Explorer.Chain
   alias Explorer.Counters.AverageBlockTime
-  alias Explorer.Celo.Metrics.BlockchainMetrics
   alias Indexer.Prometheus.RPCInstrumenter
   alias Timex.Duration
 
