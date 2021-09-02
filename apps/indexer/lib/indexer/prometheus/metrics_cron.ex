@@ -51,7 +51,6 @@ defmodule Indexer.Prometheus.MetricsCron do
     pending_block_count = BlockchainMetrics.pending_blockcount()
     :telemetry.execute([:indexer, :blocks, :pending_blockcount], %{value: pending_block_count})
 
-
     number_of_locks = Chain.fetch_number_of_locks()
     :telemetry.execute([:indexer, :db, :locks], %{value: number_of_locks})
 
