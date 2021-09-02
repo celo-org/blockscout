@@ -13,7 +13,8 @@ defmodule Indexer.Prometheus.BlockInstrumenter do
       [:pending],
       [:average_time],
       [:last_block_age],
-      [:last_block_number]
+      [:last_block_number],
+      [:pending_blockcount]
     ]
 
     Enum.each(counter_events, &setup_counter/1)
