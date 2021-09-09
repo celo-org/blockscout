@@ -24,7 +24,6 @@ defmodule Indexer.Celo.Util do
     current = Application.get_env(:ethereum_jsonrpc, :internal_transaction_timeout)
     Logger.info("Setting debug_traceTransaction rpc timeout from #{current} to #{timeout}")
     Application.put_env(:ethereum_jsonrpc, :internal_transaction_timeout, timeout, persistent: true)
-    require IEx; IEx.pry
   end
 
   def get_internal_transaction_state() do
