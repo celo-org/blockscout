@@ -5,6 +5,8 @@
 # is restricted to this project.
 use Mix.Config
 
+alias BlockScoutWeb.LoggerBackend
+
 # General application configuration
 config :block_scout_web,
   namespace: BlockScoutWeb,
@@ -153,3 +155,5 @@ config :block_scout_web, BlockScoutWeb.WebRouter, enabled: System.get_env("DISAB
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
 import_config "#{Mix.env()}.exs"
+
+config :prometheus, BlockScoutWeb.Prometheus.Exporter, path: "/metrics/web"

@@ -5,15 +5,21 @@ defmodule BlockScoutWeb.Application do
 
   use Application
 
+  require Logger
+
   alias BlockScoutWeb.Counters.BlocksIndexedCounter
+  alias BlockScoutWeb.LoggerBackend
   alias BlockScoutWeb.{Endpoint, Prometheus}
   alias BlockScoutWeb.{RealtimeEventHandler, StakingEventHandler}
+  alias Prometheus.{Exporter, GenericInstrumenter}
 
   def start(_type, _args) do
     import Supervisor
 
-    Prometheus.Instrumenter.setup()
-    Prometheus.Exporter.setup()
+    Exporter.setup()
+    GenericInstrumenter.setup()
+    PrometheusPhx.setup()
+    Logger.add_backend(LoggerBackend, level: :error)
 
     # Define workers and child supervisors to be supervised
     children = [

@@ -12,7 +12,7 @@ defmodule BlockScoutWeb.Chain do
       string_to_address_hash: 1,
       string_to_block_hash: 1,
       string_to_transaction_hash: 1,
-      address_from_name: 1
+      token_contract_address_from_token_name: 1
     ]
 
   alias Explorer.Chain.Block.Reward
@@ -120,6 +120,23 @@ defmodule BlockScoutWeb.Chain do
     end
   end
 
+  def paging_options(%{
+        "address_hash" => address_hash,
+        "tx_hash" => tx_hash,
+        "block_hash" => block_hash,
+        "holder_count" => holder_count,
+        "name" => name,
+        "inserted_at" => inserted_at,
+        "item_type" => item_type
+      }) do
+    [
+      paging_options: %{
+        @default_paging_options
+        | key: {address_hash, tx_hash, block_hash, holder_count, name, inserted_at, item_type}
+      }
+    ]
+  end
+
   def paging_options(%{"holder_count" => holder_count, "name" => token_name}) do
     case Integer.parse(holder_count) do
       {holder_count, ""} ->
@@ -187,7 +204,7 @@ defmodule BlockScoutWeb.Chain do
   def paging_options(%{"inserted_at" => inserted_at_string, "hash" => hash_string}) do
     with {:ok, inserted_at, _} <- DateTime.from_iso8601(inserted_at_string),
          {:ok, hash} <- string_to_transaction_hash(hash_string) do
-      [paging_options: %{@default_paging_options | key: {inserted_at, hash}}]
+      [paging_options: %{@default_paging_options | key: {inserted_at, hash}, is_pending_tx: true}]
     else
       _ ->
         [paging_options: @default_paging_options]
@@ -245,7 +262,7 @@ defmodule BlockScoutWeb.Chain do
   end
 
   defp token_address_from_name(name) do
-    case address_from_name(name) do
+    case token_contract_address_from_token_name(name) do
       {:ok, hash} -> find_or_insert_address_from_hash(hash)
       _ -> {:error, :not_found}
     end
@@ -312,6 +329,28 @@ defmodule BlockScoutWeb.Chain do
 
   defp paging_params(%StakingPool{staking_address_hash: address_hash, stakes_ratio: value}) do
     %{"address_hash" => address_hash, "value" => Decimal.to_string(value)}
+  end
+
+  defp paging_params(%{
+         address_hash: address_hash,
+         tx_hash: tx_hash,
+         block_hash: block_hash,
+         holder_count: holder_count,
+         name: name,
+         inserted_at: inserted_at,
+         type: type
+       }) do
+    inserted_at_datetime = DateTime.to_iso8601(inserted_at)
+
+    %{
+      "address_hash" => address_hash,
+      "tx_hash" => tx_hash,
+      "block_hash" => block_hash,
+      "holder_count" => holder_count,
+      "name" => name,
+      "inserted_at" => inserted_at_datetime,
+      "item_type" => type
+    }
   end
 
   defp block_or_transaction_from_param(param) do

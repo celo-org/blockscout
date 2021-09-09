@@ -39,10 +39,6 @@ defmodule BlockScoutWeb.WebRouter do
       resources("/signers", BlockSignersController, only: [:index], as: :signers)
     end
 
-    get("/reorgs", BlockController, :reorg, as: :reorg)
-
-    get("/uncles", BlockController, :uncle, as: :uncle)
-
     get("/validators", StakesController, :index, as: :validators, assigns: %{filter: :validator})
     get("/active-pools", StakesController, :index, as: :active_pools, assigns: %{filter: :active})
     get("/inactive-pools", StakesController, :index, as: :inactive_pools, assigns: %{filter: :inactive})
@@ -316,6 +312,8 @@ defmodule BlockScoutWeb.WebRouter do
     get("/search", ChainController, :search)
 
     get("/search-logs", AddressLogsController, :search_logs)
+
+    get("/search-results", SearchController, :search_results)
 
     get("/token-autocomplete", ChainController, :token_autocomplete)
 

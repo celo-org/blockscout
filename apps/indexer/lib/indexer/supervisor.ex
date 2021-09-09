@@ -21,6 +21,7 @@ defmodule Indexer.Supervisor do
   alias Indexer.Fetcher.{
     BlockReward,
     CeloAccount,
+    CeloMaterializedViewRefresh,
     CeloValidator,
     CeloValidatorGroup,
     CeloValidatorHistory,
@@ -45,6 +46,8 @@ defmodule Indexer.Supervisor do
     UncatalogedTokenTransfers,
     UnclesWithoutIndex
   }
+
+  alias Indexer.Prometheus.MetricsCron
 
   def child_spec([]) do
     child_spec([[]])
@@ -129,16 +132,6 @@ defmodule Indexer.Supervisor do
       {TokenBalance.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {TokenUpdater.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {ReplacedTransaction.Supervisor, [[memory_monitor: memory_monitor]]},
-      {CeloAccount.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
-      {CeloValidator.Supervisor,
-       [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
-      {CeloValidatorGroup.Supervisor,
-       [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
-      {CeloValidatorHistory.Supervisor,
-       [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
-      {CeloVoterRewards.Supervisor,
-       [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
-      {CeloVoters.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
 
       # Out-of-band fetchers
       {CoinBalanceOnDemand.Supervisor, [json_rpc_named_arguments]},
@@ -151,10 +144,23 @@ defmodule Indexer.Supervisor do
        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {BlocksTransactionsMismatch.Supervisor,
        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
-      {PendingOpsCleaner, [[], []]}
+      {PendingOpsCleaner, [[], []]},
+
+      # Celo
+      {CeloAccount.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
+      {CeloValidator.Supervisor,
+       [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
+      {CeloValidatorGroup.Supervisor,
+       [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
+      {CeloValidatorHistory.Supervisor,
+       [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
+      {CeloVoterRewards.Supervisor,
+       [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
+      {CeloVoters.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
+      {CeloMaterializedViewRefresh, [[], []]}
     ]
 
-    extended_fetchers =
+    fetchers_with_bridged_tokens =
       if Chain.bridged_tokens_enabled?() do
         fetchers_with_omni_status = [{SetOmniBridgedMetadataForTokens, [[], []]} | basic_fetchers]
         [{CalcLpTokensTotalLiqudity, [[], []]} | fetchers_with_omni_status]
@@ -164,15 +170,24 @@ defmodule Indexer.Supervisor do
 
     amb_bridge_mediators = Application.get_env(:block_scout_web, :amb_bridge_mediators)
 
-    all_fetchers =
+    fetchers_with_amb_bridge_mediators =
       if amb_bridge_mediators && amb_bridge_mediators !== "" do
-        [{SetAmbBridgedMetadataForTokens, [[], []]} | extended_fetchers]
+        [{SetAmbBridgedMetadataForTokens, [[], []]} | fetchers_with_bridged_tokens]
       else
-        extended_fetchers
+        fetchers_with_bridged_tokens
+      end
+
+    metrics_enabled = Application.get_env(:indexer, :metrics_enabled)
+
+    fetchers_with_metrics =
+      if metrics_enabled do
+        [{MetricsCron, [[]]} | fetchers_with_amb_bridge_mediators]
+      else
+        fetchers_with_amb_bridge_mediators
       end
 
     Supervisor.init(
-      all_fetchers,
+      fetchers_with_metrics,
       strategy: :one_for_one
     )
   end

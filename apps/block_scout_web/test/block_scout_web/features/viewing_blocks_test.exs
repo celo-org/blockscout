@@ -92,9 +92,16 @@ defmodule BlockScoutWeb.ViewingBlocksTest do
         block: block
       )
 
-      session
-      |> BlockPage.visit_page(block)
-      |> BlockPage.accept_cookies_click()
+      visited_page_session =
+        session
+        |> BlockPage.visit_page(block)
+        |> BlockPage.accept_cookies_click()
+
+      # token transfers are loaded in defer tags - https://github.com/blockscout/blockscout/pull/4398
+      # sleep here to ensure js is loaded before assertion
+      Process.sleep(:timer.seconds(1))
+
+      visited_page_session
       |> assert_has(BlockPage.token_transfers(transaction, count: 1))
       |> click(BlockPage.token_transfers_expansion(transaction))
       |> assert_has(BlockPage.token_transfers(transaction, count: 3))
@@ -146,41 +153,6 @@ defmodule BlockScoutWeb.ViewingBlocksTest do
       |> BlockListPage.visit_page()
       |> assert_has(BlockListPage.block(%Block{number: 314}))
       |> assert_has(BlockListPage.place_holder_blocks(3))
-    end
-  end
-
-  describe "viewing uncle blocks list" do
-    setup do
-      uncles =
-        for _index <- 1..10 do
-          uncle = insert(:block, consensus: false)
-          insert(:block_second_degree_relation, uncle_hash: uncle.hash)
-
-          transaction = insert(:transaction)
-          insert(:transaction_fork, hash: transaction.hash, uncle_hash: uncle.hash)
-
-          uncle
-        end
-
-      {:ok, %{uncles: uncles}}
-    end
-
-    test "lists uncle blocks", %{session: session, uncles: [uncle | _]} do
-      session
-      |> BlockListPage.visit_uncles_page()
-      |> assert_has(BlockListPage.block(uncle))
-      |> assert_has(BlockListPage.blocks(10))
-    end
-  end
-
-  describe "viewing reorg blocks list" do
-    test "lists uncle blocks", %{session: session} do
-      [reorg | _] = insert_list(10, :block, consensus: false)
-
-      session
-      |> BlockListPage.visit_reorgs_page()
-      |> assert_has(BlockListPage.block(reorg))
-      |> assert_has(BlockListPage.blocks(10))
     end
   end
 end

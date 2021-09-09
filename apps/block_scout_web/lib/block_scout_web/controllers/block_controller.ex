@@ -3,60 +3,31 @@ defmodule BlockScoutWeb.BlockController do
 
   import BlockScoutWeb.Chain, only: [paging_options: 1, next_page_params: 3, split_list_by_page: 1]
 
-  alias BlockScoutWeb.BlockView
+  alias BlockScoutWeb.{BlockView, Controller}
   alias Explorer.Chain
   alias Phoenix.View
 
   def index(conn, params) do
-    case params["block_type"] do
-      "Uncle" ->
-        uncle(conn, params)
-
-      "Reorg" ->
-        reorg(conn, params)
-
-      _ ->
-        [
-          necessity_by_association: %{
-            :transactions => :optional,
-            [miner: :names] => :optional,
-            :celo_delegator => :optional,
-            [celo_delegator: :celo_account] => :optional,
-            :rewards => :optional
-          },
-          block_type: "Block"
-        ]
-        |> handle_render(conn, params)
-    end
+    [
+      necessity_by_association: %{
+        :transactions => :optional,
+        [miner: :names] => :optional,
+        :celo_delegator => :optional,
+        [celo_delegator: :celo_account] => :optional,
+        :rewards => :optional
+      },
+      block_type: "Block"
+    ]
+    |> handle_render(conn, params)
   end
 
   def show(conn, %{"hash_or_number" => hash_or_number}) do
-    redirect(conn, to: block_transaction_path(conn, :index, hash_or_number))
-  end
+    block_transaction_path =
+      conn
+      |> block_transaction_path(:index, hash_or_number)
+      |> Controller.full_path()
 
-  def reorg(conn, params) do
-    [
-      necessity_by_association: %{
-        :transactions => :optional,
-        [miner: :names] => :optional,
-        :rewards => :optional
-      },
-      block_type: "Reorg"
-    ]
-    |> handle_render(conn, params)
-  end
-
-  def uncle(conn, params) do
-    [
-      necessity_by_association: %{
-        :transactions => :optional,
-        [miner: :names] => :optional,
-        :nephews => :required,
-        :rewards => :optional
-      },
-      block_type: "Uncle"
-    ]
-    |> handle_render(conn, params)
+    redirect(conn, to: block_transaction_path)
   end
 
   defp handle_render(full_options, conn, %{"type" => "JSON"} = params) do
@@ -106,7 +77,7 @@ defmodule BlockScoutWeb.BlockController do
 
   defp handle_render(full_options, conn, _params) do
     render(conn, "index.html",
-      current_path: current_path(conn),
+      current_path: Controller.current_full_path(conn),
       block_type: Keyword.get(full_options, :block_type, "Block")
     )
   end
