@@ -121,8 +121,11 @@ defmodule Indexer.Fetcher.InternalTransaction do
         end
     end
     |> case do
-      {:ok, internal_transactions_params} ->
-        import_internal_transaction(internal_transactions_params, unique_numbers)
+      {:ok, internal_transactions_params, failed} ->
+        success = unique_numbers
+        |> Enum.filter(&(!MapSet.member(failed, &1)))
+
+        import_internal_transaction(internal_transactions_params, success)
 
       {:error, :block_not_indexed_properly = reason} ->
         Logger.debug(
@@ -180,9 +183,9 @@ defmodule Indexer.Fetcher.InternalTransaction do
     end
   end
 
-  defp check_db(num, used_gas, res) do
+  defp check_db(num, used_gas, res, fail_list) do
     if num != 0 || Decimal.to_integer(used_gas) == 0 do
-      {:ok, res}
+      {:ok, res, fail_list}
     else
       {:error, :block_not_indexed_properly}
     end
@@ -193,8 +196,8 @@ defmodule Indexer.Fetcher.InternalTransaction do
   end
 
   defp fetch_block_internal_transactions_by_transactions(unique_numbers, json_rpc_named_arguments) do
-    Enum.reduce(unique_numbers, {:ok, []}, fn
-      block_number, {:ok, acc_list} ->
+    Enum.reduce(unique_numbers, {:ok, [], MapSet.new()}, fn
+      block_number, {:ok, acc_list, failed_blocks} ->
         block = Chain.number_to_any_block(block_number)
 
         block_number
@@ -210,12 +213,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
               {res, Enum.count(transactions), block}
             catch
               :exit, error ->
-                Logger.error(
-                  "EthereumJSONRPC.fetch_internal_transactions/2 failed for block #{block_number} - error=#{
-                    inspect(error)
-                  } block_gas=#{round(block.gas_used / (block.gas_limit / 100))}%"
-                )
-
                 {:error, error, block}
             end
         end
@@ -236,14 +233,24 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
             res = add_block_hash(block_hash, internal_transactions) ++ acc_list
 
-            check_db(num, Decimal.new(used_gas), res)
+            case check_db(num, Decimal.new(used_gas), res, fail_list) do
+              r = {:ok, res, fail_list} ->
+                r
 
-          {error_or_ignore, _, _} ->
-            error_or_ignore
+              {:error, :block_not_indexed_properly, _} ->
+                Logger.error("Block #{block_number} not indexed properly, adding to fail list")
+                {:ok, res, MapSet.put(failed_blocks, block_number)}
+            end
+
+          {error_or_ignore, error, _} ->
+            Logger.error(
+              "Failed to fetch internal transactions for block #{block_number} - error=#{inspect(error)} block_gas=#{
+                round(block.gas_used / (block.gas_limit / 100))
+              }% - adding to fail list"
+            )
+
+            {:ok, acc_list, MapSet.put(failed_blocks, block_number)}
         end
-
-      _, error_or_ignore ->
-        error_or_ignore
     end)
   end
 
