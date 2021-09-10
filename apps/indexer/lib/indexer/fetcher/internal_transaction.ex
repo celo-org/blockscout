@@ -124,7 +124,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
       {:ok, internal_transactions_params, failed} ->
         success =
           unique_numbers
-          |> Enum.filter(&(!MapSet.member(failed, &1)))
+          |> Enum.filter(&(!MapSet.member?(failed, &1)))
 
         import_internal_transaction(internal_transactions_params, success)
 
@@ -234,8 +234,8 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
             res = add_block_hash(block_hash, internal_transactions) ++ acc_list
 
-            case check_db(num, Decimal.new(used_gas), res, fail_list) do
-              r = {:ok, res, fail_list} ->
+            case check_db(num, Decimal.new(used_gas), res, failed_blocks) do
+              r = {:ok, _res, _fail_list} ->
                 r
 
               {:error, :block_not_indexed_properly, _} ->
@@ -243,7 +243,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
                 {:ok, res, MapSet.put(failed_blocks, block_number)}
             end
 
-          {error_or_ignore, error, _} ->
+          {_error_or_ignore, error, _} ->
             Logger.error(
               "Failed to fetch internal transactions for block #{block_number} - error=#{inspect(error)} block_gas=#{
                 round(block.gas_used / (block.gas_limit / 100))
