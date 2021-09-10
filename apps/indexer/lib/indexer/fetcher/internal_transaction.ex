@@ -122,8 +122,9 @@ defmodule Indexer.Fetcher.InternalTransaction do
     end
     |> case do
       {:ok, internal_transactions_params, failed} ->
-        success = unique_numbers
-        |> Enum.filter(&(!MapSet.member(failed, &1)))
+        success =
+          unique_numbers
+          |> Enum.filter(&(!MapSet.member(failed, &1)))
 
         import_internal_transaction(internal_transactions_params, success)
 
