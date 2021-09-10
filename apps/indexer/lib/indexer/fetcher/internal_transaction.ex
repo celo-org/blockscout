@@ -210,6 +210,12 @@ defmodule Indexer.Fetcher.InternalTransaction do
               {res, Enum.count(transactions), block}
             catch
               :exit, error ->
+                Logger.error(
+                  "EthereumJSONRPC.fetch_internal_transactions/2 failed for block #{block_number} - error=#{
+                    inspect(error)
+                  } block_gas=#{round(block.gas_used / (block.gas_limit / 100))}%"
+                )
+
                 {:error, error, block}
             end
         end
