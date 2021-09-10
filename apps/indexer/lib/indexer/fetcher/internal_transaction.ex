@@ -238,16 +238,14 @@ defmodule Indexer.Fetcher.InternalTransaction do
               r = {:ok, _res, _fail_list} ->
                 r
 
-              {:error, :block_not_indexed_properly, _} ->
+              {:error, :block_not_indexed_properly} ->
                 Logger.error("Block #{block_number} not indexed properly, adding to fail list")
                 {:ok, res, MapSet.put(failed_blocks, block_number)}
             end
 
-          {_error_or_ignore, error, _} ->
+          {error_or_ignore, _, _} = e ->
             Logger.error(
-              "Failed to fetch internal transactions for block #{block_number} - error=#{inspect(error)} block_gas=#{
-                round(block.gas_used / (block.gas_limit / 100))
-              }% - adding to fail list"
+              "Failed to fetch internal transactions for block #{block_number} - error=#{inspect(error_or_ignore)} - adding to fail list"
             )
 
             {:ok, acc_list, MapSet.put(failed_blocks, block_number)}
