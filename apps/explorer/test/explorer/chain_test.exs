@@ -5911,4 +5911,18 @@ defmodule Explorer.ChainTest do
       assert implementation_abi == @implementation_abi
     end
   end
+
+  describe "fetch_sum_pending_withdrawal/0" do
+    test "fetches all CELO that is in the unlocking period" do
+      insert(:celo_withdrawal, %{timestamp: Timex.shift(DateTime.utc_now(), days: -1), amount: 1})
+      insert(:celo_withdrawal, %{timestamp: Timex.shift(DateTime.utc_now(), days: 0), amount: 2})
+      insert(:celo_withdrawal, %{timestamp: Timex.shift(DateTime.utc_now(), days: 1), amount: 3})
+
+      assert %Wei{value: Decimal.new(5)} == Chain.fetch_sum_pending_withdrawal()
+    end
+
+    test "fetches all pending CELO when there are no blocks" do
+      assert %Wei{value: Decimal.new(0)} == Chain.fetch_sum_pending_withdrawal()
+    end
+  end
 end

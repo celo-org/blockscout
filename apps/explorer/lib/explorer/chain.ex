@@ -52,6 +52,7 @@ defmodule Explorer.Chain do
     CeloValidatorGroup,
     CeloValidatorHistory,
     CeloVoters,
+    CeloWithdrawal,
     CurrencyHelpers,
     Data,
     DecompiledSmartContract,
@@ -3952,7 +3953,7 @@ defmodule Explorer.Chain do
   Updates a `t:SmartContract.t/0`.
 
   Has the similar logic as create_smart_contract/1.
-  Used in cases when you need to update row in DB contains SmartContract, e.g. in case of changing 
+  Used in cases when you need to update row in DB contains SmartContract, e.g. in case of changing
   status `partially verified` to `fully verified` (re-verify).
   """
   @spec update_smart_contract(map()) :: {:ok, SmartContract.t()} | {:error, Ecto.Changeset.t()}
@@ -7461,6 +7462,26 @@ defmodule Explorer.Chain do
 
       true ->
         :token_transfer
+    end
+  end
+
+  @doc """
+  Returns the total amount of CELO that is in the unlocking period.
+  Details at: https://docs.celo.org/celo-codebase/protocol/proof-of-stake/locked-gold#unlocking-period
+  """
+  @spec fetch_sum_pending_withdrawal() :: non_neg_integer()
+  def fetch_sum_pending_withdrawal do
+    query =
+      from(w in CeloWithdrawal,
+        where: w.timestamp >= fragment("NOW()"),
+        select: sum(w.amount)
+      )
+
+    query
+    |> Repo.one()
+    |> case do
+      nil -> %Wei{value: Decimal.new(0)}
+      sum -> sum
     end
   end
 end

@@ -18,6 +18,7 @@ defmodule Explorer.Factory do
     Address.CoinBalance,
     Address.CoinBalanceDaily,
     Block,
+    CeloWithdrawal,
     ContractMethod,
     Data,
     DecompiledSmartContract,
@@ -702,6 +703,15 @@ defmodule Explorer.Factory do
       name: "Validator #123",
       locked_gold: wei_per_ether * 4,
       nonvoting_locked_gold: wei_per_ether * 4
+    }
+  end
+
+  def celo_withdrawal_factory do
+    %CeloWithdrawal{
+      account_address: address_hash(),
+      amount: Decimal.new(1),
+      index: sequence("withdrawal_index", & &1),
+      timestamp: Timex.shift(Timex.now(), days: Enum.random(0..100) * -1)
     }
   end
 end
