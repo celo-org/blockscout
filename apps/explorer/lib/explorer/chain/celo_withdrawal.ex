@@ -11,7 +11,7 @@ defmodule Explorer.Chain.CeloWithdrawal do
 
   @typedoc """
   * `address` - address of the validator.
-  * 
+  *
   """
 
   @type t :: %__MODULE__{
@@ -36,10 +36,9 @@ defmodule Explorer.Chain.CeloWithdrawal do
     field(:amount, Wei)
 
     belongs_to(
-      :account_address,
+      :address,
       Address,
-      foreign_key: :address,
-      primary_key: true,
+      foreign_key: :account_address,
       references: :hash,
       type: Hash.Address
     )
