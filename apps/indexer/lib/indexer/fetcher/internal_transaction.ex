@@ -240,7 +240,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
               {:error, :block_not_indexed_properly} ->
                 Logger.error("Block #{block_number} not indexed properly, adding to fail list")
-                {:ok, res, MapSet.put(failed_blocks, block_number)}
+                {:ok, acc_list, MapSet.put(failed_blocks, block_number)}
             end
 
           {error_or_ignore, _, _} = e ->
