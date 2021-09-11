@@ -228,7 +228,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
               ]
             end)
 
-            res = internal_transactions ++ acc_list
+            res = add_block_hash(block_hash, internal_transactions) ++ acc_list
 
             case check_db(num, Decimal.new(used_gas), res) do
               r = {:ok, _res} ->
