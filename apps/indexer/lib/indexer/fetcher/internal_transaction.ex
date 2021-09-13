@@ -83,11 +83,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
     final
   end
 
-  defp params(%{block_number: block_number, hash: hash, index: index, block_hash: block_hash})
-       when is_integer(block_number) do
-    %{block_number: block_number, hash_data: to_string(hash), transaction_index: index, block_hash: block_hash}
-  end
-
   @impl BufferedTask
   @decorate trace(
               name: "fetch",
@@ -112,7 +107,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
       EthereumJSONRPC.Besu ->
         EthereumJSONRPC.fetch_block_internal_transactions(unique_numbers, json_rpc_named_arguments)
 
-      _ ->
+      _jsonrpc_variant ->
         try do
           fetch_block_internal_transactions_by_transactions(unique_numbers, json_rpc_named_arguments)
         rescue
@@ -180,18 +175,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
     end
   end
 
-  defp check_db(num, used_gas, res) do
-    if num != 0 || Decimal.to_integer(used_gas) == 0 do
-      {:ok, res}
-    else
-      {:error, :block_not_indexed_properly}
-    end
-  end
-
-  defp add_block_hash(block_hash, internal_transactions) do
-    Enum.map(internal_transactions, fn a -> Map.put(a, :block_hash, block_hash) end)
-  end
-
   defp fetch_block_internal_transactions_by_transactions(unique_numbers, json_rpc_named_arguments) do
     Enum.reduce(unique_numbers, {:ok, []}, fn
       block_number, {:ok, acc_list} ->
@@ -199,54 +182,69 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
         block_number
         |> Chain.get_transactions_of_block_number()
-        |> Enum.map(&params(&1))
-        |> case do
-          [] ->
-            {{:ok, []}, 0, block}
-
-          transactions ->
-            try do
-              res = EthereumJSONRPC.fetch_internal_transactions(transactions, json_rpc_named_arguments)
-              {res, Enum.count(transactions), block}
-            catch
-              :exit, error ->
-                {:error, error, block}
-            end
-        end
-        |> case do
-          {{:ok, internal_transactions}, num, {:ok, %{gas_used: used_gas, hash: block_hash}}} ->
-            Logger.debug(fn ->
-              [
-                "Found ",
-                inspect(Enum.count(internal_transactions)),
-                " internal tx for block ",
-                inspect(block_number),
-                " had txs: ",
-                inspect(num),
-                " used gas ",
-                inspect(used_gas)
-              ]
-            end)
-
-            res = add_block_hash(block_hash, internal_transactions) ++ acc_list
-
-            case check_db(num, Decimal.new(used_gas), res) do
-              r = {:ok, _res} ->
-                r
-
-              {:error, :block_not_indexed_properly} ->
-                Logger.error("Block #{block_number} not indexed properly")
-                {:ok, acc_list}
-            end
-
-          {error_or_ignore, _, _} ->
-            Logger.error(
-              "Failed to fetch internal transactions for block #{block_number} - error=#{inspect(error_or_ignore)}"
-            )
-
-            {:ok, acc_list}
-        end
+        |> extract_transaction_parameters()
+        |> perform_internal_transaction_fetch(block, json_rpc_named_arguments)
+        |> handle_transaction_fetch_results(block_number, acc_list)
     end)
+  end
+
+  defp extract_transaction_parameters(transactions) do
+    transactions
+    |> Enum.map(&params(&1))
+  end
+
+  defp params(%{block_number: block_number, hash: hash, index: index, block_hash: block_hash})
+       when is_integer(block_number) do
+    %{block_number: block_number, hash_data: to_string(hash), transaction_index: index, block_hash: block_hash}
+  end
+
+  defp perform_internal_transaction_fetch([], _block, _jsonrpc_named_arguments), do: {{:ok, []}, 0, block}
+
+  defp perform_internal_transaction_fetch(transactions, block, jsonrpc_named_arguments) do
+    {:ok, res} = EthereumJSONRPC.fetch_internal_transactions(transactions, json_rpc_named_arguments)
+    {{:ok, res}, Enum.count(transactions), block}
+  catch
+    :exit, error ->
+      {:error, error, block}
+  end
+
+  defp handle_transaction_fetch_results(
+         {{:ok, internal_transactions}, num, {:ok, %{gas_used: used_gas, hash: block_hash}}},
+         block_number,
+         acc
+       ) do
+    Logger.debug(
+      "Found #{Enum.count(internal_transactions)} internal tx for block #{block_number} had txs: #{num} used gas #{
+        used_gas
+      }"
+    )
+
+    case check_db(num, Decimal.new(used_gas)) do
+      {:ok} ->
+        {:ok, add_block_hash(block_hash, internal_transactions) ++ acc}
+
+      {:error, :block_not_indexed_properly} ->
+        Logger.error("Block #{block_number} not indexed properly")
+        {:ok, acc}
+    end
+  end
+
+  defp handle_transaction_fetch_results({error_or_ignore, _, _}, block_number, acc) do
+    Logger.error("Failed to fetch internal transactions for block #{block_number} - error=#{inspect(error_or_ignore)}")
+
+    {:ok, acc_list}
+  end
+
+  defp check_db(num, used_gas) do
+    if num != 0 || Decimal.to_integer(used_gas) == 0 do
+      {:ok}
+    else
+      {:error, :block_not_indexed_properly}
+    end
+  end
+
+  defp add_block_hash(block_hash, internal_transactions) do
+    Enum.map(internal_transactions, fn a -> Map.put(a, :block_hash, block_hash) end)
   end
 
   defp decode("0x" <> str) do
