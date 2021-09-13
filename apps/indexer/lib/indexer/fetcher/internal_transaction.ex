@@ -203,8 +203,8 @@ defmodule Indexer.Fetcher.InternalTransaction do
   defp perform_internal_transaction_fetch(transactions, block, jsonrpc_named_arguments) do
     {:ok, res} = EthereumJSONRPC.fetch_internal_transactions(transactions, jsonrpc_named_arguments)
     {{:ok, res}, Enum.count(transactions), block}
-  catch
-    :exit, error ->
+  rescue
+    error ->
       {:error, error, block}
   end
 
@@ -229,8 +229,8 @@ defmodule Indexer.Fetcher.InternalTransaction do
     end
   end
 
-  defp handle_transaction_fetch_results({error_or_ignore, _, _}, block_number, acc) do
-    Logger.error("Failed to fetch internal transactions for block #{block_number} - error=#{inspect(error_or_ignore)}")
+  defp handle_transaction_fetch_results({:error, e, _block}, block_number, acc) do
+    Logger.error("Failed to fetch internal transactions for block #{block_number} - error=#{inspect(e)}")
 
     {:ok, acc}
   end

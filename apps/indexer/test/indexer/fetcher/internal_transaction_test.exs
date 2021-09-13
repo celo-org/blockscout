@@ -337,10 +337,10 @@ defmodule Indexer.Fetcher.InternalTransactionTest do
       insert(:pending_block_operation, block_hash: valid_block_hash2, fetch_internal_transactions: true)
       insert(:pending_block_operation, block_hash: empty_block_hash, fetch_internal_transactions: true)
 
-      assert %{block_hash: valid_block_hash} = Repo.get(PendingBlockOperation, valid_block_hash)
-      assert %{block_hash: invalid_block_hash} = Repo.get(PendingBlockOperation, invalid_block_hash)
-      assert %{block_hash: valid_block_hash2} = Repo.get(PendingBlockOperation, valid_block_hash2)
-      assert %{block_hash: empty_block_hash} = Repo.get(PendingBlockOperation, empty_block_hash)
+      assert %{block_hash: ^valid_block_hash} = Repo.get(PendingBlockOperation, valid_block_hash)
+      assert %{block_hash: ^invalid_block_hash} = Repo.get(PendingBlockOperation, invalid_block_hash)
+      assert %{block_hash: ^valid_block_hash2} = Repo.get(PendingBlockOperation, valid_block_hash2)
+      assert %{block_hash: ^empty_block_hash} = Repo.get(PendingBlockOperation, empty_block_hash)
 
       EthereumJSONRPC.Mox
       |> expect(:json_rpc, fn [%{id: id, method: "debug_traceTransaction"}], _options ->
