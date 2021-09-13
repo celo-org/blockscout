@@ -1906,7 +1906,9 @@ defmodule Explorer.ChainTest do
                     updated_at: %{}
                   }
                 ],
-                internal_transactions: [],
+                internal_transactions: [
+                  %Explorer.Chain.InternalTransaction{}
+                ],
                 logs: [
                   %Log{
                     address_hash: %Hash{
