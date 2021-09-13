@@ -235,7 +235,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
                 r
 
               {:error, :block_not_indexed_properly} ->
-                Logger.error("Block #{block_number} not indexed properly, adding to fail list")
+                Logger.error("Block #{block_number} not indexed properly")
                 {:ok, acc_list}
             end
 
@@ -264,13 +264,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
   end
 
   defp import_internal_transaction(internal_transactions_params, unique_numbers) do
-    # successful_blocks =
-    #   internal_transactions_params
-    #   |> Enum.map(fn tx -> Map.get(tx, :block_number) end)
-    #   |> MapSet.new()
-
-    # processed_blocks = if MapSet.size(successful_blocks) == 0, do: unique_numbers, else: successful_blocks
-
     internal_transactions_params_without_failed_creations = remove_failed_creations(internal_transactions_params)
 
     addresses_params =
