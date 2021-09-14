@@ -312,7 +312,6 @@ defmodule Indexer.Fetcher.InternalTransactionTest do
       assert %{block_hash: block_hash} = Repo.get(PendingBlockOperation, block_hash)
     end
 
-    @tag mustexec: true
     test "handles problematic blocks correctly" do
       valid_block = insert(:block)
       transaction = insert(:transaction) |> with_block(valid_block)
@@ -344,8 +343,6 @@ defmodule Indexer.Fetcher.InternalTransactionTest do
 
       EthereumJSONRPC.Mox
       |> expect(:json_rpc, fn [%{id: id, method: "debug_traceTransaction"}], _options ->
-        Logger.debug("First")
-
         {:ok,
          [
            %{
@@ -372,12 +369,9 @@ defmodule Indexer.Fetcher.InternalTransactionTest do
          ]}
       end)
       |> expect(:json_rpc, fn [%{id: id, method: "debug_traceTransaction"}], _options ->
-        Logger.debug("second")
         {:error, :closed}
       end)
       |> expect(:json_rpc, fn [%{id: id, method: "debug_traceTransaction"}], _options ->
-        Logger.debug("Third")
-
         {:ok,
          [
            %{
