@@ -32,7 +32,7 @@ config :logger, :addresses_without_code,
 
 variant =
   if is_nil(System.get_env("ETHEREUM_JSONRPC_VARIANT")) do
-    "geth"
+    "parity"
   else
     System.get_env("ETHEREUM_JSONRPC_VARIANT")
     |> String.split(".")

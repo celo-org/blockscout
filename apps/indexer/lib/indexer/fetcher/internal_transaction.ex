@@ -185,6 +185,9 @@ defmodule Indexer.Fetcher.InternalTransaction do
         |> extract_transaction_parameters()
         |> perform_internal_transaction_fetch(block, json_rpc_named_arguments)
         |> handle_transaction_fetch_results(block_number, acc_list)
+
+      _, error_or_ignore ->
+        error_or_ignore
     end)
   end
 
