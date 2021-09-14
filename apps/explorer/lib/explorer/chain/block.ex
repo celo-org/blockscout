@@ -7,7 +7,18 @@ defmodule Explorer.Chain.Block do
 
   use Explorer.Schema
 
-  alias Explorer.Chain.{Address, CeloSigners, CeloValidatorHistory, Data, Gas, Hash, PendingBlockOperation, Transaction, Wei}
+  alias Explorer.Chain.{
+    Address,
+    CeloSigners,
+    CeloValidatorHistory,
+    Data,
+    Gas,
+    Hash,
+    PendingBlockOperation,
+    Transaction,
+    Wei
+  }
+
   alias Explorer.Chain.Block.{Reward, SecondDegreeRelation}
 
   @optional_attrs ~w(size refetch_needed total_difficulty difficulty extra_data round base_fee_per_gas)a
