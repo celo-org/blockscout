@@ -12,7 +12,7 @@ defmodule BlockScoutWeb.CSPHeader do
     Controller.put_secure_browser_headers(conn, %{
       "content-security-policy" =>
         "\
-        connect-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdn.segment.com https://api.segment.io https://request-global.czilladx.com/ #{
+        connect-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdn.segment.com https://api.segment.io https://request-global.czilladx.com/ https://raw.githubusercontent.com/ #{
           websocket_endpoints(conn)
         }; \
         default-src 'self';\
