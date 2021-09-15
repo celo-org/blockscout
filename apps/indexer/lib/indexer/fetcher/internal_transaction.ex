@@ -14,8 +14,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
   alias Explorer.Celo.Util
   alias Explorer.Chain
-  alias Explorer.Chain.Transaction
-  alias Explorer.Chain.Block
+  alias Explorer.Chain.{Block, Transaction}
   alias Explorer.Chain.Cache.{Accounts, Blocks}
   alias Indexer.{BufferedTask, Tracer}
   alias Indexer.Fetcher.TokenBalance
@@ -209,6 +208,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
     case EthereumJSONRPC.fetch_internal_transactions(transactions, jsonrpc_named_arguments) do
       {:ok, res} ->
         {{:ok, res}, Enum.count(transactions), block}
+
       {:error, reason} ->
         {:error, reason, block}
     end
