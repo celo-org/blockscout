@@ -427,7 +427,7 @@ jobs:
           mix ecto.migrate
           cd apps/explorer
           mix compile
-          mix test --no-start --exclude no_parity
+          mix test --no-start --exclude no_parity --exclude smart_contract_compiler
         env:
           MIX_ENV: "test"
           # match POSTGRES_PASSWORD for postgres image below
