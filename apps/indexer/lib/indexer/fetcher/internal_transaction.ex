@@ -14,6 +14,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
   alias Explorer.Celo.Util
   alias Explorer.Chain
+  alias Explorer.Chain.Transaction
   alias Explorer.Chain.Block
   alias Explorer.Chain.Cache.{Accounts, Blocks}
   alias Indexer.{BufferedTask, Tracer}
@@ -196,7 +197,8 @@ defmodule Indexer.Fetcher.InternalTransaction do
     |> Enum.map(&params(&1))
   end
 
-  defp params(%{block_number: block_number, hash: hash, index: index, block_hash: block_hash})
+  # Transforms parameters from Transaction struct to those expected by EthereumJSONRPC.fetch_internal_transactions
+  defp params(%Transaction{block_number: block_number, hash: hash, index: index, block_hash: block_hash})
        when is_integer(block_number) do
     %{block_number: block_number, hash_data: to_string(hash), transaction_index: index, block_hash: block_hash}
   end
@@ -204,11 +206,12 @@ defmodule Indexer.Fetcher.InternalTransaction do
   defp perform_internal_transaction_fetch([], block, _jsonrpc_named_arguments), do: {{:ok, []}, 0, block}
 
   defp perform_internal_transaction_fetch(transactions, block, jsonrpc_named_arguments) do
-    {:ok, res} = EthereumJSONRPC.fetch_internal_transactions(transactions, jsonrpc_named_arguments)
-    {{:ok, res}, Enum.count(transactions), block}
-  rescue
-    error ->
-      {:error, error, block}
+    case EthereumJSONRPC.fetch_internal_transactions(transactions, jsonrpc_named_arguments) do
+      {:ok, res} ->
+        {{:ok, res}, Enum.count(transactions), block}
+      {:error, reason} ->
+        {:error, reason, block}
+    end
   end
 
   defp handle_transaction_fetch_results(
@@ -246,6 +249,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
     end
   end
 
+  # block_hash is required for TokenTransfers.parse_itx
   defp add_block_hash(block_hash, internal_transactions) do
     Enum.map(internal_transactions, fn a -> Map.put(a, :block_hash, block_hash) end)
   end
