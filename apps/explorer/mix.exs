@@ -132,7 +132,7 @@ defmodule Explorer.Mixfile do
   defp env_aliases(:dev), do: []
 
   defp env_aliases(_env) do
-    [compile: "compile"]
+    [compile: "compile --warnings-as-errors"]
   end
 
   defp package do

@@ -3,7 +3,6 @@ defmodule Indexer.Fetcher.InternalTransactionTest do
   use Explorer.DataCase
 
   import Mox
-  require Logger
 
   alias Explorer.Chain
   alias Explorer.Chain.PendingBlockOperation
@@ -247,8 +246,6 @@ defmodule Indexer.Fetcher.InternalTransactionTest do
           EthereumJSONRPC.Geth ->
             EthereumJSONRPC.Mox
             |> expect(:json_rpc, fn [%{id: id, method: "debug_traceTransaction"}], _options ->
-              Logger.debug("Foo")
-
               {:ok,
                [
                  %{
