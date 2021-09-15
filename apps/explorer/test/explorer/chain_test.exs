@@ -1825,9 +1825,7 @@ defmodule Explorer.ChainTest do
       gas_limit = Decimal.new(6_946_336)
       gas_used = Decimal.new(50450)
 
-      {:ok, import_result} = Chain.import(@import_data)
-
-      expected =
+      assert {:ok,
               %{
                 addresses: [
                   %Address{
@@ -1863,9 +1861,9 @@ defmodule Explorer.ChainTest do
                 blocks: [
                   %Block{
                     consensus: true,
-                    difficulty: difficulty,
-                    gas_limit: gas_limit,
-                    gas_used: gas_used,
+                    difficulty: ^difficulty,
+                    gas_limit: ^gas_limit,
+                    gas_used: ^gas_used,
                     hash: %Hash{
                       byte_count: 32,
                       bytes:
@@ -1903,13 +1901,12 @@ defmodule Explorer.ChainTest do
                       time_zone: "Etc/UTC",
                       zone_abbr: "UTC"
                     },
-                    total_difficulty: total_difficulty,
+                    total_difficulty: ^total_difficulty,
                     inserted_at: %{},
                     updated_at: %{}
                   }
                 ],
-                internal_transactions: [
-                ],
+                internal_transactions: [],
                 logs: [
                   %Log{
                     address_hash: %Hash{
@@ -1972,7 +1969,7 @@ defmodule Explorer.ChainTest do
                 ],
                 token_transfers: [
                   %TokenTransfer{
-                    amount: token_transfer_amount,
+                    amount: ^token_transfer_amount,
                     log_index: 0,
                     #                    block_hash: %Hash{
                     #                      byte_count: 32,
@@ -2007,10 +2004,7 @@ defmodule Explorer.ChainTest do
                     updated_at: %{}
                   }
                 ]
-              }
-
-        expected
-        |> Enum.each(fn {k, v} ->  assert v == import_result[k] end)
+              }} = Chain.import(@import_data)
     end
   end
 
