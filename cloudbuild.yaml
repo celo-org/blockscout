@@ -1,7 +1,7 @@
 steps:
   - name: "gcr.io/cloud-builders/docker"
     args: ["build", "-f", "docker/Dockerfile",
-          #"--cache-from", "gcr.io/$PROJECT_ID/blockscout:latest", --uncomment after latest tag is built
+          "--cache-from", "gcr.io/$PROJECT_ID/blockscout:latest",
           "-t", "gcr.io/$PROJECT_ID/blockscout:$COMMIT_SHA",
           "-t", "gcr.io/$PROJECT_ID/blockscout:latest", "."]
     waitFor: ["-"]
@@ -10,7 +10,7 @@ steps:
           "--build-arg", "DISABLE_WRITE_API=true",
           "--build-arg", "DISABLE_INDEXER=true",
           "--build-arg", "DISABLE_WEBAPP=true",
-          #"--cache-from", "gcr.io/$PROJECT_ID/blockscout:api-latest", -- uncomment after latest tag is built
+          "--cache-from", "gcr.io/$PROJECT_ID/blockscout:api-latest",
           "-t", "gcr.io/$PROJECT_ID/blockscout:api-$COMMIT_SHA",
           "-t", "gcr.io/$PROJECT_ID/blockscout:api-latest", "."]
     waitFor: ["-"]
@@ -19,4 +19,4 @@ images:
   - "gcr.io/$PROJECT_ID/blockscout:api-$COMMIT_SHA"
 options:
     machineType: 'E2_HIGHCPU_32'
-timeout: 7200s
+timeout: 1200s
