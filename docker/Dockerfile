@@ -24,8 +24,8 @@ ADD apps/indexer/mix.exs ./apps/indexer/
 RUN mix do deps.get, local.rebar --force, deps.compile
 
 # Cache npm deps before application code
-ADD apps/block_scout_web/assets/package*.json  apps/block_scout_web/assets/*.js ./apps/block_scout_web/assets/
-ADD apps/explorer/assets/package*.json ./apps/explorer/
+ADD apps/block_scout_web/assets/ ./apps/block_scout_web/assets/
+ADD apps/explorer/package*.json ./apps/explorer/
 
 RUN cd apps/block_scout_web/assets/ && \
     npm install && \
