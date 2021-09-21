@@ -71,7 +71,7 @@ defmodule BlockScoutWeb.API.RPC.StatsController do
     render(conn, "totaltransactions.json", count: transaction_estimated_count)
   end
 
-  def pendigcelo(conn, _params) do
+  def pendingcelo(conn, _params) do
     sum_pending_withdrawal = Chain.fetch_sum_pending_withdrawal()
 
     render(conn, "pendingcelo.json", count: sum_pending_withdrawal)
