@@ -14,7 +14,6 @@ defmodule BlockScoutWeb.ChecksumAddress do
   def init(opts), do: opts
 
   def call(%Conn{params: %{"id" => id}} = conn, _opts) do
-    IO.inspect(conn)
     check_checksum(conn, id, "id")
   end
 

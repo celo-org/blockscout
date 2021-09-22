@@ -16,7 +16,7 @@ defmodule BlockScoutWeb.Plug.ValidateRouteParameters do
 
   def init(opts), do: opts
 
-  def call(conn = %{params: params, private: %{validate: validation}}, _) do
+  def call(%{params: params, private: %{validate: validation}} = conn, _) do
     validate(conn, params, validation)
   end
 
