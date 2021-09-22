@@ -40,7 +40,7 @@ ADD apps/explorer/package*.json ./apps/explorer/
 
 RUN cd apps/block_scout_web/assets/ && \
     npm install && \
-    npm run --silent deploy && \
+    npm run deploy && \
     cd -
 
 RUN cd apps/explorer/ && \
