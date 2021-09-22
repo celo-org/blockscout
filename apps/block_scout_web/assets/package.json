@@ -12,9 +12,9 @@
     "npm": "7.x"
   },
   "scripts": {
-    "deploy": "webpack --mode production",
-    "watch": "webpack --mode development --watch",
-    "build": "webpack --mode development",
+    "deploy": "webpack --mode=production",
+    "watch": "webpack --mode=development --watch",
+    "build": "webpack --mode=development",
     "test": "jest",
     "eslint": "eslint js/**"
   },
