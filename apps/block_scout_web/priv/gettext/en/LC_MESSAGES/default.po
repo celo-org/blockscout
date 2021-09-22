@@ -480,6 +480,8 @@ msgstr ""
 #: lib/block_scout_web/templates/address/_balance_card.html.eex:18
 #: lib/block_scout_web/templates/internal_transaction/_tile.html.eex:20
 #: lib/block_scout_web/templates/layout/app.html.eex:45
+#: lib/block_scout_web/templates/smart_contract/_functions.html.eex:95
+#: lib/block_scout_web/templates/smart_contract/_functions.html.eex:95
 #: lib/block_scout_web/templates/smart_contract/_functions.html.eex:131
 #: lib/block_scout_web/templates/transaction/_pending_tile.html.eex:20
 #: lib/block_scout_web/templates/transaction/_tile.html.eex:37
@@ -1059,12 +1061,6 @@ msgstr ""
 #, elixir-format
 #: lib/block_scout_web/views/transaction_view.ex:222
 msgid "ERC-721 "
-msgstr ""
-
-#, elixir-format
-#: lib/block_scout_web/templates/smart_contract/_functions.html.eex:95
-#: lib/block_scout_web/templates/smart_contract/_functions.html.eex:95
-msgid "ETH"
 msgstr ""
 
 #, elixir-format
