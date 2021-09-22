@@ -20,4 +20,4 @@ steps:
     waitFor: ["-"]
 options:
     machineType: 'E2_HIGHCPU_32'
-timeout: 1200s
+timeout: 1800s
