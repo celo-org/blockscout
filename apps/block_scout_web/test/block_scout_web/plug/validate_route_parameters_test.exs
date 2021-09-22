@@ -16,8 +16,7 @@ defmodule BlockScoutWeb.Plug.ValidateRouteParametersTest do
     end
 
     test "doesn't invalidate base conn", %{conn: conn} do
-      result =
-        conn |> ValidateRouteParameters.call(nil)
+      result = conn |> ValidateRouteParameters.call(nil)
 
       refute result.halted
     end
@@ -36,36 +35,46 @@ defmodule BlockScoutWeb.Plug.ValidateRouteParametersTest do
         conn
         |> put_private(:validate, %{"test_key" => &(&1 == "expected_value")})
 
-      failed_conn = %{ conn_with_validation | params: Map.merge(conn_with_validation.params, %{"test_key" => "bad_value"})}
-                    |> ValidateRouteParameters.call(nil)
+      failed_conn =
+        %{conn_with_validation | params: Map.merge(conn_with_validation.params, %{"test_key" => "bad_value"})}
+        |> ValidateRouteParameters.call(nil)
 
       assert failed_conn.halted
 
-      valid_conn = %{ conn_with_validation | params: Map.merge(conn_with_validation.params, %{"test_key" => "expected_value"})}
-                    |> ValidateRouteParameters.call(nil)
+      valid_conn =
+        %{conn_with_validation | params: Map.merge(conn_with_validation.params, %{"test_key" => "expected_value"})}
+        |> ValidateRouteParameters.call(nil)
+
       refute valid_conn.halted
     end
 
     test "address validation", %{conn: conn} do
       valid_address = "0x57AbAE14E7F223aB8C4D2C9bDe135b8Ff6b884ec"
-      test_conn = %{ conn | params: Map.merge(conn.params, %{"address_id" => valid_address})}
-                |> put_private(:validate, %{"address_id" => :is_address})
 
-      result =
-        test_conn |> ValidateRouteParameters.call(nil)
+      test_conn =
+        %{conn | params: Map.merge(conn.params, %{"address_id" => valid_address})}
+        |> put_private(:validate, %{"address_id" => :is_address})
+
+      result = test_conn |> ValidateRouteParameters.call(nil)
 
       refute test_conn.halted
 
       invalid_address = "0x5asdflkj;jl;k(*&"
-      test_conn = %{ conn | params: Map.merge(conn.params, %{"address_id" => invalid_address})}
-                  |> put_private(:validate, %{"address_id" => :is_address})
-                  |> ValidateRouteParameters.call(nil)
+
+      test_conn =
+        %{conn | params: Map.merge(conn.params, %{"address_id" => invalid_address})}
+        |> put_private(:validate, %{"address_id" => :is_address})
+        |> ValidateRouteParameters.call(nil)
+
       assert test_conn.halted
 
       xss_address = "0x57AbAE14E7F223aB8C4D2C9bDe135b8Ff6b884ecp4fg%20onfocus%3dalert(origin)%20autofocus"
-      test_conn = %{ conn | params: Map.merge(conn.params, %{"address_id" => xss_address})}
-                  |> put_private(:validate, %{"address_id" => :is_address})
-                  |> ValidateRouteParameters.call(nil)
+
+      test_conn =
+        %{conn | params: Map.merge(conn.params, %{"address_id" => xss_address})}
+        |> put_private(:validate, %{"address_id" => :is_address})
+        |> ValidateRouteParameters.call(nil)
+
       assert test_conn.halted
     end
   end

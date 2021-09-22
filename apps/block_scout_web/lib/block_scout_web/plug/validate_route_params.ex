@@ -19,28 +19,31 @@ defmodule BlockScoutWeb.Plug.ValidateRouteParameters do
   def call(conn = %{params: params, private: %{validate: validation}}, _) do
     validate(conn, params, validation)
   end
+
   def call(conn, _), do: conn
 
   def validate(conn, params, validation) when is_map(validation) do
     invalid =
       validation
-      |> Enum.map( fn {param, validate_func} ->
-       perform_validation(params[param], validate_func)
+      |> Enum.map(fn {param, validate_func} ->
+        perform_validation(params[param], validate_func)
       end)
       |> Enum.any?(fn valid -> valid == false end)
 
-   if invalid do
-     conn
-     |> validation_failed()
-   else
-    conn
-   end
+    if invalid do
+      conn
+      |> validation_failed()
+    else
+      conn
+    end
   end
+
   def validate(conn, %{}, _validation), do: conn
   def validate(conn, _, _), do: conn
 
   def perform_validation(nil, _validator), do: true
   def perform_validation(p, validator) when is_function(validator), do: validator.(p)
+
   def perform_validation(p, validator) when is_atom(validator) do
     case validator do
       :is_address -> perform_validation(p, &is_address/1)
