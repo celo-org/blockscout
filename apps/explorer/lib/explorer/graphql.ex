@@ -178,7 +178,7 @@ defmodule Explorer.GraphQL do
     token_contract_names = ["goldToken"]
     token_symbols = ["cGLD"]
 
-     from(
+    from(
       tt in TokenTransfer,
       join: t in CeloParams,
       where: tt.token_contract_address_hash == t.address_value,
@@ -206,7 +206,6 @@ defmodule Explorer.GraphQL do
       left_join: wt in CeloWalletAccounts,
       on: tt.to_address_hash == wt.wallet_address_hash,
       select: %{
-
         transaction_hash: tt.transaction_hash,
         from_address_hash: tt.from_address_hash,
         to_address_hash: tt.to_address_hash,
@@ -214,7 +213,6 @@ defmodule Explorer.GraphQL do
         comment: tt.comment,
         block_number: tt.block_number
       },
-      
       order_by: [desc: tt.block_number, desc: tt.amount, desc: tt.log_index]
     )
   end
