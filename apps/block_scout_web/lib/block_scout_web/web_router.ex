@@ -11,7 +11,7 @@ defmodule BlockScoutWeb.WebRouter do
     plug(:protect_from_forgery)
     plug(BlockScoutWeb.CSPHeader)
     plug(BlockScoutWeb.ChecksumAddress)
-    plug(BlockScoutWeb.ValidateRouteParams)
+    plug(BlockScoutWeb.Plug.ValidateRouteParameters)
   end
 
   # Disallows Iframes (write routes)

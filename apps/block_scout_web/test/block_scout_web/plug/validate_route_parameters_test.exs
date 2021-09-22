@@ -1,15 +1,9 @@
 defmodule BlockScoutWeb.Plug.ValidateRouteParametersTest do
   use BlockScoutWeb.ConnCase
 
-  import Plug.Conn, only: [put_session: 3]
-
+  import Plug.Conn
   alias BlockScoutWeb.Plug.ValidateRouteParameters
   alias BlockScoutWeb.Router
-  alias Explorer.Accounts.User
-
-  test "init/1" do
-    assert FetchUserFromSession.init([]) == []
-  end
 
   describe "call/2" do
     setup %{conn: conn} do
@@ -21,26 +15,35 @@ defmodule BlockScoutWeb.Plug.ValidateRouteParametersTest do
       {:ok, conn: conn}
     end
 
-    test "loads user if valid user id in session", %{conn: conn} do
-      user = insert(:user)
+    test "doesn't invalidate base conn", %{conn: conn} do
+      result =
+        conn |> ValidateRouteParameters.call(nil)
 
+      refute result.halted
+    end
+
+    test "doesn't invalidate when validation set but no matching params", %{conn: conn} do
       result =
         conn
-        |> put_session(:user_id, user.id)
-        |> FetchUserFromSession.call([])
+        |> put_private(:validate, %{"test_key" => :validation_func})
+        |> ValidateRouteParameters.call(nil)
 
-      assert %User{} = result.assigns.user
+      refute result.halted
     end
 
-    test "returns conn if user id is invalid in session", %{conn: conn} do
-      conn = put_session(conn, :user_id, 1)
-      result = FetchUserFromSession.call(conn, [])
+    test "invalidates against function", %{conn: conn} do
+      conn_with_validation =
+        conn
+        |> put_private(:validate, %{"test_key" => &(&1 == "expected_value")})
 
-      assert conn == result
-    end
+      failed_conn = %{ conn_with_validation | params: Map.merge(conn_with_validation.params, %{"test_key" => "bad_value"})}
+                    |> ValidateRouteParameters.call(nil)
 
-    test "returns conn if no user id is in session", %{conn: conn} do
-      assert FetchUserFromSession.call(conn, []) == conn
+      assert failed_conn.halted
+
+      valid_conn = %{ conn_with_validation | params: Map.merge(conn_with_validation.params, %{"test_key" => "expected_value"})}
+                    |> ValidateRouteParameters.call(nil)
+      refute valid_conn.halted
     end
   end
 end

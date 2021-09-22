@@ -1,10 +1,10 @@
-defmodule BlockScoutWeb.ValidateRouteParams do
+defmodule BlockScoutWeb.Plug.ValidateRouteParameters do
   @moduledoc """
   Validates route parameters
 
   To trigger validation, a map of keys to validation functions / atoms must be set under the `:validate` key in the
   the private field of the Plug.Conn object. This plug is designed to fail safe, that is - unless a parameter has
-  been found to be explicitly invalid it will be treated as invalid.
+  been found to be explicitly invalid it will be treated as valid.
 
   Validation functions can be any function that returns a boolean variable or :is_address which invokes
   Explorer.Chain.Hash.Address.validate/1.
@@ -39,13 +39,13 @@ defmodule BlockScoutWeb.ValidateRouteParams do
   def validate(conn, %{}, _validation), do: conn
   def validate(conn, _, _), do: conn
 
+  def perform_validation(nil, _validator), do: true
   def perform_validation(p, validator) when is_function(validator), do: validator.(p)
   def perform_validation(p, validator) when is_atom(validator) do
     case validator do
       :is_address -> perform_validation(p, &is_address/1)
     end
   end
-  def perform_validation(nil, _validator), do: true
 
   defp is_address(param) do
     case Address.validate(param) do
