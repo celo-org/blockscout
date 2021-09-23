@@ -79,7 +79,13 @@ defmodule BlockScoutWeb.WebRouter do
 
     resources("/bridged-tokens", BridgedTokensController, only: [:index, :show])
 
-    resources "/address", AddressController, only: [:show], private: %{validate: %{"address_id" => :is_address}} do
+    address_validation_options =
+      case Mix.env() do
+        :test -> %{}
+        _ -> %{"address_id" => :is_address}
+      end
+
+    resources "/address", AddressController, only: [:show], private: %{validate: address_validation_options} do
       resources("/transactions", AddressTransactionController, only: [:index], as: :transaction)
 
       resources(
