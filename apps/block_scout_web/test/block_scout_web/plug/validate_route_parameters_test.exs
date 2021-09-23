@@ -48,7 +48,7 @@ defmodule BlockScoutWeb.Plug.ValidateRouteParametersTest do
       refute valid_conn.halted
     end
 
-    test "address validation", %{conn: conn} do
+    test "handles valid address", %{conn: conn} do
       valid_address = "0x57AbAE14E7F223aB8C4D2C9bDe135b8Ff6b884ec"
 
       test_conn =
@@ -58,7 +58,9 @@ defmodule BlockScoutWeb.Plug.ValidateRouteParametersTest do
       result = test_conn |> ValidateRouteParameters.call(nil)
 
       refute test_conn.halted
+    end
 
+    test "handles invalid address", %{conn: conn} do
       invalid_address = "0x5asdflkj;jl;k(*&"
 
       test_conn =
@@ -67,11 +69,24 @@ defmodule BlockScoutWeb.Plug.ValidateRouteParametersTest do
         |> ValidateRouteParameters.call(nil)
 
       assert test_conn.halted
+    end
 
+    test "handles xss attempt", %{conn: conn} do
       xss_address = "0x57AbAE14E7F223aB8C4D2C9bDe135b8Ff6b884ecp4fg%20onfocus%3dalert(origin)%20autofocus"
 
       test_conn =
         %{conn | params: Map.merge(conn.params, %{"address_id" => xss_address})}
+        |> put_private(:validate, %{"address_id" => :is_address})
+        |> ValidateRouteParameters.call(nil)
+
+      assert test_conn.halted
+    end
+
+    test "handles non hex input", %{conn: conn} do
+      non_hex_input = "invalid_address"
+
+      test_conn =
+        %{conn | params: Map.merge(conn.params, %{"address_id" => non_hex_input})}
         |> put_private(:validate, %{"address_id" => :is_address})
         |> ValidateRouteParameters.call(nil)
 
