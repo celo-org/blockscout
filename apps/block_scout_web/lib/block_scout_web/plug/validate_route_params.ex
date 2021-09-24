@@ -50,11 +50,13 @@ defmodule BlockScoutWeb.Plug.ValidateRouteParameters do
     end
   end
 
-  defp is_address(param = "0x" <> _hash) do
+  defp is_address("0x" <> _hash = param) do
     case Address.validate(param) do
       {:ok, _} -> true
       _ -> false
     end
   end
-  defp is_address(_hash), do: false #is not a hex encoded string
+
+  # is not a hex encoded string
+  defp is_address(_hash), do: false
 end
