@@ -58,5 +58,3 @@ RUN if [ "$COIN" != "" ]; then sed -i s/"POA"/"${COIN}"/g apps/block_scout_web/p
 
 # Run foreground build and phoenix digest
 RUN mix compile && mix phx.digest
-
-RUN mix phx.digest
