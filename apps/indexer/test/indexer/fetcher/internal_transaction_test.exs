@@ -306,24 +306,21 @@ defmodule Indexer.Fetcher.InternalTransactionTest do
 
       assert :ok == InternalTransaction.run([block.number, block.number], json_rpc_named_arguments)
 
-      assert %{block_hash: block_hash} = Repo.get(PendingBlockOperation, block_hash)
+      assert %{block_hash: ^block_hash} = Repo.get(PendingBlockOperation, block_hash)
     end
 
     test "handles problematic blocks correctly" do
       valid_block = insert(:block)
       transaction = insert(:transaction) |> with_block(valid_block)
       valid_block_hash = valid_block.hash
-      transaction_hash = transaction.hash
 
       invalid_block = insert(:block)
       transaction2 = insert(:transaction) |> with_block(invalid_block)
       invalid_block_hash = invalid_block.hash
-      transaction_hash2 = transaction2.hash
 
       valid_block2 = insert(:block)
-      transaction3 = insert(:transaction) |> with_block(valid_block2)
+      insert(:transaction) |> with_block(valid_block2)
       valid_block_hash2 = valid_block2.hash
-      transaction_hash3 = transaction3.hash
 
       empty_block = insert(:block, gas_used: 0)
       empty_block_hash = empty_block.hash
@@ -365,7 +362,7 @@ defmodule Indexer.Fetcher.InternalTransactionTest do
            }
          ]}
       end)
-      |> expect(:json_rpc, fn [%{id: id, method: "debug_traceTransaction"}], _options ->
+      |> expect(:json_rpc, fn [%{id: _id, method: "debug_traceTransaction"}], _options ->
         {:error, :closed}
       end)
       |> expect(:json_rpc, fn [%{id: id, method: "debug_traceTransaction"}], _options ->
