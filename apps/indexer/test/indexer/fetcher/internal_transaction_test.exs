@@ -486,7 +486,7 @@ defmodule Indexer.Fetcher.InternalTransactionTest do
            }
          ]}
       end)
-      |> expect(:json_rpc, 2, fn [%{id: id, method: "eth_call"}], _options ->
+      |> expect(:json_rpc, fn [%{id: id, method: "eth_call"}], _options ->
         # Utils.get_address("GoldToken") query
         {:ok,
          [
@@ -592,7 +592,7 @@ defmodule Indexer.Fetcher.InternalTransactionTest do
            }
          ]}
       end)
-      |> expect(:json_rpc, 2, fn [%{id: id, method: "eth_call"}], _options ->
+      |> expect(:json_rpc, fn [%{id: id, method: "eth_call"}], _options ->
         # Utils.get_address("GoldToken") query
         {:ok,
          [
