@@ -485,8 +485,8 @@ msgstr ""
 #: lib/block_scout_web/templates/smart_contract/_functions.html.eex:131
 #: lib/block_scout_web/templates/transaction/_pending_tile.html.eex:20
 #: lib/block_scout_web/templates/transaction/_tile.html.eex:37
-#: lib/block_scout_web/views/transaction_view.ex:503
-#: lib/block_scout_web/views/wei_helpers.ex:78
+#: lib/block_scout_web/views/transaction_view.ex:506
+#: lib/block_scout_web/views/wei_helpers.ex:80
 msgid "CELO"
 msgstr ""
 
@@ -1356,7 +1356,7 @@ msgstr ""
 #: lib/block_scout_web/templates/transaction/_tabs.html.eex:11
 #: lib/block_scout_web/templates/transaction_internal_transaction/index.html.eex:6
 #: lib/block_scout_web/views/address_view.ex:403
-#: lib/block_scout_web/views/transaction_view.ex:524
+#: lib/block_scout_web/views/transaction_view.ex:527
 msgid "Internal Transactions"
 msgstr ""
 
@@ -1495,7 +1495,7 @@ msgstr ""
 #: lib/block_scout_web/templates/transaction/_tabs.html.eex:17
 #: lib/block_scout_web/templates/transaction_log/index.html.eex:8
 #: lib/block_scout_web/views/address_view.ex:414
-#: lib/block_scout_web/views/transaction_view.ex:525
+#: lib/block_scout_web/views/transaction_view.ex:528
 msgid "Logs"
 msgstr ""
 
@@ -1879,7 +1879,7 @@ msgstr ""
 #, elixir-format
 #: lib/block_scout_web/templates/transaction/_tabs.html.eex:24
 #: lib/block_scout_web/templates/transaction_raw_trace/index.html.eex:7
-#: lib/block_scout_web/views/transaction_view.ex:526
+#: lib/block_scout_web/views/transaction_view.ex:529
 msgid "Raw Trace"
 msgstr ""
 
@@ -2591,7 +2591,7 @@ msgstr ""
 #: lib/block_scout_web/views/address_view.ex:405
 #: lib/block_scout_web/views/tokens/instance/overview_view.ex:177
 #: lib/block_scout_web/views/tokens/overview_view.ex:41
-#: lib/block_scout_web/views/transaction_view.ex:523
+#: lib/block_scout_web/views/transaction_view.ex:526
 msgid "Token Transfers"
 msgstr ""
 
@@ -3020,7 +3020,7 @@ msgid "We found the following pools you can claim reward from:"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/views/wei_helpers.ex:76
+#: lib/block_scout_web/views/wei_helpers.ex:78
 msgid "Wei"
 msgstr ""
 

@@ -10,6 +10,7 @@
 - [#4579](https://github.com/blockscout/blockscout/pull/4579) - Write contract page: Resize inputs; Improve multiplier selector
 
 ### Fixes
+- [#4713](https://github.com/blockscout/blockscout/pull/4713) - Search input field: sanitize input
 - [#4612](https://github.com/blockscout/blockscout/pull/4612) - Hide error selector in the contract's functions list
 - [#4615](https://github.com/blockscout/blockscout/pull/4615) - Fix broken style for `View more transfers` button
 - [#4592](https://github.com/blockscout/blockscout/pull/4592) - Add `type` field for `receive` and `fallback` entities of a Smart Contract
@@ -19,6 +20,7 @@
 - [#4586](https://github.com/blockscout/blockscout/pull/4586) - Fix floating tooltips on the token transfer family blocks
 - [#4587](https://github.com/blockscout/blockscout/pull/4587) - Enable navbar menu on Search results page
 - [#4582](https://github.com/blockscout/blockscout/pull/4582) - Fix NaN input on write contract page
+
 
 ### Chore
 - [#4611](https://github.com/blockscout/blockscout/pull/4611) - Ability to hide miner in block views
