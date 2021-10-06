@@ -10,6 +10,7 @@ defmodule Indexer.Supervisor do
   alias Indexer.{
     Block,
     CalcLpTokensTotalLiqudity,
+    EmptyBlocksSanitizer,
     PendingOpsCleaner,
     PendingTransactionsSanitizer,
     SetAmbBridgedMetadataForTokens,
@@ -137,6 +138,7 @@ defmodule Indexer.Supervisor do
 
       # Out-of-band fetchers
       {CoinBalanceOnDemand.Supervisor, [json_rpc_named_arguments]},
+      {EmptyBlocksSanitizer, [[json_rpc_named_arguments: json_rpc_named_arguments]]},
       {TokenTotalSupplyOnDemand.Supervisor, [json_rpc_named_arguments]},
       {PendingTransactionsSanitizer, [[json_rpc_named_arguments: json_rpc_named_arguments]]},
 
