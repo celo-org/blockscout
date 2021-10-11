@@ -279,17 +279,17 @@ defmodule Indexer.Fetcher.InternalTransaction do
       })
 
     # celo native token special updates
-    token_transfers = []
+    token_transfers =
+      with {:ok, celo_token} <- Util.get_address("GoldToken") do
+        update_celo_token_balances(celo_token, addresses_params)
 
-    if Application.get_env(:indexer, Indexer.Block.Fetcher, [])[:enable_gold_token] do
-      token_transfers =
-        with {:ok, celo_token} <- Util.get_address("GoldToken") do
-          update_celo_token_balances(celo_token, addresses_params)
-          CeloTokenTransfers.from_internal_transactions(internal_transactions_params_without_failed_creations, celo_token)
-        else
-          _ -> []
-        end
-    end
+        CeloTokenTransfers.from_internal_transactions(
+          internal_transactions_params_without_failed_creations,
+          celo_token
+        )
+      else
+        _ -> []
+      end
 
     address_hash_to_block_number =
       Enum.into(addresses_params, %{}, fn %{fetched_coin_balance_block_number: block_number, hash: hash} ->

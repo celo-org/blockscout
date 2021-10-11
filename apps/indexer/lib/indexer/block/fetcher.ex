@@ -198,12 +198,7 @@ defmodule Indexer.Block.Fetcher do
             cusd: stable_token_usd,
             ceur: _
           }, oracle_address,
-          celo_token_enabled} <-
-           (if try_celo_token_enabled do
-              read_addresses()
-            else
-              {:ok, %{celo: nil, cusd: nil, ceur: nil}, nil, false}
-            end),
+          celo_token_enabled} <- read_addresses(),
          %{token_transfers: celo_token_transfers} =
            (if celo_token_enabled do
               TokenTransfers.parse_tx(transactions_with_receipts, celo_token)

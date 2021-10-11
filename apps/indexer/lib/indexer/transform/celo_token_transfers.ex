@@ -4,10 +4,10 @@ defmodule Indexer.Transform.CeloTokenTransfers do
   """
 
   def from_internal_transactions(itxs, celo_token_contract_address) do
-
-    %{token_transfers: transfers} = txs
-    |> Enum.filter(&is_itx_celo_token_transfer/1)
-    |> Enum.reduce(%{token_transfers: [], celo_token: celo_token_contract_address}, &itx_to_celo_token_transfer/2)
+    %{token_transfers: transfers} =
+      itxs
+      |> Enum.filter(&is_itx_celo_token_transfer/1)
+      |> Enum.reduce(%{token_transfers: [], celo_token: celo_token_contract_address}, &itx_to_celo_token_transfer/2)
 
     transfers
   end
