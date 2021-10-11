@@ -1,6 +1,17 @@
 FROM bitwalker/alpine-elixir-phoenix:1.11.4
 
-RUN apk --no-cache --update add alpine-sdk gmp-dev automake libtool inotify-tools autoconf python3 file
+RUN apk --no-cache --update add alpine-sdk gmp-dev automake libtool inotify-tools autoconf python3 file pango-dev jpeg-dev libjpeg-turbo-dev giflib-dev librsvg-dev
+
+ENV GLIBC_REPO=https://github.com/sgerrand/alpine-pkg-glibc
+ENV GLIBC_VERSION=2.30-r0
+
+RUN set -ex && \
+    apk --update add libstdc++ curl ca-certificates && \
+    for pkg in glibc-${GLIBC_VERSION} glibc-bin-${GLIBC_VERSION}; \
+        do curl -sSL ${GLIBC_REPO}/releases/download/${GLIBC_VERSION}/${pkg}.apk -o /tmp/${pkg}.apk; done && \
+    apk add --allow-untrusted /tmp/*.apk && \
+    rm -v /tmp/*.apk && \
+    /usr/glibc-compat/sbin/ldconfig /lib /usr/glibc-compat/lib
 
 # Get Rust
 RUN curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y
@@ -23,7 +34,11 @@ ADD apps/indexer/mix.exs ./apps/indexer/
 
 RUN mix do deps.get, local.rebar --force, deps.compile
 
+# Update base image npm
+RUN npm install -g npm@7.24.1
+
 # Cache npm deps before application code
+
 ADD apps/block_scout_web/assets/ ./apps/block_scout_web/assets/
 ADD apps/explorer/package*.json ./apps/explorer/
 
@@ -56,7 +71,6 @@ ENV DISABLE_WRITE_API=${DISABLE_WRITE_API} \
 
 RUN if [ "$COIN" != "" ]; then sed -i s/"POA"/"${COIN}"/g apps/block_scout_web/priv/gettext/en/LC_MESSAGES/default.po; fi
 
-# Run foreground build and phoenix digest
+# Invalidate cache via modifying build args on compilation
+ARG FORCE_MIX_COMPILE_CACHE_MISS
 RUN mix compile && mix phx.digest
-
-RUN mix phx.digest
