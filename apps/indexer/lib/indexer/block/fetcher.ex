@@ -154,10 +154,10 @@ defmodule Indexer.Block.Fetcher do
         ceur: stable_token_eur
       }
 
-      {:ok, tokens, oracle_address, true}
+      {:ok, tokens, oracle_address}
     else
       _err ->
-        {:ok, %{celo: nil, cusd: nil, ceur: nil}, nil, false}
+        {:ok, %{celo: nil, cusd: nil, ceur: nil}, nil}
     end
   end
 
@@ -191,20 +191,13 @@ defmodule Indexer.Block.Fetcher do
          logs = tx_logs ++ process_extra_logs(extra_logs),
          transactions_with_receipts = Receipts.put(transactions_params_without_receipts, receipts),
          %{token_transfers: normal_token_transfers, tokens: normal_tokens} = TokenTransfers.parse(logs),
-         try_celo_token_enabled = config(:enable_gold_token),
          {:ok,
           %{
             celo: celo_token,
             cusd: stable_token_usd,
             ceur: _
-          }, oracle_address,
-          celo_token_enabled} <- read_addresses(),
-         %{token_transfers: celo_token_transfers} =
-           (if celo_token_enabled do
-              TokenTransfers.parse_tx(transactions_with_receipts, celo_token)
-            else
-              %{token_transfers: []}
-            end),
+          }, oracle_address} <- read_addresses(),
+         %{token_transfers: celo_token_transfers} = TokenTransfers.parse_tx(transactions_with_receipts, celo_token),
          # Non CELO fees should be handled by events
          %{
            accounts: celo_accounts,
@@ -237,13 +230,7 @@ defmodule Indexer.Block.Fetcher do
          %{mint_transfers: mint_transfers} = MintTransfers.parse(logs),
          %FetchedBeneficiaries{params_set: beneficiary_params_set, errors: beneficiaries_errors} =
            fetch_beneficiaries(blocks, json_rpc_named_arguments),
-         tokens =
-           normal_tokens ++
-             (if celo_token_enabled do
-                [%{contract_address_hash: celo_token, type: "ERC-20"}]
-              else
-                []
-              end),
+         tokens = normal_tokens ++ [%{contract_address_hash: celo_token, type: "ERC-20"}],
          token_transfers = normal_token_transfers ++ celo_token_transfers,
          addresses =
            Addresses.extract_addresses(%{
@@ -255,12 +242,7 @@ defmodule Indexer.Block.Fetcher do
              transactions: transactions_with_receipts,
              wallets: celo_wallets,
              # The address of the CELO token has to be added to the addresses table
-             celo_token:
-               if celo_token_enabled do
-                 [%{hash: celo_token, block_number: last_block}]
-               else
-                 []
-               end
+             celo_token: [%{hash: celo_token, block_number: last_block}]
            }),
          celo_transfers =
            normal_token_transfers
@@ -287,12 +269,7 @@ defmodule Indexer.Block.Fetcher do
          address_token_balances_from_transfers =
            AddressTokenBalances.params_set(%{token_transfers_params: token_transfers}),
          # Also update the CELO token balances
-         address_token_balances =
-           (if celo_token_enabled do
-              add_celo_token_balances(celo_token, addresses, address_token_balances_from_transfers)
-            else
-              address_token_balances_from_transfers
-            end),
+         address_token_balances = add_celo_token_balances(celo_token, addresses, address_token_balances_from_transfers),
          {:ok, inserted} <-
            __MODULE__.import(
              state,
