@@ -18,7 +18,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
   alias Explorer.Chain.Cache.{Accounts, Blocks}
   alias Indexer.{BufferedTask, Tracer}
   alias Indexer.Fetcher.TokenBalance
-  alias Indexer.Transform.{Addresses, TokenTransfers}
+  alias Indexer.Transform.{Addresses, TokenTransfers, CeloTokenTransfers}
 
   @behaviour BufferedTask
 
@@ -258,14 +258,16 @@ defmodule Indexer.Fetcher.InternalTransaction do
     %{bytes: Base.decode16!(str, case: :mixed)}
   end
 
-  defp add_gold_token_balances(gold_token, addresses, acc) do
-    Enum.reduce(addresses, acc, fn
+  defp update_celo_token_balances(gold_token, addresses) do
+    Enum.reduce(addresses, MapSet.new([]), fn
       %{fetched_coin_balance_block_number: bn, hash: hash}, acc ->
         MapSet.put(acc, %{address_hash: decode(hash), token_contract_address_hash: decode(gold_token), block_number: bn})
 
       _, acc ->
         acc
     end)
+    |> MapSet.to_list()
+    |> TokenBalance.async_fetch()
   end
 
   defp import_internal_transaction(internal_transactions_params, unique_numbers) do
@@ -276,20 +278,18 @@ defmodule Indexer.Fetcher.InternalTransaction do
         internal_transactions: internal_transactions_params_without_failed_creations
       })
 
-    # Gold token special updates
-    token_transfers =
-      with true <- Application.get_env(:indexer, Indexer.Block.Fetcher, [])[:enable_gold_token],
-           {:ok, gold_token} <- Util.get_address("GoldToken") do
-        set = add_gold_token_balances(gold_token, addresses_params, MapSet.new())
-        TokenBalance.async_fetch(MapSet.to_list(set))
+    # celo native token special updates
+    token_transfers = []
 
-        %{token_transfers: celo_token_transfers} =
-          TokenTransfers.parse_itx(internal_transactions_params_without_failed_creations, gold_token)
-
-        celo_token_transfers
-      else
-        _ -> []
-      end
+    if Application.get_env(:indexer, Indexer.Block.Fetcher, [])[:enable_gold_token] do
+      token_transfers =
+        with {:ok, celo_token} <- Util.get_address("GoldToken") do
+          update_celo_token_balances(celo_token, addresses_params)
+          CeloTokenTransfers.from_internal_transactions(internal_transactions_params_without_failed_creations, celo_token)
+        else
+          _ -> []
+        end
+    end
 
     address_hash_to_block_number =
       Enum.into(addresses_params, %{}, fn %{fetched_coin_balance_block_number: block_number, hash: hash} ->
