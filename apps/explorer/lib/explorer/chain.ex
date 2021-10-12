@@ -34,8 +34,6 @@ defmodule Explorer.Chain do
 
   alias Explorer.Counters.LastFetchedCounter
 
-  alias Explorer.Chain
-
   alias Explorer.Chain.{
     Address,
     Address.CoinBalance,
@@ -52,7 +50,6 @@ defmodule Explorer.Chain do
     CeloValidatorGroup,
     CeloValidatorHistory,
     CeloVoters,
-    PendingCelo,
     CurrencyHelpers,
     Data,
     DecompiledSmartContract,
@@ -62,6 +59,7 @@ defmodule Explorer.Chain do
     InternalTransaction,
     Log,
     PendingBlockOperation,
+    PendingCelo,
     ProxyContract,
     SmartContract,
     SmartContractAdditionalSource,

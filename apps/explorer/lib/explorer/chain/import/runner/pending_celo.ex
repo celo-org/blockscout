@@ -6,7 +6,7 @@ defmodule Explorer.Chain.Import.Runner.PendingCelo do
   require Ecto.Query
 
   alias Ecto.{Changeset, Multi, Repo}
-  alias Explorer.Chain.{PendingCelo, Import}
+  alias Explorer.Chain.{Import, PendingCelo}
   alias Explorer.Chain.Import.Runner.Util
 
   import Ecto.Query, only: [from: 2]

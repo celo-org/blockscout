@@ -7,8 +7,6 @@ defmodule Explorer.Chain.Address do
 
   use Explorer.Schema
 
-  alias Ecto.Changeset
-
   alias Explorer.Chain.{
     Address,
     Block,
@@ -18,11 +16,11 @@ defmodule Explorer.Chain.Address do
     CeloValidator,
     CeloValidatorGroup,
     CeloVoters,
-    PendingCelo,
     Data,
     DecompiledSmartContract,
     Hash,
     InternalTransaction,
+    PendingCelo,
     ProxyContract,
     SmartContract,
     SmartContractAdditionalSource,
@@ -30,6 +28,8 @@ defmodule Explorer.Chain.Address do
     Transaction,
     Wei
   }
+
+  alias Ecto.Changeset
 
   alias Explorer.Chain.Cache.NetVersion
 
