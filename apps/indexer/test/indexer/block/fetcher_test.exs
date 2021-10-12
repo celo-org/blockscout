@@ -296,7 +296,7 @@ defmodule Indexer.Block.FetcherTest do
             to_address_hash = "0x8bf38d4764929064f2d4d3a56520a76ab3df415b"
             transaction_hash = "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5"
 
-            setup_mox(block_quantity, from_address_hash, to_address_hash, transaction_hash)
+            setup_mox(block_quantity, from_address_hash, to_address_hash, transaction_hash, unprefixed_celo_token_address_hash)
 
           variant ->
             raise ArgumentError, "Unsupported variant (#{variant})"
@@ -418,7 +418,7 @@ defmodule Indexer.Block.FetcherTest do
                             %Explorer.Chain.Hash{
                               byte_count: 20,
                               bytes: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>
-                            } = zero_address_hash
+                            }
                         },
                         %Address{
                           hash:
@@ -503,8 +503,12 @@ defmodule Indexer.Block.FetcherTest do
     test "deletes the entry in pending celo in case of a gold_withdrawn event", %{
       block_fetcher: %Fetcher{json_rpc_named_arguments: json_rpc_named_arguments} = block_fetcher
     } do
+      celo_token_address = insert(:contract_address)
+      insert(:token, contract_address: celo_token_address)
+      "0x" <> unprefixed_celo_token_address_hash = to_string(celo_token_address.hash)
+
       block_number = @first_full_block_number
-      returned = insert(:pending_celo, %{account_address: "0xC257274276a4E539741Ca11b590B9447B26A8051", amount: 3840})
+      insert(:pending_celo, %{account_address: "0xC257274276a4E539741Ca11b590B9447B26A8051", amount: 3840})
 
       if json_rpc_named_arguments[:transport] == EthereumJSONRPC.Mox do
         case Keyword.fetch!(json_rpc_named_arguments, :variant) do
@@ -514,7 +518,7 @@ defmodule Indexer.Block.FetcherTest do
             to_address_hash = "0x8bf38d4764929064f2d4d3a56520a76ab3df415b"
             transaction_hash = "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5"
 
-            setup_mox(block_quantity, from_address_hash, to_address_hash, transaction_hash)
+            setup_mox(block_quantity, from_address_hash, to_address_hash, transaction_hash, unprefixed_celo_token_address_hash)
 
           variant ->
             raise ArgumentError, "Unsupported variant (#{variant})"
@@ -532,7 +536,7 @@ defmodule Indexer.Block.FetcherTest do
                             %Explorer.Chain.Hash{
                               byte_count: 20,
                               bytes: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>
-                            } = zero_address_hash
+                            }
                         },
                         %Address{
                           hash:
@@ -780,7 +784,7 @@ defmodule Indexer.Block.FetcherTest do
     }
   end
 
-  defp setup_mox(block_quantity, from_address_hash, to_address_hash, transaction_hash) do
+  defp setup_mox(block_quantity, from_address_hash, to_address_hash, transaction_hash, unprefixed_celo_token_address_hash) do
     EthereumJSONRPC.Mox
     |> expect(:json_rpc, fn json, _options ->
       assert [%{id: id, method: "eth_getBlockByNumber", params: [^block_quantity, true]}] = json
@@ -909,12 +913,12 @@ defmodule Indexer.Block.FetcherTest do
           }
         ]}
     end)
-    |> expect(:json_rpc, fn [%{id: id, method: "trace_block", params: [^block_quantity]}], _options ->
+    |> expect(:json_rpc, 2, fn [%{id: id, method: "trace_block", params: [^block_quantity]}], _options ->
       {:ok, [%{id: id, result: []}]}
     end)
       # async requests need to be grouped in one expect because the order is non-deterministic while multiple expect
       # calls on the same name/arity are used in order
-    |> expect(:json_rpc, 15, fn json, _options ->
+    |> expect(:json_rpc, 19, fn json, _options ->
       [request] = json
 
       case request do
