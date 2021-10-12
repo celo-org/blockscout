@@ -378,8 +378,11 @@ defmodule Indexer.Block.Fetcher do
 
   defp delete_pending_celo(withdrawals) do
     case withdrawals do
-      [[]] -> 0
-      withdrawals -> Enum.each(withdrawals, fn %{address: address, amount: amount} -> Chain.delete_pending_celo(address, amount) end)
+      [[]] ->
+        0
+
+      withdrawals ->
+        Enum.each(withdrawals, fn %{address: address, amount: amount} -> Chain.delete_pending_celo(address, amount) end)
     end
   end
 

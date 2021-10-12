@@ -57,7 +57,6 @@ defmodule Indexer.Transform.CeloAccounts do
     |> Enum.map(fn address -> %{address: address} end)
   end
 
-
   defp get_withdrawals(logs, topics) do
     logs
     |> Enum.filter(fn log -> Enum.member?(topics, log.first_topic) end)

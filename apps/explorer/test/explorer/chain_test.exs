@@ -5930,7 +5930,10 @@ defmodule Explorer.ChainTest do
   describe "delete_pending_celo/2" do
     test "delete pending celo entries when passed amount and address" do
       insert(:pending_celo, %{timestamp: Timex.shift(DateTime.utc_now(), days: -1), amount: 1})
-      %PendingCelo{account_address: account_address} = insert(:pending_celo, %{timestamp: Timex.shift(DateTime.utc_now(), days: 0), amount: 2})
+
+      %PendingCelo{account_address: account_address} =
+        insert(:pending_celo, %{timestamp: Timex.shift(DateTime.utc_now(), days: 0), amount: 2})
+
       insert(:pending_celo, %{timestamp: Timex.shift(DateTime.utc_now(), days: 1), amount: 3})
 
       Chain.delete_pending_celo(account_address, 2)

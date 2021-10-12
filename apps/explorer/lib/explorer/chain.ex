@@ -7571,9 +7571,11 @@ defmodule Explorer.Chain do
   """
   @spec delete_pending_celo(Hash.t(), non_neg_integer()) :: {integer(), nil | [term()]}
   def delete_pending_celo(address, amount) do
-    query = from(pending_celo in PendingCelo,
-      where: pending_celo.account_address == ^address and pending_celo.amount == ^amount
-    )
+    query =
+      from(pending_celo in PendingCelo,
+        where: pending_celo.account_address == ^address and pending_celo.amount == ^amount
+      )
+
     Repo.delete_all(query)
   end
 
