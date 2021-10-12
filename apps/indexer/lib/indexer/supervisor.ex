@@ -31,6 +31,7 @@ defmodule Indexer.Supervisor do
     CoinBalanceOnDemand,
     ContractCode,
     InternalTransaction,
+    PendingCelo,
     PendingTransaction,
     ReplacedTransaction,
     Token,
@@ -155,6 +156,8 @@ defmodule Indexer.Supervisor do
       {CeloValidatorHistory.Supervisor,
        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {CeloVoterRewards.Supervisor,
+       [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
+      {PendingCelo.Supervisor,
        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {CeloVoters.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {CeloMaterializedViewRefresh, [[], []]}
