@@ -130,6 +130,7 @@ defmodule Indexer.Block.Fetcher do
   end
 
   defp add_celo_token_balances(nil, _addresses, acc), do: acc
+
   defp add_celo_token_balances(celo_token, addresses, acc) do
     Enum.reduce(addresses, acc, fn
       %{fetched_coin_balance_block_number: bn, hash: hash}, acc ->
@@ -242,7 +243,12 @@ defmodule Indexer.Block.Fetcher do
              transactions: transactions_with_receipts,
              wallets: celo_wallets,
              # The address of the CELO token has to be added to the addresses table
-             celo_token: if celo_token do [%{hash: celo_token, block_number: last_block}] else [] end
+             celo_token:
+               if celo_token do
+                 [%{hash: celo_token, block_number: last_block}]
+               else
+                 []
+               end
            }),
          celo_transfers =
            normal_token_transfers

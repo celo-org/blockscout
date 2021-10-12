@@ -12,13 +12,14 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
   import Indexer.Block.Fetcher, only: [async_import_coin_balances: 2]
 
-  alias Explorer.Celo.Util
+  alias Explorer.Celo.Util, as: CeloUtil
   alias Explorer.Chain
   alias Explorer.Chain.{Block, Transaction}
   alias Explorer.Chain.Cache.{Accounts, Blocks}
   alias Indexer.{BufferedTask, Tracer}
   alias Indexer.Fetcher.TokenBalance
   alias Indexer.Transform.{Addresses, TokenTransfers, CeloTokenTransfers}
+  alias Indexer.Fetcher.InternalTransaction.Util
 
   @behaviour BufferedTask
 
@@ -93,85 +94,26 @@ defmodule Indexer.Fetcher.InternalTransaction do
   def run(block_numbers, json_rpc_named_arguments) do
     unique_numbers = Enum.uniq(block_numbers)
 
-    unique_numbers_count = Enum.count(unique_numbers)
-    Logger.metadata(count: unique_numbers_count)
-
+    Logger.metadata(count: Enum.count(unique_numbers))
     Logger.debug("fetching internal transactions for blocks")
 
     json_rpc_named_arguments
     |> Keyword.fetch!(:variant)
-    |> case do
-      EthereumJSONRPC.Parity ->
-        EthereumJSONRPC.fetch_block_internal_transactions(unique_numbers, json_rpc_named_arguments)
-
-      EthereumJSONRPC.Besu ->
-        EthereumJSONRPC.fetch_block_internal_transactions(unique_numbers, json_rpc_named_arguments)
-
-      _jsonrpc_variant ->
-        try do
-          fetch_block_internal_transactions_by_transactions(unique_numbers, json_rpc_named_arguments)
-        rescue
-          error ->
-            {:error, error}
-        end
-    end
-    |> case do
-      {:ok, internal_transactions_params} ->
-        import_internal_transaction(internal_transactions_params, unique_numbers)
-
-      {:error, :block_not_indexed_properly = reason} ->
-        Logger.debug(
-          fn ->
-            block_numbers = unique_numbers |> inspect(charlists: :as_lists)
-
-            [
-              "failed to fetch internal transactions for #{unique_numbers_count} blocks: #{block_numbers} reason: ",
-              inspect(reason)
-            ]
-          end,
-          error_count: unique_numbers_count
-        )
-
-        :ok
-
-      {:error, reason} ->
-        Logger.error(
-          fn ->
-            block_numbers = unique_numbers |> inspect(charlists: :as_lists)
-
-            [
-              "failed to fetch internal transactions for #{unique_numbers_count} blocks: #{block_numbers} reason: ",
-              inspect(reason)
-            ]
-          end,
-          error_count: unique_numbers_count
-        )
-
-        :ok
-
-      :ignore ->
-        :ok
-    end
+    |> fetch_block_internal_transactions(unique_numbers, json_rpc_named_arguments)
+    |> import_internal_transaction(unique_numbers)
   end
 
-  def import_first_trace(internal_transactions_params) do
-    imports =
-      Chain.import(%{
-        internal_transactions: %{params: internal_transactions_params, with: :blockless_changeset},
-        timeout: :infinity
-      })
+  defp fetch_block_internal_transactions(rpc_variant, unique_numbers, json_rpc_named_arguments)
+       when rpc_variant in [EthereumJSONRPC.Parity, EthereumJSONRPC.Besu] do
+    EthereumJSONRPC.fetch_block_internal_transactions(unique_numbers, json_rpc_named_arguments)
+  end
 
-    case imports do
-      {:error, step, reason, _changes_so_far} ->
-        Logger.error(
-          fn ->
-            [
-              "failed to import first trace for tx: ",
-              inspect(reason)
-            ]
-          end,
-          step: step
-        )
+  defp fetch_block_internal_transactions(_variant, unique_numbers, json_rpc_named_arguments) do
+    try do
+      fetch_block_internal_transactions_by_transactions(unique_numbers, json_rpc_named_arguments)
+    rescue
+      error ->
+        {:error, error}
     end
   end
 
@@ -270,8 +212,23 @@ defmodule Indexer.Fetcher.InternalTransaction do
     |> TokenBalance.async_fetch()
   end
 
-  defp import_internal_transaction(internal_transactions_params, unique_numbers) do
-    internal_transactions_params_without_failed_creations = remove_failed_creations(internal_transactions_params)
+  defp import_internal_transaction(:ignore, _unique_numbers), do: :ok
+
+  defp import_internal_transaction({:error, reason}, unique_numbers) do
+    block_numbers = unique_numbers |> inspect(charlists: :as_lists)
+    unique_numbers_count = unique_numbers |> Enum.count()
+
+    Logger.debug(
+      "failed to fetch internal transactions for #{unique_numbers_count} blocks: #{block_numbers} reason: ",
+      inspect(reason),
+      error_count: unique_numbers_count
+    )
+
+    :ok
+  end
+
+  defp import_internal_transaction({:ok, internal_transactions_params}, unique_numbers) do
+    internal_transactions_params_without_failed_creations = Util.remove_failed_creations(internal_transactions_params)
 
     addresses_params =
       Addresses.extract_addresses(%{
@@ -280,7 +237,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
     # celo native token special updates
     token_transfers =
-      with {:ok, celo_token} <- Util.get_address("GoldToken") do
+      with {:ok, celo_token} <- CeloUtil.get_address("GoldToken") do
         update_celo_token_balances(celo_token, addresses_params)
 
         CeloTokenTransfers.from_internal_transactions(
@@ -337,33 +294,5 @@ defmodule Indexer.Fetcher.InternalTransaction do
         # re-queue the de-duped entries
         {:retry, unique_numbers}
     end
-  end
-
-  defp remove_failed_creations(internal_transactions_params) do
-    internal_transactions_params
-    |> Enum.map(fn internal_transaction_param ->
-      transaction_index = internal_transaction_param[:transaction_index]
-      block_number = internal_transaction_param[:block_number]
-
-      failed_parent =
-        internal_transactions_params
-        |> Enum.filter(fn internal_transactions_param ->
-          internal_transactions_param[:block_number] == block_number &&
-            internal_transactions_param[:transaction_index] == transaction_index &&
-            internal_transactions_param[:trace_address] == [] && !is_nil(internal_transactions_param[:error])
-        end)
-        |> Enum.at(0)
-
-      if failed_parent do
-        internal_transaction_param
-        |> Map.delete(:created_contract_address_hash)
-        |> Map.delete(:created_contract_code)
-        |> Map.delete(:gas_used)
-        |> Map.delete(:output)
-        |> Map.put(:error, failed_parent[:error])
-      else
-        internal_transaction_param
-      end
-    end)
   end
 end

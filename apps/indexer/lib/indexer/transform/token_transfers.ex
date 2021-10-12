@@ -50,6 +50,7 @@ defmodule Indexer.Transform.TokenTransfers do
   end
 
   def parse_tx(_txs, nil), do: %{token_transfers: []}
+
   def parse_tx(txs, gold_token) do
     initial_acc = %{token_transfers: [], gold_token: gold_token}
 
