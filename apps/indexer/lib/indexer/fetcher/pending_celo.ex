@@ -1,6 +1,6 @@
 defmodule Indexer.Fetcher.PendingCelo do
   @moduledoc """
-  Fetches Celo account withdrawals.
+  Fetches pending Celo.
   """
   use Indexer.Fetcher
   use Spandex.Decorators
@@ -79,7 +79,7 @@ defmodule Indexer.Fetcher.PendingCelo do
   end
 
   defp get_withdrawals(account) do
-    Enum.reduce(account.withdrawals, {[], []}, fn
+    Enum.reduce(account.pending, {[], []}, fn
       %{error: _error} = account, {failed, success} ->
         {[account | failed], success}
 
@@ -106,7 +106,7 @@ defmodule Indexer.Fetcher.PendingCelo do
       end)
 
     import_params = %{
-      celo_withdrawals: %{params: success},
+      pending_celo: %{params: success},
       timeout: :infinity
     }
 
@@ -115,7 +115,7 @@ defmodule Indexer.Fetcher.PendingCelo do
         :ok
 
       {:error, reason} ->
-        Logger.debug(fn -> ["failed to import Celo account withdrawal data: ", inspect(reason)] end,
+        Logger.debug(fn -> ["failed to import pending Celo data: ", inspect(reason)] end,
           error_count: Enum.count(accounts)
         )
     end

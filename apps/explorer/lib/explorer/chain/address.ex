@@ -18,7 +18,7 @@ defmodule Explorer.Chain.Address do
     CeloValidator,
     CeloValidatorGroup,
     CeloVoters,
-    CeloWithdrawal,
+    PendingCelo,
     Data,
     DecompiledSmartContract,
     Hash,
@@ -128,7 +128,7 @@ defmodule Explorer.Chain.Address do
     has_many(:celo_voters, CeloVoters, foreign_key: :group_address_hash)
     has_many(:celo_voted, CeloVoters, foreign_key: :voter_address_hash)
     has_many(:celo_claims, CeloClaims, foreign_key: :address)
-    has_many(:celo_withdrawal, CeloWithdrawal, foreign_key: :account_address)
+    has_many(:pending_celo, PendingCelo, foreign_key: :account_address)
 
     has_one(:implementation_contract, ProxyContract, foreign_key: :proxy_address)
 

@@ -52,7 +52,7 @@ defmodule Explorer.Chain do
     CeloValidatorGroup,
     CeloValidatorHistory,
     CeloVoters,
-    CeloWithdrawal,
+    PendingCelo,
     CurrencyHelpers,
     Data,
     DecompiledSmartContract,
@@ -7466,13 +7466,13 @@ defmodule Explorer.Chain do
   end
 
   @doc """
-  Returns the total amount of CELO that is in the unlocking period.
+  Returns the total amount of CELO that is in the unlocking period (pending).
   Details at: https://docs.celo.org/celo-codebase/protocol/proof-of-stake/locked-gold#unlocking-period
   """
-  @spec fetch_sum_pending_withdrawal() :: non_neg_integer()
-  def fetch_sum_pending_withdrawal do
+  @spec fetch_sum_pending_celo() :: non_neg_integer()
+  def fetch_sum_pending_celo do
     query =
-      from(w in CeloWithdrawal,
+      from(w in PendingCelo,
         where: w.timestamp >= fragment("NOW()"),
         select: sum(w.amount)
       )
@@ -7490,8 +7490,8 @@ defmodule Explorer.Chain do
   """
   @spec delete_pending_celo(Hash.t(), non_neg_integer()) :: {integer(), nil | [term()]}
   def delete_pending_celo(address, amount) do
-    query = from(withdrawal in CeloWithdrawal,
-      where: withdrawal.account_address == ^address and withdrawal.amount == ^amount
+    query = from(pending_celo in PendingCelo,
+      where: pending_celo.account_address == ^address and pending_celo.amount == ^amount
     )
     Repo.delete_all(query)
   end

@@ -72,9 +72,9 @@ defmodule BlockScoutWeb.API.RPC.StatsController do
   end
 
   def pendingcelo(conn, _params) do
-    sum_pending_withdrawal = Chain.fetch_sum_pending_withdrawal()
+    sum_pending_celo = Chain.fetch_sum_pending_celo()
 
-    render(conn, "pendingcelo.json", count: sum_pending_withdrawal)
+    render(conn, "pendingcelo.json", count: sum_pending_celo)
   end
 
   defp fetch_contractaddress(params) do

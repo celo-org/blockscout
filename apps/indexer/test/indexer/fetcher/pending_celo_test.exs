@@ -20,7 +20,7 @@ defmodule Indexer.Fetcher.PendingCeloTest do
       :ok
     end
 
-    test "imports the celo withdrawals for the given address" do
+    test "imports the pending celo for the given address" do
       %Address{
         hash: %Hash{bytes: address}
       } = insert(:address, hash: "0xe26b6a5655601a9db347be8bd23dd7d4eabcf818")
@@ -65,10 +65,10 @@ defmodule Indexer.Fetcher.PendingCeloTest do
       assert PendingCelo.run(
                [%{address: address, retries_count: 0}],
                nil
-             ) == {:retry, [%{address: <<226, 107, 106, 86, 85, 96, 26, 157, 179, 71, 190, 139, 210, 61, 215, 212, 234, 188, 248, 24>>, retries_count: 1, withdrawals: [%{address: <<226, 107, 106, 86, 85, 96, 26, 157, 179, 71, 190, 139, 210, 61, 215, 212, 234, 188, 248, 24>>, amount: 3002013349941538980547, timestamp: 1633168369}]}]}
+             ) == {:retry, [%{address: <<226, 107, 106, 86, 85, 96, 26, 157, 179, 71, 190, 139, 210, 61, 215, 212, 234, 188, 248, 24>>, retries_count: 1, pending: [%{address: <<226, 107, 106, 86, 85, 96, 26, 157, 179, 71, 190, 139, 210, 61, 215, 212, 234, 188, 248, 24>>, amount: 3002013349941538980547, timestamp: 1633168369}]}]}
 
-      celo_withdrawal_updated = Explorer.Repo.get_by(ChainPendingCelo, account_address: address)
-      IO.inspect celo_withdrawal_updated
+      pending_celo_updated = Explorer.Repo.get_by(ChainPendingCelo, account_address: address)
+      IO.inspect pending_celo_updated
     end
   end
 end

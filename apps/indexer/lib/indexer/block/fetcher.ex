@@ -377,7 +377,11 @@ defmodule Indexer.Block.Fetcher do
   end
 
   defp delete_pending_celo(withdrawals) do
-    Enum.each(withdrawals, fn %{address: address, amount: amount} -> Chain.delete_pending_celo(address, amount) end)
+    IO.inspect(withdrawals, label: "withdrrrraw")
+    case withdrawals do
+      [[]] -> 0
+      withdrawals -> Enum.each(withdrawals, fn %{address: address, amount: amount} -> Chain.delete_pending_celo(address, amount) end)
+    end
   end
 
   def import(

@@ -24,7 +24,7 @@ defmodule Indexer.Transform.CeloAccounts do
       validator_groups:
         get_addresses(logs, Events.validator_group_events()) ++
           get_addresses(logs, Events.vote_events(), fn a -> a.third_topic end),
-      withdrawals: [get_withdrawal_addresses(logs, Events.withdrawal_events())],
+      withdrawals: [get_withdrawals(logs, Events.withdrawal_events())],
       signers: get_signers(logs, Events.signer_events()),
       voter_rewards: get_rewards(logs, Events.validator_group_voter_reward_events()),
       voters: get_voters(logs, Events.voter_events()),
@@ -58,7 +58,7 @@ defmodule Indexer.Transform.CeloAccounts do
   end
 
 
-  defp get_withdrawal_addresses(logs, topics) do
+  defp get_withdrawals(logs, topics) do
     logs
     |> Enum.filter(fn log -> Enum.member?(topics, log.first_topic) end)
     |> Enum.reduce([], fn log, accounts -> do_parse_withdrawals(log, accounts, fn a -> a.second_topic end) end)

@@ -182,7 +182,7 @@ defmodule Explorer.Celo.AccountReader do
         {:ok,
          %{
            address: address,
-           withdrawals:
+           pending:
              Enum.map(Enum.zip(values, timestamps), fn {v, t} -> %{address: address, amount: v, timestamp: t} end)
          }}
 

@@ -18,7 +18,7 @@ defmodule Explorer.Factory do
     Address.CoinBalance,
     Address.CoinBalanceDaily,
     Block,
-    CeloWithdrawal,
+    PendingCelo,
     ContractMethod,
     Data,
     DecompiledSmartContract,
@@ -706,11 +706,11 @@ defmodule Explorer.Factory do
     }
   end
 
-  def celo_withdrawal_factory do
-    %CeloWithdrawal{
+  def pending_celo_factory do
+    %PendingCelo{
       account_address: address_hash(),
       amount: Decimal.new(1),
-      index: sequence("withdrawal_index", & &1),
+      index: sequence("pending_index", & &1),
       timestamp: Timex.shift(Timex.now(), days: Enum.random(0..100) * -1)
     }
   end
