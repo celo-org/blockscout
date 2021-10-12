@@ -6,6 +6,7 @@ defmodule Indexer.Fetcher.UnbatchedInternalTransaction do
   use Indexer.Fetcher
 
   require Logger
+  alias Indexer.BufferedTask
 
   @behaviour BufferedTask
 
@@ -22,7 +23,8 @@ defmodule Indexer.Fetcher.UnbatchedInternalTransaction do
 
   @spec async_fetch(Number) :: :ok
   def async_fetch(block_number, timeout \\ 5000) when is_number(block_number) do
-    BufferedTask.buffer(__MODULE__, block_number, timeout)
+    Logger.error("Buffering #{block_number}")
+    BufferedTask.buffer(__MODULE__, [block_number], timeout)
   end
 
   @doc false

@@ -16,6 +16,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
   alias Explorer.Chain.{Block, Transaction}
   alias Explorer.Chain.Cache.{Accounts, Blocks}
   alias Indexer.{BufferedTask, Tracer}
+  alias Indexer.Transform.Addresses
   alias Indexer.Fetcher.TokenBalance
   alias Indexer.Fetcher.InternalTransaction.Util
   alias Indexer.Fetcher.UnbatchedInternalTransaction
