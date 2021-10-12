@@ -38,6 +38,7 @@ defmodule Indexer.Supervisor do
     TokenInstance,
     TokenTotalSupplyOnDemand,
     TokenUpdater,
+    UnbatchedInternalTransaction,
     UncleBlock
   }
 
@@ -124,6 +125,8 @@ defmodule Indexer.Supervisor do
       {BlockReward.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {InternalTransaction.Supervisor,
        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
+      {UnbatchedInternalTransaction.Supervisor,
+        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {CoinBalance.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {Token.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {TokenInstance.Supervisor,

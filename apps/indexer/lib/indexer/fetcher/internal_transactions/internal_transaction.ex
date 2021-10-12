@@ -12,14 +12,13 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
   import Indexer.Block.Fetcher, only: [async_import_coin_balances: 2]
 
-  alias Explorer.Celo.Util, as: CeloUtil
   alias Explorer.Chain
   alias Explorer.Chain.{Block, Transaction}
   alias Explorer.Chain.Cache.{Accounts, Blocks}
   alias Indexer.{BufferedTask, Tracer}
   alias Indexer.Fetcher.TokenBalance
-  alias Indexer.Transform.{Addresses, TokenTransfers, CeloTokenTransfers}
   alias Indexer.Fetcher.InternalTransaction.Util
+  alias Indexer.Fetcher.UnbatchedInternalTransaction
 
   @behaviour BufferedTask
 
@@ -117,6 +116,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
     end
   end
 
+  @doc "Fetch internal transactions individually for rpcvariants that don't support a fetch by block method (e.g. Geth)"
   defp fetch_block_internal_transactions_by_transactions(unique_numbers, json_rpc_named_arguments) do
     Enum.reduce(unique_numbers, {:ok, []}, fn
       block_number, {:ok, acc_list} ->
@@ -180,6 +180,10 @@ defmodule Indexer.Fetcher.InternalTransaction do
   defp handle_transaction_fetch_results({:error, e, _block}, block_number, acc) do
     Logger.error("failed to fetch internal transactions for block #{block_number} - error=#{inspect(e)}")
 
+    if e == :closed do
+      UnbatchedInternalTransaction.async_fetch(block_number)
+    end
+
     {:ok, acc}
   end
 
@@ -191,26 +195,11 @@ defmodule Indexer.Fetcher.InternalTransaction do
     end
   end
 
-  # block_hash is required for TokenTransfers.parse_itx
+  # block_hash is required for CeloTokenTransfers.from_internal_transactions
   defp add_block_hash(block_hash, internal_transactions) do
     Enum.map(internal_transactions, fn a -> Map.put(a, :block_hash, block_hash) end)
   end
 
-  defp decode("0x" <> str) do
-    %{bytes: Base.decode16!(str, case: :mixed)}
-  end
-
-  defp update_celo_token_balances(gold_token, addresses) do
-    Enum.reduce(addresses, MapSet.new([]), fn
-      %{fetched_coin_balance_block_number: bn, hash: hash}, acc ->
-        MapSet.put(acc, %{address_hash: decode(hash), token_contract_address_hash: decode(gold_token), block_number: bn})
-
-      _, acc ->
-        acc
-    end)
-    |> MapSet.to_list()
-    |> TokenBalance.async_fetch()
-  end
 
   defp import_internal_transaction(:ignore, _unique_numbers), do: :ok
 
@@ -219,8 +208,9 @@ defmodule Indexer.Fetcher.InternalTransaction do
     unique_numbers_count = unique_numbers |> Enum.count()
 
     Logger.debug(
-      "failed to fetch internal transactions for #{unique_numbers_count} blocks: #{block_numbers} reason: ",
-      inspect(reason),
+      "failed to fetch internal transactions for #{unique_numbers_count} blocks: #{block_numbers} reason: #{
+        inspect(reason)
+      }",
       error_count: unique_numbers_count
     )
 
@@ -235,18 +225,8 @@ defmodule Indexer.Fetcher.InternalTransaction do
         internal_transactions: internal_transactions_params_without_failed_creations
       })
 
-    # celo native token special updates
     token_transfers =
-      with {:ok, celo_token} <- CeloUtil.get_address("GoldToken") do
-        update_celo_token_balances(celo_token, addresses_params)
-
-        CeloTokenTransfers.from_internal_transactions(
-          internal_transactions_params_without_failed_creations,
-          celo_token
-        )
-      else
-        _ -> []
-      end
+      Util.extract_celo_native_asset_transfers(addresses_params, internal_transactions_params_without_failed_creations)
 
     address_hash_to_block_number =
       Enum.into(addresses_params, %{}, fn %{fetched_coin_balance_block_number: block_number, hash: hash} ->
