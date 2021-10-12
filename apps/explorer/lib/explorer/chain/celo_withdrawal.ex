@@ -22,7 +22,7 @@ defmodule Explorer.Chain.CeloWithdrawal do
         }
 
   @attrs ~w(
-        address timestamp amount index
+        account_address timestamp amount index
     )a
 
   @required_attrs ~w(
