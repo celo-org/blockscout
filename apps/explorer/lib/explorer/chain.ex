@@ -34,6 +34,8 @@ defmodule Explorer.Chain do
 
   alias Explorer.Counters.LastFetchedCounter
 
+  alias Explorer.Chain
+
   alias Explorer.Chain.{
     Address,
     Address.CoinBalance,

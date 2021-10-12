@@ -76,7 +76,6 @@ defmodule BlockScout.Mixfile do
     [
       {:absinthe_plug, git: "https://github.com/blockscout/absinthe_plug.git", tag: "1.5.3", override: true},
       {:tesla, "~> 1.3.3"},
-      {:prometheus_ex, git: "https://github.com/deadtrickster/prometheus.ex", override: true},
       # Documentation
       {:ex_doc, "~> 0.24.2", only: :dev, runtime: false},
       {:number, "~> 1.0.3"}
