@@ -7484,4 +7484,15 @@ defmodule Explorer.Chain do
       sum -> sum
     end
   end
+
+  @doc """
+  Deletes pending CELO when passed the address and the amount
+  """
+  @spec delete_pending_celo(Hash.t(), non_neg_integer()) :: {integer(), nil | [term()]}
+  def delete_pending_celo(address, amount) do
+    query = from(withdrawal in CeloWithdrawal,
+      where: withdrawal.account_address == ^address and withdrawal.amount == ^amount
+    )
+    Repo.delete_all(query)
+  end
 end

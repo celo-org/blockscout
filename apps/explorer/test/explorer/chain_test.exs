@@ -14,6 +14,7 @@ defmodule Explorer.ChainTest do
   alias Explorer.Chain.{
     Address,
     Block,
+    CeloWithdrawal,
     Data,
     DecompiledSmartContract,
     Hash,
@@ -5923,6 +5924,18 @@ defmodule Explorer.ChainTest do
 
     test "fetches all pending CELO when there are no blocks" do
       assert %Wei{value: Decimal.new(0)} == Chain.fetch_sum_pending_withdrawal()
+    end
+  end
+
+  describe "delete_pending_celo/2" do
+    test "delete pending celo entries when passed amount and address" do
+      insert(:celo_withdrawal, %{timestamp: Timex.shift(DateTime.utc_now(), days: -1), amount: 1})
+      %CeloWithdrawal{account_address: account_address} = insert(:celo_withdrawal, %{timestamp: Timex.shift(DateTime.utc_now(), days: 0), amount: 2})
+      insert(:celo_withdrawal, %{timestamp: Timex.shift(DateTime.utc_now(), days: 1), amount: 3})
+
+      Chain.delete_pending_celo(account_address, 2)
+
+      assert Repo.aggregate(CeloWithdrawal, :count, :index) == 2
     end
   end
 end
