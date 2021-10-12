@@ -1,6 +1,6 @@
-defmodule Explorer.Chain.CeloWithdrawal do
+defmodule Explorer.Chain.PendingCelo do
   @moduledoc """
-  Table for storing withdrawal information for Celo Accounts.
+  Table for storing unlocked CELO that has not been withdrawn yet.
   """
 
   require Logger
@@ -30,7 +30,7 @@ defmodule Explorer.Chain.CeloWithdrawal do
     )a
 
   @primary_key false
-  schema "celo_withdrawal" do
+  schema "pending_celo" do
     field(:timestamp, :utc_datetime_usec)
     field(:index, :integer, primary_key: true)
     field(:amount, Wei)
@@ -46,10 +46,10 @@ defmodule Explorer.Chain.CeloWithdrawal do
     timestamps(null: false, type: :utc_datetime_usec)
   end
 
-  def changeset(%__MODULE__{} = celo_withdrawal, attrs) do
-    celo_withdrawal
+  def changeset(%__MODULE__{} = pending_celo, attrs) do
+    pending_celo
     |> cast(attrs, @attrs)
     |> validate_required(@required_attrs)
-    |> unique_constraint(:celo_withdrawal_key, name: :celo_withdrawal_account_address_index_index)
+    |> unique_constraint(:pending_celo_key, name: :pending_celo_account_address_index_index)
   end
 end

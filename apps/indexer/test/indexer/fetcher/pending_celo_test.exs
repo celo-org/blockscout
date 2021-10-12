@@ -1,12 +1,12 @@
-defmodule Indexer.Fetcher.CeloWithdrawalTest do
+defmodule Indexer.Fetcher.PendingCeloTest do
   use EthereumJSONRPC.Case
   use Explorer.DataCase
 
   import Mox
 
   alias Explorer.Chain.{Address, Hash}
-  alias Explorer.Chain.CeloWithdrawal, as: ChainCeloWithdrawal
-  alias Indexer.Fetcher.CeloWithdrawal
+  alias Explorer.Chain.PendingCelo, as: ChainPendingCelo
+  alias Indexer.Fetcher.PendingCelo
 
   @moduletag :capture_log
 
@@ -15,7 +15,7 @@ defmodule Indexer.Fetcher.CeloWithdrawalTest do
 
   describe "run/3" do
     setup %{json_rpc_named_arguments: json_rpc_named_arguments} do
-      CeloWithdrawal.Supervisor.Case.start_supervised!(json_rpc_named_arguments: json_rpc_named_arguments)
+      PendingCelo.Supervisor.Case.start_supervised!(json_rpc_named_arguments: json_rpc_named_arguments)
 
       :ok
     end
@@ -62,12 +62,12 @@ defmodule Indexer.Fetcher.CeloWithdrawalTest do
         end
       )
 
-      assert CeloWithdrawal.run(
+      assert PendingCelo.run(
                [%{address: address, retries_count: 0}],
                nil
              ) == {:retry, [%{address: <<226, 107, 106, 86, 85, 96, 26, 157, 179, 71, 190, 139, 210, 61, 215, 212, 234, 188, 248, 24>>, retries_count: 1, withdrawals: [%{address: <<226, 107, 106, 86, 85, 96, 26, 157, 179, 71, 190, 139, 210, 61, 215, 212, 234, 188, 248, 24>>, amount: 3002013349941538980547, timestamp: 1633168369}]}]}
 
-      celo_withdrawal_updated = Explorer.Repo.get_by(ChainCeloWithdrawal, account_address: address)
+      celo_withdrawal_updated = Explorer.Repo.get_by(ChainPendingCelo, account_address: address)
       IO.inspect celo_withdrawal_updated
     end
   end

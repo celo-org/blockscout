@@ -1,4 +1,4 @@
-defmodule Indexer.Fetcher.CeloWithdrawal do
+defmodule Indexer.Fetcher.PendingCelo do
   @moduledoc """
   Fetches Celo account withdrawals.
   """
@@ -7,11 +7,11 @@ defmodule Indexer.Fetcher.CeloWithdrawal do
 
   require Logger
 
-  alias Indexer.Fetcher.CeloWithdrawal.Supervisor, as: CeloWithdrawalSupervisor
+  alias Indexer.Fetcher.PendingCelo.Supervisor, as: PendingCeloSupervisor
 
   alias Explorer.Celo.AccountReader
   alias Explorer.Chain
-  alias Explorer.Chain.CeloWithdrawal
+  alias Explorer.Chain.PendingCelo
 
   alias Indexer.BufferedTask
   alias Indexer.Fetcher.Util
@@ -21,7 +21,7 @@ defmodule Indexer.Fetcher.CeloWithdrawal do
   @max_retries 3
 
   def async_fetch(accounts) do
-    if CeloWithdrawalSupervisor.disabled?() do
+    if PendingCeloSupervisor.disabled?() do
       :ok
     else
       params =
@@ -84,7 +84,7 @@ defmodule Indexer.Fetcher.CeloWithdrawal do
         {[account | failed], success}
 
       item, {failed, success} ->
-        changeset = CeloWithdrawal.changeset(%CeloWithdrawal{}, item)
+        changeset = PendingCelo.changeset(%PendingCelo{}, item)
 
         if changeset.valid? do
           {failed, [changeset.changes | success]}

@@ -1,5 +1,5 @@
-defmodule Indexer.Fetcher.CeloWithdrawal.Supervisor.Case do
-  alias Indexer.Fetcher.CeloWithdrawal
+defmodule Indexer.Fetcher.PendingCelo.Supervisor.Case do
+  alias Indexer.Fetcher.PendingCelo
 
   def start_supervised!(fetcher_arguments \\ []) when is_list(fetcher_arguments) do
     merged_fetcher_arguments =
@@ -11,7 +11,7 @@ defmodule Indexer.Fetcher.CeloWithdrawal.Supervisor.Case do
       )
 
     [merged_fetcher_arguments]
-    |> CeloWithdrawal.Supervisor.child_spec()
+    |> PendingCelo.Supervisor.child_spec()
     |> ExUnit.Callbacks.start_supervised!()
   end
 end
