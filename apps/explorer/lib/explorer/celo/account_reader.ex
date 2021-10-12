@@ -174,8 +174,7 @@ defmodule Explorer.Celo.AccountReader do
     end
   end
 
-  # how to delete them from the table?
-  def withdrawal_data(%{address: address}) do
+  def withdrawal_data(address) do
     data = fetch_withdrawal_data(address)
 
     case data["getPendingWithdrawals"] do
