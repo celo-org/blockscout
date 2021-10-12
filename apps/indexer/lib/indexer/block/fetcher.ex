@@ -129,6 +129,7 @@ defmodule Indexer.Block.Fetcher do
     e_logs
   end
 
+  defp add_celo_token_balances(nil, addresses, _acc), do: addresses
   defp add_celo_token_balances(celo_token, addresses, acc) do
     Enum.reduce(addresses, acc, fn
       %{fetched_coin_balance_block_number: bn, hash: hash}, acc ->
@@ -230,7 +231,6 @@ defmodule Indexer.Block.Fetcher do
          %{mint_transfers: mint_transfers} = MintTransfers.parse(logs),
          %FetchedBeneficiaries{params_set: beneficiary_params_set, errors: beneficiaries_errors} =
            fetch_beneficiaries(blocks, json_rpc_named_arguments),
-         tokens = normal_tokens ++ [%{contract_address_hash: celo_token, type: "ERC-20"}],
          token_transfers = normal_token_transfers ++ celo_token_transfers,
          addresses =
            Addresses.extract_addresses(%{
@@ -242,7 +242,7 @@ defmodule Indexer.Block.Fetcher do
              transactions: transactions_with_receipts,
              wallets: celo_wallets,
              # The address of the CELO token has to be added to the addresses table
-             celo_token: [%{hash: celo_token, block_number: last_block}]
+             celo_token: if celo_token do [%{hash: celo_token, block_number: last_block}] else [] end
            }),
          celo_transfers =
            normal_token_transfers
@@ -285,7 +285,7 @@ defmodule Indexer.Block.Fetcher do
                account_names: %{params: account_names},
                celo_signers: %{params: signers},
                token_transfers: %{params: token_transfers},
-               tokens: %{params: tokens, on_conflict: :nothing},
+               tokens: %{params: block_tokens(normal_tokens, celo_token), on_conflict: :nothing},
                transactions: %{params: transactions_with_receipts},
                exchange_rate: %{params: exchange_rates},
                wallets: %{params: celo_wallets}
@@ -323,6 +323,9 @@ defmodule Indexer.Block.Fetcher do
         {:error, {step, failed_value, changes_so_far}}
     end
   end
+
+  defp block_tokens(tokens, nil), do: tokens
+  defp block_tokens(tokens, celo_token), do: [[%{contract_address_hash: celo_token, type: "ERC-20"}] | tokens]
 
   defp update_block_cache([]), do: :ok
 

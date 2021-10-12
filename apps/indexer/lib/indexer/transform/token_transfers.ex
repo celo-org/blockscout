@@ -49,6 +49,7 @@ defmodule Indexer.Transform.TokenTransfers do
     token_transfers_from_logs_dedup
   end
 
+  def parse_tx(_txs, nil), do: %{token_transfers: []}
   def parse_tx(txs, gold_token) do
     initial_acc = %{token_transfers: [], gold_token: gold_token}
 
