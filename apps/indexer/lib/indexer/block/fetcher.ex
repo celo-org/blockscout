@@ -129,7 +129,7 @@ defmodule Indexer.Block.Fetcher do
     e_logs
   end
 
-  defp add_celo_token_balances(nil, addresses, _acc), do: addresses
+  defp add_celo_token_balances(nil, _addresses, acc), do: acc
   defp add_celo_token_balances(celo_token, addresses, acc) do
     Enum.reduce(addresses, acc, fn
       %{fetched_coin_balance_block_number: bn, hash: hash}, acc ->
@@ -325,7 +325,7 @@ defmodule Indexer.Block.Fetcher do
   end
 
   defp block_tokens(tokens, nil), do: tokens
-  defp block_tokens(tokens, celo_token), do: [[%{contract_address_hash: celo_token, type: "ERC-20"}] | tokens]
+  defp block_tokens(tokens, celo_token), do: [%{contract_address_hash: celo_token, type: "ERC-20"} | tokens]
 
   defp update_block_cache([]), do: :ok
 
