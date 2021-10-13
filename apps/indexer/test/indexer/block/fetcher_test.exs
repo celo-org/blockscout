@@ -5,7 +5,6 @@ defmodule Indexer.Block.FetcherTest do
 
   import Mox
   import EthereumJSONRPC, only: [integer_to_quantity: 1]
-  import EthereumJSONRPC.Case
 
   alias Explorer.Chain
   alias Explorer.Chain.{Address, PendingCelo, Log, Transaction, Wei}
@@ -555,7 +554,7 @@ defmodule Indexer.Block.FetcherTest do
                               bytes:
                                 <<139, 243, 141, 71, 100, 146, 144, 100, 242, 212, 211, 165, 101, 32, 167, 106, 179,
                                   223, 65, 91>>
-                            } = first_address_hash
+                            }
                         },
                         %Address{
                           hash:
@@ -564,7 +563,7 @@ defmodule Indexer.Block.FetcherTest do
                               bytes:
                                 <<232, 221, 197, 199, 162, 210, 240, 215, 169, 121, 132, 89, 192, 16, 79, 223, 94, 152,
                                   122, 202>>
-                            } = second_address_hash
+                            }
                         }
                       ],
                       blocks: [
@@ -590,7 +589,7 @@ defmodule Indexer.Block.FetcherTest do
                       ],
                       transactions: [
                         %Transaction{
-                          block_number: block_number,
+                          block_number: _,
                           index: 0,
                           hash: %Explorer.Chain.Hash{
                             byte_count: 32,
@@ -675,7 +674,7 @@ defmodule Indexer.Block.FetcherTest do
 
              %{id: id, method: "trace_block"} ->
                block_quantity = integer_to_quantity(block_number)
-               res = eth_block_number_fake_response(block_quantity)
+               eth_block_number_fake_response(block_quantity)
 
                %{
                  id: id,
@@ -722,7 +721,7 @@ defmodule Indexer.Block.FetcherTest do
         end)
       end
 
-      assert {:ok, %{errors: [], inserted: %{block_rewards: block_rewards}}} =
+      assert {:ok, %{errors: [], inserted: %{block_rewards: _}}} =
                Fetcher.fetch_and_import_range(block_fetcher, block_number..block_number)
 
       assert Repo.one!(select(Chain.Block.Reward, fragment("COUNT(*)"))) == 2
