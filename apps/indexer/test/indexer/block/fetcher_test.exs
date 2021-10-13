@@ -869,74 +869,9 @@ defmodule Indexer.Block.FetcherTest do
          }
        ]}
     end)
-    |> expect(:json_rpc, fn
-      [%{id: id, jsonrpc: "2.0", method: "eth_getLogs"}], _ ->
-        {:ok, [%{id: id, jsonrpc: "2.0", result: []}]}
-    end)
-    |> expect(:json_rpc, fn json, _options ->
-      assert [
-               %{
-                 id: id,
-                 method: "eth_getTransactionReceipt",
-                 params: ["0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5"]
-               }
-             ] = json
-
-      {:ok,
-       [
-         %{
-           id: id,
-           jsonrpc: "2.0",
-           result: %{
-             "blockHash" => "0xf6b4b8c88df3ebd252ec476328334dc026cf66606a84fb769b3d3cbccc8471bd",
-             "blockNumber" => "0x25",
-             "contractAddress" => nil,
-             "cumulativeGasUsed" => "0xc512",
-             "gasUsed" => "0xc512",
-             "logs" => [
-               %{
-                 "address" => "0x8bf38d4764929064f2d4d3a56520a76ab3df415b",
-                 "blockHash" => "0xf6b4b8c88df3ebd252ec476328334dc026cf66606a84fb769b3d3cbccc8471bd",
-                 "blockNumber" => "0x25",
-                 "data" => "0x0000000000000000000000000000000000000000000000000000000000000f00",
-                 "logIndex" => "0x0",
-                 "topics" => [
-                   "0x292d39ba701489b7f640c83806d3eeabe0a32c9f0a61b49e95612ebad42211cd",
-                   "0x000000000000000000000000C257274276a4E539741Ca11b590B9447B26A8051"
-                 ],
-                 "transactionHash" => "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5",
-                 "transactionIndex" => "0x0",
-                 "transactionLogIndex" => "0x0",
-                 "type" => "mined"
-               }
-             ],
-             "logsBloom" =>
-               "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000200000000000000000000020000000000000000200000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
-             "root" => nil,
-             "status" => "0x1",
-             "transactionHash" => "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5",
-             "transactionIndex" => "0x0"
-           }
-         }
-       ]}
-    end)
-    # read_addresses for 4 smart contracts in the fetcher
-    |> expect(:json_rpc, 4, fn [%{id: id, method: "eth_call"}], _options ->
-      {:ok,
-       [
-         %{
-           jsonrpc: "2.0",
-           id: id,
-           result: "0x000000000000000000000000" <> unprefixed_celo_token_address_hash
-         }
-       ]}
-    end)
-    |> expect(:json_rpc, 2, fn [%{id: id, method: "trace_block", params: [^block_quantity]}], _options ->
-      {:ok, [%{id: id, result: []}]}
-    end)
     # async requests need to be grouped in one expect because the order is non-deterministic while multiple expect
     # calls on the same name/arity are used in order
-    |> expect(:json_rpc, 19, fn json, _options ->
+    |> expect(:json_rpc, 27, fn json, _options ->
       [request] = json
 
       case request do
@@ -1059,6 +994,65 @@ defmodule Indexer.Block.FetcherTest do
                ]
              }
            ]}
+
+        %{id: id, method: "trace_block", params: [^block_quantity]} ->
+          {:ok, [%{id: id, result: []}]}
+
+        # read_addresses for 4 smart contracts in the fetcher
+        %{id: id, method: "eth_call"} ->
+          {:ok,
+            [
+              %{
+                jsonrpc: "2.0",
+                id: id,
+                result: "0x000000000000000000000000" <> unprefixed_celo_token_address_hash
+              }
+            ]}
+
+          %{
+            id: id,
+            method: "eth_getTransactionReceipt",
+            params: ["0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5"]
+          } ->
+            {:ok,
+              [
+                %{
+                  id: id,
+                  jsonrpc: "2.0",
+                  result: %{
+                    "blockHash" => "0xf6b4b8c88df3ebd252ec476328334dc026cf66606a84fb769b3d3cbccc8471bd",
+                    "blockNumber" => "0x25",
+                    "contractAddress" => nil,
+                    "cumulativeGasUsed" => "0xc512",
+                    "gasUsed" => "0xc512",
+                    "logs" => [
+                      %{
+                        "address" => "0x8bf38d4764929064f2d4d3a56520a76ab3df415b",
+                        "blockHash" => "0xf6b4b8c88df3ebd252ec476328334dc026cf66606a84fb769b3d3cbccc8471bd",
+                        "blockNumber" => "0x25",
+                        "data" => "0x0000000000000000000000000000000000000000000000000000000000000f00",
+                        "logIndex" => "0x0",
+                        "topics" => [
+                          "0x292d39ba701489b7f640c83806d3eeabe0a32c9f0a61b49e95612ebad42211cd",
+                          "0x000000000000000000000000C257274276a4E539741Ca11b590B9447B26A8051"
+                        ],
+                        "transactionHash" => "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5",
+                        "transactionIndex" => "0x0",
+                        "transactionLogIndex" => "0x0",
+                        "type" => "mined"
+                      }
+                    ],
+                    "logsBloom" =>
+                      "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000200000000000000000000020000000000000000200000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                    "root" => nil,
+                    "status" => "0x1",
+                    "transactionHash" => "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5",
+                    "transactionIndex" => "0x0"
+                  }
+                }
+              ]}
+          %{id: id, jsonrpc: "2.0", method: "eth_getLogs"} -> {:ok, [%{id: id, jsonrpc: "2.0", result: []}]}
+
       end
     end)
   end
