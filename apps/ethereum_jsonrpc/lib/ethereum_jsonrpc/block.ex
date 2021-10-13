@@ -141,7 +141,7 @@ defmodule EthereumJSONRPC.Block do
         transactions_root: "0x56e81f171bcc55a6ff8345e692c0f86e5b48e01b996cadc001622fb5e363b421",
         uncles: []
       }
-  [Geth] `elixir` can be converted to params
+      # [Geth] `elixir` can be converted to params
       iex> EthereumJSONRPC.Block.elixir_to_params(
       ...>   %{
       ...>     "difficulty" => 17561410778,

@@ -100,6 +100,7 @@ defmodule EthereumJSONRPC.Transaction do
       ...>     "value" => 31337
       ...>   }
       ...> )
+      
       %{
         block_hash: "0x4e3a3754410177e6937ef1f84bba68ea139e8d1a2258c5f85db9f1cd715a1bdd",
         block_number: 46147,
