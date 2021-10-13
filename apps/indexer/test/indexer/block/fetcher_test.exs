@@ -300,7 +300,8 @@ defmodule Indexer.Block.FetcherTest do
               from_address_hash,
               to_address_hash,
               transaction_hash,
-              unprefixed_celo_token_address_hash
+              unprefixed_celo_token_address_hash,
+              27
             )
 
           variant ->
@@ -527,7 +528,8 @@ defmodule Indexer.Block.FetcherTest do
               from_address_hash,
               to_address_hash,
               transaction_hash,
-              unprefixed_celo_token_address_hash
+              unprefixed_celo_token_address_hash,
+              38
             )
 
           variant ->
@@ -796,7 +798,8 @@ defmodule Indexer.Block.FetcherTest do
          from_address_hash,
          to_address_hash,
          transaction_hash,
-         unprefixed_celo_token_address_hash
+         unprefixed_celo_token_address_hash,
+         call_json_rpc_times
        ) do
     EthereumJSONRPC.Mox
     |> expect(:json_rpc, fn json, _options ->
@@ -869,7 +872,7 @@ defmodule Indexer.Block.FetcherTest do
     end)
     # async requests need to be grouped in one expect because the order is non-deterministic while multiple expect
     # calls on the same name/arity are used in order
-    |> expect(:json_rpc, 27, fn json, _options ->
+    |> expect(:json_rpc, call_json_rpc_times, fn json, _options ->
       [request] = json
 
       case request do
