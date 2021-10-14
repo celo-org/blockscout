@@ -301,7 +301,7 @@ defmodule Indexer.Block.FetcherTest do
               to_address_hash,
               transaction_hash,
               unprefixed_celo_token_address_hash,
-              28
+              27
             )
 
           variant ->
