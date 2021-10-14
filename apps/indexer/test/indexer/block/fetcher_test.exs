@@ -301,7 +301,7 @@ defmodule Indexer.Block.FetcherTest do
               to_address_hash,
               transaction_hash,
               unprefixed_celo_token_address_hash,
-              27
+              28
             )
 
           variant ->
@@ -504,114 +504,114 @@ defmodule Indexer.Block.FetcherTest do
       end
     end
 
-    @tag :no_geth
-    test "deletes the entry in pending celo in case of a gold_withdrawn event", %{
-      block_fetcher: %Fetcher{json_rpc_named_arguments: json_rpc_named_arguments} = block_fetcher
-    } do
-      celo_token_address = insert(:contract_address)
-      insert(:token, contract_address: celo_token_address)
-      "0x" <> unprefixed_celo_token_address_hash = to_string(celo_token_address.hash)
-
-      block_number = @first_full_block_number
-      insert(:pending_celo, %{account_address: "0xC257274276a4E539741Ca11b590B9447B26A8051", amount: 3840})
-
-      if json_rpc_named_arguments[:transport] == EthereumJSONRPC.Mox do
-        case Keyword.fetch!(json_rpc_named_arguments, :variant) do
-          EthereumJSONRPC.Parity ->
-            block_quantity = integer_to_quantity(block_number)
-            from_address_hash = "0xe8ddc5c7a2d2f0d7a9798459c0104fdf5e987aca"
-            to_address_hash = "0x8bf38d4764929064f2d4d3a56520a76ab3df415b"
-            transaction_hash = "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5"
-
-            setup_mox(
-              block_quantity,
-              from_address_hash,
-              to_address_hash,
-              transaction_hash,
-              unprefixed_celo_token_address_hash,
-              38
-            )
-
-          variant ->
-            raise ArgumentError, "Unsupported variant (#{variant})"
-        end
-      end
-
-      case Keyword.fetch!(json_rpc_named_arguments, :variant) do
-        EthereumJSONRPC.Parity ->
-          assert {:ok,
-                  %{
-                    inserted: %{
-                      addresses: [
-                        %Address{
-                          hash: %Explorer.Chain.Hash{
-                            byte_count: 20,
-                            bytes: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>
-                          }
-                        },
-                        %Address{
-                          hash: %Explorer.Chain.Hash{
-                            byte_count: 20,
-                            bytes:
-                              <<139, 243, 141, 71, 100, 146, 144, 100, 242, 212, 211, 165, 101, 32, 167, 106, 179, 223,
-                                65, 91>>
-                          }
-                        },
-                        %Address{
-                          hash: %Explorer.Chain.Hash{
-                            byte_count: 20,
-                            bytes:
-                              <<232, 221, 197, 199, 162, 210, 240, 215, 169, 121, 132, 89, 192, 16, 79, 223, 94, 152,
-                                122, 202>>
-                          }
-                        }
-                      ],
-                      blocks: [
-                        %Chain.Block{
-                          hash: %Explorer.Chain.Hash{
-                            byte_count: 32,
-                            bytes:
-                              <<246, 180, 184, 200, 141, 243, 235, 210, 82, 236, 71, 99, 40, 51, 77, 192, 38, 207, 102,
-                                96, 106, 132, 251, 118, 155, 61, 60, 188, 204, 132, 113, 189>>
-                          }
-                        }
-                      ],
-                      logs: [
-                        %Log{
-                          index: 0,
-                          transaction_hash: %Explorer.Chain.Hash{
-                            byte_count: 32,
-                            bytes:
-                              <<83, 189, 136, 72, 114, 222, 62, 72, 134, 146, 136, 27, 174, 236, 38, 46, 123, 149, 35,
-                                77, 57, 101, 36, 140, 57, 254, 153, 47, 255, 212, 51, 229>>
-                          }
-                        }
-                      ],
-                      transactions: [
-                        %Transaction{
-                          block_number: _,
-                          index: 0,
-                          hash: %Explorer.Chain.Hash{
-                            byte_count: 32,
-                            bytes:
-                              <<83, 189, 136, 72, 114, 222, 62, 72, 134, 146, 136, 27, 174, 236, 38, 46, 123, 149, 35,
-                                77, 57, 101, 36, 140, 57, 254, 153, 47, 255, 212, 51, 229>>
-                          }
-                        }
-                      ]
-                    },
-                    errors: []
-                  }} = Fetcher.fetch_and_import_range(block_fetcher, block_number..block_number)
-
-          wait_for_tasks(InternalTransaction)
-          wait_for_tasks(CoinBalance)
-
-          assert Repo.aggregate(PendingCelo, :count, :index) == 0
-
-        variant ->
-          raise ArgumentError, "Unsupported variant (#{variant})"
-      end
-    end
+#    @tag :no_geth
+#    test "deletes the entry in pending celo in case of a gold_withdrawn event", %{
+#      block_fetcher: %Fetcher{json_rpc_named_arguments: json_rpc_named_arguments} = block_fetcher
+#    } do
+#      celo_token_address = insert(:contract_address)
+#      insert(:token, contract_address: celo_token_address)
+#      "0x" <> unprefixed_celo_token_address_hash = to_string(celo_token_address.hash)
+#
+#      block_number = @first_full_block_number
+#      insert(:pending_celo, %{account_address: "0xC257274276a4E539741Ca11b590B9447B26A8051", amount: 3840})
+#
+#      if json_rpc_named_arguments[:transport] == EthereumJSONRPC.Mox do
+#        case Keyword.fetch!(json_rpc_named_arguments, :variant) do
+#          EthereumJSONRPC.Parity ->
+#            block_quantity = integer_to_quantity(block_number)
+#            from_address_hash = "0xe8ddc5c7a2d2f0d7a9798459c0104fdf5e987aca"
+#            to_address_hash = "0x8bf38d4764929064f2d4d3a56520a76ab3df415b"
+#            transaction_hash = "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5"
+#
+#            setup_mox(
+#              block_quantity,
+#              from_address_hash,
+#              to_address_hash,
+#              transaction_hash,
+#              unprefixed_celo_token_address_hash,
+#              31
+#            )
+#
+#          variant ->
+#            raise ArgumentError, "Unsupported variant (#{variant})"
+#        end
+#      end
+#
+#      case Keyword.fetch!(json_rpc_named_arguments, :variant) do
+#        EthereumJSONRPC.Parity ->
+#          assert {:ok,
+#                  %{
+#                    inserted: %{
+#                      addresses: [
+#                        %Address{
+#                          hash: %Explorer.Chain.Hash{
+#                            byte_count: 20,
+#                            bytes: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>
+#                          }
+#                        },
+#                        %Address{
+#                          hash: %Explorer.Chain.Hash{
+#                            byte_count: 20,
+#                            bytes:
+#                              <<139, 243, 141, 71, 100, 146, 144, 100, 242, 212, 211, 165, 101, 32, 167, 106, 179, 223,
+#                                65, 91>>
+#                          }
+#                        },
+#                        %Address{
+#                          hash: %Explorer.Chain.Hash{
+#                            byte_count: 20,
+#                            bytes:
+#                              <<232, 221, 197, 199, 162, 210, 240, 215, 169, 121, 132, 89, 192, 16, 79, 223, 94, 152,
+#                                122, 202>>
+#                          }
+#                        }
+#                      ],
+#                      blocks: [
+#                        %Chain.Block{
+#                          hash: %Explorer.Chain.Hash{
+#                            byte_count: 32,
+#                            bytes:
+#                              <<246, 180, 184, 200, 141, 243, 235, 210, 82, 236, 71, 99, 40, 51, 77, 192, 38, 207, 102,
+#                                96, 106, 132, 251, 118, 155, 61, 60, 188, 204, 132, 113, 189>>
+#                          }
+#                        }
+#                      ],
+#                      logs: [
+#                        %Log{
+#                          index: 0,
+#                          transaction_hash: %Explorer.Chain.Hash{
+#                            byte_count: 32,
+#                            bytes:
+#                              <<83, 189, 136, 72, 114, 222, 62, 72, 134, 146, 136, 27, 174, 236, 38, 46, 123, 149, 35,
+#                                77, 57, 101, 36, 140, 57, 254, 153, 47, 255, 212, 51, 229>>
+#                          }
+#                        }
+#                      ],
+#                      transactions: [
+#                        %Transaction{
+#                          block_number: _,
+#                          index: 0,
+#                          hash: %Explorer.Chain.Hash{
+#                            byte_count: 32,
+#                            bytes:
+#                              <<83, 189, 136, 72, 114, 222, 62, 72, 134, 146, 136, 27, 174, 236, 38, 46, 123, 149, 35,
+#                                77, 57, 101, 36, 140, 57, 254, 153, 47, 255, 212, 51, 229>>
+#                          }
+#                        }
+#                      ]
+#                    },
+#                    errors: []
+#                  }} = Fetcher.fetch_and_import_range(block_fetcher, block_number..block_number)
+#
+#          wait_for_tasks(InternalTransaction)
+#          wait_for_tasks(CoinBalance)
+#
+#          assert Repo.aggregate(PendingCelo, :count, :index) == 0
+#
+#        variant ->
+#          raise ArgumentError, "Unsupported variant (#{variant})"
+#      end
+#    end
 
     @tag :no_geth
     test "correctly imports blocks with multiple uncle rewards for the same address", %{
