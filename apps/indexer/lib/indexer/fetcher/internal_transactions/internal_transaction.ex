@@ -125,7 +125,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
         block_number
         |> Chain.get_transactions_of_block_number()
-        |> extract_transaction_parameters()
+        |> Util.extract_transaction_parameters()
         |> perform_internal_transaction_fetch(block, json_rpc_named_arguments)
         |> handle_transaction_fetch_results(block_number, acc_list)
 
@@ -134,16 +134,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
     end)
   end
 
-  defp extract_transaction_parameters(transactions) do
-    transactions
-    |> Enum.map(&params(&1))
-  end
-
-  # Transforms parameters from Transaction struct to those expected by EthereumJSONRPC.fetch_internal_transactions
-  defp params(%Transaction{block_number: block_number, hash: hash, index: index, block_hash: block_hash})
-       when is_integer(block_number) do
-    %{block_number: block_number, hash_data: to_string(hash), transaction_index: index, block_hash: block_hash}
-  end
 
   defp perform_internal_transaction_fetch([], block, _jsonrpc_named_arguments), do: {{:ok, []}, 0, block}
 
@@ -200,7 +190,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
   defp add_block_hash(block_hash, internal_transactions) do
     Enum.map(internal_transactions, fn a -> Map.put(a, :block_hash, block_hash) end)
   end
-
 
   defp import_internal_transaction(:ignore, _unique_numbers), do: :ok
 

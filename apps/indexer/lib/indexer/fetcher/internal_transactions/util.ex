@@ -83,4 +83,15 @@ defmodule Indexer.Fetcher.InternalTransaction.Util do
   defp decode("0x" <> str) do
     %{bytes: Base.decode16!(str, case: :mixed)}
   end
+
+  def extract_transaction_parameters(transactions) do
+    transactions
+    |> Enum.map(&params(&1))
+  end
+
+  # Transforms parameters from Transaction struct to those expected by EthereumJSONRPC.fetch_internal_transactions
+  defp params(%Transaction{block_number: block_number, hash: hash, index: index, block_hash: block_hash})
+       when is_integer(block_number) do
+    %{block_number: block_number, hash_data: to_string(hash), transaction_index: index, block_hash: block_hash}
+  end
 end
