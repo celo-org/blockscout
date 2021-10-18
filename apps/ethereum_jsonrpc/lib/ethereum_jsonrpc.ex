@@ -302,6 +302,8 @@ defmodule EthereumJSONRPC do
   @doc """
   Fetches internal transactions from variant API.
   """
+  @spec fetch_internal_transactions([map()], json_rpc_named_arguments) ::
+          {:error, error :: term()} | {:ok, [internal_transaction_params :: map()]}
   def fetch_internal_transactions(params_list, json_rpc_named_arguments) when is_list(params_list) do
     Keyword.fetch!(json_rpc_named_arguments, :variant).fetch_internal_transactions(
       params_list,

@@ -10,11 +10,9 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
   require Logger
 
-  import Indexer.Block.Fetcher, only: [async_import_coin_balances: 2]
 
   alias Explorer.Chain
   alias Explorer.Chain.{Block, Transaction}
-  alias Explorer.Chain.Cache.{Accounts, Blocks}
   alias Indexer.{BufferedTask, Tracer}
   alias Indexer.Transform.Addresses
   alias Indexer.Fetcher.TokenBalance
@@ -205,64 +203,5 @@ defmodule Indexer.Fetcher.InternalTransaction do
     )
 
     :ok
-  end
-
-  defp import_internal_transaction({:ok, internal_transactions_params}, unique_numbers) do
-    internal_transactions_params_without_failed_creations = Util.remove_failed_creations(internal_transactions_params)
-
-    addresses_params =
-      Addresses.extract_addresses(%{
-        internal_transactions: internal_transactions_params_without_failed_creations
-      })
-
-    token_transfers =
-      Util.extract_celo_native_asset_transfers(addresses_params, internal_transactions_params_without_failed_creations)
-
-    address_hash_to_block_number =
-      Enum.into(addresses_params, %{}, fn %{fetched_coin_balance_block_number: block_number, hash: hash} ->
-        {hash, block_number}
-      end)
-
-    empty_block_numbers =
-      unique_numbers
-      |> MapSet.new()
-      |> MapSet.difference(MapSet.new(internal_transactions_params_without_failed_creations, & &1.block_number))
-      |> Enum.map(&%{block_number: &1})
-
-    internal_transactions_and_empty_block_numbers =
-      internal_transactions_params_without_failed_creations ++ empty_block_numbers
-
-    imports =
-      Chain.import(%{
-        token_transfers: %{params: token_transfers},
-        addresses: %{params: addresses_params},
-        internal_transactions: %{params: internal_transactions_and_empty_block_numbers, with: :blockless_changeset},
-        timeout: :infinity
-      })
-
-    case imports do
-      {:ok, imported} ->
-        Accounts.drop(imported[:addreses])
-        Blocks.drop_nonconsensus(imported[:remove_consensus_of_missing_transactions_blocks])
-
-        async_import_coin_balances(imported, %{
-          address_hash_to_fetched_balance_block_number: address_hash_to_block_number
-        })
-
-      {:error, step, reason, _changes_so_far} ->
-        Logger.error(
-          fn ->
-            [
-              "failed to import internal transactions for blocks: ",
-              inspect(reason)
-            ]
-          end,
-          step: step,
-          error_count: Enum.count(unique_numbers)
-        )
-
-        # re-queue the de-duped entries
-        {:retry, unique_numbers}
-    end
   end
 end
