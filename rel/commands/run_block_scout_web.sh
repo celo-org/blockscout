@@ -15,6 +15,6 @@
     DATABASE_URL=postgresql://postgres@localhost:5432/explorer \
     ENABLE_SOURCIFY_INTEGRATION=true \
     SOURCIFY_SERVER_URL=https://sourcify.dev/server \
-    SOURCIFY_REPO_URL=https://repo.sourcify.dev/contracts/full_match/ \
+    SOURCIFY_REPO_URL=https://repo.sourcify.dev/contracts/ \
     CHAIN_ID=44787 \
     mix cmd --app block_scout_web "mix phx.server"

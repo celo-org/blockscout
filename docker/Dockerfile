@@ -60,7 +60,7 @@ ARG DISABLE_INDEXER="false"
 ARG DISABLE_WEBAPP="false"
 ARG ENABLE_SOURCIFY_INTEGRATION="true"
 ARG SOURCIFY_SERVER_URL="https://sourcify.dev/server"
-ARG SOURCIFY_REPO_URL="https://repo.sourcify.dev/contracts/full_match/"
+ARG SOURCIFY_REPO_URL="https://repo.sourcify.dev/contracts/"
 
 ENV DISABLE_WRITE_API=${DISABLE_WRITE_API} \
     DISABLE_INDEXER=${DISABLE_INDEXER} \
