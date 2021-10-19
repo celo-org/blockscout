@@ -126,7 +126,7 @@ defmodule Indexer.Supervisor do
       {InternalTransaction.Supervisor,
        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {UnbatchedInternalTransaction.Supervisor,
-        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
+       [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {CoinBalance.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {Token.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {TokenInstance.Supervisor,

@@ -10,14 +10,12 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
   require Logger
 
-
   alias Explorer.Chain
   alias Explorer.Chain.{Block, Transaction}
   alias Indexer.{BufferedTask, Tracer}
-  alias Indexer.Transform.Addresses
-  alias Indexer.Fetcher.TokenBalance
   alias Indexer.Fetcher.InternalTransaction.Util
   alias Indexer.Fetcher.UnbatchedInternalTransaction
+  alias Indexer.Transform.Addresses
 
   @behaviour BufferedTask
 
@@ -107,12 +105,10 @@ defmodule Indexer.Fetcher.InternalTransaction do
   end
 
   defp fetch_block_internal_transactions(_variant, unique_numbers, json_rpc_named_arguments) do
-    try do
-      fetch_block_internal_transactions_by_transactions(unique_numbers, json_rpc_named_arguments)
-    rescue
-      error ->
-        {:error, error}
-    end
+    fetch_block_internal_transactions_by_transactions(unique_numbers, json_rpc_named_arguments)
+  rescue
+    error ->
+      {:error, error}
   end
 
   @doc "Fetch internal transactions individually for rpcvariants that don't support a fetch by block method (e.g. Geth)"
@@ -131,7 +127,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
         error_or_ignore
     end)
   end
-
 
   defp perform_internal_transaction_fetch([], block, _jsonrpc_named_arguments), do: {{:ok, []}, 0, block}
 

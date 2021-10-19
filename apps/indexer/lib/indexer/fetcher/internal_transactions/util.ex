@@ -7,8 +7,8 @@ defmodule Indexer.Fetcher.InternalTransaction.Util do
   alias Explorer.Chain
   alias Explorer.Chain.Transaction
   alias Explorer.Chain.Cache.{Accounts, Blocks}
-  alias Indexer.Transform.{Addresses, TokenTransfers, CeloTokenTransfers}
   alias Indexer.Fetcher.TokenBalance
+  alias Indexer.Transform.{Addresses, CeloTokenTransfers, TokenTransfers}
 
   import Indexer.Block.Fetcher, only: [async_import_coin_balances: 2]
 
@@ -64,16 +64,19 @@ defmodule Indexer.Fetcher.InternalTransaction.Util do
 
   @doc "Extract CELO transfers from internal transaction traces"
   def extract_celo_native_asset_transfers(addresses, itxs) do
-    with {:ok, celo_token} <- CeloUtil.get_address("GoldToken") do
-      update_celo_token_balances(celo_token, addresses)
-      CeloTokenTransfers.from_internal_transactions(itxs, celo_token)
-    else
-      _ -> []
+    case CeloUtil.get_address("GoldToken") do
+      {:ok, celo_token} ->
+        update_celo_token_balances(celo_token, addresses)
+        CeloTokenTransfers.from_internal_transactions(itxs, celo_token)
+
+      _ ->
+        []
     end
   end
 
   defp update_celo_token_balances(gold_token, addresses) do
-    Enum.reduce(addresses, MapSet.new([]), fn
+    addresses
+    |> Enum.reduce(MapSet.new([]), fn
       %{fetched_coin_balance_block_number: bn, hash: hash}, acc ->
         MapSet.put(acc, %{address_hash: decode(hash), token_contract_address_hash: decode(gold_token), block_number: bn})
 
@@ -98,7 +101,6 @@ defmodule Indexer.Fetcher.InternalTransaction.Util do
        when is_integer(block_number) do
     %{block_number: block_number, hash_data: to_string(hash), transaction_index: index, block_hash: block_hash}
   end
-
 
   @doc "Imports internal transactions, CELO transfers and new addresses to the DB"
   def import_internal_transaction(internal_transactions_params, unique_numbers) do

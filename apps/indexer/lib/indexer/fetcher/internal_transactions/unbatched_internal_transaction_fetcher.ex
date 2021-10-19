@@ -35,7 +35,7 @@ defmodule Indexer.Fetcher.UnbatchedInternalTransaction do
     unless state do
       raise ArgumentError,
             ":json_rpc_named_arguments must be provided to `#{__MODULE__}.child_spec " <>
-            "to allow for json_rpc calls when running."
+              "to allow for json_rpc calls when running."
     end
 
     merged_init_opts =
@@ -55,19 +55,22 @@ defmodule Indexer.Fetcher.UnbatchedInternalTransaction do
   def run([block_number], json_rpc_named_arguments) do
     {:ok, block} = Chain.number_to_any_block(block_number)
 
-    results = block_number
-              |> Chain.get_transactions_of_block_number()
-              |> Util.extract_transaction_parameters()
-              |> fetch_internal_transactions(block, json_rpc_named_arguments)
+    results =
+      block_number
+      |> Chain.get_transactions_of_block_number()
+      |> Util.extract_transaction_parameters()
+      |> fetch_internal_transactions(block, json_rpc_named_arguments)
 
-    failures = results
-               |> Enum.filter(fn {{status, _}, _block, _tx} -> status == :error end)
+    failures =
+      results
+      |> Enum.filter(fn {{status, _}, _block, _tx} -> status == :error end)
 
     if Enum.count(failures) > 0 do
-      indices = failures
-                |> Enum.map(fn {{_,_}, _block, tx} -> tx[:transaction_index] end)
-                |> Enum.sort
-                |> Enum.join(",")
+      indices =
+        failures
+        |> Enum.map(fn {{_, _}, _block, tx} -> tx[:transaction_index] end)
+        |> Enum.sort()
+        |> Enum.join(",")
 
       Logger.error("Failed to retrieve internal transactions for transactions #{indices} of block #{block_number}")
 
@@ -81,34 +84,38 @@ defmodule Indexer.Fetcher.UnbatchedInternalTransaction do
   def import_internal_transaction({:ok, itx}, block_number), do: Util.import_internal_transaction(itx, [block_number])
 
   def fetch_internal_transactions(transactions, block, _jsonrpc_args, retry_count \\ 3)
+
   def fetch_internal_transactions(transactions, block, _jsonrpc_args, 0) do
     transactions
     |> Enum.map(fn tx ->
       {{:error, "Retry limit exceeded"}, block, tx}
     end)
   end
+
   def fetch_internal_transactions(transactions, block, jsonrpc_args, retry_count) do
-    fetch_results = transactions
-                    |> Enum.map(fn tx ->
-      case EthereumJSONRPC.fetch_internal_transactions([tx], jsonrpc_args) do
-        {:ok, res} ->
-          {{:ok, res}, 1, block}
+    fetch_results =
+      transactions
+      |> Enum.map(fn tx ->
+        case EthereumJSONRPC.fetch_internal_transactions([tx], jsonrpc_args) do
+          {:ok, res} ->
+            {{:ok, res}, 1, block}
 
-        {:error, reason} ->
-          {{:error, reason}, block, tx}
+          {:error, reason} ->
+            {{:error, reason}, block, tx}
 
-        {:error, :timeout} ->
-          Logger.error("Fetch itx timeout for #{tx[:block_number]} transaction #{tx[:transaction_index]}")
-          {{:error, reason}, block, tx}
-      end
-    end)
+          {:error, :timeout} ->
+            Logger.error("Fetch itx timeout for #{tx[:block_number]} transaction #{tx[:transaction_index]}")
+            {{:error, reason}, block, tx}
+        end
+      end)
 
     # reduce results to a tuple of {failed_tx_list, succeeded_fetch_result_list}
-    {failed, success} = fetch_results
-                        |> Enum.reduce({[],[]}, fn
-      {{:error, _} ,_, tx}, {f, s} -> {[tx | f], s}
-      t = {{:ok, _} ,_, _}, {f, s} -> {f, [t | s]}
-    end)
+    {failed, success} =
+      fetch_results
+      |> Enum.reduce({[], []}, fn
+        {{:error, _}, _, tx}, {f, s} -> {[tx | f], s}
+        t = {{:ok, _}, _, _}, {f, s} -> {f, [t | s]}
+      end)
 
     # retry failures and return
     if Enum.count(failed) > 0 do
