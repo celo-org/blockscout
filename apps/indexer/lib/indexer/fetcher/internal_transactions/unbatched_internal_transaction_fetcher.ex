@@ -101,11 +101,15 @@ defmodule Indexer.Fetcher.UnbatchedInternalTransaction do
             {{:ok, res}, 1, block}
 
           {:error, reason} ->
+            Logger.error(
+              "Fetch itx error #{inspect(reason)} for #{tx[:block_number]} transaction #{tx[:transaction_index]}"
+            )
+
             {{:error, reason}, block, tx}
 
           {:error, :timeout} ->
             Logger.error("Fetch itx timeout for #{tx[:block_number]} transaction #{tx[:transaction_index]}")
-            {{:error, reason}, block, tx}
+            {{:error, :timeout}, block, tx}
         end
       end)
 

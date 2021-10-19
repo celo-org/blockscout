@@ -8,7 +8,7 @@ defmodule Indexer.Fetcher.InternalTransaction.Util do
   alias Explorer.Chain.Transaction
   alias Explorer.Chain.Cache.{Accounts, Blocks}
   alias Indexer.Fetcher.TokenBalance
-  alias Indexer.Transform.{Addresses, CeloTokenTransfers, TokenTransfers}
+  alias Indexer.Transform.{Addresses, CeloTokenTransfers}
 
   import Indexer.Block.Fetcher, only: [async_import_coin_balances: 2]
 
