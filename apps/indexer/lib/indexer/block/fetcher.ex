@@ -198,7 +198,7 @@ defmodule Indexer.Block.Fetcher do
           %{
             celo: celo_token,
             cusd: stable_token_usd,
-            cbrl: _,
+            cbrl: stable_token_brl,
             ceur: _
           }, oracle_address,
           celo_token_enabled} <-

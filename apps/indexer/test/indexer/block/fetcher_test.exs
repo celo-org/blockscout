@@ -769,7 +769,7 @@ defmodule Indexer.Block.FetcherTest do
 
       if json_rpc_named_arguments[:transport] == EthereumJSONRPC.Mox do
         EthereumJSONRPC.Mox
-        |> expect(:json_rpc, 7, fn requests, _options ->
+        |> expect(:json_rpc, 8, fn requests, _options ->
           {:ok,
            Enum.map(requests, fn
              %{id: id, method: "eth_getBlockByNumber", params: ["0x708677", true]} ->
