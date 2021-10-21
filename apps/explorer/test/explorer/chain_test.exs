@@ -1,6 +1,6 @@
 defmodule Explorer.ChainTest do
   use Explorer.DataCase
-  use EthereumJSONRPC.Case, async: true
+  use EthereumJSONRPC.Case
 
   require Ecto.Query
 
@@ -310,7 +310,7 @@ defmodule Explorer.ChainTest do
 
       [_log] = Chain.address_to_logs(address_hash, paging_options: paging_options1)
 
-      paging_options2 = %PagingOptions{page_size: 60, key: {transaction.block_number, log1.index}}
+      paging_options2 = %PagingOptions{page_size: 60, key: {transaction.block_number, 0, log1.index}}
 
       assert Enum.count(Chain.address_to_logs(address_hash, paging_options: paging_options2)) == 50
     end
@@ -4859,7 +4859,7 @@ defmodule Explorer.ChainTest do
       token_balances =
         address.hash
         |> Chain.fetch_last_token_balances()
-        |> Enum.map(fn {token_balance, _} -> token_balance.address_hash end)
+        |> Enum.map(fn {token_balance, _, _} -> token_balance.address_hash end)
 
       assert token_balances == [current_token_balance.address_hash]
     end
