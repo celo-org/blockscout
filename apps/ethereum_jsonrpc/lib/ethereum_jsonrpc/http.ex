@@ -70,6 +70,9 @@ defmodule EthereumJSONRPC.HTTP do
           chunked_json_rpc(tail, options, [decoded_body | decoded_response_bodies])
         end
 
+      {:error, :closed} ->
+        rechunk_json_rpc(chunks, options, :closed, decoded_response_bodies)
+
       {:error, :timeout} ->
         rechunk_json_rpc(chunks, options, :timeout, decoded_response_bodies)
 
@@ -141,9 +144,7 @@ defmodule EthereumJSONRPC.HTTP do
     case unstandardized do
       %{"result" => _, "error" => _} ->
         raise ArgumentError,
-              "result and error keys are mutually exclusive in JSONRPC 2.0 response objects, but got #{
-                inspect(unstandardized)
-              }"
+              "result and error keys are mutually exclusive in JSONRPC 2.0 response objects, but got #{inspect(unstandardized)}"
 
       %{"result" => result} ->
         Map.put(standardized, :result, result)
