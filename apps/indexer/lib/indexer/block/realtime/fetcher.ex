@@ -281,8 +281,13 @@ defmodule Indexer.Block.Realtime.Fetcher do
     )
   end
 
+  @realtime_fetcher_delay :timer.seconds(5)
+
   @decorate span(tracer: Tracer)
   defp do_fetch_and_import_block(block_number_to_fetch, block_fetcher, retry) do
+    # delay to allow for block propogation through celo archive nodes
+    :timer.sleep(@realtime_fetcher_delay)
+
     case fetch_and_import_range(block_fetcher, block_number_to_fetch..block_number_to_fetch) do
       {:ok, %{inserted: _, errors: []}} ->
         Logger.debug("Fetched and imported.")
