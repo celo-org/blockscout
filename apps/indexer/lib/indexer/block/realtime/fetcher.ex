@@ -74,7 +74,7 @@ defmodule Indexer.Block.Realtime.Fetcher do
     {:noreply, new_state}
   end
 
-  # ms
+  # delay to allow for block propogation through celo archive nodes in milliseconds
   @realtime_fetcher_delay 1500
 
   @impl GenServer
@@ -95,7 +95,6 @@ defmodule Indexer.Block.Realtime.Fetcher do
       Publisher.broadcast([{:last_block_number, number}], :realtime)
     end
 
-    # delay to allow for block propogation through celo archive nodes
     :timer.sleep(@realtime_fetcher_delay)
 
     # Subscriptions don't support getting all the blocks and transactions data,
