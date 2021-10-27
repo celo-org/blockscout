@@ -74,7 +74,8 @@ defmodule Indexer.Block.Realtime.Fetcher do
     {:noreply, new_state}
   end
 
-  @realtime_fetcher_delay 1500 #ms
+  # ms
+  @realtime_fetcher_delay 1500
 
   @impl GenServer
   def handle_info(
@@ -93,7 +94,6 @@ defmodule Indexer.Block.Realtime.Fetcher do
     if number > 0 do
       Publisher.broadcast([{:last_block_number, number}], :realtime)
     end
-
 
     # delay to allow for block propogation through celo archive nodes
     :timer.sleep(@realtime_fetcher_delay)
@@ -289,7 +289,6 @@ defmodule Indexer.Block.Realtime.Fetcher do
 
   @decorate span(tracer: Tracer)
   defp do_fetch_and_import_block(block_number_to_fetch, block_fetcher, retry) do
-
     case fetch_and_import_range(block_fetcher, block_number_to_fetch..block_number_to_fetch) do
       {:ok, %{inserted: _, errors: []}} ->
         Logger.debug("Fetched and imported.")

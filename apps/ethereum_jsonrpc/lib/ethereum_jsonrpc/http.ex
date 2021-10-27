@@ -97,7 +97,7 @@ defmodule EthereumJSONRPC.HTTP do
     end
   end
 
-  defp log_rechunk_failure([ %{ method: "debug_traceTransaction", params: [txHash, _] }], :closed) do
+  defp log_rechunk_failure([%{method: "debug_traceTransaction", params: [txHash, _]}], :closed) do
     Logger.error("debug_traceTransaction failed for single batch with transaction=#{txHash}")
   end
 
