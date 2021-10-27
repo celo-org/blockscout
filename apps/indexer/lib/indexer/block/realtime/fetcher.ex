@@ -281,7 +281,7 @@ defmodule Indexer.Block.Realtime.Fetcher do
     )
   end
 
-  @realtime_fetcher_delay :timer.seconds(5)
+  @realtime_fetcher_delay :timer.seconds(2.5)
 
   @decorate span(tracer: Tracer)
   defp do_fetch_and_import_block(block_number_to_fetch, block_fetcher, retry) do
