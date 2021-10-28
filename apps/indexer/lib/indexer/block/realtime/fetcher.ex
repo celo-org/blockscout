@@ -74,7 +74,7 @@ defmodule Indexer.Block.Realtime.Fetcher do
     {:noreply, new_state}
   end
 
-  # delay to allow for block propogation through celo archive nodes in milliseconds
+  # delay to allow for block propagation through celo archive nodes in milliseconds
   @realtime_fetcher_delay 1500
 
   @impl GenServer
