@@ -1,16 +1,17 @@
-defmodule Explorer.SmartContract.PublisherTest do
+defmodule Explorer.SmartContract.Solidity.PublisherTest do
   use ExUnit.Case, async: true
 
   use Explorer.DataCase
 
-  doctest Explorer.SmartContract.Publisher
+  doctest Explorer.SmartContract.Solidity.Publisher
 
   @moduletag timeout: :infinity
 
   alias Explorer.Chain.{ContractMethod, SmartContract}
   alias Explorer.{Factory, Repo}
-  alias Explorer.SmartContract.Publisher
+  alias Explorer.SmartContract.Solidity.Publisher
 
+  @moduletag :smart_contract_compiler
   describe "publish/2" do
     test "with valid data creates a smart_contract" do
       contract_code_info = Factory.contract_code_info()
@@ -86,7 +87,7 @@ defmodule Explorer.SmartContract.PublisherTest do
       }
 
       response = Publisher.publish(contract_address.hash, valid_attrs)
-      assert {:ok, %SmartContract{} = smart_contract} = response
+      assert {:ok, %SmartContract{} = _smart_contract} = response
 
       Enum.each(contract_code_info.abi, fn selector ->
         [parsed] = ABI.parse_specification([selector])
@@ -174,7 +175,7 @@ defmodule Explorer.SmartContract.PublisherTest do
         end)
 
       response = Publisher.publish(contract_address.hash, params, external_libraries_form_params)
-      assert {:ok, %SmartContract{} = smart_contract} = response
+      assert {:ok, %SmartContract{} = _smart_contract} = response
     end
   end
 end

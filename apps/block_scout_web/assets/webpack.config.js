@@ -97,7 +97,10 @@ const appJs =
       'text_ad': './js/lib/text_ad.js',
       'banner': './js/lib/banner.js',
       'autocomplete': './js/lib/autocomplete.js',
-      'search-results': './js/pages/search-results/search.js'
+      'search-results': './js/pages/search-results/search.js',
+      'token-overview': './js/pages/token/overview.js',
+      'export-csv': './css/export-csv.scss',
+      'datepicker': './js/lib/datepicker.js'
     },
     output: {
       filename: '[name].js',

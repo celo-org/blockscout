@@ -1,6 +1,6 @@
 defmodule Explorer.ChainTest do
   use Explorer.DataCase
-  use EthereumJSONRPC.Case, async: true
+  use EthereumJSONRPC.Case
 
   require Ecto.Query
 
@@ -14,6 +14,7 @@ defmodule Explorer.ChainTest do
   alias Explorer.Chain.{
     Address,
     Block,
+    PendingCelo,
     Data,
     DecompiledSmartContract,
     Hash,
@@ -309,7 +310,7 @@ defmodule Explorer.ChainTest do
 
       [_log] = Chain.address_to_logs(address_hash, paging_options: paging_options1)
 
-      paging_options2 = %PagingOptions{page_size: 60, key: {transaction.block_number, log1.index}}
+      paging_options2 = %PagingOptions{page_size: 60, key: {transaction.block_number, 0, log1.index}}
 
       assert Enum.count(Chain.address_to_logs(address_hash, paging_options: paging_options2)) == 50
     end
@@ -4858,7 +4859,7 @@ defmodule Explorer.ChainTest do
       token_balances =
         address.hash
         |> Chain.fetch_last_token_balances()
-        |> Enum.map(fn {token_balance, _} -> token_balance.address_hash end)
+        |> Enum.map(fn {token_balance, _, _} -> token_balance.address_hash end)
 
       assert token_balances == [current_token_balance.address_hash]
     end
@@ -5909,6 +5910,35 @@ defmodule Explorer.ChainTest do
       implementation_abi = Chain.get_implementation_abi("0x" <> implementation_contract_address_hash_string)
 
       assert implementation_abi == @implementation_abi
+    end
+  end
+
+  describe "fetch_sum_pending_celo/0" do
+    test "fetches all CELO that is in the unlocking period" do
+      insert(:pending_celo, %{timestamp: Timex.shift(DateTime.utc_now(), days: -1), amount: 1})
+      insert(:pending_celo, %{timestamp: Timex.shift(DateTime.utc_now(), days: 0), amount: 2})
+      insert(:pending_celo, %{timestamp: Timex.shift(DateTime.utc_now(), days: 1), amount: 3})
+
+      assert %Wei{value: Decimal.new(5)} == Chain.fetch_sum_pending_celo()
+    end
+
+    test "fetches all pending CELO when there are no blocks" do
+      assert %Wei{value: Decimal.new(0)} == Chain.fetch_sum_pending_celo()
+    end
+  end
+
+  describe "delete_pending_celo/2" do
+    test "delete pending celo entries when passed amount and address" do
+      insert(:pending_celo, %{timestamp: Timex.shift(DateTime.utc_now(), days: -1), amount: 1})
+
+      %PendingCelo{account_address: account_address} =
+        insert(:pending_celo, %{timestamp: Timex.shift(DateTime.utc_now(), days: 0), amount: 2})
+
+      insert(:pending_celo, %{timestamp: Timex.shift(DateTime.utc_now(), days: 1), amount: 3})
+
+      Chain.delete_pending_celo(account_address, 2)
+
+      assert Repo.aggregate(PendingCelo, :count, :index) == 2
     end
   end
 end

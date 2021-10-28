@@ -492,15 +492,18 @@ defmodule BlockScoutWeb.TransactionView do
   defp fee_to_denomination({fee_type, fee}, opts) do
     denomination = Keyword.get(opts, :denomination)
     include_label? = Keyword.get(opts, :include_label, true)
-    {fee_type, format_wei_value(Wei.from(fee, :wei), denomination, include_unit_label: include_label?)}
+    currency = Keyword.get(opts, :currency)
+
+    {fee_type,
+     format_wei_value(Wei.from(fee, :wei), denomination, include_unit_label: include_label?, currency: currency)}
   end
 
-  def get_token_name(transaction) do
-    token = Transaction.get_token_name(transaction)
+  def get_fee_token_name(transaction) do
+    token = Transaction.get_fee_token_name(transaction)
 
     case token do
       {:ok, address} -> address
-      {:error, :not_found} -> %{name: "", symbol: " #{gettext("CELO")}"}
+      {:error, :not_found} -> %{name: "", symbol: "#{gettext("CELO")}"}
     end
   end
 
@@ -547,5 +550,34 @@ defmodule BlockScoutWeb.TransactionView do
       Enum.count(token_transfers_types) == creations_count -> @token_creation_type
       true -> @token_transfer_type
     end
+  end
+
+  defp show_tenderly_link? do
+    System.get_env("SHOW_TENDERLY_LINK") == "true"
+  end
+
+  defp tenderly_chain_path do
+    System.get_env("TENDERLY_CHAIN_PATH") || "/"
+  end
+
+  def get_max_length do
+    string_value = Application.get_env(:block_scout_web, :max_length_to_show_string_without_trimming)
+
+    case Integer.parse(string_value) do
+      {integer, ""} -> integer
+      _ -> 0
+    end
+  end
+
+  def trim(length, string) do
+    %{show: String.slice(string, 0..length), hide: String.slice(string, (length + 1)..String.length(string))}
+  end
+
+  defp template_to_string(template) when is_list(template) do
+    template_to_string(Enum.at(template, 1))
+  end
+
+  defp template_to_string(template) when is_tuple(template) do
+    safe_to_string(template)
   end
 end

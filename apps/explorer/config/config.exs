@@ -25,7 +25,8 @@ config :explorer,
     if(System.get_env("DISABLE_WEBAPP") != "true",
       do: Explorer.Chain.Events.SimpleSender,
       else: Explorer.Chain.Events.DBSender
-    )
+    ),
+  enabled_1559_support: System.get_env("ENABLE_1559_SUPPORT") == "true"
 
 config :explorer, Explorer.Counters.AverageBlockTime,
   enabled: true,
@@ -49,9 +50,7 @@ config :explorer, Explorer.ChainSpec.GenesisData,
   chain_spec_path:
     System.get_env(
       "CHAIN_SPEC_PATH",
-      "https://www.googleapis.com/storage/v1/b/genesis_blocks/o/#{
-        String.downcase(System.get_env("SUBNETWORK", "Baklava"))
-      }?alt=media"
+      "https://www.googleapis.com/storage/v1/b/genesis_blocks/o/#{String.downcase(System.get_env("SUBNETWORK", "Baklava"))}?alt=media"
     ),
   emission_format: System.get_env("EMISSION_FORMAT", "DEFAULT"),
   rewards_contract_address: System.get_env("REWARDS_CONTRACT", "0xeca443e8e1ab29971a45a9c57a6a9875701698a5")
@@ -119,6 +118,18 @@ config :explorer, Explorer.Counters.TokenTransfersCounter,
   enable_consolidation: true
 
 config :explorer, Explorer.Counters.AddressTransactionsCounter,
+  enabled: true,
+  enable_consolidation: true
+
+config :explorer, Explorer.Counters.AddressTokenTransfersCounter,
+  enabled: true,
+  enable_consolidation: true
+
+config :explorer, Explorer.Counters.BlockBurnedFeeCounter,
+  enabled: true,
+  enable_consolidation: true
+
+config :explorer, Explorer.Counters.BlockPriorityFeeCounter,
   enabled: true,
   enable_consolidation: true
 

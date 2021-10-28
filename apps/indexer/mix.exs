@@ -48,7 +48,7 @@ defmodule Indexer.MixProject do
       {:plug_cowboy, "~> 2.0"},
       {:poison, "~> 4.0"},
       # Optional dependency of `:spandex` for `Spandex.Decorators`
-      {:decorator, "~> 1.2"},
+      {:decorator, "~> 1.4"},
       # JSONRPC access to Parity for `Explorer.Indexer`
       {:ethereum_jsonrpc, in_umbrella: true},
       # RLP encoding
@@ -69,7 +69,7 @@ defmodule Indexer.MixProject do
       {:logger_json, "~> 3.2"},
       {:jason, "~> 1.1"},
       # Metrics
-      {:prometheus_ex, "~> 3.0"},
+      {:prometheus_ex, "~>3.0"},
       {:prometheus_plugs, "~> 1.1"},
       {:prometheus_process_collector, "~> 1.1"},
       {:telemetry, "~> 0.4.0"}
