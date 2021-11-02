@@ -63,7 +63,7 @@ defmodule Explorer.Celo.Util do
     end
   end
 
-  def get_address_raw(name) do
+  defp get_address_raw(name) do
     contract_abi = AbiHandler.get_abi()
 
     methods = [
