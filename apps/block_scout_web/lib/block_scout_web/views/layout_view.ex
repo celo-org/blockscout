@@ -195,13 +195,103 @@ defmodule BlockScoutWeb.LayoutView do
 
   def other_explorers do
     if Application.get_env(:block_scout_web, :link_to_other_explorers) do
-      decode_other_explorers_json(Application.get_env(:block_scout_web, :other_explorers, []))
+      decode_json(Application.get_env(:block_scout_web, :other_explorers, []))
     else
       []
     end
   end
 
-  defp decode_other_explorers_json(data) do
+  def bridges_list do
+    if Application.get_env(:block_scout_web, :bridges) do
+      try do
+        :block_scout_web
+        |> Application.get_env(:bridges)
+        |> Parser.parse!(%{keys: :atoms!})
+      rescue
+        _ ->
+          []
+      end
+    else
+      []
+    end
+  end
+
+  def other_bridges_list do
+    if Application.get_env(:block_scout_web, :other_bridges) do
+      try do
+        :block_scout_web
+        |> Application.get_env(:other_bridges)
+        |> Parser.parse!(%{keys: :atoms!})
+      rescue
+        _ ->
+          []
+      end
+    else
+      []
+    end
+  end
+
+  def bridges_alm_list do
+    if Application.get_env(:block_scout_web, :bridges_alm) do
+      try do
+        :block_scout_web
+        |> Application.get_env(:bridges_alm)
+        |> Parser.parse!(%{keys: :atoms!})
+      rescue
+        _ ->
+          []
+      end
+    else
+      []
+    end
+  end
+
+  def defi_list do
+    if Application.get_env(:block_scout_web, :defi) do
+      try do
+        :block_scout_web
+        |> Application.get_env(:defi)
+        |> Parser.parse!(%{keys: :atoms!})
+      rescue
+        _ ->
+          []
+      end
+    else
+      []
+    end
+  end
+
+  def nft_list do
+    if Application.get_env(:block_scout_web, :nft) do
+      try do
+        :block_scout_web
+        |> Application.get_env(:nft)
+        |> Parser.parse!(%{keys: :atoms!})
+      rescue
+        _ ->
+          []
+      end
+    else
+      []
+    end
+  end
+
+  def apps_list do
+    if Application.get_env(:block_scout_web, :external_apps) do
+      try do
+        :block_scout_web
+        |> Application.get_env(:external_apps)
+        |> Parser.parse!(%{keys: :atoms!})
+      rescue
+        _ ->
+          []
+      end
+    else
+      []
+    end
+  end
+
+  defp decode_json(data) do
     Jason.decode!(~s(#{data}))
   rescue
     _ -> []
