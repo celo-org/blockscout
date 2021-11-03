@@ -147,19 +147,19 @@ defmodule Indexer.Block.Fetcher do
     with {:ok, celo_token} <- Util.get_address("GoldToken"),
          {:ok, stable_token_usd} <- Util.get_address("StableToken"),
          {:ok, stable_token_eur} <- Util.get_address("StableTokenEUR"),
-         {:ok, stable_token_brl} <- Util.get_address("StableTokenBRL"),
+         {:ok, stable_token_real} <- Util.get_address("StableTokenREAL"),
          {:ok, oracle_address} <- Util.get_address("SortedOracles") do
       tokens = %{
         celo: celo_token,
         cusd: stable_token_usd,
         ceur: stable_token_eur,
-        cbrl: stable_token_brl
+        creal: stable_token_real
       }
 
       {:ok, tokens, oracle_address, true}
     else
       _err ->
-        {:ok, %{celo: nil, cusd: nil, ceur: nil, cbrl: nil}, nil, false}
+        {:ok, %{celo: nil, cusd: nil, ceur: nil, creal: nil}, nil, false}
     end
   end
 
@@ -198,14 +198,14 @@ defmodule Indexer.Block.Fetcher do
           %{
             celo: celo_token,
             cusd: stable_token_usd,
-            cbrl: stable_token_brl,
+            creal: stable_token_real,
             ceur: _
           }, oracle_address,
           celo_token_enabled} <-
            (if try_celo_token_enabled do
               read_addresses()
             else
-              {:ok, %{celo: nil, cusd: nil, ceur: nil, cbrl: nil}, nil, false}
+              {:ok, %{celo: nil, cusd: nil, ceur: nil, creal: nil}, nil, false}
             end),
          %{token_transfers: celo_token_transfers} =
            (if celo_token_enabled do

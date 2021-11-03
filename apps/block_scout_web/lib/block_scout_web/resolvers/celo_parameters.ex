@@ -7,7 +7,7 @@ defmodule BlockScoutWeb.Resolvers.CeloParameters do
     with {:ok, result} <- Chain.get_celo_parameters(),
          {:ok, usd} <- get_address_param(result, "stableToken"),
          {:ok, eur} <- get_address_param(result, "stableTokenEUR"),
-         {:ok, brl} <- get_address_param(result, "stableTokenBRL"),
+         {:ok, real} <- get_address_param(result, "stableTokenREAL"),
          {:ok, celo} <- get_address_param(result, "goldToken"),
          {:ok, locked} <- get_param(result, "totalLockedGold"),
          {:ok, validators} <- get_param(result, "numRegisteredValidators"),
@@ -19,7 +19,7 @@ defmodule BlockScoutWeb.Resolvers.CeloParameters do
          stable_tokens: %{
            cusd: usd,
            ceur: eur,
-           cbrl: brl
+           creal: real
          },
          total_locked_gold: locked,
          min_electable_validators: min_validators.value |> Decimal.to_integer(),
