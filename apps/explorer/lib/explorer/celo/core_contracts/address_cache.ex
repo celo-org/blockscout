@@ -7,11 +7,11 @@ defmodule Explorer.Celo.CoreContracts do
 
   # address of the registry contract, same across networks
   @registry_address "0x000000000000000000000000000000000000ce10"
-  def registry_address(), do: @registry_address
+  def registry_address, do: @registry_address
 
   # full list of core contracts, see https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/lib/registry-utils.ts
   @core_contracts ~w(Accounts Attestations BlockchainParameters DoubleSigningSlasher DowntimeSlasher Election EpochRewards Escrow Exchange ExchangeEUR FeeCurrencyWhitelist Freezer GasPriceMinimum GoldToken Governance GovernanceSlasher GovernanceApproverMultiSig GrandaMento LockedGold Random Reserve ReserveSpenderMultiSig SortedOracles StableToken StableTokenEUR TransferWhitelist Validators)
-  def contract_list(), do: @core_contracts
+  def contract_list, do: @core_contracts
 
   ## GenServer Callbacks
 
@@ -41,15 +41,16 @@ defmodule Explorer.Celo.CoreContracts do
   end
 
   @impl true
-  def handle_info(:refresh, _cache = %{timer: timer}) do
+  def handle_info(:refresh, %{timer: timer}) do
     _ = Process.cancel_timer(timer, info: false)
 
     # fetch addresses for all contracts
-    cache = @core_contracts
-    |> Enum.reduce(%{}, fn name, acc ->
-      address = get_address_raw(name)
-      Map.put(acc, name, address)
-    end)
+    cache =
+      @core_contracts
+      |> Enum.reduce(%{}, fn name, acc ->
+        address = get_address_raw(name)
+        Map.put(acc, name, address)
+      end)
 
     period = Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh]
     timer = Process.send_after(self(), :refresh, period)
@@ -69,11 +70,9 @@ defmodule Explorer.Celo.CoreContracts do
   end
 
   @doc """
-  Trigger a refresh of all Celo Core Contract addresses and start periodic updates
+  Trigger a refresh of all Celo Core Contract addresses
   """
-  def start_refresh() do
-    send(__MODULE__, :refresh)
-  end
+  def refresh, do: send(__MODULE__, :refresh)
 
   defp get_address_raw(name) do
     contract_abi = AbiHandler.get_abi()
