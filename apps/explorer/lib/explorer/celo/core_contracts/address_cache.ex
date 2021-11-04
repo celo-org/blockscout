@@ -31,7 +31,7 @@ defmodule Explorer.Celo.CoreContracts do
         "Alfajores" -> cache(:alfajores)
         "Baklava" -> cache(:baklava)
         :error ->
-          Logger.error("No SUBNETWORK env var set for address cache, falling back to mainnet")
+          Logger.warn("No SUBNETWORK env var set for Celo contract address cache, falling back to mainnet")
           cache(:mainnet)
       end
 
