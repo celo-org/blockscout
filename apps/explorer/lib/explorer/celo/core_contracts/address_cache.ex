@@ -6,6 +6,7 @@ defmodule Explorer.Celo.CoreContracts do
   use GenServer
   alias Explorer.Celo.AbiHandler
   alias Explorer.SmartContract.Reader
+  require Logger
 
   # address of the registry contract, same across networks
   @registry_address "0x000000000000000000000000000000000000ce10"
@@ -25,10 +26,13 @@ defmodule Explorer.Celo.CoreContracts do
   @impl true
   def init(_) do
     cache =
-      case System.fetch_env!("SUBNETWORK") do
+      case System.fetch_env("SUBNETWORK") do
         "Celo" -> cache(:mainnet)
         "Alfajores" -> cache(:alfajores)
         "Baklava" -> cache(:baklava)
+        :error ->
+          Logger.error("No SUBNETWORK env var set for address cache, falling back to mainnet")
+          cache(:mainnet)
       end
 
     period = Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh]

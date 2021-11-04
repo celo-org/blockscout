@@ -301,7 +301,7 @@ defmodule Indexer.Block.FetcherTest do
               to_address_hash,
               transaction_hash,
               unprefixed_celo_token_address_hash,
-              31
+              16
             )
 
           variant ->
@@ -625,7 +625,7 @@ defmodule Indexer.Block.FetcherTest do
 
       if json_rpc_named_arguments[:transport] == EthereumJSONRPC.Mox do
         EthereumJSONRPC.Mox
-        |> expect(:json_rpc, 7, fn requests, _options ->
+        |> expect(:json_rpc, 3, fn requests, _options ->
           {:ok,
            Enum.map(requests, fn
              %{id: id, method: "eth_getBlockByNumber", params: ["0x708677", true]} ->
@@ -663,14 +663,6 @@ defmodule Indexer.Block.FetcherTest do
 
              %{id: id, jsonrpc: "2.0", method: "eth_getLogs"} ->
                %{id: id, jsonrpc: "2.0", result: []}
-
-             # read_addresses for 4 smart contracts in the fetcher
-             %{id: id, jsonrpc: "2.0", method: "eth_call"} ->
-               %{
-                 jsonrpc: "2.0",
-                 id: id,
-                 result: "0x000000000000000000000000" <> unprefixed_celo_token_address_hash
-               }
 
              %{id: id, method: "trace_block"} ->
                block_quantity = integer_to_quantity(block_number)
