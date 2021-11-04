@@ -41,10 +41,15 @@ defmodule Explorer.Celo.CoreContracts do
   end
 
   @impl true
-  def handle_info(:refresh, cache = %{timer: timer}) do
+  def handle_info(:refresh, _cache = %{timer: timer}) do
     _ = Process.cancel_timer(timer, info: false)
 
     # fetch addresses for all contracts
+    cache = @core_contracts
+    |> Enum.reduce(%{}, fn name, acc ->
+      address = get_address_raw(name)
+      Map.put(acc, name, address)
+    end)
 
     period = Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh]
     timer = Process.send_after(self(), :refresh, period)
@@ -69,7 +74,6 @@ defmodule Explorer.Celo.CoreContracts do
   def start_refresh() do
     send(__MODULE__, :refresh)
   end
-
 
   defp get_address_raw(name) do
     contract_abi = AbiHandler.get_abi()
