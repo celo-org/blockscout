@@ -198,7 +198,7 @@ msgid "Actual gas amount used by the transaction."
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/layout/_topnav.html.eex:168
+#: lib/block_scout_web/templates/layout/_topnav.html.eex:169
 msgid "Add Your App"
 msgstr ""
 
@@ -481,7 +481,7 @@ msgid "Bridged from Ethereum"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/layout/_topnav.html.eex:174
+#: lib/block_scout_web/templates/layout/_topnav.html.eex:176
 msgid "Bridges"
 msgstr ""
 
@@ -1077,7 +1077,7 @@ msgid "Easy Cowboy! This block does not exist yet!"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/layout/_topnav.html.eex:186
+#: lib/block_scout_web/templates/layout/_topnav.html.eex:188
 msgid "Ecosystem"
 msgstr ""
 
@@ -1615,7 +1615,7 @@ msgid "Module"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/layout/_topnav.html.eex:197
+#: lib/block_scout_web/templates/layout/_topnav.html.eex:200
 msgid "More apps"
 msgstr ""
 
@@ -1650,7 +1650,7 @@ msgid "N/A"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/layout/_topnav.html.eex:192
+#: lib/block_scout_web/templates/layout/_topnav.html.eex:194
 msgid "NFT"
 msgstr ""
 
