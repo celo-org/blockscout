@@ -20,7 +20,7 @@ defmodule Explorer.Celo.Util do
     methods
     |> Enum.map(&format_request/1)
     |> Enum.filter(fn req -> req.contract_address != :error end)
-    |> Enum.map(fn %{contract_address: {:ok, address}} = req -> Map.put(req, :contract_address, address) end)
+    |> Enum.map(fn %{contract_address: address} = req -> Map.put(req, :contract_address, address) end)
     |> Reader.query_contracts_by_name(contract_abi)
     |> Enum.zip(methods)
     |> Enum.into(%{}, fn
