@@ -486,17 +486,6 @@ defmodule Indexer.Fetcher.InternalTransactionTest do
            }
          ]}
       end)
-      |> expect(:json_rpc, fn [%{id: id, method: "eth_call"}], _options ->
-        # Utils.get_address("GoldToken") query
-        {:ok,
-         [
-           %{
-             jsonrpc: "2.0",
-             id: id,
-             result: "0x000000000000000000000000" <> unprefixed_celo_token_address_hash
-           }
-         ]}
-      end)
 
       json_rpc_named_arguments = [
         transport: EthereumJSONRPC.Mox,
@@ -589,17 +578,6 @@ defmodule Indexer.Fetcher.InternalTransactionTest do
                  "gasUsed" => "0x0"
                }
              ]
-           }
-         ]}
-      end)
-      |> expect(:json_rpc, fn [%{id: id, method: "eth_call"}], _options ->
-        # Utils.get_address("GoldToken") query
-        {:ok,
-         [
-           %{
-             jsonrpc: "2.0",
-             id: id,
-             result: "0x000000000000000000000000" <> unprefixed_celo_token_address_hash
            }
          ]}
       end)
