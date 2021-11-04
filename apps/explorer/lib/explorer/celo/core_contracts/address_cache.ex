@@ -4,6 +4,8 @@ defmodule Explorer.Celo.CoreContracts do
   """
 
   use GenServer
+  alias Explorer.Celo.AbiHandler
+  alias Explorer.SmartContract.Reader
 
   # address of the registry contract, same across networks
   @registry_address "0x000000000000000000000000000000000000ce10"
