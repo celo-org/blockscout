@@ -36,6 +36,8 @@ config :explorer, Explorer.Celo.AbiHandler, enabled: true
 
 config :explorer, Explorer.Celo.SignerCache, enabled: true
 
+config :explorer, Explorer.Celo.CoreContracts, enabled: true, refresh: :timer.hours(1)
+
 config :explorer, :stacktrace_depth, 20
 
 config :explorer, Explorer.Chain.Events.Listener,

@@ -1,7 +1,10 @@
 defmodule Explorer.Celo.CoreContracts do
   @moduledoc """
-    Caches the addresses of core contracts on various celo networks
+    Caches the addresses of core contracts on Celo blockchains
   """
+
+  use GenServer
+
   # address of the registry contract, same across networks
   @registry_address "0x000000000000000000000000000000000000ce10"
   def registry_address(), do: @registry_address
@@ -10,14 +13,91 @@ defmodule Explorer.Celo.CoreContracts do
   @core_contracts ~w(Accounts Attestations BlockchainParameters DoubleSigningSlasher DowntimeSlasher Election EpochRewards Escrow Exchange ExchangeEUR FeeCurrencyWhitelist Freezer GasPriceMinimum GoldToken Governance GovernanceSlasher GovernanceApproverMultiSig GrandaMento LockedGold Random Reserve ReserveSpenderMultiSig SortedOracles StableToken StableTokenEUR TransferWhitelist Validators)
   def contract_list(), do: @core_contracts
 
-  # init - load cache based on environment
+  ## GenServer Callbacks
 
-  def get_core_contract_address("Registry"), do: @registry_address
-
-  def get_core_contract_address(name) do
+  @spec start_link(term()) :: GenServer.on_start()
+  def start_link(_) do
+    GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
   end
 
-  def cache(:mainnet) do
+  @impl true
+  def init(_) do
+    cache =
+      case System.fetch_env!("SUBNETWORK") do
+        "Celo" -> cache(:mainnet)
+        "Alfajores" -> cache(:alfajores)
+        "Baklava" -> cache(:baklava)
+      end
+
+    period = Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh]
+    timer = Process.send_after(self(), :refresh, period)
+
+    {:ok, Map.put(cache, :timer, timer)}
+  end
+
+  @impl true
+  def handle_call({:get_address, contract_name}, _from, cache) do
+    {:reply, cache[contract_name], cache}
+  end
+
+  @impl true
+  def handle_info(:refresh, cache = %{timer: timer}) do
+    _ = Process.cancel_timer(timer, info: false)
+
+    # fetch addresses for all contracts
+
+    period = Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh]
+    timer = Process.send_after(self(), :refresh, period)
+
+    {:noreply, Map.put(cache, :timer, timer)}
+  end
+
+  ## API Methods
+
+  @doc """
+  Return the address associated with the core contract that has a given name
+  """
+  def contract_address("Registry"), do: @registry_address
+
+  def contract_address(name) when name in @core_contracts do
+    GenServer.call(__MODULE__, {:get_address, name})
+  end
+
+  @doc """
+  Trigger a refresh of all Celo Core Contract addresses and start periodic updates
+  """
+  def start_refresh() do
+    send(__MODULE__, :refresh)
+  end
+
+
+  defp get_address_raw(name) do
+    contract_abi = AbiHandler.get_abi()
+
+    methods = [
+      %{
+        contract_address: @registry_address,
+        function_name: "getAddressForString",
+        args: [name]
+      }
+    ]
+
+    res =
+      methods
+      |> Reader.query_contracts_by_name(contract_abi)
+      |> Enum.zip(methods)
+      |> Enum.into(%{}, fn {response, %{function_name: function_name}} ->
+        {function_name, response}
+      end)
+
+    case res["getAddressForString"] do
+      {:ok, [address]} -> {:ok, address}
+      _ -> :error
+    end
+  end
+
+  # methods provide initial values only, during runtime values addresses be fetched periodically from the Registry contract
+  defp cache(:mainnet) do
     %{
       "Accounts" => "0x7d21685c17607338b313a7174bab6620bad0aab7",
       "Attestations" => "0xdc553892cdeeed9f575aa0fba099e5847fd88d20",
@@ -49,7 +129,7 @@ defmodule Explorer.Celo.CoreContracts do
     }
   end
 
-  def cache(:baklava) do
+  defp cache(:baklava) do
     %{
       "Accounts" => "0x64ff4e6f7e08119d877fd2e26f4c20b537819080",
       "Attestations" => "0xaeb505a8ba97241cc85d98c2e892608dd16da3cc",
@@ -81,7 +161,7 @@ defmodule Explorer.Celo.CoreContracts do
     }
   end
 
-  def cache(:alfajores) do
+  defp cache(:alfajores) do
     %{
       "Accounts" => "0xed7f51a34b4e71fbe69b3091fcf879cd14bd73a9",
       "Attestations" => "0xad5e5722427d79dff28a4ab30249729d1f8b4cc0",
