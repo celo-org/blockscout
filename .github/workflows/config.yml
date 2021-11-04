@@ -389,7 +389,6 @@ jobs:
           POSTGRES_PASSWORD: 1234
           # match PGUSER for elixir image above
           POSTGRES_USER: postgres
-          SUBNETWORK: Celo
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -465,7 +464,6 @@ jobs:
           POSTGRES_PASSWORD: 1234
           # match PGUSER for elixir image above
           POSTGRES_USER: postgres
-          SUBNETWORK: Celo
         # Set health checks to wait until postgres has started
         options: >-
           --health-cmd pg_isready
@@ -513,6 +511,7 @@ jobs:
           PGUSER: postgres
           ETHEREUM_JSONRPC_CASE: "EthereumJSONRPC.Case.Parity.Mox"
           ETHEREUM_JSONRPC_WEB_SOCKET_CASE: "EthereumJSONRPC.WebSocket.Case.Mox"
+          SUBNETWORK: Celo
       - name: Upload Unit Test Results
         if: always()
         uses: actions/upload-artifact@v2
@@ -606,6 +605,7 @@ jobs:
           PGUSER: postgres
           ETHEREUM_JSONRPC_CASE: "EthereumJSONRPC.Case.Parity.Mox"
           ETHEREUM_JSONRPC_WEB_SOCKET_CASE: "EthereumJSONRPC.WebSocket.Case.Mox"
+          SUBNETWORK: Celo
           CHAIN_ID: "77"
       - name: Upload Unit Test Results
         if: always()
