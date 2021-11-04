@@ -239,6 +239,17 @@ defmodule Indexer.Block.Realtime.FetcherTest do
              }
            ]}
         end)
+        # read_addresses for 4 smart contracts in the fetcher
+        |> expect(:json_rpc, 4, fn [%{id: id, method: "eth_call"}], _ ->
+          {:ok,
+           [
+             %{
+               jsonrpc: "2.0",
+               id: id,
+               result: "0x000000000000000000000000" <> unprefixed_celo_token_address_hash
+             }
+           ]}
+        end)
         |> expect(:json_rpc, 4, fn
           [
             %{id: 0, jsonrpc: "2.0", method: "trace_block", params: ["0x3C365F"]},
