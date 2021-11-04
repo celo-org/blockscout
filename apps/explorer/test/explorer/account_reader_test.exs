@@ -34,7 +34,7 @@ defmodule Explorer.Token.AccountReaderTest do
     expect(
       EthereumJSONRPC.Mox,
       :json_rpc,
-      8,
+      1,
       fn requests, _opts ->
         {:ok,
          Enum.map(requests, fn
