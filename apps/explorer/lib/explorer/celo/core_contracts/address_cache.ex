@@ -27,9 +27,9 @@ defmodule Explorer.Celo.CoreContracts do
   def init(_) do
     cache =
       case System.fetch_env("SUBNETWORK") do
-        "Celo" -> cache(:mainnet)
-        "Alfajores" -> cache(:alfajores)
-        "Baklava" -> cache(:baklava)
+        {:ok, "Celo"} -> cache(:mainnet)
+        {:ok, "Alfajores"} -> cache(:alfajores)
+        {:ok, "Baklava"} -> cache(:baklava)
         :error ->
           Logger.warn("No SUBNETWORK env var set for Celo contract address cache, falling back to mainnet")
           cache(:mainnet)
