@@ -58,15 +58,26 @@ defmodule Explorer.Celo.AccountReader do
   def validator_group_reward_data(address, bn) do
     data =
       call_methods([
-        {:election, "getActiveVotesForGroup", [address], bn - 1},
-        {:epochrewards, "calculateTargetEpochRewards", [], bn - 1},
-        {:election, "getActiveVotes", [], bn - 1}
+#        {:election, "getActiveVotesForGroup", [address], bn - 1},
+        {:epochrewards, "calculateTargetEpochRewards", [], bn},
+#        {:election, "getActiveVotes", [], bn - 1}
       ])
 
-    with {:ok, [active_votes]} <- data["getActiveVotesForGroup"],
-         {:ok, [total_active_votes]} <- data["getActiveVotes"],
-         {:ok, [_ | [total_reward | _]]} <- data["calculateTargetEpochRewards"] do
-      {:ok, %{active_votes: active_votes, total_active_votes: total_active_votes, total_reward: total_reward}}
+#         with {:ok, [active_votes]} <- data["getActiveVotesForGroup"],
+#         {:ok, [total_active_votes]} <- data["getActiveVotes"],
+    with {:ok, [
+      validator_target_epoch_rewards,
+      voter_target_epoch_rewards,
+      community_target_epoch_rewards,
+      carbon_offsetting_target_epoch_rewards
+    ]} <- data["calculateTargetEpochRewards"] do
+#      {:ok, %{active_votes: active_votes, total_active_votes: total_active_votes, total_reward: total_reward}}
+      {:ok, %{
+        validator_target_epoch_rewards: validator_target_epoch_rewards,
+        voter_target_epoch_rewards: voter_target_epoch_rewards,
+        community_target_epoch_rewards: community_target_epoch_rewards,
+        carbon_offsetting_target_epoch_rewards: carbon_offsetting_target_epoch_rewards
+      }}
     else
       _ -> :error
     end

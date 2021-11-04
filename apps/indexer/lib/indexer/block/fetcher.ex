@@ -331,7 +331,8 @@ defmodule Indexer.Block.Fetcher do
       Market.bulk_insert_history(market_history)
 
       async_import_celo_validators(%{celo_validators: %{params: celo_validators}})
-      async_import_celo_voter_rewards(%{celo_voter_rewards: %{params: celo_voter_rewards}})
+      # TODO: remove
+#      async_import_celo_voter_rewards(%{celo_voter_rewards: %{params: celo_voter_rewards}})
       async_import_celo_validator_groups(%{celo_validator_groups: %{params: celo_validator_groups}})
       async_import_celo_voters(%{celo_voters: %{params: celo_voters}})
       async_import_celo_validator_history(range)
@@ -496,6 +497,7 @@ defmodule Indexer.Block.Fetcher do
 
   def async_import_celo_validator_groups(_), do: :ok
 
+  # TODO: remove
   def async_import_celo_voter_rewards(%{celo_voter_rewards: accounts}) do
     CeloVoterRewards.async_fetch(accounts)
   end

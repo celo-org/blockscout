@@ -54,9 +54,9 @@ defmodule Indexer.Fetcher.CeloVoterRewards do
   end
 
   @impl BufferedTask
-  def run(accounts, _json_rpc_named_arguments) do
+  def run(entries, _json_rpc_named_arguments) do
     failed_list =
-      accounts
+      entries
       |> Enum.map(&Map.put(&1, :retries_count, &1.retries_count + 1))
       |> fetch_from_blockchain()
       |> import_items()
@@ -68,7 +68,7 @@ defmodule Indexer.Fetcher.CeloVoterRewards do
     end
   end
 
-  defp fetch_from_blockchain(addresses) do
+  def fetch_from_blockchain(addresses) do
     addresses
     |> Enum.filter(&(&1.retries_count <= @max_retries))
     |> Enum.map(fn %{address_hash: address, block_number: bn} = account ->
