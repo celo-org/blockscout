@@ -602,8 +602,7 @@ defmodule Explorer.SmartContract.Reader do
     |> Tuple.to_list()
     |> Enum.map(fn value ->
       if is_list(value) do
-        value
-        |> Enum.join("")
+        parse_item(value)
       else
         hex =
           value
@@ -612,6 +611,10 @@ defmodule Explorer.SmartContract.Reader do
         "0x" <> hex
       end
     end)
+  end
+
+  defp parse_item(items) when is_list(items) do
+    Enum.map(items, &parse_item/1)
   end
 
   defp parse_item(item) do
