@@ -55,6 +55,7 @@ defmodule Explorer.Celo.Util do
   defp contract(:gold), do: get_address("GoldToken")
   defp contract(:usd), do: get_address("StableToken")
   defp contract(:eur), do: get_address("StableTokenEUR")
+  defp contract(:reserve), do: get_address("Reserve")
 
   def get_address(name) do
     case get_address_raw(name) do
