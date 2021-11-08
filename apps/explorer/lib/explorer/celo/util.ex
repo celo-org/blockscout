@@ -26,6 +26,7 @@ defmodule Explorer.Celo.Util do
     |> Enum.into(%{}, fn
       {response, {_, function_name, _}} -> {function_name, response}
       {response, {_, function_name, _, _}} -> {function_name, response}
+      {response, {_, function_name, _, _, custom_name}} -> {custom_name, response}
     end)
   end
 
@@ -38,6 +39,15 @@ defmodule Explorer.Celo.Util do
   end
 
   defp format_request({contract_name, function_name, params, bn}) do
+    %{
+      contract_address: contract(contract_name),
+      function_name: function_name,
+      args: params,
+      block_number: bn
+    }
+  end
+
+  defp format_request({contract_name, function_name, params, bn, _}) do
     %{
       contract_address: contract(contract_name),
       function_name: function_name,
