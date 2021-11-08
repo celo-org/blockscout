@@ -57,7 +57,10 @@ defmodule Explorer.Celo.Util do
   defp contract(:eur), do: get_address("StableTokenEUR")
 
   def get_address(name) do
-    {:ok, AddressCache.contract_address(name)}
+    case AddressCache.contract_address(name) do
+      :error -> {:error}
+      address ->{:ok, address}
+    end
   end
 
   def get_token_contract_names do
