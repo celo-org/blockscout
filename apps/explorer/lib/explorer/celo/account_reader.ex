@@ -55,29 +55,80 @@ defmodule Explorer.Celo.AccountReader do
     end
   end
 
-  def validator_group_reward_data(address, bn) do
+  def validator_group_reward_data(_address, bn) do
     data =
       call_methods([
-#        {:election, "getActiveVotesForGroup", [address], bn - 1},
         {:epochrewards, "calculateTargetEpochRewards", [], bn},
-#        {:election, "getActiveVotes", [], bn - 1}
+        {:epochrewards, "getTargetGoldTotalSupply", [], bn},
+        {:epochrewards, "getRewardsMultiplier", [], bn},
+        {:epochrewards, "getRewardsMultiplierParameters", [], bn},
+        {:epochrewards, "getTargetVotingYieldParameters", [], bn},
+        {:epochrewards, "getTargetVotingGoldFraction", [], bn},
+        {:epochrewards, "getVotingGoldFraction", [], bn},
+        {:lockedgold, "getTotalLockedGold", [], bn},
+        {:lockedgold, "getNonvotingLockedGold", [], bn},
+        {:election, "getTotalVotes", [], bn},
+        {:election, "getElectableValidators", [], bn},
+        {:reserve, "getReserveGoldBalance", [], bn},
+        {:gold, "totalSupply", [], bn, "goldTotalSupply"},
+        {:usd, "totalSupply", [], bn, "stableUSDTotalSupply"}
       ])
 
-#         with {:ok, [active_votes]} <- data["getActiveVotesForGroup"],
-#         {:ok, [total_active_votes]} <- data["getActiveVotes"],
-    with {:ok, [
-      validator_target_epoch_rewards,
-      voter_target_epoch_rewards,
-      community_target_epoch_rewards,
-      carbon_offsetting_target_epoch_rewards
-    ]} <- data["calculateTargetEpochRewards"] do
-#      {:ok, %{active_votes: active_votes, total_active_votes: total_active_votes, total_reward: total_reward}}
-      {:ok, %{
-        validator_target_epoch_rewards: validator_target_epoch_rewards,
-        voter_target_epoch_rewards: voter_target_epoch_rewards,
-        community_target_epoch_rewards: community_target_epoch_rewards,
-        carbon_offsetting_target_epoch_rewards: carbon_offsetting_target_epoch_rewards
-      }}
+    with {:ok,
+          [
+            validator_target_epoch_rewards,
+            voter_target_epoch_rewards,
+            community_target_epoch_rewards,
+            carbon_offsetting_target_epoch_rewards
+          ]} <- data["calculateTargetEpochRewards"],
+         {:ok, [target_total_supply]} <- data["getTargetGoldTotalSupply"],
+         {:ok, [rewards_multiplier]} <- data["getRewardsMultiplier"],
+         {:ok,
+          [
+            rewards_multiplier_max,
+            rewards_multiplier_under,
+            rewards_multiplier_over
+          ]} <- data["getRewardsMultiplierParameters"],
+         {:ok,
+          [
+            target_voting_yield,
+            target_voting_yield_max,
+            target_voting_yield_adjustment_factor
+          ]} <- data["getTargetVotingYieldParameters"],
+         {:ok, [target_voting_fraction]} <- data["getTargetVotingGoldFraction"],
+         {:ok, [voting_fraction]} <- data["getVotingGoldFraction"],
+         {:ok, [total_locked_gold]} <- data["getTotalLockedGold"],
+         {:ok, [total_non_voting]} <- data["getNonvotingLockedGold"],
+         {:ok, [total_votes]} <- data["getTotalVotes"],
+         {:ok, [_, electable_validators_max]} <- data["getElectableValidators"],
+         {:ok, [reserve_gold_balance]} <- data["getReserveGoldBalance"],
+         {:ok, [reserve_gold_balance]} <- data["getReserveGoldBalance"],
+         {:ok, [gold_total_supply]} <- data["goldTotalSupply"],
+         {:ok, [stable_usd_total_supply]} <- data["stableUSDTotalSupply"] do
+      {:ok,
+       %{
+         validator_target_epoch_rewards: validator_target_epoch_rewards,
+         voter_target_epoch_rewards: voter_target_epoch_rewards,
+         community_target_epoch_rewards: community_target_epoch_rewards,
+         carbon_offsetting_target_epoch_rewards: carbon_offsetting_target_epoch_rewards,
+         target_total_supply: target_total_supply,
+         rewards_multiplier: rewards_multiplier,
+         rewards_multiplier_max: rewards_multiplier_max,
+         rewards_multiplier_under: rewards_multiplier_under,
+         rewards_multiplier_over: rewards_multiplier_over,
+         target_voting_yield: target_voting_yield,
+         target_voting_yield_max: target_voting_yield_max,
+         target_voting_yield_adjustment_factor: target_voting_yield_adjustment_factor,
+         target_voting_fraction: target_voting_fraction,
+         voting_fraction: voting_fraction,
+         total_locked_gold: total_locked_gold,
+         total_non_voting: total_non_voting,
+         total_votes: total_votes,
+         electable_validators_max: electable_validators_max,
+         reserve_gold_balance: reserve_gold_balance,
+         gold_total_supply: gold_total_supply,
+         stable_usd_total_supply: stable_usd_total_supply
+       }}
     else
       _ -> :error
     end

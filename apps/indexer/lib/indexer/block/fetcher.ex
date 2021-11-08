@@ -332,7 +332,7 @@ defmodule Indexer.Block.Fetcher do
 
       async_import_celo_validators(%{celo_validators: %{params: celo_validators}})
       # TODO: remove
-#      async_import_celo_voter_rewards(%{celo_voter_rewards: %{params: celo_voter_rewards}})
+      #      async_import_celo_voter_rewards(%{celo_voter_rewards: %{params: celo_voter_rewards}})
       async_import_celo_validator_groups(%{celo_validator_groups: %{params: celo_validator_groups}})
       async_import_celo_voters(%{celo_voters: %{params: celo_voters}})
       async_import_celo_validator_history(range)

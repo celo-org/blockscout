@@ -53,6 +53,94 @@ defmodule Indexer.Fetcher.CeloVoterRewardsTest do
     } do
       block_quantity = integer_to_quantity(block_number)
 
+      # getting the EpochRewards contract
+      expect(EthereumJSONRPC.Mox, :json_rpc, 7, fn [
+                                                     %{
+                                                       id: id,
+                                                       jsonrpc: "2.0",
+                                                       method: "eth_call",
+                                                       params: [
+                                                         %{
+                                                           data:
+                                                             "0x853db3230000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000c45706f6368526577617264730000000000000000000000000000000000000000",
+                                                           to: "0x000000000000000000000000000000000000ce10"
+                                                         },
+                                                         _
+                                                       ]
+                                                     }
+                                                   ],
+                                                   _ ->
+        {
+          :ok,
+          [
+            %{
+              id: id,
+              jsonrpc: "2.0",
+              result: "0x00000000000000000000000007f007d389883622ef8d4d347b3f78007f28d8b7"
+            }
+          ]
+        }
+      end)
+
+      # getting the LockedGold contract
+      expect(EthereumJSONRPC.Mox, :json_rpc, 2, fn [
+                                                     %{
+                                                       id: id,
+                                                       jsonrpc: "2.0",
+                                                       method: "eth_call",
+                                                       params: [
+                                                         %{
+                                                           data:
+                                                             "0x853db3230000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000a4c6f636b6564476f6c6400000000000000000000000000000000000000000000",
+                                                           to: "0x000000000000000000000000000000000000ce10"
+                                                         },
+                                                         _
+                                                       ]
+                                                     }
+                                                   ],
+                                                   _ ->
+        {
+          :ok,
+          [
+            %{
+              id: id,
+              jsonrpc: "2.0",
+              result: "0x0000000000000000000000006cc083aed9e3ebe302a6336dbc7c921c9f03349e"
+            }
+          ]
+        }
+      end)
+
+      # getting the Election contract
+      expect(EthereumJSONRPC.Mox, :json_rpc, 2, fn [
+                                                     %{
+                                                       id: id,
+                                                       jsonrpc: "2.0",
+                                                       method: "eth_call",
+                                                       params: [
+                                                         %{
+                                                           data:
+                                                             "0x853db32300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000008456c656374696f6e000000000000000000000000000000000000000000000000",
+                                                           to: "0x000000000000000000000000000000000000ce10"
+                                                         },
+                                                         _
+                                                       ]
+                                                     }
+                                                   ],
+                                                   _ ->
+        {
+          :ok,
+          [
+            %{
+              id: id,
+              jsonrpc: "2.0",
+              result: "0x0000000000000000000000008d6677192144292870907e3fa8a5527fe55a7ff6"
+            }
+          ]
+        }
+      end)
+
+      # getting the Reserve contract
       expect(EthereumJSONRPC.Mox, :json_rpc, fn [
                                                   %{
                                                     id: id,
@@ -60,7 +148,8 @@ defmodule Indexer.Fetcher.CeloVoterRewardsTest do
                                                     method: "eth_call",
                                                     params: [
                                                       %{
-                                                        data: "0x853db3230000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000c45706f6368526577617264730000000000000000000000000000000000000000",
+                                                        data:
+                                                          "0x853db323000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000075265736572766500000000000000000000000000000000000000000000000000",
                                                         to: "0x000000000000000000000000000000000000ce10"
                                                       },
                                                       _
@@ -74,18 +163,26 @@ defmodule Indexer.Fetcher.CeloVoterRewardsTest do
             %{
               id: id,
               jsonrpc: "2.0",
-              result: "0x00000000000000000000000007f007d389883622ef8d4d347b3f78007f28d8b7"
+              result: "0x0000000000000000000000009380fa34fd9e4fd14c06305fd7b6199089ed4eb9"
             }
           ]
         }
       end)
 
+      # getting the GoldToken contract
       expect(EthereumJSONRPC.Mox, :json_rpc, fn [
                                                   %{
                                                     id: id,
                                                     jsonrpc: "2.0",
                                                     method: "eth_call",
-                                                    params: [%{data: "0x64347043", to: _}, _]
+                                                    params: [
+                                                      %{
+                                                        data:
+                                                          "0x853db32300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000009476f6c64546f6b656e0000000000000000000000000000000000000000000000",
+                                                        to: "0x000000000000000000000000000000000000ce10"
+                                                      },
+                                                      _
+                                                    ]
                                                   }
                                                 ],
                                                 _ ->
@@ -95,14 +192,279 @@ defmodule Indexer.Fetcher.CeloVoterRewardsTest do
             %{
               id: id,
               jsonrpc: "2.0",
-              result: "0x00000000000000000000000000000000000000000000000b24d1d64bfe92e4b100000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000f1c59e289d2d46d8f4000000000000000000000000000000000000000000000000f793108be48879b3"
+              result: "0x000000000000000000000000471ece3750da237f93b8e339c536989b8978a438"
             }
           ]
         }
       end)
 
-      assert [%{address_hash: %Explorer.Chain.Hash{byte_count: 20, bytes: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2>>}, block_number: 0, carbon_offsetting_target_epoch_rewards: 17839620741965314483, community_target_epoch_rewards: 4459905185491328620788, retries_count: 0, validator_target_epoch_rewards: 205567322088184931505, voter_target_epoch_rewards: 0}]
-             = CeloVoterRewards.fetch_from_blockchain([%{address_hash: address_hash(), block_number: block_number, retries_count: 0}])
+      # getting the StableToken contract
+      expect(EthereumJSONRPC.Mox, :json_rpc, fn [
+                                                  %{
+                                                    id: id,
+                                                    jsonrpc: "2.0",
+                                                    method: "eth_call",
+                                                    params: [
+                                                      %{
+                                                        data:
+                                                          "0x853db3230000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000b537461626c65546f6b656e000000000000000000000000000000000000000000",
+                                                        to: "0x000000000000000000000000000000000000ce10"
+                                                      },
+                                                      _
+                                                    ]
+                                                  }
+                                                ],
+                                                _ ->
+        {
+          :ok,
+          [
+            %{
+              id: id,
+              jsonrpc: "2.0",
+              result: "0x000000000000000000000000765de816845861e75a25fca122bb6898b8b1282a"
+            }
+          ]
+        }
+      end)
+
+      expect(
+        EthereumJSONRPC.Mox,
+        :json_rpc,
+        # calculateTargetEpochRewards
+        # getTargetGoldTotalSupply
+        # getRewardsMultiplier
+        # getRewardsMultiplierParameters
+        # getTargetVotingYieldParameters
+        # getTargetVotingGoldFraction
+        # getVotingGoldFraction
+        # getTotalLockedGold
+        # getNonvotingLockedGold
+        # getTotalVotes
+        # getElectableValidators
+        # getReserveGoldBalance
+        # goldTotalSupply
+        # stableUSDTotalSupply
+        fn [
+             %{
+               id: id_0,
+               jsonrpc: "2.0",
+               method: "eth_call",
+               params: [%{data: "0x64347043", to: _}, _]
+             },
+             %{
+               id: id_1,
+               jsonrpc: "2.0",
+               method: "eth_call",
+               params: [%{data: "0x5049890f", to: _}, _]
+             },
+             %{
+               id: id_2,
+               jsonrpc: "2.0",
+               method: "eth_call",
+               params: [%{data: "0x0203ab24", to: _}, _]
+             },
+             %{
+               id: id_3,
+               jsonrpc: "2.0",
+               method: "eth_call",
+               params: [%{data: "0x5f396e48", to: _}, _]
+             },
+             %{
+               id: id_4,
+               jsonrpc: "2.0",
+               method: "eth_call",
+               params: [%{data: "0x171af90f", to: _}, _]
+             },
+             %{
+               id: id_5,
+               jsonrpc: "2.0",
+               method: "eth_call",
+               params: [%{data: "0xae098de2", to: _}, _]
+             },
+             %{
+               id: id_6,
+               jsonrpc: "2.0",
+               method: "eth_call",
+               params: [%{data: "0xa1b95962", to: _}, _]
+             },
+             %{
+               id: id_7,
+               jsonrpc: "2.0",
+               method: "eth_call",
+               params: [%{data: "0x30a61d59", to: _}, _]
+             },
+             %{
+               id: id_8,
+               jsonrpc: "2.0",
+               method: "eth_call",
+               params: [%{data: "0x807876b7", to: _}, _]
+             },
+             %{
+               id: id_9,
+               jsonrpc: "2.0",
+               method: "eth_call",
+               params: [%{data: "0x9a0e7d66", to: _}, _]
+             },
+             %{
+               id: id_10,
+               jsonrpc: "2.0",
+               method: "eth_call",
+               params: [%{data: "0xf9f41a7a", to: _}, _]
+             },
+             %{
+               id: id_11,
+               jsonrpc: "2.0",
+               method: "eth_call",
+               params: [%{data: "0x8d9a5e6f", to: _}, _]
+             },
+             %{
+               id: id_12,
+               jsonrpc: "2.0",
+               method: "eth_call",
+               params: [%{data: "0x18160ddd", to: "0x471ece3750da237f93b8e339c536989b8978a438"}, _]
+             },
+             %{
+               id: id_13,
+               jsonrpc: "2.0",
+               method: "eth_call",
+               params: [%{data: "0x18160ddd", to: "0x765de816845861e75a25fca122bb6898b8b1282a"}, _]
+             }
+           ],
+           _ ->
+          {
+            :ok,
+            [
+              # calculateTargetEpochRewards
+              %{
+                id: id_0,
+                jsonrpc: "2.0",
+                result:
+                  "0x00000000000000000000000000000000000000000000000b25b7389d6e6f8233000000000000000000000000000000000000000000000583d67889a223c1b9ab00000000000000000000000000000000000000000000034b50882b7adf687bd70000000000000000000000000000000000000000000000035f8ddb4f56e8ddad"
+              },
+              # getTargetGoldTotalSupply
+              %{
+                id: id_1,
+                jsonrpc: "2.0",
+                result: "0x000000000000000000000000000000000000000001f12657ea8a3cbb0ff9aa5d"
+              },
+              # getRewardsMultiplier
+              %{
+                id: id_2,
+                jsonrpc: "2.0",
+                result: "0x00000000000000000000000000000000000000000000d3ea531c462b6d289800"
+              },
+              # getRewardsMultiplierParameters
+              %{
+                id: id_3,
+                jsonrpc: "2.0",
+                result:
+                  "0x00000000000000000000000000000000000000000001a784379d99db420000000000000000000000000000000000000000000000000069e10de76676d08000000000000000000000000000000000000000000000000422ca8b0a00a425000000"
+              },
+              # getTargetVotingYieldParameters
+              %{
+                id: id_4,
+                jsonrpc: "2.0",
+                result:
+                  "0x000000000000000000000000000000000000000000000008ac7230489e80000000000000000000000000000000000000000000000000001b1ae4d6e2ef5000000000000000000000000000000000000000000000000000000000000000000000"
+              },
+              # getTargetVotingGoldFraction
+              %{
+                id: id_5,
+                jsonrpc: "2.0",
+                result: "0x0000000000000000000000000000000000000000000069e10de76676d0800000"
+              },
+              # getVotingGoldFraction
+              %{
+                id: id_6,
+                jsonrpc: "2.0",
+                result: "0x0000000000000000000000000000000000000000000056e297f4f13e205a7f52"
+              },
+              # getTotalLockedGold
+              %{
+                id: id_7,
+                jsonrpc: "2.0",
+                result: "0x000000000000000000000000000000000000000001059ec802d92a296076aedb"
+              },
+              # getNonvotingLockedGold
+              %{
+                id: id_8,
+                jsonrpc: "2.0",
+                result: "0x00000000000000000000000000000000000000000012bb087e1546063ebff82e"
+              },
+              # getTotalVotes
+              %{
+                id: id_9,
+                jsonrpc: "2.0",
+                result: "0x000000000000000000000000000000000000000000f2e3bf84c3e42321b6b6ad"
+              },
+              # getElectableValidators
+              %{
+                id: id_10,
+                jsonrpc: "2.0",
+                result:
+                  "0x0000000000000000000000000000000000000000000000000000000000000016000000000000000000000000000000000000000000000000000000000000006e"
+              },
+              # getReserveGoldBalance
+              %{
+                id: id_11,
+                jsonrpc: "2.0",
+                result: "0x0000000000000000000000000000000000000000005f563e55a0348825d9cb68"
+              },
+              # goldTotalSupply
+              %{
+                id: id_12,
+                jsonrpc: "2.0",
+                result: "0x000000000000000000000000000000000000000001f09bd2274f90dfe61df4d1"
+              },
+              # stableUSDTotalSupply
+              %{
+                id: id_13,
+                jsonrpc: "2.0",
+                result: "0x00000000000000000000000000000000000000000004498a2f3c39c0d4b5ebd9"
+              }
+            ]
+          }
+        end
+      )
+
+      fetched =
+        CeloVoterRewards.fetch_from_blockchain([
+          %{address_hash: address_hash(), block_number: block_number, retries_count: 0}
+        ])
+
+      IO.inspect(fetched)
+
+      assert [
+               %{
+                 address_hash: %Explorer.Chain.Hash{
+                   byte_count: 20,
+                   bytes: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2>>
+                 },
+                 block_number: 0,
+                 carbon_offsetting_target_epoch_rewards: 62_225_632_760_255_012_269,
+                 community_target_epoch_rewards: 15_556_408_190_063_753_067_479,
+                 retries_count: 0,
+                 validator_target_epoch_rewards: 205_631_887_959_760_273_971,
+                 voter_target_epoch_rewards: 26_043_810_141_454_976_793_003,
+                 target_total_supply: 601_017_204_041_941_484_863_859_293,
+                 rewards_multiplier: 1_000_741_854_737_500_000_000_000,
+                 rewards_multiplier_max: 2_000_000_000_000_000_000_000_000,
+                 rewards_multiplier_under: 500_000_000_000_000_000_000_000,
+                 rewards_multiplier_over: 5_000_000_000_000_000_000_000_000,
+                 target_voting_yield: 160_000_000_000_000_000_000,
+                 target_voting_yield_adjustment_factor: 0,
+                 target_voting_yield_max: 500_000_000_000_000_000_000,
+                 target_voting_fraction: 500_000_000_000_000_000_000_000,
+                 voting_fraction: 410_303_431_329_291_024_629_586,
+                 total_locked_gold: 316_279_462_377_767_975_674_883_803,
+                 total_non_voting: 22_643_903_944_557_354_402_445_358,
+                 total_votes: 293_635_558_433_210_621_272_438_445,
+                 electable_validators_max: 110,
+                 reserve_gold_balance: 115_255_226_249_038_379_930_471_272,
+                 gold_total_supply: 600_363_049_982_598_326_620_386_513,
+                 stable_usd_total_supply: 5_182_985_086_049_091_467_996_121
+               }
+             ] == fetched
     end
   end
 
