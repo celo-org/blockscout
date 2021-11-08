@@ -19,3 +19,6 @@ Mox.defmock(Explorer.Market.History.Source.TestSource, for: Explorer.Market.Hist
 Mox.defmock(Explorer.History.TestHistorian, for: Explorer.History.Historian)
 
 Mox.defmock(EthereumJSONRPC.Mox, for: EthereumJSONRPC.Transport)
+
+Mox.defmock(Explorer.Celo.AddressCache.Mock, for: Explorer.Celo.AddressCache)
+Mox.stub(Explorer.Celo.AddressCache.Mock, :contract_address, fn name -> name end)

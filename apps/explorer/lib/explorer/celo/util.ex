@@ -4,7 +4,7 @@ defmodule Explorer.Celo.Util do
   """
 
   require Logger
-  alias Explorer.Celo.{AbiHandler, CoreContracts}
+  alias Explorer.Celo.{AbiHandler, AddressCache}
   alias Explorer.SmartContract.Reader
 
   @celo_token_contract_symbols %{
@@ -57,7 +57,7 @@ defmodule Explorer.Celo.Util do
   defp contract(:eur), do: get_address("StableTokenEUR")
 
   def get_address(name) do
-    CoreContracts.contract_address(name)
+    {:ok, AddressCache.contract_address(name)}
   end
 
   def get_token_contract_names do
