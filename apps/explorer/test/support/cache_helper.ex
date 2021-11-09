@@ -4,7 +4,7 @@ defmodule Explorer.Celo.CacheHelper do
   end
 
   def set_test_addresses(names_to_addresses = %{}) do
-    Explorer.Celo.AddressCache.Mock |> Mox.stub(:contract_address, fn name -> IO.inspect(name); names_to_addresses[name] end)
+    Explorer.Celo.AddressCache.Mock |> Mox.stub(:contract_address, fn name -> names_to_addresses[name] end)
   end
 
   def empty_address_cache() do
