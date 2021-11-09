@@ -3,6 +3,7 @@ defmodule Indexer.Block.Realtime.FetcherTest do
   use Explorer.DataCase
 
   import Mox
+  import Explorer.Celo.CacheHelper
 
   alias Explorer.Chain
   alias Explorer.Chain.{Address, Transaction}
@@ -64,7 +65,7 @@ defmodule Indexer.Block.Realtime.FetcherTest do
       celo_token_address = insert(:contract_address)
       insert(:token, contract_address: celo_token_address)
 
-      Mox.stub(Explorer.Celo.AddressCache.Mock, :contract_address, fn _name -> to_string(celo_token_address.hash) end)
+      set_test_address(to_string(celo_token_address.hash))
 
       {:ok, sequence} = Sequence.start_link(ranges: [], step: 2)
       Sequence.cap(sequence)
