@@ -94,23 +94,16 @@ defmodule Explorer.Tags.AddressTag.Cataloger do
   end
 
   defp set_tag_for_single_env_var_address(env_var, tag) do
-    IO.inspect(env_var)
-    IO.inspect(tag)
-
     address =
       env_var
       |> System.get_env("")
       |> String.downcase()
 
     tag_id = AddressTag.get_tag_id(tag)
-    IO.inspect(tag_id)
     AddressToTag.set_tag_to_addresses(tag_id, [address])
   end
 
   defp set_tag_for_multiple_env_var_addresses(env_vars, tag) do
-    IO.inspect(env_vars)
-    IO.inspect(tag)
-
     addresses =
       env_vars
       |> Enum.map(fn env_var ->
@@ -120,14 +113,10 @@ defmodule Explorer.Tags.AddressTag.Cataloger do
       end)
 
     tag_id = AddressTag.get_tag_id(tag)
-    IO.inspect(tag_id)
     AddressToTag.set_tag_to_addresses(tag_id, addresses)
   end
 
   defp set_tag_for_env_var_multiple_addresses(env_var, tag) do
-    IO.inspect(env_var)
-    IO.inspect(tag)
-
     addresses =
       env_var
       |> System.get_env("")
@@ -138,7 +127,6 @@ defmodule Explorer.Tags.AddressTag.Cataloger do
       end)
 
     tag_id = AddressTag.get_tag_id(tag)
-    IO.inspect(tag_id)
     AddressToTag.set_tag_to_addresses(tag_id, addresses)
   end
 
