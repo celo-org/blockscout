@@ -5,6 +5,7 @@ defmodule Indexer.Block.FetcherTest do
 
   import Mox
   import EthereumJSONRPC, only: [integer_to_quantity: 1]
+  import Explorer.Celo.CacheHelper
 
   alias Explorer.Chain
   alias Explorer.Chain.{Address, PendingCelo, Log, Transaction, Wei}
@@ -283,7 +284,8 @@ defmodule Indexer.Block.FetcherTest do
     } do
       celo_token_address = insert(:contract_address)
       insert(:token, contract_address: celo_token_address)
-      "0x" <> unprefixed_celo_token_address_hash = to_string(celo_token_address.hash)
+
+      set_test_address(to_string(celo_token_address.hash))
 
       block_number = @first_full_block_number
 
@@ -300,7 +302,6 @@ defmodule Indexer.Block.FetcherTest do
               from_address_hash,
               to_address_hash,
               transaction_hash,
-              unprefixed_celo_token_address_hash,
               16
             )
 
@@ -619,7 +620,7 @@ defmodule Indexer.Block.FetcherTest do
     } do
       celo_token_address = insert(:contract_address)
       insert(:token, contract_address: celo_token_address)
-      "0x" <> unprefixed_celo_token_address_hash = to_string(celo_token_address.hash)
+      set_test_address(to_string(celo_token_address.hash))
 
       block_number = 7_374_455
 
@@ -790,7 +791,6 @@ defmodule Indexer.Block.FetcherTest do
          from_address_hash,
          to_address_hash,
          transaction_hash,
-         unprefixed_celo_token_address_hash,
          call_json_rpc_times
        ) do
     EthereumJSONRPC.Mox
@@ -945,16 +945,6 @@ defmodule Indexer.Block.FetcherTest do
         %{id: id, method: "eth_getBalance", params: [_, ^block_quantity]} ->
           {:ok, [%{id: id, jsonrpc: "2.0", result: "0x1"}]}
 
-        %{id: id, method: "eth_call"} ->
-          {:ok,
-           [
-             %{
-               id: id,
-               jsonrpc: "2.0",
-               result: "0x000000000000000000000000" <> unprefixed_celo_token_address_hash
-             }
-           ]}
-
         %{id: id, method: "trace_replayBlockTransactions", params: [^block_quantity, ["trace"]]} ->
           {:ok,
            [
@@ -990,17 +980,6 @@ defmodule Indexer.Block.FetcherTest do
 
         %{id: id, method: "trace_block", params: [^block_quantity]} ->
           {:ok, [%{id: id, result: []}]}
-
-        # read_addresses for 4 smart contracts in the fetcher
-        %{id: id, method: "eth_call"} ->
-          {:ok,
-           [
-             %{
-               jsonrpc: "2.0",
-               id: id,
-               result: "0x000000000000000000000000" <> unprefixed_celo_token_address_hash
-             }
-           ]}
 
         %{
           id: id,
