@@ -97,6 +97,7 @@ defmodule Explorer.Application do
       configure(Explorer.Counters.Bridge),
       configure(Explorer.Validator.MetadataProcessor),
       configure(Explorer.Staking.ContractState),
+      configure(Explorer.Tags.AddressTag.Cataloger),
       configure(MinMissingBlockNumber)
     ]
     |> List.flatten()

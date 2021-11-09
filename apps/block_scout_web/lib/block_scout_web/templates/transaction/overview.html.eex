@@ -48,6 +48,7 @@
             <div style="display: inline-block; vertical-align: bottom; line-height: 25px;">
               <%= gettext "Transaction Details" %>
             </div>
+            <%= render BlockScoutWeb.AddressView, "_labels.html", address_hash: @transaction.to_address_hash %>
           </h1>
           <%= if status == :pending do %>
             <div class="tile tile-muted d-flex justify-content-center align-items-center mb-4">

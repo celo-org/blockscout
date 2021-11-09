@@ -7,17 +7,27 @@ defmodule BlockScoutWeb.Tokens.OverviewView do
 
   alias BlockScoutWeb.{AccessHelpers, CurrencyHelpers, LayoutView}
 
-  import BlockScoutWeb.AddressView, only: [from_address_hash: 1]
+  import BlockScoutWeb.AddressView, only: [from_address_hash: 1, is_test?: 1]
 
   @tabs ["token-transfers", "token-holders", "read-contract", "inventory"]
   @etherscan_token_link "https://etherscan.io/token/"
   @blockscout_base_link "https://blockscout.com/"
+
+  @honey_token "0x71850b7e9ee3f13ab46d67167341e4bdc905eef9"
 
   def decimals?(%Token{decimals: nil}), do: false
   def decimals?(%Token{decimals: _}), do: true
 
   def token_name?(%Token{name: nil}), do: false
   def token_name?(%Token{name: _}), do: true
+
+  def token_display_name(token) do
+    if token.bridged do
+      Chain.token_display_name_based_on_bridge_destination(token.name, token.foreign_chain_id)
+    else
+      token.name
+    end
+  end
 
   def total_supply?(%Token{total_supply: nil}), do: false
   def total_supply?(%Token{total_supply: _}), do: true
@@ -44,6 +54,7 @@ defmodule BlockScoutWeb.Tokens.OverviewView do
   defp tab_name(["inventory"]), do: gettext("Inventory")
 
   def display_inventory?(%Token{type: "ERC-721"}), do: true
+  def display_inventory?(%Token{type: "ERC-1155"}), do: true
   def display_inventory?(_), do: false
 
   def smart_contract_with_read_only_functions?(
@@ -58,12 +69,29 @@ defmodule BlockScoutWeb.Tokens.OverviewView do
   Get the total value of the token supply in USD.
   """
   def total_supply_usd(token) do
-    if token.custom_cap do
+    if Map.has_key?(token, :custom_cap) && token.custom_cap do
       token.custom_cap
     else
       tokens = CurrencyHelpers.divide_decimals(token.total_supply, token.decimals)
       price = token.usd_value
       Decimal.mult(tokens, price)
+    end
+  end
+
+  def custom_token?(contract_address) do
+    contract_address_lower = "0x" <> Base.encode16(contract_address.bytes, case: :lower)
+
+    case contract_address_lower do
+      @honey_token -> true
+      _ -> false
+    end
+  end
+
+  def custom_token_icon(contract_address) do
+    contract_address_lower = "0x" <> Base.encode16(contract_address.bytes, case: :lower)
+
+    case contract_address_lower do
+      _ -> ""
     end
   end
 

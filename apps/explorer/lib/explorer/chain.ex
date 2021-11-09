@@ -95,6 +95,7 @@ defmodule Explorer.Chain do
   alias Explorer.Market.MarketHistoryCache
   alias Explorer.{PagingOptions, Repo}
   alias Explorer.SmartContract.Reader
+  alias Explorer.Tags.{AddressTag, AddressToTag}
   alias Explorer.Staking.ContractState
 
   alias Dataloader.Ecto, as: DataloaderEcto
@@ -1262,6 +1263,32 @@ defmodule Explorer.Chain do
     end
   end
 
+  def search_label_query(term) do
+    inner_query =
+      from(tag in AddressTag,
+        where: fragment("to_tsvector('english', label ) @@ to_tsquery(?)", ^term),
+        select: tag
+      )
+
+    from(att in AddressToTag,
+      inner_join: at in subquery(inner_query),
+      on: att.tag_id == at.id,
+      select: %{
+        address_hash: att.address_hash,
+        tx_hash: fragment("CAST(NULL AS bytea)"),
+        block_hash: fragment("CAST(NULL AS bytea)"),
+        foreign_token_hash: fragment("CAST(NULL AS bytea)"),
+        foreign_chain_id: ^nil,
+        type: "label",
+        name: at.label,
+        symbol: ^nil,
+        holder_count: ^nil,
+        inserted_at: att.inserted_at,
+        block_number: 0
+      }
+    )
+  end
+
   defp search_token_query(term) do
     from(token in Token,
       left_join: bridged in BridgedToken,
@@ -1515,6 +1542,34 @@ defmodule Explorer.Chain do
               type: "contract"
             },
             order_by: [desc: smart_contract.inserted_at]
+          )
+
+        Repo.all(query)
+
+      _ ->
+        []
+    end
+  end
+
+  @spec search_label(String.t()) :: [Map.t()]
+  def search_label(string) do
+    case prepare_search_term(string) do
+      {:some, term} ->
+        inner_query =
+          from(tag in AddressTag,
+            where: fragment("to_tsvector('english', label ) @@ to_tsquery(?)", ^term),
+            select: tag
+          )
+
+        query =
+          from(att in AddressToTag,
+            inner_join: at in subquery(inner_query),
+            on: att.tag_id == at.id,
+            select: %{
+              contract_address_hash: att.address_hash,
+              name: at.label,
+              type: "label"
+            }
           )
 
         Repo.all(query)
@@ -2408,7 +2463,7 @@ defmodule Explorer.Chain do
     query =
       if filter && filter !== "" do
         base_query_with_paging
-        |> where(fragment("to_tsvector('english', symbol || ' ' || name ) @@ to_tsquery(?)", ^filter))
+        |> where(fragment("to_tsvector('english', symbol || ' ' || name ) @@ plainto_tsquery(?)", ^filter))
       else
         base_query_with_paging
       end
@@ -7605,6 +7660,47 @@ defmodule Explorer.Chain do
     |> Repo.one()
   end
 
+  def moon_token?(contract_address) do
+    reddit_token?(contract_address, :moon_token_addresses)
+  end
+
+  def bricks_token?(contract_address) do
+    reddit_token?(contract_address, :bricks_token_addresses)
+  end
+
+  defp reddit_token?(contract_address, _env_var) when is_nil(contract_address), do: false
+
+  defp reddit_token?(contract_address, env_var) when not is_nil(contract_address) do
+    token_addresses_string = Application.get_env(:block_scout_web, env_var)
+    contract_address_lower = Base.encode16(contract_address.bytes, case: :lower)
+
+    if token_addresses_string do
+      token_addresses =
+        try do
+          token_addresses_string
+          |> String.downcase()
+          |> String.split(",")
+        rescue
+          _ ->
+            []
+        end
+
+      token_addresses
+      |> Enum.any?(fn token ->
+        token == "0x" <> contract_address_lower
+      end)
+    else
+      false
+    end
+  end
+
+  def total_gas(gas_items) do
+    gas_items
+    |> Enum.reduce(Decimal.new(0), fn gas_item, acc ->
+      if gas_item.total_gas, do: Decimal.add(acc, gas_item.total_gas), else: acc
+    end)
+  end
+
   def bridged_tokens_enabled? do
     eth_omni_bridge_mediator = Application.get_env(:block_scout_web, :eth_omni_bridge_mediator)
     bsc_omni_bridge_mediator = Application.get_env(:block_scout_web, :bsc_omni_bridge_mediator)
@@ -7643,6 +7739,24 @@ defmodule Explorer.Chain do
     end
   end
 
+  @spec is_active_validator?(Address.t()) :: boolean()
+  def is_active_validator?(address_hash) do
+    now = Timex.now()
+
+    one_hour_before =
+      now
+      |> Timex.shift(hours: -1)
+
+    query =
+      from(
+        b in Block,
+        where: b.miner_hash == ^address_hash,
+        where: b.inserted_at >= ^one_hour_before
+      )
+
+    Repo.exists?(query)
+  end
+
   @doc """
   It is used by `totalfees` API endpoint of `stats` module for retrieving of total fee per day
   """
@@ -7663,6 +7777,136 @@ defmodule Explorer.Chain do
       _ ->
         {:error, "An incorrect input date provided. It should be in ISO 8601 format (yyyy-mm-dd)."}
     end
+  end
+
+  def chain_id_full_display_name(nil), do: ""
+
+  def chain_id_full_display_name(chain_id) do
+    chain_id_int =
+      if is_integer(chain_id) do
+        chain_id
+      else
+        chain_id
+        |> Decimal.to_integer()
+      end
+
+    case chain_id_int do
+      1 -> "Ethereum"
+      56 -> "BSC"
+      99 -> "POA"
+      _ -> ""
+    end
+  end
+
+  @spec is_active_validator?(Address.t()) :: boolean()
+  def is_active_validator?(address_hash) do
+    now = Timex.now()
+
+    one_hour_before =
+      now
+      |> Timex.shift(hours: -1)
+
+    query =
+      from(
+        b in Block,
+        where: b.miner_hash == ^address_hash,
+        where: b.inserted_at >= ^one_hour_before
+      )
+
+    Repo.exists?(query)
+  end
+
+  @spec amb_eth_tx?(Address.t()) :: boolean()
+  def amb_eth_tx?(hash) do
+    # "0x59a9a802" - TokensBridgingInitiated(address indexed token, address indexed sender, uint256 value, bytes32 indexed messageId)
+
+    eth_omni_bridge_mediator = String.downcase(System.get_env("ETH_OMNI_BRIDGE_MEDIATOR", ""))
+
+    if eth_omni_bridge_mediator == "" do
+      false
+    else
+      Repo.exists?(
+        from(
+          l in Log,
+          where: l.transaction_hash == ^hash,
+          where: fragment("first_topic like '0x59a9a802%'"),
+          where: l.address_hash == ^eth_omni_bridge_mediator
+        )
+      )
+    end
+  end
+
+  @spec amb_bsc_tx?(Address.t()) :: boolean()
+  def amb_bsc_tx?(hash) do
+    # "0x59a9a802" - TokensBridgingInitiated(address indexed token, address indexed sender, uint256 value, bytes32 indexed messageId)
+
+    bsc_omni_bridge_mediator = String.downcase(System.get_env("BSC_OMNI_BRIDGE_MEDIATOR", ""))
+
+    if bsc_omni_bridge_mediator == "" do
+      false
+    else
+      Repo.exists?(
+        from(
+          l in Log,
+          where: l.transaction_hash == ^hash,
+          where: fragment("first_topic like '0x59a9a802%'"),
+          where: l.address_hash == ^bsc_omni_bridge_mediator
+        )
+      )
+    end
+  end
+
+  @spec amb_poa_tx?(Address.t()) :: boolean()
+  def amb_poa_tx?(hash) do
+    # "0x59a9a802" - TokensBridgingInitiated(address indexed token, address indexed sender, uint256 value, bytes32 indexed messageId)
+
+    poa_omni_bridge_mediator = String.downcase(System.get_env("POA_OMNI_BRIDGE_MEDIATOR", ""))
+
+    if poa_omni_bridge_mediator == "" do
+      false
+    else
+      Repo.exists?(
+        from(
+          l in Log,
+          where: l.transaction_hash == ^hash,
+          where: fragment("first_topic like '0x59a9a802%'"),
+          where: l.address_hash == ^poa_omni_bridge_mediator
+        )
+      )
+    end
+  end
+
+  def token_display_name_based_on_bridge_destination(name, foreign_chain_id) do
+    cond do
+      Decimal.cmp(foreign_chain_id, 1) == :eq ->
+        name
+        |> String.replace("on xDai", "from Ethereum")
+
+      Decimal.cmp(foreign_chain_id, 56) == :eq ->
+        name
+        |> String.replace("on xDai", "from BSC")
+
+      true ->
+        name
+    end
+  end
+
+  def token_display_name_based_on_bridge_destination(name, symbol, foreign_chain_id) do
+    token_name =
+      cond do
+        Decimal.cmp(foreign_chain_id, 1) == :eq ->
+          name
+          |> String.replace("on xDai", "from Ethereum")
+
+        Decimal.cmp(foreign_chain_id, 56) == :eq ->
+          name
+          |> String.replace("on xDai", "from BSC")
+
+        true ->
+          name
+      end
+
+    "#{token_name} (#{symbol})"
   end
 
   @spec get_token_transfer_type(TokenTransfer.t()) ::

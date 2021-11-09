@@ -25,6 +25,7 @@
         <%= if method_name do %>
           <%= render BlockScoutWeb.FormView, "_tag.html", text: method_name, additional_classes: ["method", "ml-1"] %>
         <% end %>
+        <%= render BlockScoutWeb.AddressView, "_labels.html", address_hash: @transaction.to_address_hash, height_auto: true %>
       </div>
       </span>
       <span>

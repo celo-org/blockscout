@@ -19,6 +19,10 @@
         background: #6ca1e2;
         color: #fff;
     }
+    &.test {
+        background: rgb(219, 79, 79);
+        color: #fff;
+    }
     &.destination-eth {
         background: #253358;
         color: #fff;
@@ -31,12 +35,52 @@
         background: #153550;
         color: #fff;
     }
-    &.bridged {
+    &.bridge {
         background: #70aee3;
         color: #fff;
     }
     &.validator {
         background: $primary;
+        color: #fff;
+    }
+    &.faucet {
+        background: #2555da;
+        color: #fff;
+    }
+    &.contract {
+        background: $dark-purple;
+        color: #fff;
+    }
+    &.eoa {
+        background: #007bff;
+        color: #fff;
+    }
+    &.proxy {
+        background: #2a9e51;
+        color: #fff;
+    }
+    &.token {
+        background: #5d26c4;
+        color: #fff;
+    }
+    &.random {
+        background: #db5959;
+        color: #fff;
+    }
+    &.df {
+        background: #75f94d;
+        color: #fff;
+    }
+    &.perp-fi {
+        background: #050505;
+        color: #77e6af;
+    }
+    &.hopr {
+        background: #fffdab;
+        color: #414141;
+    }
+    &.component {
+        background: #61749e;
         color: #fff;
     }
     &.secondary {
