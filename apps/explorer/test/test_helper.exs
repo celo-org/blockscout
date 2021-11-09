@@ -19,4 +19,3 @@ Mox.defmock(Explorer.Market.History.Source.TestSource, for: Explorer.Market.Hist
 Mox.defmock(Explorer.History.TestHistorian, for: Explorer.History.Historian)
 
 Mox.defmock(EthereumJSONRPC.Mox, for: EthereumJSONRPC.Transport)
-
