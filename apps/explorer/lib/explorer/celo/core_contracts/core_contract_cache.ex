@@ -90,7 +90,7 @@ defmodule Explorer.Celo.CoreContracts do
   """
   def refresh, do: send(__MODULE__, :refresh)
 
-  #Directly query celo blockchain registry contract for core contract addresses
+  # Directly query celo blockchain registry contract for core contract addresses
   defp get_address_raw(name) do
     contract_abi = AbiHandler.get_abi()
 

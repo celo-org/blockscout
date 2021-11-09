@@ -59,7 +59,7 @@ defmodule Explorer.Celo.Util do
   def get_address(name) do
     case AddressCache.contract_address(name) do
       :error -> {:error}
-      address ->{:ok, address}
+      address -> {:ok, address}
     end
   end
 

@@ -535,7 +535,6 @@ defmodule Indexer.Block.Catchup.FetcherTest do
         [%{id: id, jsonrpc: "2.0", method: "eth_getLogs"}], _options ->
           {:ok, [%{id: id, jsonrpc: "2.0", result: []}]}
 
-
         [%{method: "trace_block", params: [^block_quantity]}], _options ->
           {:error, :boom}
 

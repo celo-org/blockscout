@@ -17,7 +17,6 @@ defmodule Indexer.Fetcher.InternalTransactionTest do
 
   @moduletag [capture_log: true, no_geth: true]
 
-
   test "does not try to fetch pending transactions from Indexer.Fetcher.PendingTransaction", %{
     json_rpc_named_arguments: json_rpc_named_arguments
   } do
@@ -343,6 +342,7 @@ defmodule Indexer.Fetcher.InternalTransactionTest do
       assert %{block_hash: ^empty_block_hash} = Repo.get(PendingBlockOperation, empty_block_hash)
 
       empty_address_cache()
+
       EthereumJSONRPC.Mox
       |> expect(:json_rpc, fn [%{id: id, method: "debug_traceTransaction"}], _options ->
         {:ok,

@@ -285,7 +285,7 @@ defmodule Indexer.Block.FetcherTest do
       celo_token_address = insert(:contract_address)
       insert(:token, contract_address: celo_token_address)
 
-      "0x" <> unprefixed_celo_token_address_hash  = to_string(celo_token_address.hash)
+      "0x" <> unprefixed_celo_token_address_hash = to_string(celo_token_address.hash)
       set_test_address(to_string(celo_token_address.hash))
 
       block_number = @first_full_block_number
@@ -622,7 +622,7 @@ defmodule Indexer.Block.FetcherTest do
     } do
       celo_token_address = insert(:contract_address)
       insert(:token, contract_address: celo_token_address)
-      "0x" <> unprefixed_celo_token_address_hash  = to_string(celo_token_address.hash)
+      "0x" <> unprefixed_celo_token_address_hash = to_string(celo_token_address.hash)
       set_test_address(to_string(celo_token_address.hash))
 
       block_number = 7_374_455
@@ -939,6 +939,7 @@ defmodule Indexer.Block.FetcherTest do
                }
              }
            ]}
+
         # read_addresses for 4 smart contracts in the fetcher
         %{id: id, jsonrpc: "2.0", method: "eth_call"} ->
           %{

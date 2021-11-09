@@ -60,7 +60,6 @@ variant =
     |> String.downcase()
   end
 
-
 config :explorer, Explorer.Celo.AddressCache, Explorer.Celo.AddressCache.Mock
 
 # Import variant specific config. This must remain at the bottom
