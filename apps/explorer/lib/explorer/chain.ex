@@ -95,8 +95,8 @@ defmodule Explorer.Chain do
   alias Explorer.Market.MarketHistoryCache
   alias Explorer.{PagingOptions, Repo}
   alias Explorer.SmartContract.Reader
-  alias Explorer.Tags.{AddressTag, AddressToTag}
   alias Explorer.Staking.ContractState
+  alias Explorer.Tags.{AddressTag, AddressToTag}
 
   alias Dataloader.Ecto, as: DataloaderEcto
 
