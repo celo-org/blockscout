@@ -4,12 +4,13 @@ defmodule Explorer.Celo.Util do
   """
 
   require Logger
-  alias Explorer.Celo.AbiHandler
+  alias Explorer.Celo.{AbiHandler, AddressCache}
   alias Explorer.SmartContract.Reader
 
   @celo_token_contract_symbols %{
     "stableToken" => "cUSD",
     "stableTokenEUR" => "cEUR",
+    "stableTokenREAL" => "cREAL",
     # cGLD is the old symbol, needs to be updated to CELO
     "goldToken" => "cGLD"
   }
@@ -55,36 +56,12 @@ defmodule Explorer.Celo.Util do
   defp contract(:gold), do: get_address("GoldToken")
   defp contract(:usd), do: get_address("StableToken")
   defp contract(:eur), do: get_address("StableTokenEUR")
+  defp contract(:real), do: get_address("StableTokenREAL")
 
   def get_address(name) do
-    case get_address_raw(name) do
-      {:ok, address} -> {:ok, address}
-      _ -> :error
-    end
-  end
-
-  def get_address_raw(name) do
-    contract_abi = AbiHandler.get_abi()
-
-    methods = [
-      %{
-        contract_address: "0x000000000000000000000000000000000000ce10",
-        function_name: "getAddressForString",
-        args: [name]
-      }
-    ]
-
-    res =
-      methods
-      |> Reader.query_contracts_by_name(contract_abi)
-      |> Enum.zip(methods)
-      |> Enum.into(%{}, fn {response, %{function_name: function_name}} ->
-        {function_name, response}
-      end)
-
-    case res["getAddressForString"] do
-      {:ok, [address]} -> {:ok, address}
-      _ -> :error
+    case AddressCache.contract_address(name) do
+      :error -> {:error}
+      address -> {:ok, address}
     end
   end
 
