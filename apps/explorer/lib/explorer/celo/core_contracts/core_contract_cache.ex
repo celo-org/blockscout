@@ -100,6 +100,11 @@ defmodule Explorer.Celo.CoreContracts do
         update_cache(name, address)
         address
 
+      "0x0000000000000000000000000000000000000000" -> #not in registry / not deployed yet, fetch each time until found
+        address = get_address_raw(name)
+        update_cache(name, address)
+        address
+
       address -> address
     end
   end
