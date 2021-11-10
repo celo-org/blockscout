@@ -62,12 +62,20 @@ defmodule Explorer.Celo.CoreContracts do
     cache =
       @core_contracts
       |> Enum.reduce(%{}, fn name, acc ->
-        address = get_address_raw(name)
-        Map.put(acc, name, address)
+        case get_address_raw(name) do
+          :error ->
+            Logger.error("Failed to fetch Celo Contract address for #{name}")
+            acc
+
+          address ->
+            Map.put(acc, name, address)
+        end
       end)
 
     period = Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh]
     timer = Process.send_after(self(), :refresh, period)
+
+    Logger.info("Updated Core Contract addresses")
 
     {:noreply, Map.put(cache, :timer, timer)}
   end
@@ -111,12 +119,12 @@ defmodule Explorer.Celo.CoreContracts do
       end)
 
     case res["getAddressForString"] do
-      {:ok, [address]} -> {:ok, address}
+      {:ok, [address]} -> address
       _ -> :error
     end
   end
 
-  # methods provide initial values only, during runtime values addresses be fetched periodically from the Registry contract
+  # methods provide initial values only, during runtime addresses will be fetched periodically from the Registry contract
   defp cache(:mainnet) do
     %{
       "Accounts" => "0x7d21685c17607338b313a7174bab6620bad0aab7",
