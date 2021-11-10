@@ -95,17 +95,20 @@ defmodule Explorer.Celo.CoreContracts do
   @impl AddressCache
   def contract_address(name) when name in @core_contracts do
     case GenServer.call(__MODULE__, {:get_address, name}) do
-      nil -> #not found in cache, fetch directly
+      # not found in cache, fetch directly
+      nil ->
         address = get_address_raw(name)
         update_cache(name, address)
         address
 
-      "0x0000000000000000000000000000000000000000" -> #not in registry / not deployed yet, fetch each time until found
+      # not in registry / not deployed yet, fetch each time until found
+      "0x0000000000000000000000000000000000000000" ->
         address = get_address_raw(name)
         update_cache(name, address)
         address
 
-      address -> address
+      address ->
+        address
     end
   end
 
