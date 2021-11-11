@@ -7810,5 +7810,4 @@ defmodule Explorer.Chain do
       fetch_epoch_rewards: true
     })
   end
-
 end

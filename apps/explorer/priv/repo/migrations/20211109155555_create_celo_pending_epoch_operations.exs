@@ -7,6 +7,7 @@ defmodule Explorer.Repo.Migrations.CreatePendingBlockOperations do
         null: false,
         primary_key: true
       )
+
       add(:fetch_epoch_rewards, :boolean, null: false)
 
       timestamps(null: false, type: :utc_datetime_usec)

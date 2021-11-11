@@ -5949,7 +5949,9 @@ defmodule Explorer.ChainTest do
 
       Chain.insert_celo_pending_epoch_operations(block.hash)
 
-      %CeloPendingEpochOperation{fetch_epoch_rewards: fetch_epoch_rewards} = Repo.get(CeloPendingEpochOperation, block.hash)
+      %CeloPendingEpochOperation{fetch_epoch_rewards: fetch_epoch_rewards} =
+        Repo.get(CeloPendingEpochOperation, block.hash)
+
       assert fetch_epoch_rewards == true
     end
   end

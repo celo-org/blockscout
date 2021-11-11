@@ -42,7 +42,6 @@ defmodule Indexer.Fetcher.CeloVoterRewardsTest do
       block = insert(:block)
       insert(:celo_pending_epoch_operations, block_hash: block.hash, fetch_epoch_rewards: true)
 
-
       assert CeloVoterRewards.init(
                [],
                fn block_number, acc -> [block_number | acc] end,
