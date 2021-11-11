@@ -140,7 +140,7 @@
               <span class="nav-link-icon">
                 <%= render BlockScoutWeb.IconsView, "_apps_icon.html" %>
               </span>
-            <%= gettext("Apps") %>
+            <%= gettext("More") %>
           </a>
           <div class="dropdown-menu dropdown-menu-apps large" aria-labeledby="navbarAppsDropdown">
             <div class="row" style="padding: 10px;">

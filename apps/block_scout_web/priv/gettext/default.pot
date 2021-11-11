@@ -303,7 +303,6 @@ msgid "Approximate Current Annual Percentage Yield. If you see N/A, please wait 
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/layout/_topnav.html.eex:143
 #: lib/block_scout_web/templates/layout/_topnav.html.eex:179
 msgid "Apps"
 msgstr ""
@@ -1616,6 +1615,11 @@ msgstr ""
 #, elixir-format
 #: lib/block_scout_web/templates/api_docs/_action_tile.html.eex:58
 msgid "Module"
+msgstr ""
+
+#, elixir-format
+#: lib/block_scout_web/templates/layout/_topnav.html.eex:143
+msgid "More"
 msgstr ""
 
 #, elixir-format
