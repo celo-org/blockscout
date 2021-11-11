@@ -232,8 +232,12 @@ defmodule BlockScoutWeb.LayoutView do
     list(:defi)
   end
 
-  def nft_list do
-    list(:nft)
+  def resources_list do
+    list(:resources)
+  end
+
+  def learning_list do
+    list(:learning)
   end
 
   def apps_list do
