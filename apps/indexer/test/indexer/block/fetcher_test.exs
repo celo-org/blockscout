@@ -7,7 +7,7 @@ defmodule Indexer.Block.FetcherTest do
   import EthereumJSONRPC, only: [integer_to_quantity: 1]
 
   alias Explorer.Chain
-  alias Explorer.Chain.{Address, PendingCelo, Log, Transaction, Wei}
+  alias Explorer.Chain.{Address, CeloPendingEpochOperation, PendingCelo, Log, Transaction, Wei}
   alias Indexer.Block.Fetcher
   alias Indexer.BufferedTask
 
@@ -725,6 +725,18 @@ defmodule Indexer.Block.FetcherTest do
                Fetcher.fetch_and_import_range(block_fetcher, block_number..block_number)
 
       assert Repo.one!(select(Chain.Block.Reward, fragment("COUNT(*)"))) == 2
+    end
+  end
+
+  describe "update_celo_pending_epoch_operations/1" do
+    test "it calls insert_celo_pending_epoch_operations in case of epoch blocks" do
+      block_1 = insert(:block, number: 17280)
+      block_2 = insert(:block, number: 17289)
+      block_3 = insert(:block, number: 34560)
+
+      Fetcher.update_celo_pending_epoch_operations([block_1, block_2, block_3])
+
+      assert Repo.aggregate(CeloPendingEpochOperation, :count) == 2
     end
   end
 
