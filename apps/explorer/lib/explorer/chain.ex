@@ -47,6 +47,7 @@ defmodule Explorer.Chain do
     CeloAccount,
     CeloClaims,
     CeloParams,
+    CeloPendingEpochOperation,
     CeloSigners,
     CeloValidator,
     CeloValidatorGroup,
@@ -7784,4 +7785,13 @@ defmodule Explorer.Chain do
     query
     |> Repo.one()
   end
+
+  @spec insert_celo_pending_epoch_operations(Hash.Full.t()) :: CeloPendingEpochOperation.t()
+  def insert_celo_pending_epoch_operations(block_hash) do
+    Repo.insert(%CeloPendingEpochOperation{
+      block_hash: block_hash,
+      fetch_epoch_rewards: true
+    })
+  end
+
 end

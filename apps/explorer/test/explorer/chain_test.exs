@@ -14,6 +14,7 @@ defmodule Explorer.ChainTest do
   alias Explorer.Chain.{
     Address,
     Block,
+    CeloPendingEpochOperation,
     PendingCelo,
     Data,
     DecompiledSmartContract,
@@ -5939,6 +5940,17 @@ defmodule Explorer.ChainTest do
       Chain.delete_pending_celo(account_address, 2)
 
       assert Repo.aggregate(PendingCelo, :count, :index) == 2
+    end
+  end
+
+  describe "insert_celo_pending_epoch_operations/1" do
+    test "inserts an epoch block hash that needs to be indexed to celo_pending_epoch_operations" do
+      block = insert(:block)
+
+      Chain.insert_celo_pending_epoch_operations(block.hash)
+
+      %CeloPendingEpochOperation{fetch_epoch_rewards: fetch_epoch_rewards} = Repo.get(CeloPendingEpochOperation, block.hash)
+      assert fetch_epoch_rewards == true
     end
   end
 end
