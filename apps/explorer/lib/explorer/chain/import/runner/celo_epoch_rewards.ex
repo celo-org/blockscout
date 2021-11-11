@@ -1,4 +1,4 @@
-defmodule Explorer.Chain.Import.Runner.CeloVoterRewards do
+defmodule Explorer.Chain.Import.Runner.CeloEpochRewards do
   @moduledoc """
   Bulk imports Celo voter rewards to the DB table.
   """
@@ -6,7 +6,7 @@ defmodule Explorer.Chain.Import.Runner.CeloVoterRewards do
   require Ecto.Query
 
   alias Ecto.{Changeset, Multi, Repo}
-  alias Explorer.Chain.{CeloVoterRewards, Import}
+  alias Explorer.Chain.{CeloEpochRewards, Import}
   alias Explorer.Chain.Import.Runner.Util
 
   import Ecto.Query, only: [from: 2]
@@ -16,13 +16,13 @@ defmodule Explorer.Chain.Import.Runner.CeloVoterRewards do
   # milliseconds
   @timeout 60_000
 
-  @type imported :: [CeloVoterRewards.t()]
+  @type imported :: [CeloEpochRewards.t()]
 
   @impl Import.Runner
-  def ecto_schema_module, do: CeloVoterRewards
+  def ecto_schema_module, do: CeloEpochRewards
 
   @impl Import.Runner
-  def option_key, do: :celo_voter_rewards
+  def option_key, do: :celo_epoch_rewards
 
   @impl Import.Runner
   def imported_table_row do
@@ -46,7 +46,7 @@ defmodule Explorer.Chain.Import.Runner.CeloVoterRewards do
   def timeout, do: @timeout
 
   @spec insert(Repo.t(), [map()], Util.insert_options()) ::
-          {:ok, [CeloVoterRewards.t()]} | {:error, [Changeset.t()]}
+          {:ok, [CeloEpochRewards.t()]} | {:error, [Changeset.t()]}
   defp insert(repo, changes_list, %{timeout: timeout, timestamps: timestamps} = options) when is_list(changes_list) do
     on_conflict = Map.get_lazy(options, :on_conflict, &default_on_conflict/0)
 
@@ -62,7 +62,7 @@ defmodule Explorer.Chain.Import.Runner.CeloVoterRewards do
         uniq_changes_list,
         conflict_target: [:block_hash, :log_index],
         on_conflict: on_conflict,
-        for: CeloVoterRewards,
+        for: CeloEpochRewards,
         returning: true,
         timeout: timeout,
         timestamps: timestamps
@@ -71,7 +71,7 @@ defmodule Explorer.Chain.Import.Runner.CeloVoterRewards do
 
   defp default_on_conflict do
     from(
-      account in CeloVoterRewards,
+      account in CeloEpochRewards,
       update: [
         set: [
           address_hash: fragment("EXCLUDED.address_hash"),

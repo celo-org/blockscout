@@ -1,4 +1,4 @@
-defmodule Indexer.Fetcher.CeloVoterRewardsTest do
+defmodule Indexer.Fetcher.CeloEpochRewardsTest do
   # MUST be `async: false` so that {:shared, pid} is set for connection to allow CoinBalanceFetcher's self-send to have
   # connection allowed immediately.
   use EthereumJSONRPC.Case, async: false
@@ -10,7 +10,7 @@ defmodule Indexer.Fetcher.CeloVoterRewardsTest do
   alias Explorer.Chain
   alias Explorer.Chain.{Block, Hash, Wei}
   alias Indexer.BufferedTask
-  alias Indexer.Fetcher.CeloVoterRewards
+  alias Indexer.Fetcher.CeloEpochRewards
 
   @moduletag :capture_log
 
@@ -42,7 +42,7 @@ defmodule Indexer.Fetcher.CeloVoterRewardsTest do
       block = insert(:block)
       insert(:celo_pending_epoch_operations, block_hash: block.hash, fetch_epoch_rewards: true)
 
-      assert CeloVoterRewards.init(
+      assert CeloEpochRewards.init(
                [],
                fn block_number, acc -> [block_number | acc] end,
                json_rpc_named_arguments
@@ -56,7 +56,7 @@ defmodule Indexer.Fetcher.CeloVoterRewardsTest do
       block = insert(:block)
       insert(:celo_pending_epoch_operations, block_hash: block.hash, fetch_epoch_rewards: false)
 
-      assert CeloVoterRewards.init(
+      assert CeloEpochRewards.init(
                [],
                fn block_number, acc -> [block_number | acc] end,
                json_rpc_named_arguments
@@ -457,7 +457,7 @@ defmodule Indexer.Fetcher.CeloVoterRewardsTest do
       )
 
       fetched =
-        CeloVoterRewards.fetch_from_blockchain([
+        CeloEpochRewards.fetch_from_blockchain([
           %{address_hash: address_hash(), block_number: block_number, retries_count: 0}
         ])
 

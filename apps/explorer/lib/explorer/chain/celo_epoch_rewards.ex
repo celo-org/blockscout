@@ -1,4 +1,4 @@
-defmodule Explorer.Chain.CeloVoterRewards do
+defmodule Explorer.Chain.CeloEpochRewards do
   @moduledoc """
   Datatype for storing Celo voter rewards
   """
@@ -29,7 +29,7 @@ defmodule Explorer.Chain.CeloVoterRewards do
 
   @required_attrs ~w( block_hash log_index )a
 
-  schema "celo_voter_rewards" do
+  schema "celo_epoch_rewards" do
     field(:reward, Wei)
     field(:active_votes, Wei)
     field(:total_reward, Wei)
@@ -59,6 +59,6 @@ defmodule Explorer.Chain.CeloVoterRewards do
     item
     |> cast(attrs, @attrs)
     |> validate_required(@required_attrs)
-    |> unique_constraint(:celo_voter_rewards_key, name: :celo_voter_rewards_block_hash_log_index_index)
+    |> unique_constraint(:celo_epoch_rewards_key, name: :celo_epoch_rewards_block_hash_log_index_index)
   end
 end

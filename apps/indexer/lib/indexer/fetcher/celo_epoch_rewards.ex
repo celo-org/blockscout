@@ -1,4 +1,4 @@
-defmodule Indexer.Fetcher.CeloVoterRewards do
+defmodule Indexer.Fetcher.CeloEpochRewards do
   @moduledoc """
   Fetches Celo voter rewards for groups.
   """
@@ -7,11 +7,11 @@ defmodule Indexer.Fetcher.CeloVoterRewards do
 
   require Logger
 
-  alias Indexer.Fetcher.CeloVoterRewards.Supervisor, as: CeloVoterRewardsSupervisor
+  alias Indexer.Fetcher.CeloEpochRewards.Supervisor, as: CeloEpochRewardsSupervisor
 
   alias Explorer.Celo.AccountReader
   alias Explorer.Chain
-  alias Explorer.Chain.CeloVoterRewards
+  alias Explorer.Chain.CeloEpochRewards
 
   alias Indexer.BufferedTask
   alias Indexer.Fetcher.Util
@@ -21,7 +21,7 @@ defmodule Indexer.Fetcher.CeloVoterRewards do
   @max_retries 3
 
   def async_fetch(accounts) do
-    if CeloVoterRewardsSupervisor.disabled?() do
+    if CeloEpochRewardsSupervisor.disabled?() do
       :ok
     else
       params =
@@ -94,7 +94,7 @@ defmodule Indexer.Fetcher.CeloVoterRewards do
           {[account | failed], success}
 
         account, {failed, success} ->
-          changeset = CeloVoterRewards.changeset(%CeloVoterRewards{}, account)
+          changeset = CeloEpochRewards.changeset(%CeloEpochRewards{}, account)
 
           if changeset.valid? do
             {failed, [changeset.changes | success]}
@@ -104,7 +104,7 @@ defmodule Indexer.Fetcher.CeloVoterRewards do
       end)
 
     import_params = %{
-      celo_voter_rewards: %{params: success},
+      celo_epoch_rewards: %{params: success},
       timeout: :infinity
     }
 

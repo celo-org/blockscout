@@ -21,7 +21,7 @@ defmodule Indexer.Block.Realtime.FetcherTest do
     CeloValidator,
     CeloValidatorGroup,
     CeloValidatorHistory,
-    CeloVoterRewards,
+    CeloEpochRewards,
     CeloVoters
   }
 
@@ -74,7 +74,7 @@ defmodule Indexer.Block.Realtime.FetcherTest do
       CeloAccount.Supervisor.Case.start_supervised!(json_rpc_named_arguments: json_rpc_named_arguments)
       CeloValidatorGroup.Supervisor.Case.start_supervised!(json_rpc_named_arguments: json_rpc_named_arguments)
       CeloValidatorHistory.Supervisor.Case.start_supervised!(json_rpc_named_arguments: json_rpc_named_arguments)
-      CeloVoterRewards.Supervisor.Case.start_supervised!(json_rpc_named_arguments: json_rpc_named_arguments)
+      CeloEpochRewards.Supervisor.Case.start_supervised!(json_rpc_named_arguments: json_rpc_named_arguments)
       CeloVoters.Supervisor.Case.start_supervised!(json_rpc_named_arguments: json_rpc_named_arguments)
 
       ContractCode.Supervisor.Case.start_supervised!(json_rpc_named_arguments: json_rpc_named_arguments)

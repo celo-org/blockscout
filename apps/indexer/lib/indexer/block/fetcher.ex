@@ -25,7 +25,6 @@ defmodule Indexer.Block.Fetcher do
     CeloValidator,
     CeloValidatorGroup,
     CeloValidatorHistory,
-    CeloVoterRewards,
     CeloVoters,
     CoinBalance,
     ContractCode,
@@ -221,7 +220,6 @@ defmodule Indexer.Block.Fetcher do
            attestations_requested: attestations_requested,
            exchange_rates: exchange_rates,
            account_names: account_names,
-           voter_rewards: celo_voter_rewards,
            wallets: celo_wallets,
            withdrawals: celo_withdrawals
          } = CeloAccounts.parse(logs, oracle_address),
@@ -331,8 +329,6 @@ defmodule Indexer.Block.Fetcher do
       Market.bulk_insert_history(market_history)
 
       async_import_celo_validators(%{celo_validators: %{params: celo_validators}})
-      # TODO: remove
-      #      async_import_celo_voter_rewards(%{celo_voter_rewards: %{params: celo_voter_rewards}})
       async_import_celo_validator_groups(%{celo_validator_groups: %{params: celo_validator_groups}})
       async_import_celo_voters(%{celo_voters: %{params: celo_voters}})
       async_import_celo_validator_history(range)
@@ -380,7 +376,8 @@ defmodule Indexer.Block.Fetcher do
 
   def update_celo_pending_epoch_operations(blocks) do
     blocks
-    |> Enum.filter_map(&(rem(&1.number, 17280) == 0), &Chain.insert_celo_pending_epoch_operations(&1.hash))
+    |> Enum.filter(&(rem(&1.number, 17280) == 0))
+    |> Enum.map(&Chain.insert_celo_pending_epoch_operations(&1.hash))
   end
 
   defp delete_pending_celo(withdrawals) do
@@ -502,11 +499,6 @@ defmodule Indexer.Block.Fetcher do
   end
 
   def async_import_celo_validator_groups(_), do: :ok
-
-  # TODO: remove
-  def async_import_celo_voter_rewards(%{celo_voter_rewards: accounts}) do
-    CeloVoterRewards.async_fetch(accounts)
-  end
 
   def async_import_celo_voters(%{celo_voters: accounts}) do
     CeloVoters.async_fetch(accounts)
