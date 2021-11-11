@@ -2805,6 +2805,23 @@ defmodule Explorer.Chain do
     Repo.stream_reduce(query, initial, reducer)
   end
 
+  @spec stream_blocks_with_unfetched_epoch_rewards(
+          initial :: accumulator,
+          reducer :: (entry :: term(), accumulator -> accumulator)
+        ) :: {:ok, accumulator}
+        when accumulator: term()
+  def stream_blocks_with_unfetched_epoch_rewards(initial, reducer) when is_function(reducer, 2) do
+    query =
+      from(
+        b in Block,
+        join: celo_pending_ops in assoc(b, :celo_pending_operations),
+        where: celo_pending_ops.fetch_epoch_rewards,
+        select: b.number
+      )
+
+    Repo.stream_reduce(query, initial, reducer)
+  end
+
   def remove_nonconsensus_blocks_from_pending_ops(block_hashes) do
     query =
       from(

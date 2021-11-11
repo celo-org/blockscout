@@ -49,8 +49,13 @@ defmodule Indexer.Fetcher.CeloVoterRewards do
   end
 
   @impl BufferedTask
-  def init(initial, _, _) do
-    initial
+  def init(initial, reducer, _json_rpc_named_arguments) do
+    {:ok, final} =
+      Chain.stream_blocks_with_unfetched_epoch_rewards(initial, fn block_number, acc ->
+        reducer.(block_number, acc)
+      end)
+
+    final
   end
 
   @impl BufferedTask

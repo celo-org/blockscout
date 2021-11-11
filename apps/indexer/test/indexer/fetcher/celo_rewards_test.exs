@@ -35,6 +35,36 @@ defmodule Indexer.Fetcher.CeloVoterRewardsTest do
     }
   end
 
+  describe "init/2" do
+    test "buffers unindexed epoch blocks", %{
+      json_rpc_named_arguments: json_rpc_named_arguments
+    } do
+      block = insert(:block)
+      insert(:celo_pending_epoch_operations, block_hash: block.hash, fetch_epoch_rewards: true)
+
+
+      assert CeloVoterRewards.init(
+               [],
+               fn block_number, acc -> [block_number | acc] end,
+               json_rpc_named_arguments
+             ) == [block.number]
+    end
+
+    @tag :no_geth
+    test "does not buffer blocks with fetched internal transactions", %{
+      json_rpc_named_arguments: json_rpc_named_arguments
+    } do
+      block = insert(:block)
+      insert(:celo_pending_epoch_operations, block_hash: block.hash, fetch_epoch_rewards: false)
+
+      assert CeloVoterRewards.init(
+               [],
+               fn block_number, acc -> [block_number | acc] end,
+               json_rpc_named_arguments
+             ) == []
+    end
+  end
+
   describe "fetch_from_blockchain/1" do
     setup do
       block = insert(:block)
