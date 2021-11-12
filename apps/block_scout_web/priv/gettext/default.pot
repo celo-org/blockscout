@@ -303,7 +303,7 @@ msgid "Approximate Current Annual Percentage Yield. If you see N/A, please wait 
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/layout/_topnav.html.eex:179
+#: lib/block_scout_web/templates/layout/_topnav.html.eex:178
 msgid "Apps"
 msgstr ""
 
@@ -479,7 +479,7 @@ msgid "Bridged from Ethereum"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/layout/_topnav.html.eex:173
+#: lib/block_scout_web/templates/layout/_topnav.html.eex:172
 msgid "Bridges"
 msgstr ""
 
@@ -1420,7 +1420,7 @@ msgid "Last Balance Update"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/layout/_topnav.html.eex:193
+#: lib/block_scout_web/templates/layout/_topnav.html.eex:192
 msgid "Learn"
 msgstr ""
 
@@ -1623,7 +1623,7 @@ msgid "More"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/layout/_topnav.html.eex:199
+#: lib/block_scout_web/templates/layout/_topnav.html.eex:198
 msgid "More apps"
 msgstr ""
 
@@ -1975,7 +1975,7 @@ msgid "Reset"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/layout/_topnav.html.eex:187
+#: lib/block_scout_web/templates/layout/_topnav.html.eex:186
 msgid "Resources"
 msgstr ""
 
