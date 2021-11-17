@@ -55,7 +55,8 @@ defmodule Explorer.Celo.AccountReader do
     end
   end
 
-  def validator_group_reward_data(_address, bn) do
+  def validator_group_reward_data(%{block_number: bn, block_hash: block_hash}) do
+
     data =
       call_methods([
         {:epochrewards, "calculateTargetEpochRewards", [], bn},
@@ -127,7 +128,14 @@ defmodule Explorer.Celo.AccountReader do
          electable_validators_max: electable_validators_max,
          reserve_gold_balance: reserve_gold_balance,
          gold_total_supply: gold_total_supply,
-         stable_usd_total_supply: stable_usd_total_supply
+         stable_usd_total_supply: stable_usd_total_supply,
+         block_hash: block_hash,
+         block_number: bn,
+         epoch_number: div(bn, 17280),
+         # Next 2 lines are necessary to satisfy the old table constraints. They have to be deleted as part of the table cleanup
+         log_index: 0,
+         address_hash: %Explorer.Chain.Hash{byte_count: 20, bytes: <<42, 57, 230, 201, 63, 231, 229, 237, 228, 165, 179, 126, 139, 187, 19, 165,
+                                                   70, 44, 201, 123>>}
        }}
     else
       _ -> :error

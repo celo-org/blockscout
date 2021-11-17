@@ -8,6 +8,7 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
   require Logger
 
   alias Indexer.Fetcher.CeloEpochRewards.Supervisor, as: CeloEpochRewardsSupervisor
+  alias Ecto.{Multi}
 
   alias Explorer.Celo.AccountReader
   alias Explorer.Chain
@@ -18,31 +19,6 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
 
   @behaviour BufferedTask
 
-  @max_retries 3
-
-  def async_fetch(accounts) do
-    if CeloEpochRewardsSupervisor.disabled?() do
-      :ok
-    else
-      params =
-        accounts.params
-        |> Enum.map(&entry/1)
-
-      BufferedTask.buffer(__MODULE__, params, :infinity)
-    end
-  end
-
-  def entry(elem) do
-    %{
-      address_hash: elem.address_hash,
-      block_hash: elem.block_hash,
-      log_index: elem.log_index,
-      reward: elem.reward,
-      block_number: elem.block_number,
-      retries_count: 0
-    }
-  end
-
   @doc false
   def child_spec([init_options, gen_server_options]) do
     Util.default_child_spec(init_options, gen_server_options, __MODULE__)
@@ -51,8 +27,9 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
   @impl BufferedTask
   def init(initial, reducer, _json_rpc_named_arguments) do
     {:ok, final} =
-      Chain.stream_blocks_with_unfetched_epoch_rewards(initial, fn block_number, acc ->
-        reducer.(block_number, acc)
+      Chain.stream_blocks_with_unfetched_epoch_rewards(initial, fn block, acc ->
+        block
+        |> reducer.(acc)
       end)
 
     final
@@ -62,7 +39,6 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
   def run(entries, _json_rpc_named_arguments) do
     failed_list =
       entries
-      |> Enum.map(&Map.put(&1, :retries_count, &1.retries_count + 1))
       |> fetch_from_blockchain()
       |> import_items()
 
@@ -73,33 +49,32 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
     end
   end
 
-  def fetch_from_blockchain(addresses) do
-    addresses
-    |> Enum.filter(&(&1.retries_count <= @max_retries))
-    |> Enum.map(fn %{address_hash: address, block_number: bn} = account ->
-      case AccountReader.validator_group_reward_data(address, bn) do
+  def fetch_from_blockchain(blocks) do
+    blocks
+    |> Enum.map(fn block ->
+      case AccountReader.validator_group_reward_data(block) do
         {:ok, data} ->
-          Map.merge(account, data)
+          data
 
         error ->
-          Map.put(account, :error, error)
+          Logger.debug(inspect(error))
       end
     end)
   end
 
-  defp import_items(accounts) do
+  def import_items(rewards) do
     {failed, success} =
-      Enum.reduce(accounts, {[], []}, fn
-        %{error: _error} = account, {failed, success} ->
-          {[account | failed], success}
+      Enum.reduce(rewards, {[], []}, fn
+        %{error: _error} = reward, {failed, success} ->
+          {[reward | failed], success}
 
-        account, {failed, success} ->
-          changeset = CeloEpochRewards.changeset(%CeloEpochRewards{}, account)
+        reward, {failed, success} ->
+          changeset = CeloEpochRewards.changeset(%CeloEpochRewards{}, reward)
 
           if changeset.valid? do
             {failed, [changeset.changes | success]}
           else
-            {[account | failed], success}
+            {[reward | failed], success}
           end
       end)
 
@@ -108,13 +83,32 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
       timeout: :infinity
     }
 
-    case Chain.import(import_params) do
+    if failed != [] do
+      Logger.debug(fn -> "requeuing rewards" end,
+        block_numbers: Enum.map(failed, fn rew -> rew.block_number end)
+      )
+    end
+
+    result =
+      Multi.new()
+      |> Multi.run(:import_rewards , fn _, _ ->
+        result = Chain.import(import_params)
+        {:ok, result}
+      end)
+      |> Multi.run(:delete_celo_pending, fn _, _ ->
+        success
+          |> Enum.map(fn reward -> Chain.delete_celo_pending_epoch_operation(reward.block_hash) end)
+        {:ok, success}
+        end)
+      |> Explorer.Repo.transaction
+
+    case result do
       {:ok, _} ->
         :ok
 
       {:error, reason} ->
         Logger.debug(fn -> ["failed to import Celo voter reward data: ", inspect(reason)] end,
-          error_count: Enum.count(accounts)
+          error_count: Enum.count(rewards)
         )
     end
 

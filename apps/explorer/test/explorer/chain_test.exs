@@ -5946,13 +5946,11 @@ defmodule Explorer.ChainTest do
   describe "insert_celo_pending_epoch_operations/1" do
     test "inserts an epoch block hash that needs to be indexed to celo_pending_epoch_operations" do
       block = insert(:block)
+      insert(:celo_pending_epoch_operations, block_hash: block.hash, fetch_epoch_rewards: true)
 
-      Chain.insert_celo_pending_epoch_operations(block.hash)
+      Chain.delete_celo_pending_epoch_operation(block.hash)
 
-      %CeloPendingEpochOperation{fetch_epoch_rewards: fetch_epoch_rewards} =
-        Repo.get(CeloPendingEpochOperation, block.hash)
-
-      assert fetch_epoch_rewards == true
+      assert Repo.one!(select(CeloPendingEpochOperation, fragment("COUNT(*)"))) == 0
     end
   end
 end

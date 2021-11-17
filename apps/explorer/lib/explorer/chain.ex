@@ -2816,7 +2816,7 @@ defmodule Explorer.Chain do
         b in Block,
         join: celo_pending_ops in assoc(b, :celo_pending_operations),
         where: celo_pending_ops.fetch_epoch_rewards,
-        select: b.number
+        select: %{block_number: b.number, block_hash: b.hash}
       )
 
     Repo.stream_reduce(query, initial, reducer)
@@ -7803,11 +7803,9 @@ defmodule Explorer.Chain do
     |> Repo.one()
   end
 
-  @spec insert_celo_pending_epoch_operations(Hash.Full.t()) :: CeloPendingEpochOperation.t()
-  def insert_celo_pending_epoch_operations(block_hash) do
-    Repo.insert(%CeloPendingEpochOperation{
-      block_hash: block_hash,
-      fetch_epoch_rewards: true
-    })
+  @spec delete_celo_pending_epoch_operation(Hash.Full.t()) :: CeloPendingEpochOperation.t()
+  def delete_celo_pending_epoch_operation(block_hash) do
+    celo_pending_operation = Repo.get(CeloPendingEpochOperation, block_hash)
+    Repo.delete(celo_pending_operation)
   end
 end
