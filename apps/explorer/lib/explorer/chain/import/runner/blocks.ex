@@ -64,7 +64,7 @@ defmodule Explorer.Chain.Import.Runner.Blocks do
     |> Multi.run(:new_pending_operations, fn repo, %{lose_consensus: nonconsensus_hashes} ->
       new_pending_operations(repo, nonconsensus_hashes, hashes, insert_options)
     end)
-    |> Multi.run(:new_celo_pending_operations, fn repo, %{lose_consensus: nonconsensus_hashes} ->
+    |> Multi.run(:new_celo_pending_operations, fn repo, _ ->
       new_celo_pending_operations(repo, changes_list, insert_options)
     end)
     |> Multi.run(:uncle_fetched_block_second_degree_relations, fn repo, _ ->

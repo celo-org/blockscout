@@ -14,7 +14,6 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
   alias Explorer.Chain.CeloEpochRewards
 
   alias Indexer.BufferedTask
-  alias Indexer.Fetcher.CeloEpochRewards.Supervisor, as: CeloEpochRewardsSupervisor
   alias Indexer.Fetcher.Util
 
   @behaviour BufferedTask

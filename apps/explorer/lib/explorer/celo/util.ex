@@ -27,7 +27,7 @@ defmodule Explorer.Celo.Util do
     |> Enum.into(%{}, fn
       {response, {_, function_name, _}} -> {function_name, response}
       {response, {_, function_name, _, _}} -> {function_name, response}
-      {response, {_, function_name, _, _, custom_name}} -> {custom_name, response}
+      {response, {_, _, _, _, custom_name}} -> {custom_name, response}
     end)
   end
 

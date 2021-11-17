@@ -102,7 +102,6 @@ defmodule Explorer.Celo.AccountReader do
          {:ok, [total_votes]} <- data["getTotalVotes"],
          {:ok, [_, electable_validators_max]} <- data["getElectableValidators"],
          {:ok, [reserve_gold_balance]} <- data["getReserveGoldBalance"],
-         {:ok, [reserve_gold_balance]} <- data["getReserveGoldBalance"],
          {:ok, [gold_total_supply]} <- data["goldTotalSupply"],
          {:ok, [stable_usd_total_supply]} <- data["stableUSDTotalSupply"] do
       {:ok,
