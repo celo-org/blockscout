@@ -499,45 +499,49 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
 
   describe "import_items/1" do
     test "saves epoch rewards and deletes celo pending epoch operations" do
-      block = insert(:block, hash: %Explorer.Chain.Hash{
-        byte_count: 32,
-        bytes: <<252, 154, 78, 156, 195, 203, 115, 134, 25, 196, 0, 181, 189, 239,
-          174, 127, 27, 61, 98, 208, 104, 72, 127, 167, 112, 119, 204, 138, 81,
-          255, 5, 91>>
-      }, number: 9434880)
+      block =
+        insert(:block,
+          hash: %Explorer.Chain.Hash{
+            byte_count: 32,
+            bytes:
+              <<252, 154, 78, 156, 195, 203, 115, 134, 25, 196, 0, 181, 189, 239, 174, 127, 27, 61, 98, 208, 104, 72,
+                127, 167, 112, 119, 204, 138, 81, 255, 5, 91>>
+          },
+          number: 9_434_880
+        )
+
       insert(:celo_pending_epoch_operations, block_hash: block.hash, fetch_epoch_rewards: true)
 
       rewards = [
         %{
           address_hash: %Explorer.Chain.Hash{
             byte_count: 20,
-            bytes: <<42, 57, 230, 201, 63, 231, 229, 237, 228, 165, 179, 126, 139,
-              187, 19, 165, 70, 44, 201, 123>>
+            bytes: <<42, 57, 230, 201, 63, 231, 229, 237, 228, 165, 179, 126, 139, 187, 19, 165, 70, 44, 201, 123>>
           },
           block_hash: block.hash,
           block_number: block.number,
-          carbon_offsetting_target_epoch_rewards: 55094655441694756188,
-          community_target_epoch_rewards: 13773663860423689047089,
+          carbon_offsetting_target_epoch_rewards: 55_094_655_441_694_756_188,
+          community_target_epoch_rewards: 13_773_663_860_423_689_047_089,
           electable_validators_max: 110,
           epoch_number: 546,
-          gold_total_supply: 632725491274706367854422889,
+          gold_total_supply: 632_725_491_274_706_367_854_422_889,
           log_index: 0,
-          reserve_gold_balance: 115257993782506057885594247,
-          rewards_multiplier: 830935429083244762116865,
-          rewards_multiplier_max: 2000000000000000000000000,
-          rewards_multiplier_over: 5000000000000000000000000,
-          rewards_multiplier_under: 500000000000000000000000,
-          stable_usd_total_supply: 102072732704065987635855047,
-          target_total_supply: 619940889565364451209200067,
-          target_voting_fraction: 600000000000000000000000,
-          target_voting_yield: 161241419224794107230,
-          target_voting_yield_adjustment_factor: 1127990000000000000,
-          target_voting_yield_max: 500000000000000000000,
-          total_locked_gold: 316316894443027811324534950,
-          total_non_voting: 22643903944557354402445358,
-          total_votes: 293672990498470456922089592,
-          validator_target_epoch_rewards: 170740156660940704543,
-          voter_target_epoch_rewards: 38399789501591793730548,
+          reserve_gold_balance: 115_257_993_782_506_057_885_594_247,
+          rewards_multiplier: 830_935_429_083_244_762_116_865,
+          rewards_multiplier_max: 2_000_000_000_000_000_000_000_000,
+          rewards_multiplier_over: 5_000_000_000_000_000_000_000_000,
+          rewards_multiplier_under: 500_000_000_000_000_000_000_000,
+          stable_usd_total_supply: 102_072_732_704_065_987_635_855_047,
+          target_total_supply: 619_940_889_565_364_451_209_200_067,
+          target_voting_fraction: 600_000_000_000_000_000_000_000,
+          target_voting_yield: 161_241_419_224_794_107_230,
+          target_voting_yield_adjustment_factor: 1_127_990_000_000_000_000,
+          target_voting_yield_max: 500_000_000_000_000_000_000,
+          total_locked_gold: 316_316_894_443_027_811_324_534_950,
+          total_non_voting: 22_643_903_944_557_354_402_445_358,
+          total_votes: 293_672_990_498_470_456_922_089_592,
+          validator_target_epoch_rewards: 170_740_156_660_940_704_543,
+          voter_target_epoch_rewards: 38_399_789_501_591_793_730_548,
           voting_fraction: "hey"
         }
       ]

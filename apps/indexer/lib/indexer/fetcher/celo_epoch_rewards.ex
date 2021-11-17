@@ -91,16 +91,17 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
 
     result =
       Multi.new()
-      |> Multi.run(:import_rewards , fn _, _ ->
+      |> Multi.run(:import_rewards, fn _, _ ->
         result = Chain.import(import_params)
         {:ok, result}
       end)
       |> Multi.run(:delete_celo_pending, fn _, _ ->
         success
-          |> Enum.map(fn reward -> Chain.delete_celo_pending_epoch_operation(reward.block_hash) end)
+        |> Enum.map(fn reward -> Chain.delete_celo_pending_epoch_operation(reward.block_hash) end)
+
         {:ok, success}
-        end)
-      |> Explorer.Repo.transaction
+      end)
+      |> Explorer.Repo.transaction()
 
     case result do
       {:ok, _} ->
