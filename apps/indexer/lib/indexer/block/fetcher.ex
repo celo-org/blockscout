@@ -338,7 +338,6 @@ defmodule Indexer.Block.Fetcher do
       update_transactions_cache(inserted[:transactions])
       update_addresses_cache(inserted[:addresses])
       update_uncles_cache(inserted[:block_second_degree_relations])
-      update_celo_pending_epoch_operations(blocks)
       result
     else
       {step, {:error, reason}} ->
@@ -372,12 +371,6 @@ defmodule Indexer.Block.Fetcher do
 
   defp update_uncles_cache(updated_relations) do
     Uncles.update_from_second_degree_relations(updated_relations)
-  end
-
-  def update_celo_pending_epoch_operations(blocks) do
-    blocks
-    |> Enum.filter(&(rem(&1.number, 17280) == 0))
-    |> Enum.map(&Chain.insert_celo_pending_epoch_operations(&1.hash))
   end
 
   defp delete_pending_celo(withdrawals) do

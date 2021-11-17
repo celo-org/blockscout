@@ -27,11 +27,26 @@ defmodule Explorer.Chain.CeloPendingEpochOperation do
     belongs_to(:block, Block, foreign_key: :block_hash, primary_key: true, references: :hash, type: Hash.Full)
   end
 
-  def changeset(%__MODULE__{} = pending_ops, attrs) do
-    pending_ops
+  def changeset(%__MODULE__{} = celo_epoch_pending_ops, attrs) do
+    celo_epoch_pending_ops
     |> cast(attrs, @required_attrs)
     |> validate_required(@required_attrs)
     |> foreign_key_constraint(:block_hash)
     |> unique_constraint(:block_hash, name: :celo_pending_epoch_operations_pkey)
+  end
+
+  def default_on_conflict do
+    from(
+      celo_epoch_pending_ops in __MODULE__,
+      update: [
+        set: [
+          fetch_epoch_rewards: celo_epoch_pending_ops.fetch_epoch_rewards or fragment("EXCLUDED.fetch_epoch_rewards"),
+          # Don't update `block_hash` as it is used for the conflict target
+          inserted_at: celo_epoch_pending_ops.inserted_at,
+          updated_at: fragment("EXCLUDED.updated_at")
+        ]
+      ],
+      where: fragment("EXCLUDED.fetch_epoch_rewards <> ?", celo_epoch_pending_ops.fetch_epoch_rewards)
+    )
   end
 end

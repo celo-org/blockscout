@@ -728,18 +728,6 @@ defmodule Indexer.Block.FetcherTest do
     end
   end
 
-  describe "update_celo_pending_epoch_operations/1" do
-    test "it calls insert_celo_pending_epoch_operations in case of epoch blocks" do
-      block_1 = insert(:block, number: 17280)
-      block_2 = insert(:block, number: 17289)
-      block_3 = insert(:block, number: 34560)
-
-      Fetcher.update_celo_pending_epoch_operations([block_1, block_2, block_3])
-
-      assert Repo.aggregate(CeloPendingEpochOperation, :count) == 2
-    end
-  end
-
   defp wait_until(timeout, producer) do
     parent = self()
     ref = make_ref()
