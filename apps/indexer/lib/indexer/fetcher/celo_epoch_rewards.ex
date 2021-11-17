@@ -7,14 +7,14 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
 
   require Logger
 
-  alias Indexer.Fetcher.CeloEpochRewards.Supervisor, as: CeloEpochRewardsSupervisor
-  alias Ecto.{Multi}
+  alias Ecto.Multi
 
   alias Explorer.Celo.AccountReader
   alias Explorer.Chain
   alias Explorer.Chain.CeloEpochRewards
 
   alias Indexer.BufferedTask
+  alias Indexer.Fetcher.CeloEpochRewards.Supervisor, as: CeloEpochRewardsSupervisor
   alias Indexer.Fetcher.Util
 
   @behaviour BufferedTask
@@ -97,7 +97,7 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
       end)
       |> Multi.run(:delete_celo_pending, fn _, _ ->
         success
-        |> Enum.map(fn reward -> Chain.delete_celo_pending_epoch_operation(reward.block_hash) end)
+        |> Enum.each(fn reward -> Chain.delete_celo_pending_epoch_operation(reward.block_hash) end)
 
         {:ok, success}
       end)
