@@ -5,6 +5,7 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
   use Explorer.DataCase
 
   import EthereumJSONRPC, only: [integer_to_quantity: 1]
+  import Explorer.Celo.CacheHelper
   import Mox
 
   alias Explorer.Chain
@@ -46,7 +47,7 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
                [],
                fn block_number, acc -> [block_number | acc] end,
                json_rpc_named_arguments
-             ) == [block.number]
+             ) == [%{block_number: block.number, block_hash: block.hash}]
     end
 
     @tag :no_geth
@@ -74,187 +75,20 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
     test "fetches epoch data from blockchain", %{
       block: %Block{
         hash: block_hash,
-        number: block_number,
-        miner_hash: %Hash{bytes: miner_hash_bytes} = miner_hash,
-        consensus: true
+        number: block_number
       },
       json_rpc_named_arguments: json_rpc_named_arguments
     } do
+      set_test_addresses(%{
+        "EpochRewards" => "0x07f007d389883622ef8d4d347b3f78007f28d8b7",
+        "LockedGold" => "0x6cc083aed9e3ebe302a6336dbc7c921c9f03349e",
+        "Election" => "0x8d6677192144292870907e3fa8a5527fe55a7ff6",
+        "Reserve" => "0x9380fa34fd9e4fd14c06305fd7b6199089ed4eb9",
+        "GoldToken" => "0x471ece3750da237f93b8e339c536989b8978a438",
+        "StableToken" => "0x765de816845861e75a25fca122bb6898b8b1282a"
+      })
+
       block_quantity = integer_to_quantity(block_number)
-
-      # getting the EpochRewards contract
-      expect(EthereumJSONRPC.Mox, :json_rpc, 7, fn [
-                                                     %{
-                                                       id: id,
-                                                       jsonrpc: "2.0",
-                                                       method: "eth_call",
-                                                       params: [
-                                                         %{
-                                                           data:
-                                                             "0x853db3230000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000c45706f6368526577617264730000000000000000000000000000000000000000",
-                                                           to: "0x000000000000000000000000000000000000ce10"
-                                                         },
-                                                         _
-                                                       ]
-                                                     }
-                                                   ],
-                                                   _ ->
-        {
-          :ok,
-          [
-            %{
-              id: id,
-              jsonrpc: "2.0",
-              result: "0x00000000000000000000000007f007d389883622ef8d4d347b3f78007f28d8b7"
-            }
-          ]
-        }
-      end)
-
-      # getting the LockedGold contract
-      expect(EthereumJSONRPC.Mox, :json_rpc, 2, fn [
-                                                     %{
-                                                       id: id,
-                                                       jsonrpc: "2.0",
-                                                       method: "eth_call",
-                                                       params: [
-                                                         %{
-                                                           data:
-                                                             "0x853db3230000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000a4c6f636b6564476f6c6400000000000000000000000000000000000000000000",
-                                                           to: "0x000000000000000000000000000000000000ce10"
-                                                         },
-                                                         _
-                                                       ]
-                                                     }
-                                                   ],
-                                                   _ ->
-        {
-          :ok,
-          [
-            %{
-              id: id,
-              jsonrpc: "2.0",
-              result: "0x0000000000000000000000006cc083aed9e3ebe302a6336dbc7c921c9f03349e"
-            }
-          ]
-        }
-      end)
-
-      # getting the Election contract
-      expect(EthereumJSONRPC.Mox, :json_rpc, 2, fn [
-                                                     %{
-                                                       id: id,
-                                                       jsonrpc: "2.0",
-                                                       method: "eth_call",
-                                                       params: [
-                                                         %{
-                                                           data:
-                                                             "0x853db32300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000008456c656374696f6e000000000000000000000000000000000000000000000000",
-                                                           to: "0x000000000000000000000000000000000000ce10"
-                                                         },
-                                                         _
-                                                       ]
-                                                     }
-                                                   ],
-                                                   _ ->
-        {
-          :ok,
-          [
-            %{
-              id: id,
-              jsonrpc: "2.0",
-              result: "0x0000000000000000000000008d6677192144292870907e3fa8a5527fe55a7ff6"
-            }
-          ]
-        }
-      end)
-
-      # getting the Reserve contract
-      expect(EthereumJSONRPC.Mox, :json_rpc, fn [
-                                                  %{
-                                                    id: id,
-                                                    jsonrpc: "2.0",
-                                                    method: "eth_call",
-                                                    params: [
-                                                      %{
-                                                        data:
-                                                          "0x853db323000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000075265736572766500000000000000000000000000000000000000000000000000",
-                                                        to: "0x000000000000000000000000000000000000ce10"
-                                                      },
-                                                      _
-                                                    ]
-                                                  }
-                                                ],
-                                                _ ->
-        {
-          :ok,
-          [
-            %{
-              id: id,
-              jsonrpc: "2.0",
-              result: "0x0000000000000000000000009380fa34fd9e4fd14c06305fd7b6199089ed4eb9"
-            }
-          ]
-        }
-      end)
-
-      # getting the GoldToken contract
-      expect(EthereumJSONRPC.Mox, :json_rpc, fn [
-                                                  %{
-                                                    id: id,
-                                                    jsonrpc: "2.0",
-                                                    method: "eth_call",
-                                                    params: [
-                                                      %{
-                                                        data:
-                                                          "0x853db32300000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000009476f6c64546f6b656e0000000000000000000000000000000000000000000000",
-                                                        to: "0x000000000000000000000000000000000000ce10"
-                                                      },
-                                                      _
-                                                    ]
-                                                  }
-                                                ],
-                                                _ ->
-        {
-          :ok,
-          [
-            %{
-              id: id,
-              jsonrpc: "2.0",
-              result: "0x000000000000000000000000471ece3750da237f93b8e339c536989b8978a438"
-            }
-          ]
-        }
-      end)
-
-      # getting the StableToken contract
-      expect(EthereumJSONRPC.Mox, :json_rpc, fn [
-                                                  %{
-                                                    id: id,
-                                                    jsonrpc: "2.0",
-                                                    method: "eth_call",
-                                                    params: [
-                                                      %{
-                                                        data:
-                                                          "0x853db3230000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000000b537461626c65546f6b656e000000000000000000000000000000000000000000",
-                                                        to: "0x000000000000000000000000000000000000ce10"
-                                                      },
-                                                      _
-                                                    ]
-                                                  }
-                                                ],
-                                                _ ->
-        {
-          :ok,
-          [
-            %{
-              id: id,
-              jsonrpc: "2.0",
-              result: "0x000000000000000000000000765de816845861e75a25fca122bb6898b8b1282a"
-            }
-          ]
-        }
-      end)
 
       expect(
         EthereumJSONRPC.Mox,
@@ -458,21 +292,19 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
 
       fetched =
         CeloEpochRewardsFetcher.fetch_from_blockchain([
-          %{address_hash: address_hash(), block_number: block_number, retries_count: 0}
+          %{block_number: block_number, block_hash: block_hash}
         ])
-
-      IO.inspect(fetched)
 
       assert [
                %{
                  address_hash: %Explorer.Chain.Hash{
                    byte_count: 20,
-                   bytes: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2>>
+                   bytes:
+                     <<42, 57, 230, 201, 63, 231, 229, 237, 228, 165, 179, 126, 139, 187, 19, 165, 70, 44, 201, 123>>
                  },
-                 block_number: 0,
+                 block_number: block_number,
                  carbon_offsetting_target_epoch_rewards: 62_225_632_760_255_012_269,
                  community_target_epoch_rewards: 15_556_408_190_063_753_067_479,
-                 retries_count: 0,
                  validator_target_epoch_rewards: 205_631_887_959_760_273_971,
                  voter_target_epoch_rewards: 26_043_810_141_454_976_793_003,
                  target_total_supply: 601_017_204_041_941_484_863_859_293,
@@ -491,7 +323,10 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
                  electable_validators_max: 110,
                  reserve_gold_balance: 115_255_226_249_038_379_930_471_272,
                  gold_total_supply: 600_363_049_982_598_326_620_386_513,
-                 stable_usd_total_supply: 5_182_985_086_049_091_467_996_121
+                 stable_usd_total_supply: 5_182_985_086_049_091_467_996_121,
+                 block_hash: block_hash,
+                 epoch_number: 0,
+                 log_index: 0
                }
              ] == fetched
     end
@@ -542,7 +377,7 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
           total_votes: 293_672_990_498_470_456_922_089_592,
           validator_target_epoch_rewards: 170_740_156_660_940_704_543,
           voter_target_epoch_rewards: 38_399_789_501_591_793_730_548,
-          voting_fraction: "hey"
+          voting_fraction: 567_519_683_693_557_844_261_489
         }
       ]
 
