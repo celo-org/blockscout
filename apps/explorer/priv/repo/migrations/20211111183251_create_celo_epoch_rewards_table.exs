@@ -30,6 +30,7 @@ defmodule Explorer.Repo.Migrations.AddMissingColumnsToCeloEpochRewards do
 
       timestamps(null: false, type: :utc_datetime_usec)
     end
+
     create(index(:celo_epoch_rewards, [:block_hash], unique: true))
   end
 end

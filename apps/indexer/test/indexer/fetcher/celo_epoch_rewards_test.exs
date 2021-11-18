@@ -9,7 +9,7 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
   import Mox
 
   alias Explorer.Chain
-  alias Explorer.Chain.{Block, CeloEpochRewards, CeloPendingEpochOperation, Hash, Wei}
+  alias Explorer.Chain.{Block, CeloEpochRewards, CeloPendingEpochOperation, Hash}
   alias Indexer.BufferedTask
   alias Indexer.Fetcher.CeloEpochRewards, as: CeloEpochRewardsFetcher
 
@@ -297,11 +297,6 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
 
       assert [
                %{
-                 address_hash: %Explorer.Chain.Hash{
-                   byte_count: 20,
-                   bytes:
-                     <<42, 57, 230, 201, 63, 231, 229, 237, 228, 165, 179, 126, 139, 187, 19, 165, 70, 44, 201, 123>>
-                 },
                  block_number: block_number,
                  carbon_offsetting_target_epoch_rewards: 62_225_632_760_255_012_269,
                  community_target_epoch_rewards: 15_556_408_190_063_753_067_479,
@@ -325,8 +320,7 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
                  gold_total_supply: 600_363_049_982_598_326_620_386_513,
                  stable_usd_total_supply: 5_182_985_086_049_091_467_996_121,
                  block_hash: block_hash,
-                 epoch_number: 0,
-                 log_index: 0
+                 epoch_number: 0
                }
              ] == fetched
     end
@@ -336,7 +330,7 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
     test "saves epoch rewards and deletes celo pending epoch operations" do
       block =
         insert(:block,
-          hash: %Explorer.Chain.Hash{
+          hash: %Hash{
             byte_count: 32,
             bytes:
               <<252, 154, 78, 156, 195, 203, 115, 134, 25, 196, 0, 181, 189, 239, 174, 127, 27, 61, 98, 208, 104, 72,
@@ -349,7 +343,7 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
 
       rewards = [
         %{
-          address_hash: %Explorer.Chain.Hash{
+          address_hash: %Hash{
             byte_count: 20,
             bytes: <<42, 57, 230, 201, 63, 231, 229, 237, 228, 165, 179, 126, 139, 187, 19, 165, 70, 44, 201, 123>>
           },

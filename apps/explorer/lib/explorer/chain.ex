@@ -46,7 +46,6 @@ defmodule Explorer.Chain do
     BridgedToken,
     CeloAccount,
     CeloClaims,
-    CeloEpochRewards,
     CeloParams,
     CeloPendingEpochOperation,
     CeloSigners,
@@ -7810,7 +7809,6 @@ defmodule Explorer.Chain do
     Repo.delete(celo_pending_operation)
   end
 
-  @spec import_epoch_rewards_and_delete_pending_celo_epoch_operations(Import.all_options(), CeloEpochRewards.t()) :: {:ok, any} | {:error, any}
   def import_epoch_rewards_and_delete_pending_celo_epoch_operations(import_params, success) do
     Multi.new()
     |> Multi.run(:import_rewards, fn _, _ ->
