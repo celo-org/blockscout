@@ -57,6 +57,7 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
 
         error ->
           Logger.debug(inspect(error))
+          Map.put(block, :error, error)
       end
     end)
   end

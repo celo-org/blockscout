@@ -138,7 +138,7 @@ defmodule Explorer.Celo.AccountReader do
          }
        }}
     else
-      _ -> :error
+      error -> error
     end
   end
 
