@@ -53,14 +53,14 @@ defmodule Explorer.Chain.Import.Runner.CeloEpochRewards do
     # Enforce ShareLocks order (see docs: sharelocks.md)
     uniq_changes_list =
       changes_list
-      |> Enum.sort_by(&{&1.block_hash, &1.log_index})
-      |> Enum.dedup_by(&{&1.block_hash, &1.log_index})
+      |> Enum.sort_by(&{&1.block_hash})
+      |> Enum.dedup_by(&{&1.block_hash})
 
     {:ok, _} =
       Import.insert_changes_list(
         repo,
         uniq_changes_list,
-        conflict_target: [:block_hash, :log_index],
+        conflict_target: [:block_hash],
         on_conflict: on_conflict,
         for: CeloEpochRewards,
         returning: true,
@@ -74,11 +74,29 @@ defmodule Explorer.Chain.Import.Runner.CeloEpochRewards do
       account in CeloEpochRewards,
       update: [
         set: [
-          address_hash: fragment("EXCLUDED.address_hash"),
-          reward: fragment("EXCLUDED.reward"),
-          active_votes: fragment("EXCLUDED.active_votes"),
-          total_reward: fragment("EXCLUDED.total_reward"),
-          total_active_votes: fragment("EXCLUDED.total_active_votes"),
+          block_number: fragment("EXCLUDED.block_number"),
+          epoch_number: fragment("EXCLUDED.epoch_number"),
+          validator_target_epoch_rewards: fragment("EXCLUDED.validator_target_epoch_rewards"),
+          voter_target_epoch_rewards: fragment("EXCLUDED.voter_target_epoch_rewards"),
+          community_target_epoch_rewards: fragment("EXCLUDED.community_target_epoch_rewards"),
+          carbon_offsetting_target_epoch_rewards: fragment("EXCLUDED.carbon_offsetting_target_epoch_rewards"),
+          target_total_supply: fragment("EXCLUDED.target_total_supply"),
+          rewards_multiplier: fragment("EXCLUDED.rewards_multiplier"),
+          rewards_multiplier_max: fragment("EXCLUDED.rewards_multiplier_max"),
+          rewards_multiplier_under: fragment("EXCLUDED.rewards_multiplier_under"),
+          rewards_multiplier_over: fragment("EXCLUDED.rewards_multiplier_over"),
+          target_voting_yield: fragment("EXCLUDED.target_voting_yield"),
+          target_voting_yield_max: fragment("EXCLUDED.target_voting_yield_max"),
+          target_voting_yield_adjustment_factor: fragment("EXCLUDED.target_voting_yield_adjustment_factor"),
+          target_voting_fraction: fragment("EXCLUDED.target_voting_fraction"),
+          voting_fraction: fragment("EXCLUDED.voting_fraction"),
+          total_locked_gold: fragment("EXCLUDED.total_locked_gold"),
+          total_non_voting: fragment("EXCLUDED.total_non_voting"),
+          total_votes: fragment("EXCLUDED.total_votes"),
+          electable_validators_max: fragment("EXCLUDED.electable_validators_max"),
+          reserve_gold_balance: fragment("EXCLUDED.reserve_gold_balance"),
+          gold_total_supply: fragment("EXCLUDED.gold_total_supply"),
+          stable_usd_total_supply: fragment("EXCLUDED.stable_usd_total_supply"),
           inserted_at: fragment("LEAST(?, EXCLUDED.inserted_at)", account.inserted_at),
           updated_at: fragment("GREATEST(?, EXCLUDED.updated_at)", account.updated_at)
         ]

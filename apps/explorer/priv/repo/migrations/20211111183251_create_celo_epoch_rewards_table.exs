@@ -2,7 +2,9 @@ defmodule Explorer.Repo.Migrations.AddMissingColumnsToCeloEpochRewards do
   use Ecto.Migration
 
   def change do
-    alter table(:celo_epoch_rewards) do
+    create table(:celo_epoch_rewards) do
+      add(:block_hash, :bytea, null: false)
+      add(:block_number, :integer, null: false)
       add(:epoch_number, :integer)
       add(:validator_target_epoch_rewards, :numeric, precision: 100)
       add(:voter_target_epoch_rewards, :numeric, precision: 100)
@@ -25,6 +27,9 @@ defmodule Explorer.Repo.Migrations.AddMissingColumnsToCeloEpochRewards do
       add(:reserve_gold_balance, :numeric, precision: 100)
       add(:gold_total_supply, :numeric, precision: 100)
       add(:stable_usd_total_supply, :numeric, precision: 100)
+
+      timestamps(null: false, type: :utc_datetime_usec)
     end
+    create(index(:celo_epoch_rewards, [:block_hash], unique: true))
   end
 end

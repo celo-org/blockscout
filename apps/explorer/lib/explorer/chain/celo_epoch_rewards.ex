@@ -7,7 +7,7 @@ defmodule Explorer.Chain.CeloEpochRewards do
 
   use Explorer.Schema
 
-  alias Explorer.Chain.{Address, Block, Hash, Wei}
+  alias Explorer.Chain.{Block, Hash, Wei}
 
   @typedoc """
   * `block_hash` - block where this reward was paid.
@@ -16,14 +16,8 @@ defmodule Explorer.Chain.CeloEpochRewards do
 
   @type t :: %__MODULE__{
           block_hash: Hash.Full.t(),
-          log_index: non_neg_integer(),
           block_number: non_neg_integer(),
-          address_hash: Hash.Address.t(),
-          active_votes: Wei.t(),
-          total_active_votes: Wei.t(),
-          total_reward: Wei.t(),
           epoch_number: non_neg_integer(),
-          reward: Wei.t(),
           validator_target_epoch_rewards: Wei.t(),
           voter_target_epoch_rewards: Wei.t(),
           community_target_epoch_rewards: Wei.t(),
@@ -47,16 +41,11 @@ defmodule Explorer.Chain.CeloEpochRewards do
           stable_usd_total_supply: Wei.t()
         }
 
-  @attrs ~w( block_hash log_index address_hash active_votes reward total_active_votes total_reward block_number epoch_number validator_target_epoch_rewards voter_target_epoch_rewards community_target_epoch_rewards carbon_offsetting_target_epoch_rewards target_total_supply rewards_multiplier rewards_multiplier_max rewards_multiplier_under rewards_multiplier_over target_voting_yield target_voting_yield_max target_voting_yield_adjustment_factor target_voting_fraction voting_fraction total_locked_gold total_non_voting total_votes electable_validators_max reserve_gold_balance gold_total_supply stable_usd_total_supply )a
+  @attrs ~w( block_hash block_number epoch_number validator_target_epoch_rewards voter_target_epoch_rewards community_target_epoch_rewards carbon_offsetting_target_epoch_rewards target_total_supply rewards_multiplier rewards_multiplier_max rewards_multiplier_under rewards_multiplier_over target_voting_yield target_voting_yield_max target_voting_yield_adjustment_factor target_voting_fraction voting_fraction total_locked_gold total_non_voting total_votes electable_validators_max reserve_gold_balance gold_total_supply stable_usd_total_supply )a
 
   @required_attrs ~w( block_hash )a
 
   schema "celo_epoch_rewards" do
-    field(:reward, Wei)
-    field(:active_votes, Wei)
-    field(:total_reward, Wei)
-    field(:total_active_votes, Wei)
-    field(:log_index, :integer)
     field(:block_number, :integer)
     field(:epoch_number, :integer)
     field(:validator_target_epoch_rewards, Wei)
@@ -81,14 +70,6 @@ defmodule Explorer.Chain.CeloEpochRewards do
     field(:gold_total_supply, Wei)
     field(:stable_usd_total_supply, Wei)
 
-    belongs_to(
-      :group_address,
-      Address,
-      foreign_key: :address_hash,
-      references: :hash,
-      type: Hash.Address
-    )
-
     belongs_to(:block, Block,
       foreign_key: :block_hash,
       primary_key: true,
@@ -103,6 +84,6 @@ defmodule Explorer.Chain.CeloEpochRewards do
     item
     |> cast(attrs, @attrs)
     |> validate_required(@required_attrs)
-    |> unique_constraint(:celo_epoch_rewards_key, name: :celo_epoch_rewards_block_hash_log_index_index)
+    |> unique_constraint(:celo_epoch_rewards_key, name: :celo_epoch_rewards_block_hash_index)
   end
 end
