@@ -5943,8 +5943,8 @@ defmodule Explorer.ChainTest do
     end
   end
 
-  describe "insert_celo_pending_epoch_operations/1" do
-    test "inserts an epoch block hash that needs to be indexed to celo_pending_epoch_operations" do
+  describe "delete_celo_pending_epoch_operation/1" do
+    test "deletes an epoch block hash that was indexed from celo_pending_epoch_operations" do
       block = insert(:block)
       insert(:celo_pending_epoch_operations, block_hash: block.hash, fetch_epoch_rewards: true)
 

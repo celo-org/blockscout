@@ -1,6 +1,6 @@
 defmodule Explorer.Chain.CeloEpochRewards do
   @moduledoc """
-  Datatype for storing Celo voter rewards
+  Datatype for storing Celo epoch rewards
   """
 
   require Logger
@@ -11,7 +11,6 @@ defmodule Explorer.Chain.CeloEpochRewards do
 
   @typedoc """
   * `block_hash` - block where this reward was paid.
-  * `log_index` - Log index for the associated event
   """
 
   @type t :: %__MODULE__{
