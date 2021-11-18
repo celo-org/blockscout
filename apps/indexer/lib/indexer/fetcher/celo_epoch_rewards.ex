@@ -7,8 +7,6 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
 
   require Logger
 
-  alias Ecto.Multi
-
   alias Explorer.Celo.AccountReader
   alias Explorer.Chain
   alias Explorer.Chain.CeloEpochRewards
@@ -89,21 +87,7 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
       )
     end
 
-    result =
-      Multi.new()
-      |> Multi.run(:import_rewards, fn _, _ ->
-        result = Chain.import(import_params)
-        {:ok, result}
-      end)
-      |> Multi.run(:delete_celo_pending, fn _, _ ->
-        success
-        |> Enum.each(fn reward -> Chain.delete_celo_pending_epoch_operation(reward.block_hash) end)
-
-        {:ok, success}
-      end)
-      |> Explorer.Repo.transaction()
-
-    case result do
+    case Chain.import_epoch_rewards_and_delete_pending_celo_epoch_operations(import_params, success) do
       {:ok, _} ->
         :ok
 

@@ -46,6 +46,7 @@ defmodule Explorer.Chain do
     BridgedToken,
     CeloAccount,
     CeloClaims,
+    CeloEpochRewards,
     CeloParams,
     CeloPendingEpochOperation,
     CeloSigners,
@@ -2814,7 +2815,7 @@ defmodule Explorer.Chain do
     query =
       from(
         b in Block,
-        join: celo_pending_ops in assoc(b, :celo_pending_operations),
+        join: celo_pending_ops in assoc(b, :celo_pending_epoch_operations),
         where: celo_pending_ops.fetch_epoch_rewards,
         select: %{block_number: b.number, block_hash: b.hash}
       )
@@ -7807,5 +7808,21 @@ defmodule Explorer.Chain do
   def delete_celo_pending_epoch_operation(block_hash) do
     celo_pending_operation = Repo.get(CeloPendingEpochOperation, block_hash)
     Repo.delete(celo_pending_operation)
+  end
+
+  @spec import_epoch_rewards_and_delete_pending_celo_epoch_operations(Import.all_options(), CeloEpochRewards.t()) :: {:ok, any} | {:error, any}
+  def import_epoch_rewards_and_delete_pending_celo_epoch_operations(import_params, success) do
+    Multi.new()
+    |> Multi.run(:import_rewards, fn _, _ ->
+      result = Chain.import(import_params)
+      {:ok, result}
+    end)
+    |> Multi.run(:delete_celo_pending, fn _, _ ->
+      success
+      |> Enum.each(fn reward -> Chain.delete_celo_pending_epoch_operation(reward.block_hash) end)
+
+      {:ok, success}
+    end)
+    |> Explorer.Repo.transaction()
   end
 end
