@@ -49,12 +49,7 @@ defmodule Explorer.Celo.Util do
   end
 
   defp format_request({contract_name, function_name, params, bn, _}) do
-    %{
-      contract_address: contract(contract_name),
-      function_name: function_name,
-      args: params,
-      block_number: bn
-    }
+    format_request({contract_name, function_name, params, bn})
   end
 
   defp contract(:blockchainparameters), do: get_address("BlockchainParameters")
