@@ -7,9 +7,11 @@ defmodule Explorer.Chain.AddressTransactionCsvExporterTest do
     test "exports address transactions to csv" do
       address = insert(:address)
 
+      fee_currency = insert(:token, symbol: "TestSymbol", name: "TestName")
+
       transaction =
         :transaction
-        |> insert(from_address: address)
+        |> insert(from_address: address, gas_currency: fee_currency.contract_address)
         |> with_block()
         |> Repo.preload(:token_transfers)
 
@@ -21,53 +23,49 @@ defmodule Explorer.Chain.AddressTransactionCsvExporterTest do
         |> AddressTransactionCsvExporter.export(from_period, to_period)
         |> Enum.to_list()
         |> Enum.drop(1)
-        |> Enum.map(fn [
-                         hash,
-                         _,
-                         block_number,
-                         _,
-                         timestamp,
-                         _,
-                         from_address,
-                         _,
-                         to_address,
-                         _,
-                         created_address,
-                         _,
-                         type,
-                         _,
-                         value,
-                         _,
-                         fee,
-                         _,
-                         status,
-                         _,
-                         error,
-                         _,
-                         cur_price,
-                         _,
-                         op_price,
-                         _,
-                         cl_price,
-                         _
-                       ] ->
-          %{
-            hash: hash,
-            block_number: block_number,
-            timestamp: timestamp,
-            from_address: from_address,
-            to_address: to_address,
-            created_address: created_address,
-            type: type,
-            value: value,
-            fee: fee,
-            status: status,
-            error: error,
-            current_price: cur_price,
-            opening_price: op_price,
-            closing_price: cl_price
-          }
-        end)
+        |> Enum.map(
+          fn p = [
+               hash,
+               _,
+               block_number,
+               _,
+               timestamp,
+               _,
+               from_address,
+               _,
+               to_address,
+               _,
+               created_address,
+               _,
+               type,
+               _,
+               value,
+               _,
+               fee,
+               _,
+               currency,
+               _,
+               status,
+               _,
+               error,
+               _
+             ] ->
+            %{
+              hash: hash,
+              block_number: block_number,
+              timestamp: timestamp,
+              from_address: from_address,
+              to_address: to_address,
+              created_address: created_address,
+              type: type,
+              value: value,
+              fee: fee,
+              currency: currency,
+              status: status,
+              error: error
+            }
+          end
+        )
 
       assert result.block_number == to_string(transaction.block_number)
       assert result.timestamp
@@ -78,20 +76,19 @@ defmodule Explorer.Chain.AddressTransactionCsvExporterTest do
       assert result.type == "OUT"
       assert result.value == transaction.value |> Wei.to(:wei) |> to_string()
       assert result.fee
+      assert result.currency == fee_currency.symbol
       assert result.status == to_string(transaction.status)
       assert result.error == to_string(transaction.error)
-      assert result.current_price
-      assert result.opening_price
-      assert result.closing_price
     end
 
     test "fetches all transactions" do
       address = insert(:address)
+      fee_currency = insert(:token)
 
       1..200
       |> Enum.map(fn _ ->
         :transaction
-        |> insert(from_address: address)
+        |> insert(from_address: address, gas_currency: fee_currency.contract_address)
         |> with_block()
       end)
       |> Enum.count()
