@@ -23,49 +23,47 @@ defmodule Explorer.Chain.AddressTransactionCsvExporterTest do
         |> AddressTransactionCsvExporter.export(from_period, to_period)
         |> Enum.to_list()
         |> Enum.drop(1)
-        |> Enum.map(
-          fn [
-               hash,
-               _,
-               block_number,
-               _,
-               timestamp,
-               _,
-               from_address,
-               _,
-               to_address,
-               _,
-               created_address,
-               _,
-               type,
-               _,
-               value,
-               _,
-               fee,
-               _,
-               currency,
-               _,
-               status,
-               _,
-               error,
-               _
-             ] ->
-            %{
-              hash: hash,
-              block_number: block_number,
-              timestamp: timestamp,
-              from_address: from_address,
-              to_address: to_address,
-              created_address: created_address,
-              type: type,
-              value: value,
-              fee: fee,
-              currency: currency,
-              status: status,
-              error: error
-            }
-          end
-        )
+        |> Enum.map(fn [
+                         hash,
+                         _,
+                         block_number,
+                         _,
+                         timestamp,
+                         _,
+                         from_address,
+                         _,
+                         to_address,
+                         _,
+                         created_address,
+                         _,
+                         type,
+                         _,
+                         value,
+                         _,
+                         fee,
+                         _,
+                         currency,
+                         _,
+                         status,
+                         _,
+                         error,
+                         _
+                       ] ->
+          %{
+            hash: hash,
+            block_number: block_number,
+            timestamp: timestamp,
+            from_address: from_address,
+            to_address: to_address,
+            created_address: created_address,
+            type: type,
+            value: value,
+            fee: fee,
+            currency: currency,
+            status: status,
+            error: error
+          }
+        end)
 
       assert result.block_number == to_string(transaction.block_number)
       assert result.timestamp

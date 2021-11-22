@@ -90,7 +90,7 @@ defmodule Explorer.Chain.AddressTokenTransferCsvExporter do
     end
   end
 
-   defp fee_currency(transaction) do
+  defp fee_currency(transaction) do
     transaction.gas_currency.token.symbol
   end
 end
