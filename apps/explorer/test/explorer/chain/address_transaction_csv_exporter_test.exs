@@ -24,7 +24,7 @@ defmodule Explorer.Chain.AddressTransactionCsvExporterTest do
         |> Enum.to_list()
         |> Enum.drop(1)
         |> Enum.map(
-          fn p = [
+          fn [
                hash,
                _,
                block_number,
