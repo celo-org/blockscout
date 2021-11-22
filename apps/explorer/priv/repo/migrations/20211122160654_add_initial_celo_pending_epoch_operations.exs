@@ -2,7 +2,7 @@ defmodule Explorer.Repo.Migrations.AddInitialCeloPendingEpochOperations do
   use Ecto.Migration
 
   def up do
-    execute """
+    execute("""
     WITH epoch_blocks AS (
     SELECT i * 17280 as block_number FROM generate_series(0, (SELECT (MAX(number)/17280) + 1 FROM blocks)) as i
     ), epoch_block_hashes AS
@@ -10,10 +10,10 @@ defmodule Explorer.Repo.Migrations.AddInitialCeloPendingEpochOperations do
     INSERT INTO celo_pending_epoch_operations (
     block_hash, fetch_epoch_rewards, inserted_at, updated_at
     ) SELECT *, NOW(), NOW() FROM epoch_block_hashes;
-    """
+    """)
   end
 
   def down do
-    execute "delete from celo_pending_epoch_operations;"
+    execute("delete from celo_pending_epoch_operations;")
   end
 end
