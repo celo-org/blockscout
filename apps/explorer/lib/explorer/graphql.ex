@@ -286,7 +286,7 @@ defmodule Explorer.GraphQL do
         gas_used: tx.gas_used,
         gas_price: tx.gas_price,
         fee_currency: tx.gas_currency_hash,
-        fee_token: fragment("coalesce(?, 'cGLD')", token.symbol),
+        fee_token: fragment("coalesce(?, 'CELO')", token.symbol),
         gateway_fee: tx.gateway_fee,
         gateway_fee_recipient: tx.gas_fee_recipient_hash,
         timestamp: b.timestamp,
