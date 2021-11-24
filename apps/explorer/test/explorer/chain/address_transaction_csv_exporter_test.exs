@@ -79,14 +79,61 @@ defmodule Explorer.Chain.AddressTransactionCsvExporterTest do
       assert result.error == to_string(transaction.error)
     end
 
+    test "exports transaction without explicity fee currency with CELO as currency" do
+      address = insert(:address)
+
+      transaction =
+        :transaction
+        |> insert(from_address: address)
+        |> with_block()
+        |> Repo.preload(:token_transfers)
+
+      from_period = Timex.format!(Timex.shift(Timex.now(), minutes: -1), "%Y-%m-%d", :strftime)
+      to_period = Timex.format!(Timex.now(), "%Y-%m-%d", :strftime)
+
+      [result_currency] =
+        address
+        |> AddressTransactionCsvExporter.export(from_period, to_period)
+        |> Enum.to_list()
+        |> Enum.drop(1)
+        |> Enum.map(fn [
+                         _hash,
+                         _,
+                         _block_number,
+                         _,
+                         _timestamp,
+                         _,
+                         _from_address,
+                         _,
+                         _to_address,
+                         _,
+                         _created_address,
+                         _,
+                         _type,
+                         _,
+                         _value,
+                         _,
+                         _fee,
+                         _,
+                         currency,
+                         _,
+                         _status,
+                         _,
+                         _error,
+                         _
+                       ] -> currency
+        end)
+
+      assert result_currency == "CELO"
+    end
+    
     test "fetches all transactions" do
       address = insert(:address)
-      fee_currency = insert(:token)
 
       1..200
       |> Enum.map(fn _ ->
         :transaction
-        |> insert(from_address: address, gas_currency: fee_currency.contract_address)
+        |> insert(from_address: address)
         |> with_block()
       end)
       |> Enum.count()

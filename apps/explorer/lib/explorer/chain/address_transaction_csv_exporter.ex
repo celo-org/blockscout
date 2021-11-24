@@ -17,7 +17,7 @@ defmodule Explorer.Chain.AddressTransactionCsvExporter do
       [token_transfers: :from_address] => :optional,
       [token_transfers: :token_contract_address] => :optional,
       :block => :required,
-      [gas_currency: :token] => :required
+      [gas_currency: :token] => :optional
     }
   ]
 
@@ -115,6 +115,8 @@ defmodule Explorer.Chain.AddressTransactionCsvExporter do
     end
   end
 
+  # if currency is nil we assume celo as tx fee currency
+  defp fee_currency(%Transaction{gas_currency_hash: nil}), do: "CELO"
   defp fee_currency(transaction) do
     transaction.gas_currency.token.symbol
   end
