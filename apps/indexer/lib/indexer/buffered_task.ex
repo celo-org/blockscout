@@ -431,11 +431,20 @@ defmodule Indexer.BufferedTask do
          %BufferedTask{dedup_entries: true, task_ref_to_batch: task_ref_to_batch, bound_queue: bound_queue},
          entries
        ) do
-    running_entries = Enum.uniq(List.flatten(Map.values(task_ref_to_batch)))
+    running_entries =
+      task_ref_to_batch
+      |> Map.values()
+      |> List.flatten()
+      |> Enum.uniq()
+      |> MapSet.new()
+
+    queued_entries = MapSet.new(bound_queue)
 
     entries
-    |> Enum.filter(fn e -> not Enum.member?(running_entries, e) end)
-    |> Enum.filter(fn e -> not Enum.member?(bound_queue, e) end)
+    |> MapSet.new()
+    |> MapSet.difference(running_entries)
+    |> MapSet.difference(queued_entries)
+    |> MapSet.to_list()
   end
 
   defp take_batch(%BufferedTask{bound_queue: bound_queue, max_batch_size: max_batch_size} = state) do
