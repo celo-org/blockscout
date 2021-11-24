@@ -117,6 +117,7 @@ defmodule Explorer.Chain.AddressTransactionCsvExporter do
 
   # if currency is nil we assume celo as tx fee currency
   defp fee_currency(%Transaction{gas_currency_hash: nil}), do: "CELO"
+
   defp fee_currency(transaction) do
     transaction.gas_currency.token.symbol
   end

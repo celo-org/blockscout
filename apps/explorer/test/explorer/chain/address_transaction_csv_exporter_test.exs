@@ -121,12 +121,13 @@ defmodule Explorer.Chain.AddressTransactionCsvExporterTest do
                          _,
                          _error,
                          _
-                       ] -> currency
+                       ] ->
+          currency
         end)
 
       assert result_currency == "CELO"
     end
-    
+
     test "fetches all transactions" do
       address = insert(:address)
 
