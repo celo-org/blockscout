@@ -1,6 +1,11 @@
 import $ from 'jquery'
 import { props } from 'eth-net-props'
 
+export const connectSelector = '[connect-wallet]'
+export const disconnectSelector = '[disconnect-wallet]'
+const connectToSelector = '[connect-to]'
+const connectedToSelector = '[connected-to]'
+
 export function getContractABI ($form) {
   const implementationAbi = $form.data('implementation-abi')
   const parentAbi = $form.data('contract-abi')
@@ -101,6 +106,73 @@ export const getCurrentAccount = () => {
         reject(err)
       })
   })
+}
+
+function hideConnectedToContainer () {
+  document.querySelector(connectedToSelector) && document.querySelector(connectedToSelector).classList.add('hidden')
+}
+
+function showConnectedToContainer () {
+  document.querySelector(connectedToSelector) && document.querySelector(connectedToSelector).classList.remove('hidden')
+}
+
+function hideConnectContainer () {
+  document.querySelector(connectSelector) && document.querySelector(connectSelector).classList.add('hidden')
+}
+
+function showConnectContainer () {
+  document.querySelector(connectSelector) && document.querySelector(connectSelector).classList.remove('hidden')
+}
+
+function hideConnectToContainer () {
+  document.querySelector(connectToSelector) && document.querySelector(connectToSelector).classList.add('hidden')
+}
+
+function showConnectToContainer () {
+  document.querySelector(connectToSelector) && document.querySelector(connectToSelector).classList.remove('hidden')
+}
+
+export function showHideDisconnectButton () {
+  // Show disconnect button only in case of Wallet Connect
+  if (window.web3 && window.web3.currentProvider && window.web3.currentProvider.wc) {
+    document.querySelector(disconnectSelector) && document.querySelector(disconnectSelector).classList.remove('hidden')
+  } else {
+    document.querySelector(disconnectSelector) && document.querySelector(disconnectSelector).classList.add('hidden')
+  }
+}
+
+export function showConnectedToElements (account) {
+  hideConnectToContainer()
+  showConnectContainer()
+  showConnectedToContainer()
+  showHideDisconnectButton()
+  setConnectToAddress(account)
+}
+
+export function showConnectElements () {
+  showConnectToContainer()
+  showConnectContainer()
+  hideConnectedToContainer()
+}
+
+export function hideConnectButton () {
+  showConnectToContainer()
+  hideConnectContainer()
+  hideConnectedToContainer()
+}
+
+function setConnectToAddress (account) {
+  if (document.querySelector('[connected-to-address]')) {
+    document.querySelector('[connected-to-address]').innerHTML = `<a href='/address/${account}'>${trimmedAddressHash(account)}</a>`
+  }
+}
+
+function trimmedAddressHash (account) {
+  if ($(window).width() < 544) {
+    return `${account.slice(0, 7)}–${account.slice(-6)}`
+  } else {
+    return account
+  }
 }
 
 function convertToBool (value) {
