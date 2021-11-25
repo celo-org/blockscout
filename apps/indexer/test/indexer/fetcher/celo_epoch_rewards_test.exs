@@ -93,101 +93,87 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
       expect(
         EthereumJSONRPC.Mox,
         :json_rpc,
-        # calculateTargetEpochRewards
-        # getTargetGoldTotalSupply
-        # getRewardsMultiplier
-        # getRewardsMultiplierParameters
-        # getTargetVotingYieldParameters
-        # getTargetVotingGoldFraction
-        # getVotingGoldFraction
-        # getTotalLockedGold
-        # getNonvotingLockedGold
-        # getTotalVotes
-        # getElectableValidators
-        # getReserveGoldBalance
-        # goldTotalSupply
-        # stableUSDTotalSupply
         fn [
              %{
-               id: id_0,
+               id: calculateTargetEpochRewards,
                jsonrpc: "2.0",
                method: "eth_call",
                params: [%{data: "0x64347043", to: _}, _]
              },
              %{
-               id: id_1,
+               id: getTargetGoldTotalSupply,
                jsonrpc: "2.0",
                method: "eth_call",
                params: [%{data: "0x5049890f", to: _}, _]
              },
              %{
-               id: id_2,
+               id: getRewardsMultiplier,
                jsonrpc: "2.0",
                method: "eth_call",
                params: [%{data: "0x0203ab24", to: _}, _]
              },
              %{
-               id: id_3,
+               id: getRewardsMultiplierParameters,
                jsonrpc: "2.0",
                method: "eth_call",
                params: [%{data: "0x5f396e48", to: _}, _]
              },
              %{
-               id: id_4,
+               id: getTargetVotingYieldParameters,
                jsonrpc: "2.0",
                method: "eth_call",
                params: [%{data: "0x171af90f", to: _}, _]
              },
              %{
-               id: id_5,
+               id: getTargetVotingGoldFraction,
                jsonrpc: "2.0",
                method: "eth_call",
                params: [%{data: "0xae098de2", to: _}, _]
              },
              %{
-               id: id_6,
+               id: getVotingGoldFraction,
                jsonrpc: "2.0",
                method: "eth_call",
                params: [%{data: "0xa1b95962", to: _}, _]
              },
              %{
-               id: id_7,
+               id: getTotalLockedGold,
                jsonrpc: "2.0",
                method: "eth_call",
                params: [%{data: "0x30a61d59", to: _}, _]
              },
              %{
-               id: id_8,
+               id: getNonvotingLockedGold,
                jsonrpc: "2.0",
                method: "eth_call",
                params: [%{data: "0x807876b7", to: _}, _]
              },
              %{
-               id: id_9,
+               id: getTotalVotes,
                jsonrpc: "2.0",
                method: "eth_call",
                params: [%{data: "0x9a0e7d66", to: _}, _]
              },
              %{
-               id: id_10,
+               id: getElectableValidators,
                jsonrpc: "2.0",
                method: "eth_call",
                params: [%{data: "0xf9f41a7a", to: _}, _]
              },
              %{
-               id: id_11,
+               id: getReserveGoldBalance,
                jsonrpc: "2.0",
                method: "eth_call",
                params: [%{data: "0x8d9a5e6f", to: _}, _]
              },
              %{
-               id: id_12,
+               id: goldTotalSupply,
                jsonrpc: "2.0",
                method: "eth_call",
                params: [%{data: "0x18160ddd", to: "0x471ece3750da237f93b8e339c536989b8978a438"}, _]
              },
              %{
-               id: id_13,
+               id: stableUSDTotalSupply,
                jsonrpc: "2.0",
                method: "eth_call",
                params: [%{data: "0x18160ddd", to: "0x765de816845861e75a25fca122bb6898b8b1282a"}, _]
@@ -197,91 +183,77 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
           {
             :ok,
             [
-              # calculateTargetEpochRewards
               %{
-                id: id_0,
+                id: calculateTargetEpochRewards,
                 jsonrpc: "2.0",
                 result:
                   "0x00000000000000000000000000000000000000000000000b25b7389d6e6f8233000000000000000000000000000000000000000000000583d67889a223c1b9ab00000000000000000000000000000000000000000000034b50882b7adf687bd70000000000000000000000000000000000000000000000035f8ddb4f56e8ddad"
               },
-              # getTargetGoldTotalSupply
               %{
-                id: id_1,
+                id: getTargetGoldTotalSupply,
                 jsonrpc: "2.0",
                 result: "0x000000000000000000000000000000000000000001f12657ea8a3cbb0ff9aa5d"
               },
-              # getRewardsMultiplier
               %{
-                id: id_2,
+                id: getRewardsMultiplier,
                 jsonrpc: "2.0",
                 result: "0x00000000000000000000000000000000000000000000d3ea531c462b6d289800"
               },
-              # getRewardsMultiplierParameters
               %{
-                id: id_3,
+                id: getRewardsMultiplierParameters,
                 jsonrpc: "2.0",
                 result:
                   "0x00000000000000000000000000000000000000000001a784379d99db420000000000000000000000000000000000000000000000000069e10de76676d08000000000000000000000000000000000000000000000000422ca8b0a00a425000000"
               },
-              # getTargetVotingYieldParameters
               %{
-                id: id_4,
+                id: getTargetVotingYieldParameters,
                 jsonrpc: "2.0",
                 result:
                   "0x000000000000000000000000000000000000000000000008ac7230489e80000000000000000000000000000000000000000000000000001b1ae4d6e2ef5000000000000000000000000000000000000000000000000000000000000000000000"
               },
-              # getTargetVotingGoldFraction
               %{
-                id: id_5,
+                id: getTargetVotingGoldFraction,
                 jsonrpc: "2.0",
                 result: "0x0000000000000000000000000000000000000000000069e10de76676d0800000"
               },
-              # getVotingGoldFraction
               %{
-                id: id_6,
+                id: getVotingGoldFraction,
                 jsonrpc: "2.0",
                 result: "0x0000000000000000000000000000000000000000000056e297f4f13e205a7f52"
               },
-              # getTotalLockedGold
               %{
-                id: id_7,
+                id: getTotalLockedGold,
                 jsonrpc: "2.0",
                 result: "0x000000000000000000000000000000000000000001059ec802d92a296076aedb"
               },
-              # getNonvotingLockedGold
               %{
-                id: id_8,
+                id: getNonvotingLockedGold,
                 jsonrpc: "2.0",
                 result: "0x00000000000000000000000000000000000000000012bb087e1546063ebff82e"
               },
-              # getTotalVotes
               %{
-                id: id_9,
+                id: getTotalVotes,
                 jsonrpc: "2.0",
                 result: "0x000000000000000000000000000000000000000000f2e3bf84c3e42321b6b6ad"
               },
-              # getElectableValidators
               %{
-                id: id_10,
+                id: getElectableValidators,
                 jsonrpc: "2.0",
                 result:
                   "0x0000000000000000000000000000000000000000000000000000000000000016000000000000000000000000000000000000000000000000000000000000006e"
               },
-              # getReserveGoldBalance
               %{
-                id: id_11,
+                id: getReserveGoldBalance,
                 jsonrpc: "2.0",
                 result: "0x0000000000000000000000000000000000000000005f563e55a0348825d9cb68"
               },
-              # goldTotalSupply
               %{
-                id: id_12,
+                id: goldTotalSupply,
                 jsonrpc: "2.0",
                 result: "0x000000000000000000000000000000000000000001f09bd2274f90dfe61df4d1"
               },
-              # stableUSDTotalSupply
               %{
-                id: id_13,
+                id: stableUSDTotalSupply,
                 jsonrpc: "2.0",
                 result: "0x00000000000000000000000000000000000000000004498a2f3c39c0d4b5ebd9"
               }
