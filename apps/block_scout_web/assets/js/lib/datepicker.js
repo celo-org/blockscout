@@ -5,7 +5,7 @@ import $ from 'jquery'
 const DATE_FORMAT = 'YYYY-MM-DD'
 
 const $button = $('#export-csv-button')
-const $downloading_message = $('#downloading-message')
+const $message = $('#downloading-message')
 
 // eslint-disable-next-line
 const _instance1 = new Pikaday({
@@ -50,7 +50,7 @@ $button.on('click', () => {
         if (dataJson.tokenProperties.valid === true) {
           $button.removeClass('spinner')
           location.href = $button.data('link')
-          $downloading_message.removeClass('hidden')
+          $message.removeClass('hidden')
         } else {
           $button.removeClass('spinner')
           return false
