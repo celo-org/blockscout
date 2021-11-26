@@ -6,11 +6,10 @@ defmodule Explorer.Chain.AddressTokenTransferCsvExporterTest do
   describe "export/3" do
     test "exports token transfers to csv" do
       address = insert(:address)
-      fee_currency = insert(:token, symbol: "TestSymbol", name: "TestName")
 
       transaction =
         :transaction
-        |> insert(from_address: address, gas_currency: fee_currency.contract_address)
+        |> insert(from_address: address)
         |> with_block()
 
       token_transfer = insert(:token_transfer, transaction: transaction, from_address: address)
@@ -73,6 +72,7 @@ defmodule Explorer.Chain.AddressTokenTransferCsvExporterTest do
       assert result.from_address == token_transfer.from_address_hash |> to_string() |> String.downcase()
       assert result.to_address == token_transfer.to_address_hash |> to_string() |> String.downcase()
       assert result.timestamp == to_string(transaction.block.timestamp)
+      assert result.transaction_currency == "CELO"
       assert result.type == "OUT"
     end
   end
