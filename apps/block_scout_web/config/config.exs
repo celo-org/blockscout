@@ -60,7 +60,9 @@ config :block_scout_web,
   max_length_to_show_string_without_trimming: System.get_env("MAX_STRING_LENGTH_WITHOUT_TRIMMING", "2040"),
   re_captcha_site_key: System.get_env("RE_CAPTCHA_SITE_KEY", nil),
   re_captcha_api_key: System.get_env("RE_CAPTCHA_API_KEY", nil),
-  re_captcha_project_id: System.get_env("RE_CAPTCHA_PROJECT_ID", nil)
+  re_captcha_project_id: System.get_env("RE_CAPTCHA_PROJECT_ID", nil),
+  re_captcha_secret_key: System.get_env("RE_CAPTCHA_SECRET_KEY", nil),
+  re_captcha_client_key: System.get_env("RE_CAPTCHA_CLIENT_KEY", nil)
 
 config :block_scout_web, BlockScoutWeb.Counters.BlocksIndexedCounter, enabled: true
 

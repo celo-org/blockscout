@@ -155,11 +155,10 @@ defmodule BlockScoutWeb.AddressTransactionControllerTest do
   describe "GET token-transfers-csv/2" do
     test "exports token transfers to csv", %{conn: conn} do
       address = insert(:address)
-      fee_currency = insert(:token, symbol: "TestSymbol", name: "TestName")
 
       transaction =
         :transaction
-        |> insert(from_address: address, gas_currency: fee_currency.contract_address)
+        |> insert(from_address: address)
         |> with_block()
 
       insert(:token_transfer, transaction: transaction, from_address: address)
@@ -182,14 +181,13 @@ defmodule BlockScoutWeb.AddressTransactionControllerTest do
   describe "GET transactions_csv/2" do
     test "download csv file with transactions", %{conn: conn} do
       address = insert(:address)
-      fee_currency = insert(:token, symbol: "TestSymbol", name: "TestName")
 
       :transaction
-      |> insert(from_address: address, gas_currency: fee_currency.contract_address)
+      |> insert(from_address: address)
       |> with_block()
 
       :transaction
-      |> insert(from_address: address, gas_currency: fee_currency.contract_address)
+      |> insert(from_address: address)
       |> with_block()
 
       from_period = Timex.format!(Timex.shift(Timex.now(), minutes: -1), "%Y-%m-%d", :strftime)

@@ -35,6 +35,7 @@ _[GitHub keywords to close any associated issues](https://blog.github.com/2013-0
   please justify why.
 -->
 
+  - [ ] I added an entry to `CHANGELOG.md` with this PR
   - [ ] If I added new functionality, I added tests covering it.
   - [ ] If I fixed a bug, I added a regression test to prevent the bug from silently reappearing again.
   - [ ] I added code comments for anything non trivial.

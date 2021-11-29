@@ -568,7 +568,7 @@ defmodule Explorer.Chain do
     from_block = from_block(options)
     to_block = to_block(options)
 
-    {block_number, _transaction_index, log_index} = paging_options.key || {BlockNumber.get_max(), 0, 0}
+    {block_number, transaction_index, log_index} = paging_options.key || {BlockNumber.get_max(), 0, 0}
 
     base_query =
       from(log in Log,
@@ -812,7 +812,7 @@ defmodule Explorer.Chain do
         select:
           sum(
             fragment(
-              "CASE
+              "CASE 
                 WHEN ? = 0 THEN 0
                 WHEN ? < ? THEN ?
                 ELSE ? END",
@@ -2397,7 +2397,7 @@ defmodule Explorer.Chain do
     base_query =
       from(t in Token,
         where: t.total_supply > ^0,
-        order_by: [desc: t.holder_count, asc: t.name],
+        order_by: [desc_nulls_last: t.holder_count, asc: t.name],
         preload: [:contract_address]
       )
 
@@ -3497,6 +3497,31 @@ defmodule Explorer.Chain do
   end
 
   @doc """
+  Returns the list of empty blocks from the DB which have not marked with `t:Explorer.Chain.Block.is_empty/0`.
+  This query used for initializtion of Indexer.EmptyBlocksSanitizer
+  """
+  def unprocessed_empty_blocks_query_list(limit) do
+    query =
+      from(block in Block,
+        as: :block,
+        where: block.consensus == true,
+        where: is_nil(block.is_empty),
+        where:
+          not exists(
+            from(transaction in Transaction,
+              where: transaction.block_number == parent_as(:block).number
+            )
+          ),
+        select: {block.number, block.hash},
+        order_by: [desc: block.number],
+        limit: ^limit
+      )
+
+    query
+    |> Repo.all(timeout: :infinity)
+  end
+
+  @doc """
   The `string` must start with `0x`, then is converted to an integer and then to `t:Explorer.Chain.Hash.Address.t/0`.
 
       iex> Explorer.Chain.string_to_address_hash("0x5aAeb6053F3E94C9b9A09f33669435E7Ef1BeAed")
@@ -3838,7 +3863,7 @@ defmodule Explorer.Chain do
     formatted_revert_reason
   end
 
-  defp format_revert_reason_message(revert_reason) do
+  def format_revert_reason_message(revert_reason) do
     case revert_reason do
       @revert_msg_prefix_1 <> rest ->
         rest
@@ -4774,7 +4799,7 @@ defmodule Explorer.Chain do
     nft_tokens =
       from(
         token in Token,
-        where: token.type == ^"ERC-721",
+        where: token.type == ^"ERC-721" or token.type == ^"ERC-1155",
         select: token.contract_address_hash
       )
 
@@ -5018,6 +5043,8 @@ defmodule Explorer.Chain do
       else
         {:ok, false}
       end
+    else
+      {:ok, false}
     end
   end
 
@@ -5928,6 +5955,13 @@ defmodule Explorer.Chain do
     |> Repo.one() || Decimal.new(0)
   end
 
+  # @spec fetch_last_token_balance_1155(Hash.Address.t(), Hash.Address.t()) :: Decimal.t()
+  def fetch_last_token_balance_1155(address_hash, token_contract_address_hash, token_id) do
+    address_hash
+    |> CurrentTokenBalance.last_token_balance_1155(token_contract_address_hash, token_id)
+    |> Repo.one() || Decimal.new(0)
+  end
+
   @spec address_to_coin_balances(Hash.Address.t(), [paging_options]) :: []
   def address_to_coin_balances(address_hash, options) do
     paging_options = Keyword.get(options, :paging_options, @default_paging_options)
@@ -6048,9 +6082,36 @@ defmodule Explorer.Chain do
     |> Repo.all()
   end
 
+  def fetch_token_holders_from_token_hash_and_token_id(contract_address_hash, token_id, options \\ []) do
+    contract_address_hash
+    |> CurrentTokenBalance.token_holders_1155_by_token_id(token_id, options)
+    |> Repo.all()
+  end
+
+  def token_id_1155_is_unique?(_, nil), do: false
+
+  def token_id_1155_is_unique?(contract_address_hash, token_id) do
+    result = contract_address_hash |> CurrentTokenBalance.token_balances_by_id_limit_2(token_id) |> Repo.all()
+
+    if length(result) == 1 do
+      Decimal.cmp(Enum.at(result, 0), 1) == :eq
+    else
+      false
+    end
+  end
+
+  def get_token_ids_1155(contract_address_hash) do
+    contract_address_hash
+    |> CurrentTokenBalance.token_ids_query()
+    |> Repo.all()
+  end
+
   @spec count_token_holders_from_token_hash(Hash.Address.t()) :: non_neg_integer()
   def count_token_holders_from_token_hash(contract_address_hash) do
-    query = from(ctb in CurrentTokenBalance.token_holders_query(contract_address_hash), select: fragment("COUNT(*)"))
+    query =
+      from(ctb in CurrentTokenBalance.token_holders_query_for_count(contract_address_hash),
+        select: fragment("COUNT(DISTINCT(address_hash))")
+      )
 
     Repo.one!(query, timeout: :infinity)
   end
@@ -6088,7 +6149,7 @@ defmodule Explorer.Chain do
   end
 
   @spec transaction_token_transfer_type(Transaction.t()) ::
-          :erc20 | :erc721 | :token_transfer | nil
+          :erc20 | :erc721 | :erc1155 | :token_transfer | nil
   def transaction_token_transfer_type(
         %Transaction{
           status: :ok,
@@ -6135,10 +6196,24 @@ defmodule Explorer.Chain do
 
         find_erc721_token_transfer(transaction.token_transfers, {from_address, to_address})
 
+      # safeTransferFrom(address,address,uint256,uint256,bytes)
+      {"0xf242432a" <> params, ^zero_wei} ->
+        types = [:address, :address, {:uint, 256}, {:uint, 256}, :bytes]
+        [from_address, to_address, _id, _value, _data] = decode_params(params, types)
+
+        find_erc1155_token_transfer(transaction.token_transfers, {from_address, to_address})
+
+      # safeBatchTransferFrom(address,address,uint256[],uint256[],bytes)
+      {"0x2eb2c2d6" <> params, ^zero_wei} ->
+        types = [:address, :address, [{:uint, 256}], [{:uint, 256}], :bytes]
+        [from_address, to_address, _ids, _values, _data] = decode_params(params, types)
+
+        find_erc1155_token_transfer(transaction.token_transfers, {from_address, to_address})
+
       {"0xf907fc5b" <> _params, ^zero_wei} ->
         :erc20
 
-      # check for ERC 20 or for old ERC 721 token versions
+      # check for ERC-20 or for old ERC-721, ERC-1155 token versions
       {unquote(TokenTransfer.transfer_function_signature()) <> params, ^zero_wei} ->
         types = [:address, {:uint, 256}]
 
@@ -6146,7 +6221,7 @@ defmodule Explorer.Chain do
 
         decimal_value = Decimal.new(value)
 
-        find_erc721_or_erc20_token_transfer(transaction.token_transfers, {address, decimal_value})
+        find_erc721_or_erc20_or_erc1155_token_transfer(transaction.token_transfers, {address, decimal_value})
 
       _ ->
         nil
@@ -6162,7 +6237,16 @@ defmodule Explorer.Chain do
     if token_transfer, do: :erc721
   end
 
-  defp find_erc721_or_erc20_token_transfer(token_transfers, {address, decimal_value}) do
+  defp find_erc1155_token_transfer(token_transfers, {from_address, to_address}) do
+    token_transfer =
+      Enum.find(token_transfers, fn token_transfer ->
+        token_transfer.from_address_hash.bytes == from_address && token_transfer.to_address_hash.bytes == to_address
+      end)
+
+    if token_transfer, do: :erc1155
+  end
+
+  defp find_erc721_or_erc20_or_erc1155_token_transfer(token_transfers, {address, decimal_value}) do
     token_transfer =
       Enum.find(token_transfers, fn token_transfer ->
         token_transfer.to_address_hash.bytes == address && token_transfer.amount == decimal_value
@@ -6172,6 +6256,7 @@ defmodule Explorer.Chain do
       case token_transfer.token do
         %Token{type: "ERC-20"} -> :erc20
         %Token{type: "ERC-721"} -> :erc721
+        %Token{type: "ERC-1155"} -> :erc1155
         _ -> nil
       end
     else
@@ -6471,7 +6556,9 @@ defmodule Explorer.Chain do
     )
   end
 
-  def get_total_staked_and_ordered(address_hash) do
+  def get_total_staked_and_ordered(""), do: nil
+
+  def get_total_staked_and_ordered(address_hash) when is_binary(address_hash) do
     StakingPoolsDelegator
     |> where([delegator], delegator.address_hash == ^address_hash and not delegator.is_deleted)
     |> select([delegator], %{
@@ -6846,6 +6933,7 @@ defmodule Explorer.Chain do
       _ -> {:error, :not_found}
     end
   end
+  def get_total_staked_and_ordered(_), do: nil
 
   defp with_decompiled_code_flag(query, _hash, false), do: query
 
@@ -6868,6 +6956,17 @@ defmodule Explorer.Chain do
     params
     |> Base.decode16!(case: :mixed)
     |> TypeDecoder.decode_raw(types)
+  end
+
+  def get_token_type(hash) do
+    query =
+      from(
+        token in Token,
+        where: token.contract_address_hash == ^hash,
+        select: token.type
+      )
+
+    Repo.one(query)
   end
 
   @doc """
@@ -7340,28 +7439,23 @@ defmodule Explorer.Chain do
     storage_slot_logic_contract_address = "0x360894a13ba1a3210667c828492db98dca3e2076cc3735a920a3ca505d382bbc"
     storage_slot_beacon_contract_address = "0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50"
 
-    {status, implementation_address} =
+    {_status, implementation_address} =
       case Contract.eth_get_storage_at_request(
              proxy_address_hash,
              storage_slot_logic_contract_address,
              nil,
              json_rpc_named_arguments
            ) do
-        {:ok, "0x"} ->
-          Contract.eth_get_storage_at_request(
-            proxy_address_hash,
-            storage_slot_beacon_contract_address,
-            nil,
-            json_rpc_named_arguments
-          )
+        {:ok, empty_address}
+        when empty_address in ["0x", "0x0000000000000000000000000000000000000000000000000000000000000000"] ->
+          fetch_beacon_proxy_implementation(proxy_address_hash, json_rpc_named_arguments)
 
-        {:ok, "0x0000000000000000000000000000000000000000000000000000000000000000"} ->
-          Contract.eth_get_storage_at_request(
-            proxy_address_hash,
-            storage_slot_beacon_contract_address,
-            nil,
-            json_rpc_named_arguments
-          )
+        {:ok, implementation_logic_address} ->
+          {:ok, implementation_logic_address}
+
+        {:error, _} ->
+          {:ok, "0x"}
+      end
 
         {:ok, implementation_logic_address} ->
           {:ok, implementation_logic_address}
@@ -7373,12 +7467,59 @@ defmodule Explorer.Chain do
     abi_decode_address_output(if status == :ok, do: implementation_address, else: "0x")
   end
 
+  # changes requested by https://github.com/blockscout/blockscout/issues/4770
+  # for support BeaconProxy pattern
+  defp fetch_beacon_proxy_implementation(proxy_address_hash, json_rpc_named_arguments) do
+    # https://eips.ethereum.org/EIPS/eip-1967
+    storage_slot_beacon_contract_address = "0xa3f0ad74e5423aebfd80d3ef4346578335a9a72aeaee59ff6cb3582b35133d50"
+
+    implementation_method_abi = [
+      %{
+        "type" => "function",
+        "stateMutability" => "view",
+        "outputs" => [%{"type" => "address", "name" => "", "internalType" => "address"}],
+        "name" => "implementation",
+        "inputs" => []
+      }
+    ]
+
+    case Contract.eth_get_storage_at_request(
+           proxy_address_hash,
+           storage_slot_beacon_contract_address,
+           nil,
+           json_rpc_named_arguments
+         ) do
+      {:ok, empty_address}
+      when empty_address in ["0x", "0x0000000000000000000000000000000000000000000000000000000000000000"] ->
+        {:ok, "0x"}
+
+      {:ok, beacon_contract_address} ->
+        case beacon_contract_address
+             |> abi_decode_address_output()
+             |> get_implementation_address_hash_basic(implementation_method_abi) do
+          <<implementation_address::binary-size(42)>> ->
+            {:ok, implementation_address}
+
+          _ ->
+            {:ok, beacon_contract_address}
+        end
+
+      {:error, _} ->
+        {:ok, "0x"}
+    end
+  end
+
   defp get_implementation_address_hash_basic(proxy_address_hash, abi) do
     # 5c60da1b = keccak256(implementation())
     implementation_address =
-      case Reader.query_contract(proxy_address_hash, abi, %{
-             "5c60da1b" => []
-           }) do
+      case Reader.query_contract(
+             proxy_address_hash,
+             abi,
+             %{
+               "5c60da1b" => []
+             },
+             false
+           ) do
         %{"5c60da1b" => {:ok, [result]}} -> result
         _ -> nil
       end
@@ -7423,17 +7564,19 @@ defmodule Explorer.Chain do
     end)
   end
 
-  defp abi_decode_address_output(address) when is_nil(address), do: nil
+  defp abi_decode_address_output(nil), do: nil
 
   defp abi_decode_address_output("0x"), do: @burn_address_hash_str
 
-  defp abi_decode_address_output(address) do
+  defp abi_decode_address_output(address) when is_binary(address) do
     if String.length(address) > 42 do
       "0x" <> String.slice(address, -40, 40)
     else
       address
     end
   end
+
+  defp abi_decode_address_output(_), do: nil
 
   defp address_to_hex(address) do
     if address do
@@ -7592,7 +7735,7 @@ defmodule Explorer.Chain do
 
       {_, block_index} =
         sorted_traces
-        |> Enum.find(fn {trace, _} ->
+        |> Enum.find({nil, -1}, fn {trace, _} ->
           trace.transaction_index == transaction_index &&
             trace.transaction_hash == transaction_hash
         end)

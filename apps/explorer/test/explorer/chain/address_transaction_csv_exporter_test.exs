@@ -47,6 +47,12 @@ defmodule Explorer.Chain.AddressTransactionCsvExporterTest do
                          status,
                          _,
                          error,
+                         _,
+                         cur_price,
+                         _,
+                         op_price,
+                         _,
+                         cl_price,
                          _
                        ] ->
           %{
@@ -61,7 +67,10 @@ defmodule Explorer.Chain.AddressTransactionCsvExporterTest do
             fee: fee,
             currency: currency,
             status: status,
-            error: error
+            error: error,
+            current_price: cur_price,
+            opening_price: op_price,
+            closing_price: cl_price
           }
         end)
 

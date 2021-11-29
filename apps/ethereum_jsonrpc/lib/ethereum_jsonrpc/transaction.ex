@@ -167,10 +167,6 @@ defmodule EthereumJSONRPC.Transaction do
   """
   @spec elixir_to_params(elixir) :: params
 
-  def elixir_to_params(%{"input" => "0x0"} = transaction) do
-    elixir_to_params(%{transaction | "input" => "0x"})
-  end
-
   def elixir_to_params(
         %{
           "blockHash" => block_hash,
@@ -334,8 +330,11 @@ defmodule EthereumJSONRPC.Transaction do
           "s" => s,
           "to" => to_address_hash,
           "transactionIndex" => index,
+          "type" => type,
           "v" => v,
-          "value" => value
+          "value" => value,
+          "maxPriorityFeePerGas" => max_priority_fee_per_gas,
+          "maxFeePerGas" => max_fee_per_gas
         } = transaction
       ) do
     result = %{
@@ -356,7 +355,10 @@ defmodule EthereumJSONRPC.Transaction do
       to_address_hash: to_address_hash,
       v: v,
       value: value,
-      transaction_index: index
+      transaction_index: index,
+      type: type,
+      max_priority_fee_per_gas: max_priority_fee_per_gas,
+      max_fee_per_gas: max_fee_per_gas
     }
 
     if transaction["creates"] do
@@ -366,39 +368,92 @@ defmodule EthereumJSONRPC.Transaction do
     end
   end
 
-  # Ganache bug. it return `to: "0x0"` except of `to: null`
   def elixir_to_params(
         %{
-          "to" => "0x0"
+          "blockHash" => block_hash,
+          "blockNumber" => block_number,
+          "from" => from_address_hash,
+          "gas" => gas,
+          "gasPrice" => gas_price,
+          "hash" => hash,
+          "input" => input,
+          "nonce" => nonce,
+          "r" => r,
+          "s" => s,
+          "to" => to_address_hash,
+          "transactionIndex" => index,
+          "v" => v,
+          "value" => value,
+          "type" => type
         } = transaction
       ) do
-    %{transaction | "to" => nil}
-    |> elixir_to_params()
+    result = %{
+      block_hash: block_hash,
+      block_number: block_number,
+      from_address_hash: from_address_hash,
+      gas: gas,
+      gas_price: gas_price,
+      hash: hash,
+      index: index,
+      input: input,
+      nonce: nonce,
+      r: r,
+      s: s,
+      to_address_hash: to_address_hash,
+      v: v,
+      value: value,
+      transaction_index: index,
+      type: type
+    }
+
+    if transaction["creates"] do
+      Map.put(result, :created_contract_address_hash, transaction["creates"])
+    else
+      result
+    end
   end
 
-  # Ganache bug. It don't send `r,s,v` transaction fields.
-  # Fix is in sources but not released yet
   def elixir_to_params(
         %{
-          "blockHash" => _,
-          "blockNumber" => _,
-          "from" => _,
-          "gas" => _,
-          "gasPrice" => _,
-          "feeCurrency" => _,
-          "gatewayFeeRecipient" => _,
-          "gatewayFee" => _,
-          "hash" => _,
-          "input" => _,
-          "nonce" => _,
-          "to" => _,
-          "transactionIndex" => _,
-          "value" => _
+          "blockHash" => block_hash,
+          "blockNumber" => block_number,
+          "from" => from_address_hash,
+          "gas" => gas,
+          "gasPrice" => gas_price,
+          "hash" => hash,
+          "input" => input,
+          "nonce" => nonce,
+          "r" => r,
+          "s" => s,
+          "to" => to_address_hash,
+          "transactionIndex" => index,
+          "v" => v,
+          "value" => value
         } = transaction
       ) do
-    transaction
-    |> Map.merge(%{"r" => 0, "s" => 0, "v" => 0})
-    |> elixir_to_params()
+    result = %{
+      block_hash: block_hash,
+      block_number: block_number,
+      from_address_hash: from_address_hash,
+      gas: gas,
+      gas_price: gas_price,
+      hash: hash,
+      index: index,
+      input: input,
+      nonce: nonce,
+      r: r,
+      s: s,
+      to_address_hash: to_address_hash,
+      v: v,
+      value: value,
+      transaction_index: index
+    }
+
+    if transaction["creates"] do
+      Map.put(result, :created_contract_address_hash, transaction["creates"])
+    else
+      result
+    end
   end
 
   @doc """

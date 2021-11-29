@@ -3,8 +3,15 @@ defmodule Explorer.Chain.AddressTransactionCsvExporter do
   Exports transactions to a csv file.
   """
 
-  alias Explorer.{Chain, PagingOptions}
+  import Ecto.Query,
+    only: [
+      from: 2
+    ]
+
+  alias Explorer.{Chain, Market, PagingOptions, Repo}
+  alias Explorer.Market.MarketHistory
   alias Explorer.Chain.{Address, Transaction, Wei}
+  alias Explorer.ExchangeRates.Token
   alias NimbleCSV.RFC4180
 
   @necessity_by_association [
@@ -30,9 +37,11 @@ defmodule Explorer.Chain.AddressTransactionCsvExporter do
     from_block = Chain.convert_date_to_min_block(from_period)
     to_block = Chain.convert_date_to_max_block(to_period)
 
+    exchange_rate = Market.get_exchange_rate(Explorer.coin()) || Token.null()
+
     address.hash
     |> fetch_all_transactions(from_block, to_block, @paging_options)
-    |> to_csv_format(address)
+    |> to_csv_format(address, exchange_rate)
     |> dump_to_stream()
   end
 
@@ -62,7 +71,7 @@ defmodule Explorer.Chain.AddressTransactionCsvExporter do
     |> RFC4180.dump_to_stream()
   end
 
-  defp to_csv_format(transactions, address) do
+  defp to_csv_format(transactions, address, exchange_rate) do
     row_names = [
       "TxHash",
       "BlockNumber",
@@ -73,14 +82,18 @@ defmodule Explorer.Chain.AddressTransactionCsvExporter do
       "Type",
       "Value",
       "Fee",
-      "FeeCurrency",
       "Status",
-      "ErrCode"
+      "ErrCode",
+      "CurrentPrice",
+      "TxDateOpeningPrice",
+      "TxDateClosingPrice"
     ]
 
     transaction_lists =
       transactions
       |> Stream.map(fn transaction ->
+        {opening_price, closing_price} = price_at_date(transaction.block.timestamp)
+
         [
           to_string(transaction.hash),
           transaction.block_number,
@@ -93,7 +106,10 @@ defmodule Explorer.Chain.AddressTransactionCsvExporter do
           fee(transaction),
           fee_currency(transaction),
           transaction.status,
-          transaction.error
+          transaction.error,
+          exchange_rate.usd_value,
+          opening_price,
+          closing_price
         ]
       end)
 
@@ -120,5 +136,19 @@ defmodule Explorer.Chain.AddressTransactionCsvExporter do
 
   defp fee_currency(transaction) do
     transaction.gas_currency.token.symbol
+  end
+  defp price_at_date(datetime) do
+    date = DateTime.to_date(datetime)
+
+    query =
+      from(
+        mh in MarketHistory,
+        where: mh.date == ^date
+      )
+
+    case Repo.one(query) do
+      nil -> {nil, nil}
+      price -> {price.opening_price, price.closing_price}
+    end
   end
 end

@@ -30,7 +30,7 @@ const _instance2 = new Pikaday({
 $button.on('click', () => {
   $button.addClass('spinner')
   // eslint-disable-next-line
-  const resp = grecaptcha.enterprise.getResponse()
+  const resp = grecaptcha.getResponse()
   if (resp) {
     $.ajax({
       url: './captcha?type=JSON',
@@ -45,12 +45,11 @@ $button.on('click', () => {
     })
       .done(function (data) {
         // eslint-disable-next-line
-        grecaptcha.enterprise.reset()
+        grecaptcha.reset()
         const dataJson = JSON.parse(data)
-        if (dataJson.tokenProperties.valid === true) {
+        if (dataJson.success) {
           $button.removeClass('spinner')
           location.href = $button.data('link')
-          $message.removeClass('hidden')
         } else {
           $button.removeClass('spinner')
           return false
