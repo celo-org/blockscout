@@ -51,7 +51,7 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
     end
 
     @tag :no_geth
-    test "does not buffer blocks with fetched internal transactions", %{
+    test "does not buffer blocks with fetched epoch rewards", %{
       json_rpc_named_arguments: json_rpc_named_arguments
     } do
       block = insert(:block)
