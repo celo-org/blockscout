@@ -142,10 +142,14 @@ defmodule Explorer.Celo.AccountReader do
            community_target_epoch_rewards,
            carbon_offsetting_target_epoch_rewards
          ]} = data["calculateTargetEpochRewards"]
-        {:ok, Map.merge(response, %{validator_target_epoch_rewards: validator_target_epoch_rewards,
-          voter_target_epoch_rewards: voter_target_epoch_rewards,
-          community_target_epoch_rewards: community_target_epoch_rewards,
-          carbon_offsetting_target_epoch_rewards: carbon_offsetting_target_epoch_rewards})}
+
+        {:ok,
+         Map.merge(response, %{
+           validator_target_epoch_rewards: validator_target_epoch_rewards,
+           voter_target_epoch_rewards: voter_target_epoch_rewards,
+           community_target_epoch_rewards: community_target_epoch_rewards,
+           carbon_offsetting_target_epoch_rewards: carbon_offsetting_target_epoch_rewards
+         })}
       end
     else
       error -> error
