@@ -4,7 +4,7 @@ defmodule Explorer.Repo.Migrations.AddInitialCeloPendingEpochOperations do
   def up do
     execute("""
     WITH epoch_blocks AS (
-    SELECT i * 17280 as block_number FROM generate_series(0, (SELECT (MAX(number)/17280) + 1 FROM blocks)) as i
+    SELECT i * 17280 as block_number FROM generate_series(1, (SELECT (MAX(number)/17280) FROM blocks)) as i
     ), epoch_block_hashes AS
     (SELECT b.hash, true as fetch FROM epoch_blocks eb LEFT JOIN blocks b ON b.number = eb.block_number)
     INSERT INTO celo_pending_epoch_operations (

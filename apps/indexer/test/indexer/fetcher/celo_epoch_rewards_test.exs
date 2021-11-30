@@ -116,7 +116,7 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
                  gold_total_supply: 600_363_049_982_598_326_620_386_513,
                  stable_usd_total_supply: 5_182_985_086_049_091_467_996_121,
                  block_hash: block_hash,
-                 epoch_number: 11
+                 epoch_number: 10
                }
              ] == fetched
     end

@@ -129,7 +129,7 @@ defmodule Explorer.Celo.AccountReader do
         stable_usd_total_supply: stable_usd_total_supply,
         block_hash: block_hash,
         block_number: bn,
-        epoch_number: div(bn, 17280) + 1
+        epoch_number: div(bn, 17280)
       }
 
       if bn <= 155_520 do
