@@ -82,7 +82,7 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
     }
 
     if failed != [] do
-      Logger.debug(fn -> "requeuing rewards" end,
+      Logger.error(fn -> "requeuing rewards" end,
         block_numbers: Enum.map(failed, fn rew -> rew.block_number end)
       )
     end
@@ -92,7 +92,7 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
         :ok
 
       {:error, reason} ->
-        Logger.debug(fn -> ["failed to import Celo voter reward data: ", inspect(reason)] end,
+        Logger.error(fn -> ["failed to import Celo voter reward data: ", inspect(reason)] end,
           error_count: Enum.count(rewards)
         )
     end
