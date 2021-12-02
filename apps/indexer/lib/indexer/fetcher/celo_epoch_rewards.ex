@@ -21,7 +21,7 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
     init_options_with_polling =
       init_options
       |> Keyword.put(:poll, true)
-      |> Keyword.put(:poll_intervall, :timer.minutes(60))
+      |> Keyword.put(:poll_interval, :timer.minutes(60))
 
     Util.default_child_spec(init_options_with_polling, gen_server_options, __MODULE__)
   end
