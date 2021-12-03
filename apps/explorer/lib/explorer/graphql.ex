@@ -312,13 +312,8 @@ defmodule Explorer.GraphQL do
   end
 
   def token_txtransfers_query do
-    # token_contract_names = Util.get_token_contract_names()
-
     from(
       tt in TokenTransfer,
-      # join: t in CeloParams,
-      # where: tt.token_contract_address_hash == t.address_value,
-      # where: t.name in ^token_contract_names,
       where: not is_nil(tt.transaction_hash),
       inner_join: tx in Transaction,
       on: tx.hash == tt.transaction_hash,
