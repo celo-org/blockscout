@@ -48,7 +48,7 @@ defmodule Explorer.Counters.AddressTransactionsCounter do
       end)
     end
 
-    address_hash_string = get_address_hash_string(address)
+    address_hash_string = to_string(address.hash)
     fetch_from_cache("hash_#{address_hash_string}")
   end
 
@@ -56,7 +56,7 @@ defmodule Explorer.Counters.AddressTransactionsCounter do
 
   defp cache_expired?(address) do
     cache_period = address_transactions_counter_cache_period()
-    address_hash_string = get_address_hash_string(address)
+    address_hash_string = to_string(address.hash)
     updated_at = fetch_from_cache("hash_#{address_hash_string}_#{@last_update_key}")
 
     cond do
@@ -71,6 +71,7 @@ defmodule Explorer.Counters.AddressTransactionsCounter do
     put_into_cache("hash_#{address_hash_string}_#{@last_update_key}", Helper.current_time())
     new_data = Chain.address_to_transaction_count(address)
     put_into_cache("hash_#{address_hash_string}", new_data)
+    put_into_db(address, new_data)
   end
 
   defp fetch_from_cache(key) do

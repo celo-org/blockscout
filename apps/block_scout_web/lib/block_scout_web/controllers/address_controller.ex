@@ -84,13 +84,16 @@ defmodule BlockScoutWeb.AddressController do
   def address_counters(conn, %{"id" => address_hash_string}) do
     with {:ok, address_hash} <- Chain.string_to_address_hash(address_hash_string),
          {:ok, address} <- Chain.hash_to_address(address_hash) do
-      {transaction_count, token_transfer_count, gas_usage_count, validation_count} = address_counters(address)
+      {transaction_count, token_transfer_count, validation_count, crc_total_worth} = address_counters(address)
+
+      address_gas_usage_from_db = address.gas_used || 0
 
       json(conn, %{
         transaction_count: transaction_count,
         token_transfer_count: token_transfer_count,
-        gas_usage_count: gas_usage_count,
-        validation_count: validation_count
+        gas_usage_count: address_gas_usage_from_db,
+        validation_count: validation_count,
+        crc_total_worth: crc_total_worth
       })
     else
       _ ->
@@ -114,18 +117,27 @@ defmodule BlockScoutWeb.AddressController do
         token_transfers_count(address)
       end)
 
-    gas_usage_count_task =
-      Task.async(fn ->
-        gas_usage_count(address)
-      end)
-
     validation_count_task =
       Task.async(fn ->
         validation_count(address)
       end)
 
-    [transaction_count_task, token_transfer_count_task, gas_usage_count_task, validation_count_task]
-    |> Task.yield_many(:timer.seconds(60))
+    crc_total_worth_task =
+      Task.async(fn ->
+        crc_total_worth(address)
+      end)
+
+    Task.start_link(fn ->
+      gas_usage_count(address)
+    end)
+
+    [
+      transaction_count_task,
+      token_transfer_count_task,
+      validation_count_task,
+      crc_total_worth_task
+    ]
+    |> Task.yield_many(:infinity)
     |> Enum.map(fn {_task, res} ->
       case res do
         {:ok, result} ->

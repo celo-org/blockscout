@@ -47,7 +47,7 @@ defmodule Explorer.Counters.TokenHoldersCounter do
       end)
     end
 
-    address_hash_string = get_address_hash_string(address_hash)
+    address_hash_string = to_string(address_hash)
     fetch_from_cache("hash_#{address_hash_string}")
   end
 
@@ -55,7 +55,7 @@ defmodule Explorer.Counters.TokenHoldersCounter do
 
   defp cache_expired?(address_hash) do
     cache_period = token_holders_counter_cache_period()
-    address_hash_string = get_address_hash_string(address_hash)
+    address_hash_string = to_string(address_hash)
     updated_at = fetch_from_cache("hash_#{address_hash_string}_#{@last_update_key}")
 
     cond do
@@ -79,7 +79,6 @@ defmodule Explorer.Counters.TokenHoldersCounter do
   defp put_into_cache(key, value) do
     :ets.insert(@cache_name, {key, value})
   end
-
 
   defp create_cache_table do
     Helper.create_cache_table(@cache_name)
