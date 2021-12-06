@@ -47,8 +47,6 @@ defmodule Explorer.Chain.Import.Runner.CeloUnlocked do
 
   @spec insert(Repo.t(), [map()], Util.insert_options()) :: {:ok, [CeloUnlocked.t()]} | {:error, [Changeset.t()]}
   defp insert(repo, changes_list, %{timeout: timeout, timestamps: timestamps} = options) when is_list(changes_list) do
-    on_conflict = Map.get_lazy(options, :on_conflict, &default_on_conflict/0)
-
     # Enforce ShareLocks order (see docs: sharelocks.md)
     uniq_changes_list =
       changes_list
@@ -59,26 +57,10 @@ defmodule Explorer.Chain.Import.Runner.CeloUnlocked do
       Import.insert_changes_list(
         repo,
         uniq_changes_list,
-        conflict_target: [:account_address, :index],
-        on_conflict: on_conflict,
         for: CeloUnlocked,
         returning: true,
         timeout: timeout,
         timestamps: timestamps
       )
-  end
-
-  defp default_on_conflict do
-    from(
-      account in CeloUnlocked,
-      update: [
-        set: [
-          timestamp: fragment("EXCLUDED.timestamp"),
-          amount: fragment("EXCLUDED.amount"),
-          inserted_at: fragment("LEAST(?, EXCLUDED.inserted_at)", account.inserted_at),
-          updated_at: fragment("GREATEST(?, EXCLUDED.updated_at)", account.updated_at)
-        ]
-      ]
-    )
   end
 end

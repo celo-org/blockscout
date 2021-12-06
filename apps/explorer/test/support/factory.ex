@@ -719,7 +719,6 @@ defmodule Explorer.Factory do
     %CeloUnlocked{
       account_address: address_hash(),
       amount: Decimal.new(1),
-      index: sequence("pending_index", & &1),
       available: Timex.shift(Timex.now(), days: Enum.random(0..100) * -1)
     }
   end

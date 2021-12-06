@@ -6,7 +6,7 @@ defmodule Explorer.Repo.Migrations.UpdateCeloUnlocked do
     rename table("celo_unlocked"), :timestamp, to: :available
 
     alter table(:celo_unlocked) do
-        remove(:index)
-      end
+      remove(:index)
+    end
   end
 end

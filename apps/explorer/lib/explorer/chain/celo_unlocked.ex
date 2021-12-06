@@ -15,14 +15,13 @@ defmodule Explorer.Chain.CeloUnlocked do
   """
 
   @type t :: %__MODULE__{
-          address: Hash.Address.t(),
+          account_address: Hash.Address.t(),
           available: DateTime.t(),
-          amount: Wei.t(),
-          index: non_neg_integer()
+          amount: Wei.t()
         }
 
   @attrs ~w(
-        available amount index
+        available amount
     )a
 
   @required_attrs ~w(
@@ -32,7 +31,6 @@ defmodule Explorer.Chain.CeloUnlocked do
   @primary_key false
   schema "celo_unlocked" do
     field(:available, :utc_datetime_usec)
-    field(:index, :integer, primary_key: true)
     field(:amount, Wei)
 
     belongs_to(
@@ -45,16 +43,15 @@ defmodule Explorer.Chain.CeloUnlocked do
 
     timestamps(null: false, type: :utc_datetime_usec)
   end
+
   def changeset(%__MODULE__{} = celo_unlocked, %{address: a} = attrs) do
     attrs = attrs |> Map.delete(:address) |> Map.put(:account_address, a)
     changeset(celo_unlocked, attrs)
   end
+
   def changeset(%__MODULE__{} = celo_unlocked, attrs) do
-    IO.inspect(attrs, label: "attrs")
     celo_unlocked
     |> cast(attrs, @attrs ++ @required_attrs)
     |> validate_required(@required_attrs)
-    |> IO.inspect(label: "cast")
-    |> unique_constraint(:celo_unlocked_key, name: :celo_unlocked_account_address_index_index)
   end
 end
