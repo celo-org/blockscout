@@ -8,7 +8,7 @@ defmodule Indexer.Block.FetcherTest do
   import Explorer.Celo.CacheHelper
 
   alias Explorer.Chain
-  alias Explorer.Chain.{Address, CeloPendingEpochOperation, PendingCelo, Log, Transaction, Wei}
+  alias Explorer.Chain.{Address, CeloPendingEpochOperation, CeloUnlocked, Log, Transaction, Wei}
   alias Indexer.Block.Fetcher
   alias Indexer.BufferedTask
 
@@ -508,7 +508,7 @@ defmodule Indexer.Block.FetcherTest do
     end
 
     #    @tag :no_geth
-    #    test "deletes the entry in pending celo in case of a gold_withdrawn event", %{
+    #    test "deletes the entry in unlocked celo in case of a gold_withdrawn event", %{
     #      block_fetcher: %Fetcher{json_rpc_named_arguments: json_rpc_named_arguments} = block_fetcher
     #    } do
     #      celo_token_address = insert(:contract_address)
@@ -516,7 +516,7 @@ defmodule Indexer.Block.FetcherTest do
     #      "0x" <> unprefixed_celo_token_address_hash = to_string(celo_token_address.hash)
     #
     #      block_number = @first_full_block_number
-    #      insert(:pending_celo, %{account_address: "0xC257274276a4E539741Ca11b590B9447B26A8051", amount: 3840})
+    #      insert(:celo_unlocked, %{account_address: "0xC257274276a4E539741Ca11b590B9447B26A8051", amount: 3840})
     #
     #      if json_rpc_named_arguments[:transport] == EthereumJSONRPC.Mox do
     #        case Keyword.fetch!(json_rpc_named_arguments, :variant) do
@@ -609,7 +609,7 @@ defmodule Indexer.Block.FetcherTest do
     #          wait_for_tasks(InternalTransaction)
     #          wait_for_tasks(CoinBalance)
     #
-    #          assert Repo.aggregate(PendingCelo, :count, :index) == 0
+    #          assert Repo.aggregate(CeloUnlocked, :count, :index) == 0
     #
     #        variant ->
     #          raise ArgumentError, "Unsupported variant (#{variant})"

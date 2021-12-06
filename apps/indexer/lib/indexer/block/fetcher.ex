@@ -336,7 +336,7 @@ defmodule Indexer.Block.Fetcher do
       async_import_celo_voters(%{celo_voters: %{params: celo_voters}})
       async_import_celo_validator_history(range)
 
-      delete_pending_celo(celo_withdrawals)
+      delete_celo_unlocked(celo_withdrawals)
       update_block_cache(inserted[:blocks])
       update_transactions_cache(inserted[:transactions])
       update_addresses_cache(inserted[:addresses])
@@ -376,13 +376,13 @@ defmodule Indexer.Block.Fetcher do
     Uncles.update_from_second_degree_relations(updated_relations)
   end
 
-  defp delete_pending_celo(withdrawals) do
+  defp delete_celo_unlocked(withdrawals) do
     case withdrawals do
       [[]] ->
         0
 
       withdrawals ->
-        Enum.each(withdrawals, fn %{address: address, amount: amount} -> Chain.delete_pending_celo(address, amount) end)
+        Enum.each(withdrawals, fn %{address: address, amount: amount} -> Chain.delete_celo_unlocked(address, amount) end)
     end
   end
 

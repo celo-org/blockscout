@@ -1,4 +1,4 @@
-defmodule Indexer.Fetcher.PendingCeloTest do
+defmodule Indexer.Fetcher.CeloUnlockedTest do
   use EthereumJSONRPC.Case
   use Explorer.DataCase
 
@@ -6,8 +6,8 @@ defmodule Indexer.Fetcher.PendingCeloTest do
   import Explorer.Celo.CacheHelper
 
   alias Explorer.Chain.{Address, Hash}
-  alias Explorer.Chain.PendingCelo, as: ChainPendingCelo
-  alias Indexer.Fetcher.PendingCelo
+  alias Explorer.Chain.CeloUnlocked, as: ChainCeloUnlocked
+  alias Indexer.Fetcher.CeloUnlocked
 
   @moduletag :capture_log
 
@@ -16,7 +16,7 @@ defmodule Indexer.Fetcher.PendingCeloTest do
 
   describe "run/3" do
     setup %{json_rpc_named_arguments: json_rpc_named_arguments} do
-      PendingCelo.Supervisor.Case.start_supervised!(json_rpc_named_arguments: json_rpc_named_arguments)
+      CeloUnlocked.Supervisor.Case.start_supervised!(json_rpc_named_arguments: json_rpc_named_arguments)
 
       :ok
     end
@@ -57,7 +57,7 @@ defmodule Indexer.Fetcher.PendingCeloTest do
         end
       )
 
-      assert PendingCelo.run(
+      assert CeloUnlocked.run(
                [%{address: address, retries_count: 0}],
                nil
              ) ==
@@ -79,7 +79,7 @@ defmodule Indexer.Fetcher.PendingCeloTest do
                   }
                 ]}
 
-      Explorer.Repo.get_by(ChainPendingCelo, account_address: address)
+      Explorer.Repo.get_by(ChainCeloUnlocked, account_address: address)
     end
   end
 end

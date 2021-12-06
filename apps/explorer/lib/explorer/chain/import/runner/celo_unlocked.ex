@@ -1,4 +1,4 @@
-defmodule Explorer.Chain.Import.Runner.PendingCelo do
+defmodule Explorer.Chain.Import.Runner.CeloUnlocked do
   @moduledoc """
   Bulk imports pending Celo to the DB table.
   """
@@ -6,7 +6,7 @@ defmodule Explorer.Chain.Import.Runner.PendingCelo do
   require Ecto.Query
 
   alias Ecto.{Changeset, Multi, Repo}
-  alias Explorer.Chain.{Import, PendingCelo}
+  alias Explorer.Chain.{Import, CeloUnlocked}
   alias Explorer.Chain.Import.Runner.Util
 
   import Ecto.Query, only: [from: 2]
@@ -16,13 +16,13 @@ defmodule Explorer.Chain.Import.Runner.PendingCelo do
   # milliseconds
   @timeout 60_000
 
-  @type imported :: [PendingCelo.t()]
+  @type imported :: [CeloUnlocked.t()]
 
   @impl Import.Runner
-  def ecto_schema_module, do: PendingCelo
+  def ecto_schema_module, do: CeloUnlocked
 
   @impl Import.Runner
-  def option_key, do: :pending_celo
+  def option_key, do: :celo_unlocked
 
   @impl Import.Runner
   def imported_table_row do
@@ -45,23 +45,23 @@ defmodule Explorer.Chain.Import.Runner.PendingCelo do
   @impl Import.Runner
   def timeout, do: @timeout
 
-  @spec insert(Repo.t(), [map()], Util.insert_options()) :: {:ok, [PendingCelo.t()]} | {:error, [Changeset.t()]}
+  @spec insert(Repo.t(), [map()], Util.insert_options()) :: {:ok, [CeloUnlocked.t()]} | {:error, [Changeset.t()]}
   defp insert(repo, changes_list, %{timeout: timeout, timestamps: timestamps} = options) when is_list(changes_list) do
     on_conflict = Map.get_lazy(options, :on_conflict, &default_on_conflict/0)
 
     # Enforce ShareLocks order (see docs: sharelocks.md)
     uniq_changes_list =
       changes_list
-      |> Enum.sort_by(&{&1.address, &1.index})
-      |> Enum.uniq_by(&{&1.address, &1.index})
+      |> Enum.sort_by(&{&1.account_address})
+      |> Enum.uniq_by(&{&1.account_address})
 
     {:ok, _} =
       Import.insert_changes_list(
         repo,
         uniq_changes_list,
-        conflict_target: [:address, :index],
+        conflict_target: [:account_address, :index],
         on_conflict: on_conflict,
-        for: PendingCelo,
+        for: CeloUnlocked,
         returning: true,
         timeout: timeout,
         timestamps: timestamps
@@ -70,7 +70,7 @@ defmodule Explorer.Chain.Import.Runner.PendingCelo do
 
   defp default_on_conflict do
     from(
-      account in PendingCelo,
+      account in CeloUnlocked,
       update: [
         set: [
           timestamp: fragment("EXCLUDED.timestamp"),

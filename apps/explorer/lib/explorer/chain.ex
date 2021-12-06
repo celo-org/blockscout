@@ -62,7 +62,7 @@ defmodule Explorer.Chain do
     InternalTransaction,
     Log,
     PendingBlockOperation,
-    PendingCelo,
+    CeloUnlocked,
     ProxyContract,
     SmartContract,
     SmartContractAdditionalSource,
@@ -7711,11 +7711,11 @@ defmodule Explorer.Chain do
   Returns the total amount of CELO that is in the unlocking period (pending).
   Details at: https://docs.celo.org/celo-codebase/protocol/proof-of-stake/locked-gold#unlocking-period
   """
-  @spec fetch_sum_pending_celo() :: non_neg_integer()
-  def fetch_sum_pending_celo do
+  @spec fetch_sum_celo_unlocked() :: non_neg_integer()
+  def fetch_sum_celo_unlocked do
     query =
-      from(w in PendingCelo,
-        where: w.timestamp >= fragment("NOW()"),
+      from(w in CeloUnlocked,
+        where: w.available >= fragment("NOW()"),
         select: sum(w.amount)
       )
 
@@ -7728,13 +7728,13 @@ defmodule Explorer.Chain do
   end
 
   @doc """
-  Deletes pending CELO when passed the address and the amount
+  Deletes unlocked CELO when passed the address and the amount
   """
-  @spec delete_pending_celo(Hash.t(), non_neg_integer()) :: {integer(), nil | [term()]}
-  def delete_pending_celo(address, amount) do
+  @spec delete_celo_unlocked(Hash.t(), non_neg_integer()) :: {integer(), nil | [term()]}
+  def delete_celo_unlocked(address, amount) do
     query =
-      from(pending_celo in PendingCelo,
-        where: pending_celo.account_address == ^address and pending_celo.amount == ^amount
+      from(celo_unlocked in CeloUnlocked,
+        where: celo_unlocked.account_address == ^address and celo_unlocked.amount == ^amount
       )
 
     Repo.delete_all(query)
