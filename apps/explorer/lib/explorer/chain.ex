@@ -426,6 +426,7 @@ defmodule Explorer.Chain do
     |> wait_for_address_transactions()
     |> Enum.sort_by(&{&1.block_number, &1.index}, &>=/2)
     |> Enum.dedup_by(& &1.hash)
+    |> tap(&(IO.inspect(&1)))
     |> Enum.take(paging_options.page_size)
   end
 
@@ -472,7 +473,13 @@ defmodule Explorer.Chain do
     |> where_block_number_in_period(from_block, to_block)
     |> join_associations(necessity_by_association)
     |> Transaction.matching_address_queries_list(direction, address_hash)
-    |> Enum.map(fn query -> Task.async(fn -> Repo.all(query) end) end)
+    |> Enum.map(fn query -> Task.async(fn ->
+        query_details = Ecto.Adapters.SQL.to_sql(:all, Explorer.Repo, query)
+        IO.puts("!!!!! fetch transactions query #{inspect(query_details)}}")
+
+        Repo.all(query)
+      end)
+    end)
   end
 
   defp address_to_mined_transactions_tasks(address_hash, options) do
@@ -4572,7 +4579,7 @@ defmodule Explorer.Chain do
     preload(query, [{^arg1, [{^arg2, [{^arg3, [{^arg4, ^arg5}]}]}]}])
   end
 
-  defp join_associations(query, necessity_by_association) when is_map(necessity_by_association) do
+  def join_associations(query, necessity_by_association) when is_map(necessity_by_association) do
     Enum.reduce(necessity_by_association, query, fn {association, join}, acc_query ->
       join_association(acc_query, association, join)
     end)
@@ -7811,11 +7818,21 @@ defmodule Explorer.Chain do
   end
 
   def convert_date_to_max_block(date) do
+    {:ok, from} =
+      date
+      |> Date.from_iso8601!()
+      |> NaiveDateTime.new(~T[00:00:00])
+
+    next_day = from |> NaiveDateTime.add(:timer.hours(24), :millisecond)
+
+    block_query = from(b in Block,
+      select: %{max: max(b.timestamp), number: b.number},
+      where: fragment("? BETWEEN ? AND ?", b.timestamp, ^from, ^next_day),
+      group_by: b.number
+    )
+
     query =
-      from(block in Block,
-        where: fragment("DATE(timestamp) = TO_DATE(?, 'YYYY-MM-DD')", ^date),
-        select: max(block.number)
-      )
+      from(b in subquery(block_query), select: max(b.number))
 
     query
     |> Repo.one()
