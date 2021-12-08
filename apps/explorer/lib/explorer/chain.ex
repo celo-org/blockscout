@@ -7744,7 +7744,6 @@ defmodule Explorer.Chain do
   """
   @spec insert_celo_unlocked(Hash.t(), non_neg_integer(), non_neg_integer()) :: {integer(), nil | [term()]}
   def insert_celo_unlocked(address, amount, available) do
-
     changeset =
       CeloUnlocked.changeset(%CeloUnlocked{}, %{
         account_address: address,
