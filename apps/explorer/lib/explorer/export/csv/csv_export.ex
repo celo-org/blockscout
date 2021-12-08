@@ -17,7 +17,7 @@ defmodule Explorer.Export.CSV do
     query
     |> Stream.chunk_every(@preload_chunks)
     |> Stream.flat_map(fn chunk ->
-      Repo.preload(chunk, Chain.join_associations(query, module.associations()))
+      Repo.preload(chunk, module.associations())
     end)
     |> Stream.map(&(module.transform(&1, address)))
     |> then(&( Stream.concat([headers], &1)))

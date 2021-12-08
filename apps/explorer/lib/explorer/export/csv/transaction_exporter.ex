@@ -2,22 +2,22 @@ defmodule Explorer.Export.CSV.TransactionExporter do
   @behaviour Explorer.Export.CSV.Exporter
   import Ecto.Query
   alias Explorer.Chain
-  alias Explorer.Chain.Transaction
-  alias Explorer.Chain.Address
+  alias Explorer.Chain.{Address, Transaction, Wei}
+
 
   defstruct module: __MODULE__
 
-  @necessity_by_association %{
-    [created_contract_address: :names] => :optional,
-    [from_address: :names] => :optional,
-    [to_address: :names] => :optional,
-    [token_transfers: :token] => :optional,
-    [token_transfers: :to_address] => :optional,
-    [token_transfers: :from_address] => :optional,
-    [token_transfers: :token_contract_address] => :optional,
-    :block => :required,
-    [gas_currency: :token] => :optional
-  }
+  @necessity_by_association [
+    created_contract_address: :names,
+    from_address: :names,
+    to_address: :names,
+#    [token_transfers: :token] => :optional,
+#    [token_transfers: :to_address] => :optional,
+#    [token_transfers: :from_address] => :optional,
+#    [token_transfers: :token_contract_address] => :optional,
+    gas_currency: :token,
+    block: []
+  ]
 
   @row_header [
     "TxHash",
