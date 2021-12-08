@@ -5939,7 +5939,16 @@ defmodule Explorer.ChainTest do
 
       Chain.delete_celo_unlocked(account_address, 2)
 
-      assert Repo.aggregate(CeloUnlocked, :count, :index) == 2
+      assert Repo.aggregate(CeloUnlocked, :count) == 1
+    end
+  end
+
+  describe "insert_celo_unlocked/2" do
+    test "inserts unlocked celo entries when passed amount, address and available" do
+      account_address = insert(:address)
+      Chain.insert_celo_unlocked(account_address.hash, 2, 1639103736)
+
+      assert Repo.aggregate(CeloUnlocked, :count) == 1
     end
   end
 

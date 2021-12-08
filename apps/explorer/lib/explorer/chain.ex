@@ -7740,6 +7740,21 @@ defmodule Explorer.Chain do
     Repo.delete_all(query)
   end
 
+  @doc """
+  Insert unlocked CELO when passed the address, the amount and when the amount will be available as a unix timestamp
+  """
+  @spec insert_celo_unlocked(Hash.t(), non_neg_integer(), non_neg_integer()) :: {integer(), nil | [term()]}
+  def insert_celo_unlocked(address, amount, available) do
+    IO.inspect(address, label: "what")
+    changeset = CeloUnlocked.changeset(%CeloUnlocked{}, %{
+      account_address: address,
+      amount: amount,
+      available: DateTime.from_unix!(available, :second)
+    })
+
+    Repo.insert(changeset)
+  end
+
   @spec get_token_icon_url_by(String.t(), String.t()) :: String.t() | nil
   def get_token_icon_url_by(chain_id, address_hash) do
     chain_name =
