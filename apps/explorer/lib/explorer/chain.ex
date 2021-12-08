@@ -7746,11 +7746,13 @@ defmodule Explorer.Chain do
   @spec insert_celo_unlocked(Hash.t(), non_neg_integer(), non_neg_integer()) :: {integer(), nil | [term()]}
   def insert_celo_unlocked(address, amount, available) do
     IO.inspect(address, label: "what")
-    changeset = CeloUnlocked.changeset(%CeloUnlocked{}, %{
-      account_address: address,
-      amount: amount,
-      available: DateTime.from_unix!(available, :second)
-    })
+
+    changeset =
+      CeloUnlocked.changeset(%CeloUnlocked{}, %{
+        account_address: address,
+        amount: amount,
+        available: DateTime.from_unix!(available, :second)
+      })
 
     Repo.insert(changeset)
   end

@@ -5946,7 +5946,7 @@ defmodule Explorer.ChainTest do
   describe "insert_celo_unlocked/2" do
     test "inserts unlocked celo entries when passed amount, address and available" do
       account_address = insert(:address)
-      Chain.insert_celo_unlocked(account_address.hash, 2, 1639103736)
+      Chain.insert_celo_unlocked(account_address.hash, 2, 1_639_103_736)
 
       assert Repo.aggregate(CeloUnlocked, :count) == 1
     end

@@ -224,7 +224,8 @@ defmodule Indexer.Block.Fetcher do
            exchange_rates: exchange_rates,
            account_names: account_names,
            wallets: celo_wallets,
-           withdrawals: celo_withdrawals
+           withdrawals: celo_withdrawals,
+           unlocked: celo_unlocked
          } = CeloAccounts.parse(logs, oracle_address),
          market_history =
            exchange_rates
@@ -336,6 +337,7 @@ defmodule Indexer.Block.Fetcher do
       async_import_celo_voters(%{celo_voters: %{params: celo_voters}})
       async_import_celo_validator_history(range)
 
+      insert_celo_unlocked(celo_unlocked)
       delete_celo_unlocked(celo_withdrawals)
       update_block_cache(inserted[:blocks])
       update_transactions_cache(inserted[:transactions])
@@ -383,6 +385,18 @@ defmodule Indexer.Block.Fetcher do
 
       withdrawals ->
         Enum.each(withdrawals, fn %{address: address, amount: amount} -> Chain.delete_celo_unlocked(address, amount) end)
+    end
+  end
+
+  defp insert_celo_unlocked(unlocked) do
+    case unlocked do
+      [[]] ->
+        0
+
+      unlocked ->
+        Enum.each(unlocked, fn %{address: address, amount: amount, available: available} ->
+          Chain.insert_celo_unlocked(address, amount, available)
+        end)
     end
   end
 
