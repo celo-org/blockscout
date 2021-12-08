@@ -7,14 +7,10 @@ defmodule Explorer.Export.CSV.TransactionExporter do
 
   defstruct module: __MODULE__
 
-  @necessity_by_association [
-    created_contract_address: :names,
-    from_address: :names,
-    to_address: :names,
-#    [token_transfers: :token] => :optional,
-#    [token_transfers: :to_address] => :optional,
-#    [token_transfers: :from_address] => :optional,
-#    [token_transfers: :token_contract_address] => :optional,
+  @preloads [
+    created_contract_address: [],
+    from_address: [],
+    to_address: [],
     gas_currency: :token,
     block: []
   ]
@@ -46,7 +42,7 @@ defmodule Explorer.Export.CSV.TransactionExporter do
     |> where([t], t.from_address_hash == ^address_hash or t.to_address_hash == ^address_hash or t.created_contract_address_hash == ^address_hash)
   end
 
-  def associations(), do: @necessity_by_association
+  def associations(), do: @preloads
 
   @impl true
   def row_names(), do: @row_header
