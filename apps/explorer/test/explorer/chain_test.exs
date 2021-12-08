@@ -5915,12 +5915,12 @@ defmodule Explorer.ChainTest do
   end
 
   describe "fetch_sum_celo_unlocked/0" do
-    test "fetches all CELO that is in the unlocking period" do
-      insert(:celo_unlocked, %{timestamp: Timex.shift(DateTime.utc_now(), days: -1), amount: 1})
-      insert(:celo_unlocked, %{timestamp: Timex.shift(DateTime.utc_now(), days: 0), amount: 2})
-      insert(:celo_unlocked, %{timestamp: Timex.shift(DateTime.utc_now(), days: 1), amount: 3})
+    test "fetches all unlocked CELO" do
+      insert(:celo_unlocked, %{available: Timex.shift(DateTime.utc_now(), days: -1), amount: 1})
+      insert(:celo_unlocked, %{available: Timex.shift(DateTime.utc_now(), days: 0), amount: 2})
+      insert(:celo_unlocked, %{available: Timex.shift(DateTime.utc_now(), days: 1), amount: 3})
 
-      assert %Wei{value: Decimal.new(5)} == Chain.fetch_sum_celo_unlocked()
+      assert %Wei{value: Decimal.new(6)} == Chain.fetch_sum_celo_unlocked()
     end
 
     test "fetches all pending CELO when there are no blocks" do
@@ -5930,7 +5930,7 @@ defmodule Explorer.ChainTest do
 
   describe "delete_celo_unlocked/2" do
     test "delete unlocked celo entries when passed amount and address" do
-      insert(:celo_unlocked, %{timestamp: Timex.shift(DateTime.utc_now(), days: -1), amount: 1})
+      insert(:celo_unlocked, %{available: Timex.shift(DateTime.utc_now(), days: -1), amount: 1})
 
       %CeloUnlocked{account_address: account_address} =
         insert(:celo_unlocked, %{available: Timex.shift(DateTime.utc_now(), days: 0), amount: 2})
@@ -5939,7 +5939,7 @@ defmodule Explorer.ChainTest do
 
       Chain.delete_celo_unlocked(account_address, 2)
 
-      assert Repo.aggregate(CeloUnlocked, :count) == 1
+      assert Repo.aggregate(CeloUnlocked, :count) == 2
     end
   end
 

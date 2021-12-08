@@ -14,6 +14,7 @@ defmodule Indexer.Fetcher.CeloUnlockedTest do
   setup :verify_on_exit!
   setup :set_mox_global
 
+  @tag :skip
   describe "run/3" do
     setup %{json_rpc_named_arguments: json_rpc_named_arguments} do
       CeloUnlocked.Supervisor.Case.start_supervised!(json_rpc_named_arguments: json_rpc_named_arguments)

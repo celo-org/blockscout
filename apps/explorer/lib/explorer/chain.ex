@@ -7708,14 +7708,13 @@ defmodule Explorer.Chain do
   end
 
   @doc """
-  Returns the total amount of CELO that is in the unlocking period (pending).
+  Returns the total amount of CELO that is unlocked and can't or hasn't yet been withdrawn.
   Details at: https://docs.celo.org/celo-codebase/protocol/proof-of-stake/locked-gold#unlocking-period
   """
   @spec fetch_sum_celo_unlocked() :: non_neg_integer()
   def fetch_sum_celo_unlocked do
     query =
       from(w in CeloUnlocked,
-        where: w.available >= fragment("NOW()"),
         select: sum(w.amount)
       )
 

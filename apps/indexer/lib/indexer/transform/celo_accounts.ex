@@ -152,7 +152,9 @@ defmodule Indexer.Transform.CeloAccounts do
   defp do_parse_withdrawal_events(log, accounts, get_topic) do
     account_address = parse_params(log, get_topic)
 
-    if String.length(log.data) > 64 do
+    # GoldUnlocked has 2 unindexed parameters which end up in the data field, while the rest of the withdrawal events
+    # only 1. Each of these parameters are of length 64 plus 2 for the 0x.
+    if String.length(log.data) > 66 do
       [amount, available] = decode_data(log.data, [{:uint, 256}, {:uint, 256}])
       %{address: account_address, amount: amount, available: available}
     else
