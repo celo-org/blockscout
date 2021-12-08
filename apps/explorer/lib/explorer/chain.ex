@@ -49,6 +49,7 @@ defmodule Explorer.Chain do
     CeloParams,
     CeloPendingEpochOperation,
     CeloSigners,
+    CeloUnlocked,
     CeloValidator,
     CeloValidatorGroup,
     CeloValidatorHistory,
@@ -62,7 +63,6 @@ defmodule Explorer.Chain do
     InternalTransaction,
     Log,
     PendingBlockOperation,
-    CeloUnlocked,
     ProxyContract,
     SmartContract,
     SmartContractAdditionalSource,
@@ -7745,7 +7745,6 @@ defmodule Explorer.Chain do
   """
   @spec insert_celo_unlocked(Hash.t(), non_neg_integer(), non_neg_integer()) :: {integer(), nil | [term()]}
   def insert_celo_unlocked(address, amount, available) do
-    IO.inspect(address, label: "what")
 
     changeset =
       CeloUnlocked.changeset(%CeloUnlocked{}, %{
