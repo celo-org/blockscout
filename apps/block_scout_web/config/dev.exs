@@ -17,14 +17,16 @@ port =
 config :block_scout_web, BlockScoutWeb.Endpoint,
   secret_key_base:
     System.get_env("SECRET_KEY_BASE") || "RMgI4C1HSkxsEjdhtGMfwAHfyT6CKWXOgzCboJflfSm4jeAlic52io05KB6mqzc5",
-  http: [
-    port: port || 4000
-  ],
+    http: [
+      port: port || 4000,
+      protocol_options: [idle_timeout: :timer.minutes(5)]
+    ],
+
   url: [
     scheme: "http",
     host: System.get_env("BLOCKSCOUT_HOST") || "localhost",
     path: System.get_env("NETWORK_PATH") || "/",
-    api_path: System.get_env("API_PATH") || "/"
+    api_path: System.get_env("API_PATH") || "/",
   ],
   https: [
     port: (port && port + 1) || 4001,
