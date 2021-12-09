@@ -21,7 +21,7 @@ defmodule Explorer.Export.CSV.TransactionExporter do
     "UnixTimestamp",
     "FromAddress",
     "ToAddress",
-    "ContractAddress",
+    "CreatedContractAddress",
     "Type",
     "Value",
     "Fee",
@@ -42,6 +42,7 @@ defmodule Explorer.Export.CSV.TransactionExporter do
     |> where([t], t.from_address_hash == ^address_hash or t.to_address_hash == ^address_hash or t.created_contract_address_hash == ^address_hash)
   end
 
+  @impl true
   def associations(), do: @preloads
 
   @impl true
