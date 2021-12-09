@@ -232,6 +232,17 @@ defmodule Explorer.GraphQL do
     )
   end
 
+  def token_txtransfers_query_for_address(address_hash) do
+    query =
+      token_txtransfers_query()
+      |> where([t], t.to_address_hash == ^address_hash or t.from_address_hash == ^address_hash)
+
+    from(
+      t in subquery(query),
+      order_by: [desc: t.block_number, asc: t.nonce]
+    )
+  end
+
   def celo_tx_transfers_query_by_txhash(tx_hash) do
     query = celo_tx_transfers_query()
 
@@ -244,6 +255,22 @@ defmodule Explorer.GraphQL do
 
   def celo_tx_transfers_query_by_address(address_hash) do
     celo_tx_transfers_query()
+    |> where([t], t.from_address_hash == ^address_hash or t.to_address_hash == ^address_hash)
+    |> order_by([transaction: t], desc: t.block_number, asc: t.nonce)
+  end
+
+  def token_tx_transfers_query_by_txhash(tx_hash) do
+    query = token_tx_transfers_query()
+
+    from(
+      t in subquery(query),
+      where: t.transaction_hash == ^tx_hash,
+      order_by: [t.log_index]
+    )
+  end
+
+  def token_tx_transfers_query_by_address(address_hash) do
+    token_tx_transfers_query()
     |> where([t], t.from_address_hash == ^address_hash or t.to_address_hash == ^address_hash)
     |> order_by([transaction: t], desc: t.block_number, asc: t.nonce)
   end
@@ -270,7 +297,7 @@ defmodule Explorer.GraphQL do
         gas_used: tx.gas_used,
         gas_price: tx.gas_price,
         fee_currency: tx.gas_currency_hash,
-        fee_token: fragment("coalesce(?, 'cGLD')", token.symbol),
+        fee_token: fragment("coalesce(?, 'CELO')", token.symbol),
         gateway_fee: tx.gateway_fee,
         gateway_fee_recipient: tx.gas_fee_recipient_hash,
         timestamp: b.timestamp,
@@ -281,6 +308,73 @@ defmodule Explorer.GraphQL do
       distinct: [desc: tt.block_number, desc: tt.transaction_hash],
       # to get the ordering from distinct clause, something is needed here too
       order_by: [desc: tt.from_address_hash, desc: tt.to_address_hash]
+    )
+  end
+
+  def token_txtransfers_query do
+    from(
+      tt in TokenTransfer,
+      where: not is_nil(tt.transaction_hash),
+      inner_join: tx in Transaction,
+      on: tx.hash == tt.transaction_hash,
+      inner_join: b in Block,
+      on: tx.block_hash == b.hash,
+      left_join: token in Token,
+      on: tx.gas_currency_hash == token.contract_address_hash,
+      select: %{
+        transaction_hash: tt.transaction_hash,
+        to_address_hash: tt.to_address_hash,
+        from_address_hash: tt.from_address_hash,
+        gas_used: tx.gas_used,
+        gas_price: tx.gas_price,
+        fee_currency: tx.gas_currency_hash,
+        fee_token: fragment("coalesce(?, 'CELO')", token.symbol),
+        gateway_fee: tx.gateway_fee,
+        gateway_fee_recipient: tx.gas_fee_recipient_hash,
+        timestamp: b.timestamp,
+        input: tx.input,
+        nonce: tx.nonce,
+        block_number: tt.block_number
+      },
+      distinct: [desc: tt.block_number, desc: tt.transaction_hash],
+      # to get the ordering from distinct clause, something is needed here too
+      order_by: [desc: tt.from_address_hash, desc: tt.to_address_hash]
+    )
+  end
+
+  def token_tx_transfers_query do
+    from(
+      tt in TokenTransfer,
+      inner_join: tx in Transaction,
+      as: :transaction,
+      on: tx.hash == tt.transaction_hash,
+      inner_join: b in Block,
+      on: tt.block_number == b.number,
+      left_join: wf in CeloWalletAccounts,
+      on: tt.from_address_hash == wf.wallet_address_hash,
+      left_join: wt in CeloWalletAccounts,
+      on: tt.to_address_hash == wt.wallet_address_hash,
+      left_join: token in Token,
+      on: tt.token_contract_address_hash == token.contract_address_hash,
+      select: %{
+        gas_used: tx.gas_used,
+        gas_price: tx.gas_price,
+        timestamp: b.timestamp,
+        input: tx.input,
+        transaction_hash: tt.transaction_hash,
+        from_address_hash: tt.from_address_hash,
+        to_address_hash: tt.to_address_hash,
+        from_account_hash: wf.account_address_hash,
+        to_account_hash: wt.account_address_hash,
+        log_index: tt.log_index,
+        value: tt.amount,
+        comment: tt.comment,
+        token: token.symbol,
+        token_address: token.contract_address_hash,
+        nonce: tx.nonce,
+        block_number: tt.block_number
+      },
+      order_by: [desc: tt.block_number, desc: tt.amount, desc: tt.log_index]
     )
   end
 
@@ -329,6 +423,7 @@ defmodule Explorer.GraphQL do
         value: tt.amount,
         comment: tt.comment,
         token: tkn.token_symbol,
+        token_address: tt.token_contract_address_hash,
         nonce: tx.nonce,
         block_number: tt.block_number
       },
