@@ -1,8 +1,7 @@
 defmodule Explorer.Export.CSV do
   @moduledoc "Runs csv export operations from the database for a given account and parameters"
 
-  alias Explorer.Repo
-  alias Explorer.Chain
+  alias Explorer.{Chain, Repo}
   alias Explorer.Chain.Address
   alias NimbleCSV.RFC4180
   alias Plug.Conn
@@ -16,7 +15,7 @@ defmodule Explorer.Export.CSV do
   @preload_chunks 500
 
   @doc "creates a stream with a given exporter module for the given address and date parameters"
-  def stream(module, address = %Address{}, from, to) do
+  def stream(module, %Address{} = address, from, to) do
     query = Repo.stream(module.query(address, from, to), timeout: @query_timeout)
     headers = module.row_names()
 
@@ -27,7 +26,7 @@ defmodule Explorer.Export.CSV do
       # here we explicitly preload associations for every `@preload_chunks` records
       Repo.preload(chunk, module.associations())
     end)
-    |> Stream.map(&(module.transform(&1, address) |> List.flatten()))
+    |> Stream.map(&(&1 |> module.transform(address) |> List.flatten()))
     |> then(&Stream.concat([headers], &1))
     |> RFC4180.dump_to_stream()
   end
@@ -36,10 +35,11 @@ defmodule Explorer.Export.CSV do
   Creates and runs a streaming operation for given exporter module and parameters,
   will chunk output to a Plug.Conn instance for streaming
   """
-  def export(module, address, from, to, conn = %Conn{}) do
+  def export(module, address, from, to, %Conn{} = conn) do
     Repo.transaction(
       fn ->
-        stream(module, address, from, to)
+        module
+        |> stream(address, from, to)
         |> Enum.reduce(conn, fn v, c ->
           {:ok, conn} = Conn.chunk(c, v)
           conn
@@ -57,7 +57,8 @@ defmodule Explorer.Export.CSV do
   def export(module, address, from, to, destination) do
     Repo.transaction(
       fn ->
-        stream(module, address, from, to)
+        module
+        |> stream(address, from, to)
         |> Enum.into(destination)
       end,
       timeout: @transaction_timeout,
