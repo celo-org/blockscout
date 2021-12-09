@@ -630,7 +630,12 @@ defmodule Explorer.Chain.Transaction do
 
   def matching_address_queries_list(query, _direction, address_hash) do
     [
-      where(query, [t], t.from_address_hash == ^address_hash or t.to_address_hash == ^address_hash or t.created_contract_address_hash == ^address_hash),
+      where(
+        query,
+        [t],
+        t.from_address_hash == ^address_hash or t.to_address_hash == ^address_hash or
+          t.created_contract_address_hash == ^address_hash
+      ),
       where(query, [t], t.to_address_hash == ^address_hash),
       where(query, [t], t.created_contract_address_hash == ^address_hash)
     ]

@@ -1,8 +1,10 @@
 defmodule Explorer.Export.CSV.TransactionExporter do
+  @moduledoc "Export all Transaction instances for a given account between two dates"
+
   import Ecto.Query
   alias Explorer.Chain
   alias Explorer.Chain.{Address, Transaction, Wei}
-  import  Explorer.Export.CSV.Utils
+  import Explorer.Export.CSV.Utils
 
   @behaviour Explorer.Export.CSV.Exporter
 
@@ -37,14 +39,18 @@ defmodule Explorer.Export.CSV.TransactionExporter do
     Transaction
     |> order_by([transaction], desc: transaction.block_number, desc: transaction.index)
     |> Chain.where_block_number_in_period(from_block, to_block)
-    |> where([t], t.from_address_hash == ^address_hash or t.to_address_hash == ^address_hash or t.created_contract_address_hash == ^address_hash)
+    |> where(
+      [t],
+      t.from_address_hash == ^address_hash or t.to_address_hash == ^address_hash or
+        t.created_contract_address_hash == ^address_hash
+    )
   end
 
   @impl true
-  def associations(), do: @preloads
+  def associations, do: @preloads
 
   @impl true
-  def row_names(), do: @row_header
+  def row_names, do: @row_header
 
   @impl true
   def transform(transaction, address) do

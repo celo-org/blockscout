@@ -18,6 +18,7 @@ defmodule Explorer.CSV.Export.TokenTransferCsvExporterTest do
       to_period = Timex.format!(Timex.now(), "%Y-%m-%d", :strftime)
 
       {:ok, csv} = Explorer.Export.CSV.export_token_transfers(address, from_period, to_period, [])
+
       [result] =
         csv
         |> Enum.drop(1)

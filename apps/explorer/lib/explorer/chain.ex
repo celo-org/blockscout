@@ -426,7 +426,6 @@ defmodule Explorer.Chain do
     |> wait_for_address_transactions()
     |> Enum.sort_by(&{&1.block_number, &1.index}, &>=/2)
     |> Enum.dedup_by(& &1.hash)
-    |> tap(&(IO.inspect(&1)))
     |> Enum.take(paging_options.page_size)
   end
 
@@ -473,7 +472,8 @@ defmodule Explorer.Chain do
     |> where_block_number_in_period(from_block, to_block)
     |> join_associations(necessity_by_association)
     |> Transaction.matching_address_queries_list(direction, address_hash)
-    |> Enum.map(fn query -> Task.async(fn ->
+    |> Enum.map(fn query ->
+      Task.async(fn ->
         query_details = Ecto.Adapters.SQL.to_sql(:all, Explorer.Repo, query)
         IO.puts("!!!!! fetch transactions query #{inspect(query_details)}}")
 
@@ -7825,14 +7825,14 @@ defmodule Explorer.Chain do
 
     next_day = from |> NaiveDateTime.add(:timer.hours(24), :millisecond)
 
-    block_query = from(b in Block,
-      select: %{max: max(b.timestamp), number: b.number},
-      where: fragment("? BETWEEN ? AND ?", b.timestamp, ^from, ^next_day),
-      group_by: b.number
-    )
+    block_query =
+      from(b in Block,
+        select: %{max: max(b.timestamp), number: b.number},
+        where: fragment("? BETWEEN ? AND ?", b.timestamp, ^from, ^next_day),
+        group_by: b.number
+      )
 
-    query =
-      from(b in subquery(block_query), select: max(b.number))
+    query = from(b in subquery(block_query), select: max(b.number))
 
     query
     |> Repo.one()

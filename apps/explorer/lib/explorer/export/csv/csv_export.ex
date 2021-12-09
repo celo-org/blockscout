@@ -1,16 +1,21 @@
 defmodule Explorer.Export.CSV do
+  @moduledoc "Runs csv export operations from the database for a given account and parameters"
+
   alias Explorer.Repo
   alias Explorer.Chain
   alias Explorer.Chain.Address
   alias NimbleCSV.RFC4180
-  alias Explorer.Export.CSV.{TokenTransferExporter,TransactionExporter}
+  alias Plug.Conn
+  alias Explorer.Export.CSV.{TokenTransferExporter, TransactionExporter}
 
   @transaction_timeout :timer.minutes(5) + :timer.seconds(10)
   @query_timeout :timer.minutes(5)
-  @pool_timeout :timer.seconds(20) #how long to wait for connection from pool
-  @preload_chunks 500 #how many records to stream from db before resolving associations
+  # how long to wait for connection from pool
+  @pool_timeout :timer.seconds(20)
+  # how many records to stream from db before resolving associations
+  @preload_chunks 500
 
-  #create a stream that will export data to csv
+  @doc "creates a stream with a given exporter module for the given address and date parameters"
   def stream(module, address = %Address{}, from, to) do
     query = Repo.stream(module.query(address, from, to), timeout: @query_timeout)
     headers = module.row_names()
@@ -23,32 +28,49 @@ defmodule Explorer.Export.CSV do
       Repo.preload(chunk, module.associations())
     end)
     |> Stream.map(&(module.transform(&1, address) |> List.flatten()))
-    |> then(&( Stream.concat([headers], &1)))
+    |> then(&Stream.concat([headers], &1))
     |> RFC4180.dump_to_stream()
   end
 
-  def export(module, address, from, to, conn = %Plug.Conn{}) do
-    Repo.transaction(fn ->
-      stream(module, address, from, to)
-      |> Enum.reduce(conn, fn v, c ->
-         {:ok, conn} = Plug.Conn.chunk(c, v)
-         conn
-      end)
-    end, timeout: @transaction_timeout, pool_timeout: @pool_timeout)
+  @doc """
+  Creates and runs a streaming operation for given exporter module and parameters,
+  will chunk output to a Plug.Conn instance for streaming
+  """
+  def export(module, address, from, to, conn = %Conn{}) do
+    Repo.transaction(
+      fn ->
+        stream(module, address, from, to)
+        |> Enum.reduce(conn, fn v, c ->
+          {:ok, conn} = Conn.chunk(c, v)
+          conn
+        end)
+      end,
+      timeout: @transaction_timeout,
+      pool_timeout: @pool_timeout
+    )
   end
 
+  @doc """
+  Creates and runs a streaming operation for given exporter module and parameters,
+  streams into a given Enum.
+  """
   def export(module, address, from, to, destination) do
-    Repo.transaction(fn ->
-      stream(module, address, from, to)
-      |> Enum.into(destination)
-    end, [timeout: @transaction_timeout, pool_timeout: @pool_timeout])
+    Repo.transaction(
+      fn ->
+        stream(module, address, from, to)
+        |> Enum.into(destination)
+      end,
+      timeout: @transaction_timeout,
+      pool_timeout: @pool_timeout
+    )
   end
 
-  #helper methods to export stuff directly
+  # helper methods to export stuff directly
 
   def export_transactions(address, from, to, destination) do
     export(TransactionExporter, address, from, to, destination)
   end
+
   def export_token_transfers(address, from, to, destination) do
     export(TokenTransferExporter, address, from, to, destination)
   end

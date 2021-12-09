@@ -144,8 +144,7 @@ defmodule Explorer.Export.CSV.TransactionExporterTest do
 
       {:ok, csv} = address |> Explorer.Export.CSV.export_transactions(from_period, to_period, [])
 
-      result =
-        csv |> Enum.drop(1)
+      result = csv |> Enum.drop(1)
 
       assert Enum.count(result) == 200
     end
