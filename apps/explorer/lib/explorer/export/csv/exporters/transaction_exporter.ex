@@ -1,11 +1,10 @@
 defmodule Explorer.Export.CSV.TransactionExporter do
-  @behaviour Explorer.Export.CSV.Exporter
   import Ecto.Query
   alias Explorer.Chain
   alias Explorer.Chain.{Address, Transaction, Wei}
+  import  Explorer.Export.CSV.Utils
 
-
-  defstruct module: __MODULE__
+  @behaviour Explorer.Export.CSV.Exporter
 
   @preloads [
     created_contract_address: [],
@@ -18,7 +17,7 @@ defmodule Explorer.Export.CSV.TransactionExporter do
   @row_header [
     "TxHash",
     "BlockNumber",
-    "UnixTimestamp",
+    "Timestamp",
     "FromAddress",
     "ToAddress",
     "CreatedContractAddress",
@@ -29,7 +28,6 @@ defmodule Explorer.Export.CSV.TransactionExporter do
     "Status",
     "ErrCode"
   ]
-
 
   @impl true
   def query(%Address{hash: address_hash}, from, to) do
@@ -64,27 +62,5 @@ defmodule Explorer.Export.CSV.TransactionExporter do
       transaction.status,
       transaction.error
     ]
-  end
-
-  defp type(%Transaction{from_address_hash: address_hash}, address_hash), do: "OUT"
-
-  defp type(%Transaction{to_address_hash: address_hash}, address_hash), do: "IN"
-
-  defp type(_, _), do: ""
-
-  defp fee(transaction) do
-    transaction
-    |> Chain.fee(:wei)
-    |> case do
-         {:actual, value} -> value
-         {:maximum, value} -> "Max of #{value}"
-       end
-  end
-
-  # if currency is nil we assume celo as tx fee currency
-  defp fee_currency(%Transaction{gas_currency_hash: nil}), do: "CELO"
-
-  defp fee_currency(transaction) do
-    transaction.gas_currency.token.symbol
   end
 end

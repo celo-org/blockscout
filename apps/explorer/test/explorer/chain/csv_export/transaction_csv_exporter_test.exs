@@ -1,4 +1,4 @@
-defmodule Explorer.Chain.AddressTransactionCsvExporterTest do
+defmodule Explorer.Export.CSV.TransactionExporterTest do
   use Explorer.DataCase
 
   alias Explorer.Chain.{AddressTransactionCsvExporter, Wei}
