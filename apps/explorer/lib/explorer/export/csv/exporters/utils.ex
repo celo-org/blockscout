@@ -3,9 +3,9 @@ defmodule Explorer.Export.CSV.Utils do
   alias Explorer.Chain.Transaction
 
 
-  def type(%Transaction{from_address_hash: address_hash}, address_hash), do: "OUT"
+  def type(%{from_address_hash: address_hash}, address_hash), do: "OUT"
 
-  def type(%Transaction{to_address_hash: address_hash}, address_hash), do: "IN"
+  def type(%{to_address_hash: address_hash}, address_hash), do: "IN"
 
   def type(_, _), do: ""
 

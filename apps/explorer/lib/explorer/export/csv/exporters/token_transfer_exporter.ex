@@ -12,6 +12,8 @@ defmodule Explorer.Export.CSV.TokenTransferExporter do
     token_transfers: :to_address,
     token_transfers: :from_address,
     token_transfers: :token_contract_address,
+    from_address: [],
+    to_address: [],
     block: []
   ]
 
