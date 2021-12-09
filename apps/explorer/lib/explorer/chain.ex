@@ -472,7 +472,7 @@ defmodule Explorer.Chain do
     |> where_block_number_in_period(from_block, to_block)
     |> join_associations(necessity_by_association)
     |> Transaction.matching_address_queries_list(direction, address_hash)
-    |> Enum.map(fn query -> Task.async(&Repo.all/1) end)
+    |> Enum.map(fn query -> Task.async(fn -> Repo.all(query) end) end)
   end
 
   defp address_to_mined_transactions_tasks(address_hash, options) do
