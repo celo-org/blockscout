@@ -472,14 +472,7 @@ defmodule Explorer.Chain do
     |> where_block_number_in_period(from_block, to_block)
     |> join_associations(necessity_by_association)
     |> Transaction.matching_address_queries_list(direction, address_hash)
-    |> Enum.map(fn query ->
-      Task.async(fn ->
-        query_details = Ecto.Adapters.SQL.to_sql(:all, Explorer.Repo, query)
-        IO.puts("!!!!! fetch transactions query #{inspect(query_details)}}")
-
-        Repo.all(query)
-      end)
-    end)
+    |> Enum.map(fn query -> Task.async(&Repo.all/1) end)
   end
 
   defp address_to_mined_transactions_tasks(address_hash, options) do
@@ -4579,7 +4572,7 @@ defmodule Explorer.Chain do
     preload(query, [{^arg1, [{^arg2, [{^arg3, [{^arg4, ^arg5}]}]}]}])
   end
 
-  def join_associations(query, necessity_by_association) when is_map(necessity_by_association) do
+  defp join_associations(query, necessity_by_association) when is_map(necessity_by_association) do
     Enum.reduce(necessity_by_association, query, fn {association, join}, acc_query ->
       join_association(acc_query, association, join)
     end)

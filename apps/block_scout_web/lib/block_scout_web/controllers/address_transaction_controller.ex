@@ -158,7 +158,7 @@ defmodule BlockScoutWeb.AddressTransactionController do
       {:ok, conn} =
         conn
         |> put_resp_content_type("application/csv")
-        |> put_resp_header("content-disposition", "attachment; filename=transactions.csv")
+        |> put_resp_header("content-disposition", "attachment; filename=token_transfers.csv")
         |> send_chunked(200)
         |> then(&CSV.export_token_transfers(address, from_period, to_period, &1))
 
