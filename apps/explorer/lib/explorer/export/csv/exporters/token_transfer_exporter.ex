@@ -3,7 +3,7 @@ defmodule Explorer.Export.CSV.TokenTransferExporter do
 
   import Ecto.Query
   alias Explorer.Chain
-  alias Explorer.Chain.{Address, TokenTransfer, Transaction, Wei}
+  alias Explorer.Chain.{Address, TokenTransfer}
   import Explorer.Export.CSV.Utils
 
   @behaviour Explorer.Export.CSV.Exporter

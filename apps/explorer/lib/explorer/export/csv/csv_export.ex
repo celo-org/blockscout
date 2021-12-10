@@ -1,7 +1,7 @@
 defmodule Explorer.Export.CSV do
   @moduledoc "Runs csv export operations from the database for a given account and parameters"
 
-  alias Explorer.{Chain, Repo}
+  alias Explorer.Repo
   alias Explorer.Chain.Address
   alias NimbleCSV.RFC4180
   alias Plug.Conn
@@ -26,7 +26,7 @@ defmodule Explorer.Export.CSV do
       # here we explicitly preload associations for every `@preload_chunks` records
       Repo.preload(chunk, module.associations())
     end)
-    |> Stream.map(&(&1 |> module.transform(address) |> List.flatten()))
+    |> Stream.map(&(module.transform(&1, address) ))
     |> then(&Stream.concat([headers], &1))
     |> RFC4180.dump_to_stream()
   end
@@ -50,10 +50,6 @@ defmodule Explorer.Export.CSV do
     )
   end
 
-  @doc """
-  Creates and runs a streaming operation for given exporter module and parameters,
-  streams into a given Enum.
-  """
   def export(module, address, from, to, destination) do
     Repo.transaction(
       fn ->
