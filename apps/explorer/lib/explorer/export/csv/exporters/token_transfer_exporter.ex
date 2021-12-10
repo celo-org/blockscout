@@ -3,20 +3,15 @@ defmodule Explorer.Export.CSV.TokenTransferExporter do
 
   import Ecto.Query
   alias Explorer.Chain
-  alias Explorer.Chain.{Address, Transaction, Wei}
+  alias Explorer.Chain.{Address, TokenTransfer, Transaction, Wei}
   import Explorer.Export.CSV.Utils
 
   @behaviour Explorer.Export.CSV.Exporter
 
   @preloads [
-    gas_currency: :token,
-    token_transfers: :token,
-    token_transfers: :to_address,
-    token_transfers: :from_address,
-    token_transfers: :token_contract_address,
-    from_address: [],
-    to_address: [],
-    block: []
+    block: [],
+    token: [],
+    transaction: [gas_currency: :token]
   ]
 
   @row_header [
@@ -40,14 +35,11 @@ defmodule Explorer.Export.CSV.TokenTransferExporter do
     from_block = Chain.convert_date_to_min_block(from)
     to_block = Chain.convert_date_to_max_block(to)
 
-    Transaction
-    |> order_by([transaction], desc: transaction.block_number, desc: transaction.index)
+    TokenTransfer
+    |> join(:left, [tt], t in assoc(tt, :transaction), as: :transaction)
+    |> order_by([transaction: transaction], desc: transaction.block_number, desc: transaction.index)
     |> Chain.where_block_number_in_period(from_block, to_block)
-    |> where(
-      [t],
-      t.from_address_hash == ^address_hash or t.to_address_hash == ^address_hash or
-        t.created_contract_address_hash == ^address_hash
-    )
+    |> where( [tt], tt.from_address_hash == ^address_hash or tt.to_address_hash == ^address_hash )
   end
 
   @impl true
@@ -57,17 +49,13 @@ defmodule Explorer.Export.CSV.TokenTransferExporter do
   def row_names, do: @row_header
 
   @impl true
-  def transform(transaction, address) do
-    transaction.token_transfers
-    |> Enum.map(fn transfer ->
-      token_transfer = %{transfer | transaction: transaction}
-
+  def transform(token_transfer, address) do
       [
         to_string(token_transfer.transaction_hash),
-        token_transfer.transaction.block_number,
-        token_transfer.transaction.block.timestamp,
-        token_transfer.from_address |> to_string() |> String.downcase(),
-        token_transfer.to_address |> to_string() |> String.downcase(),
+        token_transfer.block_number,
+        token_transfer.block.timestamp,
+        token_transfer.from_address_hash |> to_string() |> String.downcase(),
+        token_transfer.to_address_hash |> to_string() |> String.downcase(),
         token_transfer.token_contract_address |> to_string() |> String.downcase(),
         type(token_transfer, address.hash),
         token_transfer.token.symbol,
@@ -77,6 +65,5 @@ defmodule Explorer.Export.CSV.TokenTransferExporter do
         token_transfer.transaction.status,
         token_transfer.transaction.error
       ]
-    end)
   end
 end
