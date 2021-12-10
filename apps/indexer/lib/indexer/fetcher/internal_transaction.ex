@@ -269,6 +269,11 @@ defmodule Indexer.Fetcher.InternalTransaction do
         _ -> []
       end
 
+    token_transfers_addresses_params =
+      Addresses.extract_addresses(%{
+        token_transfers: token_transfers
+      })
+
     address_hash_to_block_number =
       Enum.into(addresses_params, %{}, fn %{fetched_coin_balance_block_number: block_number, hash: hash} ->
         {hash, block_number}
@@ -286,14 +291,14 @@ defmodule Indexer.Fetcher.InternalTransaction do
     imports =
       Chain.import(%{
         token_transfers: %{params: token_transfers},
-        addresses: %{params: addresses_params},
+        addresses: %{params: token_transfers_addresses_params},
         internal_transactions: %{params: internal_transactions_and_empty_block_numbers, with: :blockless_changeset},
         timeout: :infinity
       })
 
     case imports do
       {:ok, imported} ->
-        Accounts.drop(imported[:addreses])
+        Accounts.drop(imported[:addresses])
         Blocks.drop_nonconsensus(imported[:remove_consensus_of_missing_transactions_blocks])
 
         async_import_coin_balances(imported, %{
