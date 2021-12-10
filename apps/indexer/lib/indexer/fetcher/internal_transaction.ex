@@ -291,7 +291,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
     imports =
       Chain.import(%{
         token_transfers: %{params: token_transfers},
-        addresses: %{params: token_transfers_addresses_params},
+        addresses: %{params: addresses_params},
         internal_transactions: %{params: internal_transactions_and_empty_block_numbers, with: :blockless_changeset},
         timeout: :infinity
       })
@@ -301,7 +301,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
         Accounts.drop(imported[:addresses])
         Blocks.drop_nonconsensus(imported[:remove_consensus_of_missing_transactions_blocks])
 
-        async_import_coin_balances(imported, %{
+        async_import_coin_balances(token_transfers_addresses_params, %{
           address_hash_to_fetched_balance_block_number: address_hash_to_block_number
         })
 
