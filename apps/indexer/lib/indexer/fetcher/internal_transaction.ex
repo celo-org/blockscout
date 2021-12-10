@@ -275,7 +275,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
       })
 
     address_hash_to_block_number =
-      Enum.into(addresses_params, %{}, fn %{fetched_coin_balance_block_number: block_number, hash: hash} ->
+      Enum.into(token_transfers_addresses_params, %{}, fn %{fetched_coin_balance_block_number: block_number, hash: hash} ->
         {hash, block_number}
       end)
 
