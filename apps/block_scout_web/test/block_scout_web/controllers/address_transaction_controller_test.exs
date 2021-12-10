@@ -69,6 +69,7 @@ defmodule BlockScoutWeb.AddressTransactionControllerTest do
       assert %Token{} = conn.assigns.exchange_rate
     end
 
+
     test "returns next page of results based on last seen transaction", %{conn: conn} do
       address = insert(:address)
 
@@ -162,8 +163,10 @@ defmodule BlockScoutWeb.AddressTransactionControllerTest do
         |> insert(from_address: address, gas_currency: fee_currency.contract_address)
         |> with_block()
 
-      insert(:token_transfer, transaction: transaction, from_address: address)
-      insert(:token_transfer, transaction: transaction, to_address: address)
+      insert(:token_transfer, transaction: transaction, from_address: address,
+        block: transaction.block, block_number: transaction.block_number)
+      insert(:token_transfer, transaction: transaction, to_address: address,
+        block: transaction.block, block_number: transaction.block_number)
 
       from_period = Timex.format!(Timex.shift(Timex.now(), minutes: -1), "%Y-%m-%d", :strftime)
       to_period = Timex.format!(Timex.now(), "%Y-%m-%d", :strftime)
@@ -174,6 +177,9 @@ defmodule BlockScoutWeb.AddressTransactionControllerTest do
           "from_period" => from_period,
           "to_period" => to_period
         })
+
+
+        require IEx; IEx.pry
 
       assert conn.resp_body |> String.split("\n") |> Enum.count() == 4
     end
