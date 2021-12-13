@@ -3,7 +3,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
 
   alias BlockScoutWeb.API.RPC.Helpers
   alias Explorer.{Chain, Etherscan}
-  alias Explorer.Chain.{Address, Wei}
+  alias Explorer.Chain.{Address, CeloUnlocked, Wei}
   alias Indexer.Fetcher.CoinBalanceOnDemand
 
   def listaccounts(conn, params) do
@@ -540,7 +540,7 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
                end),
              available_for_withdrawal:
                Enum.reduce(pending_withdrawals, Decimal.new(0), fn withdrawal, acc ->
-                 if DateTime.diff(withdrawal.available, DateTime.utc_now()) <= 0 do
+                 if CeloUnlocked.is_available(withdrawal) do
                    Decimal.add(Wei.to(withdrawal.amount, :wei), acc)
                  else
                    acc
