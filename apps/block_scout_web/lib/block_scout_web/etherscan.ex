@@ -205,13 +205,16 @@ defmodule BlockScoutWeb.Etherscan do
       %{
         "total" => "2000000000000000000",
         "available_for_withdrawal" => "1000000000000000000",
-        "pending_withdrawals" => [%{
-          "total" => "1000000000000000000",
-          "available_at" => "2021-12-09 00:11:23"
-        }, %{
-          "total" => "1000000000000000000",
-          "available_at" => "2021-12-11 11:21:50"
-        }]
+        "pending_withdrawals" => [
+          %{
+            "total" => "1000000000000000000",
+            "available_at" => "2021-12-09 00:11:23"
+          },
+          %{
+            "total" => "1000000000000000000",
+            "available_at" => "2021-12-11 11:21:50"
+          }
+        ]
       }
     ]
   }

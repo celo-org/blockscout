@@ -2678,8 +2678,20 @@ defmodule BlockScoutWeb.API.RPC.AddressControllerTest do
       available_1 = Timex.shift(DateTime.utc_now(), days: -1)
       available_2 = Timex.shift(DateTime.utc_now(), days: 1)
       address = insert(:address)
-      pending_withdrawal_1 = insert(:celo_unlocked, %{account_address: address.hash, amount: 2000000000000000000, available: available_1})
-      pending_withdrawal_2 = insert(:celo_unlocked, %{account_address: address.hash, amount: 1000000000000000000, available: available_2})
+
+      pending_withdrawal_1 =
+        insert(:celo_unlocked, %{
+          account_address: address.hash,
+          amount: 2_000_000_000_000_000_000,
+          available: available_1
+        })
+
+      pending_withdrawal_2 =
+        insert(:celo_unlocked, %{
+          account_address: address.hash,
+          amount: 1_000_000_000_000_000_000,
+          available: available_2
+        })
 
       params = %{
         "module" => "account",
@@ -2687,18 +2699,28 @@ defmodule BlockScoutWeb.API.RPC.AddressControllerTest do
         "address" => to_string(address.hash)
       }
 
-      expected_result = [%{
-          "total" => to_string(Decimal.add(Explorer.Chain.Wei.to(pending_withdrawal_1.amount, :wei), Explorer.Chain.Wei.to(pending_withdrawal_2.amount, :wei))),
+      expected_result = [
+        %{
+          "total" =>
+            to_string(
+              Decimal.add(
+                Explorer.Chain.Wei.to(pending_withdrawal_1.amount, :wei),
+                Explorer.Chain.Wei.to(pending_withdrawal_2.amount, :wei)
+              )
+            ),
           "availableForWithdrawal" => to_string(pending_withdrawal_1.amount),
-          "pendingWithdrawals" => [%{
-            "total" => to_string(pending_withdrawal_1.amount),
-            "availableAt" => to_string(available_1)
-          }, %{
-            "total" => to_string(pending_withdrawal_2.amount),
-            "availableAt" => to_string(available_2)
-          }]
-        }]
-
+          "pendingWithdrawals" => [
+            %{
+              "total" => to_string(pending_withdrawal_1.amount),
+              "availableAt" => to_string(available_1)
+            },
+            %{
+              "total" => to_string(pending_withdrawal_2.amount),
+              "availableAt" => to_string(available_2)
+            }
+          ]
+        }
+      ]
 
       assert response =
                conn

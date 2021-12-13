@@ -195,12 +195,17 @@ defmodule BlockScoutWeb.API.RPC.AddressView do
     %{
       "total" => pending_withdrawal.total,
       "availableForWithdrawal" => pending_withdrawal.available_for_withdrawal,
-      "pendingWithdrawals" => Enum.map(pending_withdrawal.pending_withdrawals, &(%{
-        "total" => &1.total,
-        "availableAt" => &1.available_at
-      }))
+      "pendingWithdrawals" =>
+        Enum.map(
+          pending_withdrawal.pending_withdrawals,
+          &%{
+            "total" => &1.total,
+            "availableAt" => &1.available_at
+          }
+        )
     }
   end
+
   defp prepare_block(block) do
     %{
       "blockNumber" => to_string(block.number),

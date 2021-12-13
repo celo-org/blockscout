@@ -219,8 +219,8 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
     with {:address_param, {:ok, address_param}} <- fetch_address(params),
          {:format, {:ok, address_hash}} <- to_address_hash(address_param),
          {:ok, pending_withdrawals} <- list_pending_withdrawals(address_hash) do
-       render(conn, :pending_withdrawals, %{pending_withdrawals: pending_withdrawals})
-     else
+      render(conn, :pending_withdrawals, %{pending_withdrawals: pending_withdrawals})
+    else
       {:address_param, :error} ->
         render(conn, :error, error: "Query parameter address is required")
 
@@ -527,18 +527,29 @@ defmodule BlockScoutWeb.API.RPC.AddressController do
 
   defp list_pending_withdrawals(address_hash) do
     case Chain.pending_withdrawals_for_account(address_hash) do
-      [] -> {:error, :not_found}
-      pending_withdrawals -> {:ok, [%{
-        total: Enum.reduce(pending_withdrawals, Decimal.new(0), fn withdrawal, acc -> Decimal.add(Explorer.Chain.Wei.to(withdrawal.amount, :wei), acc) end),
-        available_for_withdrawal: Enum.reduce(pending_withdrawals, Decimal.new(0), fn withdrawal, acc ->
-          if DateTime.diff(withdrawal.available, DateTime.utc_now()) <= 0 do
-            Decimal.add(Explorer.Chain.Wei.to(withdrawal.amount, :wei), acc)
-          else
-            acc
-          end
-        end),
-        pending_withdrawals: Enum.map(pending_withdrawals, &(%{total: to_string(&1.amount), available_at: to_string(&1.available)}))
-      }]}
+      [] ->
+        {:error, :not_found}
+
+      pending_withdrawals ->
+        {:ok,
+         [
+           %{
+             total:
+               Enum.reduce(pending_withdrawals, Decimal.new(0), fn withdrawal, acc ->
+                 Decimal.add(Wei.to(withdrawal.amount, :wei), acc)
+               end),
+             available_for_withdrawal:
+               Enum.reduce(pending_withdrawals, Decimal.new(0), fn withdrawal, acc ->
+                 if DateTime.diff(withdrawal.available, DateTime.utc_now()) <= 0 do
+                   Decimal.add(Wei.to(withdrawal.amount, :wei), acc)
+                 else
+                   acc
+                 end
+               end),
+             pending_withdrawals:
+               Enum.map(pending_withdrawals, &%{total: to_string(&1.amount), available_at: to_string(&1.available)})
+           }
+         ]}
     end
   end
 
