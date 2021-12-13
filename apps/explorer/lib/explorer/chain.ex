@@ -7727,6 +7727,25 @@ defmodule Explorer.Chain do
   end
 
   @doc """
+  Returns the total amount of CELO that is unlocked and hasn't yet been withdrawn.
+  """
+  @spec fetch_sum_available_celo_unlocked() :: non_neg_integer()
+  def fetch_sum_available_celo_unlocked do
+    query =
+      from(w in CeloUnlocked,
+        select: sum(w.amount),
+        where: w.available <= fragment("NOW()")
+      )
+
+    query
+    |> Repo.one()
+    |> case do
+      nil -> %Wei{value: Decimal.new(0)}
+      sum -> sum
+    end
+  end
+
+  @doc """
   Deletes unlocked CELO when passed the address and the amount
   """
   @spec delete_celo_unlocked(Hash.t(), non_neg_integer()) :: {integer(), nil | [term()]}
