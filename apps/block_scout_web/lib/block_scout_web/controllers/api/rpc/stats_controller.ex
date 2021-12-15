@@ -72,20 +72,16 @@ defmodule BlockScoutWeb.API.RPC.StatsController do
   end
 
   def celounlocked(conn, _params) do
-    sum_celo_unlocked =
-      Chain.fetch_sum_celo_unlocked()
-      |> Wei.to(:wei)
-      |> Decimal.to_string()
-    sum_available_celo_unlocked =
-      Chain.fetch_sum_available_celo_unlocked()
-      |> Wei.to(:wei)
-      |> Decimal.to_string()
+    %Wei{value: sum_celo_unlocked} = Chain.fetch_sum_celo_unlocked()
+    %Wei{value: sum_available_celo_unlocked} = Chain.fetch_sum_available_celo_unlocked()
 
     render(conn, "celounlocked.json",
-      celo_unlocked: [%{
-        total: sum_celo_unlocked,
-        available_for_withdrawal: sum_available_celo_unlocked
-      }]
+      celo_unlocked: [
+        %{
+          total: Decimal.to_string(sum_celo_unlocked),
+          available_for_withdrawal: Decimal.to_string(sum_available_celo_unlocked)
+        }
+      ]
     )
   end
 

@@ -341,7 +341,6 @@ defmodule BlockScoutWeb.Etherscan do
     "result" => "101959776311500000000000000"
   }
 
-
   @stats_celounlocked_example_value %{
     "status" => "1",
     "message" => "OK",

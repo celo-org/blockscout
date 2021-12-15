@@ -145,8 +145,8 @@ defmodule BlockScoutWeb.API.RPC.StatsControllerTest do
               |> Decimal.add(Explorer.Chain.Wei.to(pending_withdrawal_2.amount, :wei))
               |> Decimal.add(Explorer.Chain.Wei.to(pending_withdrawal_3.amount, :wei))
             ),
-            "availableForWithdrawal" =>
-              to_string(
+          "availableForWithdrawal" =>
+            to_string(
               Decimal.add(
                 Explorer.Chain.Wei.to(pending_withdrawal_1.amount, :wei),
                 Explorer.Chain.Wei.to(pending_withdrawal_2.amount, :wei)
