@@ -13,10 +13,8 @@ defmodule EthereumJSONRPC.TransactionTest do
     end
   end
 
-
-  #takes decoded json and converts + normalises to params map
+  # takes decoded json and converts + normalises to params map
   describe "elixir_to_params/1" do
-
     test "transforms legacy transaction without type" do
       transaction_json = ~S"""
       {
@@ -41,9 +39,10 @@ defmodule EthereumJSONRPC.TransactionTest do
       }
       """
 
-      result = transaction_json
-      |> Jason.decode!()
-      |> Transaction.elixir_to_params()
+      result =
+        transaction_json
+        |> Jason.decode!()
+        |> Transaction.elixir_to_params()
 
       assert result.gas == "0xc37d5"
       assert result.block_hash == "0x13e5fee5b2c16ceb7ca24f8821bdadfd56c60c439cba05d3877d2df86e35b9f2"
@@ -53,32 +52,33 @@ defmodule EthereumJSONRPC.TransactionTest do
 
     test "transforms legacy transaction with type" do
       transaction_json = ~S"""
-      {
-            "blockHash": "0x98d3e9b236730c9a563b0940fe57cfc31ba040d997b0b4b2b015cda4991b6473",
-            "blockNumber": "0x8c21a3",
-            "ethCompatible": false,
-            "feeCurrency": "0x62492a644a588fd904270bed06ad52b9abfea1ae",
-            "from": "0x6c3ac5fcb13e8dcd908c405ec6dacf0ef575d8fc",
-            "gas": "0x1e971",
-            "gasPrice": "0x28f29fbe",
-            "gatewayFee": "0x1",
-            "gatewayFeeRecipient": "0xbabababababa",
-            "hash": "0xe8196cadced0e005add1490fd1ed041b41c9e33fc4afc76fa0dabacfccc06374",
-            "input": "0xa9059cbb000000000000000000000000f19ef729c9328854e39fb7d4c58e48aedb6a7b970000000000000000000000000000000000000000000000000000000000002710",
-            "nonce": "0x3d530",
-            "r": "0x9698f4c225ba151471433cf06c5625c82650f41a662d27cbb15ea1c87bc205aa",
-            "s": "0x27f7d6c64410af88291609c7170784110367042fd59511765a37b4450065b03b",
-            "to": "0xddc9be57f553fe75752d61606b94cbd7e0264ef8",
-            "transactionIndex": "0x9",
-            "type": "0x0",
-            "v": "0x1e704",
-            "value": "0x0"
-        }
-    """
+        {
+              "blockHash": "0x98d3e9b236730c9a563b0940fe57cfc31ba040d997b0b4b2b015cda4991b6473",
+              "blockNumber": "0x8c21a3",
+              "ethCompatible": false,
+              "feeCurrency": "0x62492a644a588fd904270bed06ad52b9abfea1ae",
+              "from": "0x6c3ac5fcb13e8dcd908c405ec6dacf0ef575d8fc",
+              "gas": "0x1e971",
+              "gasPrice": "0x28f29fbe",
+              "gatewayFee": "0x1",
+              "gatewayFeeRecipient": "0xbabababababa",
+              "hash": "0xe8196cadced0e005add1490fd1ed041b41c9e33fc4afc76fa0dabacfccc06374",
+              "input": "0xa9059cbb000000000000000000000000f19ef729c9328854e39fb7d4c58e48aedb6a7b970000000000000000000000000000000000000000000000000000000000002710",
+              "nonce": "0x3d530",
+              "r": "0x9698f4c225ba151471433cf06c5625c82650f41a662d27cbb15ea1c87bc205aa",
+              "s": "0x27f7d6c64410af88291609c7170784110367042fd59511765a37b4450065b03b",
+              "to": "0xddc9be57f553fe75752d61606b94cbd7e0264ef8",
+              "transactionIndex": "0x9",
+              "type": "0x0",
+              "v": "0x1e704",
+              "value": "0x0"
+          }
+      """
 
-      result = transaction_json
-               |> Jason.decode!()
-               |> Transaction.elixir_to_params()
+      result =
+        transaction_json
+        |> Jason.decode!()
+        |> Transaction.elixir_to_params()
 
       assert result.gas == "0x1e971"
       assert result.block_hash == "0x98d3e9b236730c9a563b0940fe57cfc31ba040d997b0b4b2b015cda4991b6473"
@@ -89,7 +89,7 @@ defmodule EthereumJSONRPC.TransactionTest do
     end
 
     test "transforms dynamic fee transaction with type" do
-      ~S"""
+      transaction_json = ~S"""
       {
         "accessList": [],
         "blockHash": "0x26b90e879b1d4b63e3b33bcfebad5c59511e3249e93fef1dc05e98b0016075fb",
@@ -100,8 +100,8 @@ defmodule EthereumJSONRPC.TransactionTest do
         "from": "0xa5ca67fe05ee3f07961f59a73a0e75732fbae592",
         "gas": 59309,
         "gasPrice": 2100000000,
-        "gatewayFee": "0x0",
-        "gatewayFeeRecipient": null,
+        "gatewayFee": "0x7",
+        "gatewayFeeRecipient": "0xbababbbb",
         "hash": "0xd87938ea8839f7e418c64579d59c2e0f727af6ec338f19cd5a874755792c01a6",
         "input": "0xa9059cbb000000000000000000000000a5ca67fe05ee3f07961f59a73a0e75732fbae59200000000000000000000000000000000000000000000000000000000000003e8",
         "maxFeePerGas": 2200000000,
@@ -116,7 +116,20 @@ defmodule EthereumJSONRPC.TransactionTest do
         "value": 0
       }
       """
+
+      result =
+        transaction_json
+        |> Jason.decode!()
+        |> Transaction.elixir_to_params()
+
+      assert result.type == "0x2"
+      assert result.max_fee_per_gas == 2200000000
+      assert result.max_priority_fee_per_gas == 2000000000
+      assert result.gas_fee_recipient_hash == "0xbababbbb"
+      assert result.gateway_fee == "0x7"
+
     end
+
     test "transforms celo transaction with type" do
       ~S"""
       {
