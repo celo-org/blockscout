@@ -12,6 +12,7 @@ defmodule EthereumJSONRPC.Transaction do
   import EthereumJSONRPC, only: [quantity_to_integer: 1, integer_to_quantity: 1, request: 1]
 
   alias EthereumJSONRPC
+  alias EthereumJSONRPC.Celo
 
   @type elixir :: %{
           String.t() => EthereumJSONRPC.address() | EthereumJSONRPC.hash() | String.t() | non_neg_integer() | nil
@@ -170,6 +171,8 @@ defmodule EthereumJSONRPC.Transaction do
   def elixir_to_params(%{"input" => "0x0"} = transaction) do
     elixir_to_params(%{transaction | "input" => "0x"})
   end
+
+  def elixir_to_params(%{"type" => "0x0"} = transaction), do: Celo.TransactionParsing.parse_legacy_transaction(transaction)
 
   def elixir_to_params(
         %{
