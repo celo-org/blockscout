@@ -670,7 +670,7 @@ defmodule Indexer.Block.FetcherTest do
 
       if json_rpc_named_arguments[:transport] == EthereumJSONRPC.Mox do
         EthereumJSONRPC.Mox
-        |> expect(:json_rpc, 10, fn requests, _options ->
+        |> expect(:json_rpc, 4, fn requests, _options ->
           {:ok,
             Enum.map(requests, fn
               %{id: id, method: "eth_getBlockByNumber", params: ["0x7", true]} ->
@@ -714,7 +714,7 @@ defmodule Indexer.Block.FetcherTest do
                         "s" => "0x1f87a076f13824f4be8963e3dffd7300dae64d5f23c9a062af0c6ead347c135f",
                         "to" => to_address_hash,
                         "transactionIndex" => "0x0",
-                        "type" => "0x7c",
+                        "type" => "0x0",
                         "v" => "0xbe",
                         "value" => "0x0"
                       }
@@ -776,10 +776,149 @@ defmodule Indexer.Block.FetcherTest do
                Fetcher.fetch_and_import_range(block_fetcher, block_number..block_number)
 
       assert %{transactions: [transaction]} = inserted
+      assert transaction.type == 0
 
-      assert transaction.type == "0x7c"
-               require IEx; IEx.pry
+      #fetch from db for ultimate anti paranoia check
+      t = Transaction |> where([t], t.hash == ^transaction_hash) |> Explorer.Repo.one()
+      assert t.type == 0
+    end
 
+
+    test "imports blocks with dynamic fee (type 0x02) transactions", %{
+      block_fetcher: %Fetcher{json_rpc_named_arguments: json_rpc_named_arguments} = block_fetcher
+    } do
+      celo_token_address = insert(:contract_address)
+      insert(:token, contract_address: celo_token_address)
+      "0x" <> unprefixed_celo_token_address_hash = to_string(celo_token_address.hash)
+      set_test_address(to_string(celo_token_address.hash))
+
+      block_number = 7
+      from_address_hash = "0xe8ddc5c7a2d2f0d7a9798459c0104fdf5e987aca"
+      to_address_hash = "0x8bf38d4764929064f2d4d3a56520a76ab3df415b"
+      transaction_hash = "0x53bd884872de3e488692881baeec262e7b95234d3965248c39fe992fffd433e5"
+      max_fee_per_gas = 78787878
+      max_priority_fee_per_gas = 67676767
+
+      if json_rpc_named_arguments[:transport] == EthereumJSONRPC.Mox do
+        EthereumJSONRPC.Mox
+        |> expect(:json_rpc, 4, fn requests, _options ->
+          {:ok,
+            Enum.map(requests, fn
+              %{id: id, method: "eth_getBlockByNumber", params: ["0x7", true]} ->
+                %{
+                  id: id,
+                  result: %{
+                    "author" => "0x5a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c",
+                    "difficulty" => "0x6bc767dd80781",
+                    "extraData" => "0x5050594520737061726b706f6f6c2d6574682d7477",
+                    "gasLimit" => "0x7a121d",
+                    "gasUsed" => "0x79cbe9",
+                    "hash" => "0x1b6fb99af0b51af6685a191b2f7bcba684f8565629bf084c70b2530479407455",
+                    "logsBloom" =>
+                      "0x044d42d008801488400e1809190200a80d06105bc0c4100b047895c0d518327048496108388040140010b8208006288102e206160e21052322440924002090c1c808a0817405ab238086d028211014058e949401012403210314896702d06880c815c3060a0f0809987c81044488292cc11d57882c912a808ca10471c84460460040000c0001012804022000a42106591881d34407420ba401e1c08a8d00a000a34c11821a80222818a4102152c8a0c044032080c6462644223104d618e0e544072008120104408205c60510542264808488220403000106281a0290404220112c10b080145028c8000300b18a2c8280701c882e702210b00410834840108084",
+                    "miner" => "0x5a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c",
+                    "mixHash" => "0xda53ae7c2b3c529783d6cdacdb90587fd70eb651c0f04253e8ff17de97844010",
+                    "nonce" => "0x0946e5f01fce12bc",
+                    "number" => "0x7",
+                    "parentHash" => "0x62543e836e0ef7edfa9e38f26526092c4be97efdf5ba9e0f53a4b0b7d5bc930a",
+                    "receiptsRoot" => "0xa7d2b82bd8526de11736c18bd5cc8cfe2692106c4364526f3310ad56d78669c4",
+                    "sha3Uncles" => "0x483a8a21a5825ad270f358b3ea56e060bbb8b3082d9a92ec8fa17a5c7e6fc1b6",
+                    "size" => "0x544c",
+                    "stateRoot" => "0x85daa9cd528004c1609d4cb3520fd958e85983bb4183124a4a9f7137fd39c691",
+                    "timestamp" => "0x5c8bc76e",
+                    "totalDifficulty" => "0x201a42c35142ae94458",
+                    "transactions" => [
+                      %{
+                        "blockHash" => "0x1b6fb99af0b51af6685a191b2f7bcba684f8565629bf084c70b2530479407455",
+                        "blockNumber" => "0x7",
+                        "chainId" => "0x4d",
+                        "from" => from_address_hash,
+                        "gas" => "0x47b760",
+                        "gasPrice" => "0x174876e800",
+                        "feeCurrency" => nil,
+                        "gatewayFeeRecipient" => nil,
+                        "gatewayFee" => "0x0",
+                        "hash" => transaction_hash,
+                        "input" => "0x10855269000000000000000000000000862d67cb0773ee3f8ce7ea89b328ffea861ab3ef",
+                        "maxFeePerGas" => max_fee_per_gas,
+                        "maxPriorityFeePerGas" => max_priority_fee_per_gas,
+                        "nonce" => "0x4",
+                        "r" => "0xa7f8f45cce375bb7af8750416e1b03e0473f93c256da2285d1134fc97a700e01",
+                        "s" => "0x1f87a076f13824f4be8963e3dffd7300dae64d5f23c9a062af0c6ead347c135f",
+                        "to" => to_address_hash,
+                        "transactionIndex" => "0x0",
+                        "type" => "0x2",
+                        "v" => "0xbe",
+                        "value" => "0x0"
+                      }
+                    ],
+                    "transactionsRoot" => "0xcd6c12fa43cd4e92ad5c0bf232b30488bbcbfe273c5b4af0366fced0767d54db",
+                    "uncles" => []
+                  }
+                }
+
+              %{
+                id: id,
+                method: "eth_getTransactionReceipt",
+                params: [^transaction_hash]
+              } ->
+                %{
+                  id: id,
+                  jsonrpc: "2.0",
+                  result: %{
+                    "blockHash" => "0x1b6fb99af0b51af6685a191b2f7bcba684f8565629bf084c70b2530479407455",
+                    "blockNumber" => "0x7",
+                    "contractAddress" => nil,
+                    "cumulativeGasUsed" => "0xc512",
+                    "gasUsed" => "0xc512",
+                    "logs" => [
+                      %{
+                        "address" => "0x8bf38d4764929064f2d4d3a56520a76ab3df415b",
+                        "blockHash" => "0x1b6fb99af0b51af6685a191b2f7bcba684f8565629bf084c70b2530479407455",
+                        "blockNumber" => "0x7",
+                        "data" => "0x0000000000000000000000000000000000000000000000000000000000000f00",
+                        "logIndex" => "0x0",
+                        "topics" => [
+                          "0x000000000000000000000000C257274276a4E539741Ca11b590B9447B26A8051"
+                        ],
+                        "transactionHash" => transaction_hash,
+                        "transactionIndex" => "0x0",
+                        "transactionLogIndex" => "0x0",
+                        "type" => "mined"
+                      }
+                    ],
+                    "logsBloom" =>
+                      "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000200000000000000000000020000000000000000200000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+                    "root" => nil,
+                    "status" => "0x1",
+                    "transactionHash" => transaction_hash,
+                    "transactionIndex" => "0x0"
+                  }
+                }
+
+              %{id: id, method: "trace_block", params: [_]} ->
+                %{id: id, result: []}
+
+              %{id: id, jsonrpc: "2.0", method: "eth_getLogs"} ->
+                %{id: id, jsonrpc: "2.0", result: []}
+            end)}
+        end)
+      end
+
+      assert {:ok, %{inserted: inserted}} =
+               Fetcher.fetch_and_import_range(block_fetcher, block_number..block_number)
+
+      assert %{transactions: [inserted_transaction]} = inserted
+      assert inserted_transaction.type == 2
+
+      {:ok, max_fee} = Explorer.Chain.Wei.cast(max_fee_per_gas)
+      assert inserted_transaction.max_fee_per_gas == max_fee
+
+      {:ok, max_priority_fee} = Explorer.Chain.Wei.cast(max_priority_fee_per_gas)
+      assert inserted_transaction.max_priority_fee_per_gas == max_priority_fee
+
+      transaction_from_db = Transaction |> where([t], t.hash == ^transaction_hash) |> Explorer.Repo.one()
+      assert transaction_from_db.type == 2
     end
   end
 
