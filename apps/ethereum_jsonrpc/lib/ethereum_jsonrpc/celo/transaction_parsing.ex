@@ -1,4 +1,6 @@
 defmodule EthereumJSONRPC.Celo.TransactionParsing do
+  @moduledoc "Functions to parse and normalise keys of typed transactions"
+
   @legacy_type "0x0"
   @access_list_type "0x1"
   @dynamic_fee_type "0x2"
@@ -6,7 +8,7 @@ defmodule EthereumJSONRPC.Celo.TransactionParsing do
 
   @optional_parameters %{
     "created" => :created_contract_address_hash,
-    "type" => :type,
+    "type" => :type, #type is optional for legacy transactions
     "accessList" => :access_list
   }
 

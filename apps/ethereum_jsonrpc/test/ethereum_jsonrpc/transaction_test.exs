@@ -131,7 +131,7 @@ defmodule EthereumJSONRPC.TransactionTest do
     end
 
     test "transforms celo transaction with type" do
-      ~S"""
+      transaction_json = ~S"""
       {
         "blockHash": "0x30f5b6fc4236a3b0cdc09fde43a9a70df9d59cb355806476e3801d2b449dd590",
         "blockNumber": 7635,
@@ -140,8 +140,8 @@ defmodule EthereumJSONRPC.TransactionTest do
         "from": "0xa5ca67fe05ee3f07961f59a73a0e75732fbae592",
         "gas": 71000,
         "gasPrice": 2200000000,
-        "gatewayFee": "0x0",
-        "gatewayFeeRecipient": null,
+        "gatewayFee": "0x9",
+        "gatewayFeeRecipient": "0xcafebabe",
         "hash": "0x864a4a2e99a846a8bb6a79c31676eae4fbbe3f5e90c50b961e53e1d456864aff",
         "input": "0x",
         "nonce": 17,
@@ -154,6 +154,56 @@ defmodule EthereumJSONRPC.TransactionTest do
         "value": 1000
       }
       """
+
+      result =
+        transaction_json
+        |> Jason.decode!()
+        |> Transaction.elixir_to_params()
+
+      assert result.type == "0x7c"
+      assert result.gas_fee_recipient_hash == "0xcafebabe"
+      assert result.gateway_fee == "0x9"
+      assert result.value == 1000
+    end
+
+    test "transforms celo transaction with type and optional max fee fields" do
+      transaction_json = ~S"""
+      {
+        "blockHash": "0x30f5b6fc4236a3b0cdc09fde43a9a70df9d59cb355806476e3801d2b449dd590",
+        "blockNumber": 7635,
+        "ethCompatible": false,
+        "feeCurrency": "0x000000000000000000000000000000000000d008",
+        "from": "0xa5ca67fe05ee3f07961f59a73a0e75732fbae592",
+        "gas": 71000,
+        "gasPrice": 2200000000,
+        "gatewayFee": "0x9",
+        "gatewayFeeRecipient": "0xcafebabe",
+        "hash": "0x864a4a2e99a846a8bb6a79c31676eae4fbbe3f5e90c50b961e53e1d456864aff",
+        "input": "0x",
+        "maxFeePerGas": 7777777,
+        "maxPriorityFeePerGas": 666666,
+        "nonce": 17,
+        "r": "0x58c544eb80a5573cfeab40c1c187c743a65f78087b80399dc8955e3639c29b37",
+        "s": "0x4f8db109a6518b591718eea4905f625596e36b5985d73815285e9a0f52acab5b",
+        "to": "0xa5ca67fe05ee3f07961f59a73a0e75732fbae592",
+        "transactionIndex": 0,
+        "type": "0x7c",
+        "v": "0x1",
+        "value": 1000
+      }
+      """
+
+      result =
+        transaction_json
+        |> Jason.decode!()
+        |> Transaction.elixir_to_params()
+
+      assert result.type == "0x7c"
+      assert result.gas_fee_recipient_hash == "0xcafebabe"
+      assert result.gateway_fee == "0x9"
+      assert result.value == 1000
+      assert result.max_fee_per_gas == 7777777
+      assert result.max_priority_fee_per_gas == 666666
     end
   end
 end
