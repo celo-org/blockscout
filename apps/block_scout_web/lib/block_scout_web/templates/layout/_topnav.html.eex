@@ -108,7 +108,7 @@
           <% end %>
         <% end %>
          <li class="nav-item">
-            <a class="nav-link topnav-nav-link" href="https://datastudio.google.com/s/noZ1Cin460c" target="_blank" id="navbarBlocksDropdown" role="button" data-toggle="tooltip" aria-haspopup="true" aria-expanded="false">
+            <a class="nav-link topnav-nav-link" href="/stats" id="navbarBlocksDropdown" role="button" data-toggle="tooltip" aria-haspopup="true" aria-expanded="false">
               <span class="nav-link-icon">
                 <%= render BlockScoutWeb.IconsView, "_stats_icon.html" %>
               </span>
