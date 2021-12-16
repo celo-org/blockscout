@@ -8,36 +8,38 @@ defmodule EthereumJSONRPC.Celo.TransactionParsing do
 
   @optional_parameters %{
     "created" => :created_contract_address_hash,
-    "type" => :type, #type is optional for legacy transactions
-    "gasPrice" => :gas_price, #this is currently included for all celo transaction types but may be removed in future
+    # type is optional for legacy transactions
+    "type" => :type,
+    # this is currently included for all celo transaction types but may be removed in future
+    "gasPrice" => :gas_price,
     "accessList" => :access_list
   }
 
-  def parse_legacy_transaction(transaction = %{"type" => @legacy_type}) do
+  def parse_legacy_transaction(%{"type" => @legacy_type} = transaction) do
     transaction
     |> base_transaction()
   end
 
-  def parse_access_list_transaction(transaction = %{"type" => @access_list_type}) do
+  def parse_access_list_transaction(%{"type" => @access_list_type} = transaction) do
     transaction
     |> base_transaction()
   end
 
   def parse_dynamic_fee_transaction(
-        transaction = %{
+        %{
           "type" => @dynamic_fee_type,
           "maxFeePerGas" => max_fee_per_gas,
           "maxPriorityFeePerGas" => max_priority_fee_per_gas
-        }
+        } = transaction
       ) do
     transaction
     |> base_transaction()
     |> Map.merge(%{max_fee_per_gas: max_fee_per_gas, max_priority_fee_per_gas: max_priority_fee_per_gas})
   end
 
-  #supposed to always be on the response object, but isn't...
+  # supposed to always be on the response object, but isn't...
   @celo_optional_parameters %{"maxFeePerGas" => :max_fee_per_gas, "maxPriorityFeePerGas" => :max_priority_fee_per_gas}
-  def parse_celo_transaction(transaction = %{"type" => @celo_custom_type}) do
+  def parse_celo_transaction(%{"type" => @celo_custom_type} = transaction) do
     celo_transaction = transaction |> base_transaction()
 
     @celo_optional_parameters
@@ -47,7 +49,7 @@ defmodule EthereumJSONRPC.Celo.TransactionParsing do
   end
 
   def base_transaction(
-        transaction = %{
+        %{
           "blockHash" => block_hash,
           "blockNumber" => block_number,
           "from" => from_address_hash,
@@ -64,7 +66,7 @@ defmodule EthereumJSONRPC.Celo.TransactionParsing do
           "transactionIndex" => index,
           "v" => v,
           "value" => value
-        }
+        } = transaction
       ) do
     result = %{
       block_hash: block_hash,
@@ -93,9 +95,9 @@ defmodule EthereumJSONRPC.Celo.TransactionParsing do
   end
 
   # explicitly ignoring access list parameter
-  defp optional_parameter(_source, destination = %{}, "accessList", _destination_key), do: destination
+  defp optional_parameter(_source, %{} = destination, "accessList", _destination_key), do: destination
 
-  defp optional_parameter(source = %{}, destination = %{}, source_key, destination_key) do
+  defp optional_parameter(%{} = source, %{} = destination, source_key, destination_key) do
     if Map.has_key?(source, source_key) do
       value = source |> Map.get(source_key)
 

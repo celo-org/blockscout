@@ -123,11 +123,10 @@ defmodule EthereumJSONRPC.TransactionTest do
         |> Transaction.elixir_to_params()
 
       assert result.type == "0x2"
-      assert result.max_fee_per_gas == 2200000000
-      assert result.max_priority_fee_per_gas == 2000000000
+      assert result.max_fee_per_gas == 2_200_000_000
+      assert result.max_priority_fee_per_gas == 2_000_000_000
       assert result.gas_fee_recipient_hash == "0xbababbbb"
       assert result.gateway_fee == "0x7"
-
     end
 
     test "transforms celo transaction with type" do
@@ -202,8 +201,8 @@ defmodule EthereumJSONRPC.TransactionTest do
       assert result.gas_fee_recipient_hash == "0xcafebabe"
       assert result.gateway_fee == "0x9"
       assert result.value == 1000
-      assert result.max_fee_per_gas == 7777777
-      assert result.max_priority_fee_per_gas == 666666
+      assert result.max_fee_per_gas == 7_777_777
+      assert result.max_priority_fee_per_gas == 666_666
     end
   end
 end

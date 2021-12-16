@@ -12,7 +12,7 @@ defmodule EthereumJSONRPC.Transaction do
   import EthereumJSONRPC, only: [quantity_to_integer: 1, integer_to_quantity: 1, request: 1]
 
   alias EthereumJSONRPC
-  alias EthereumJSONRPC.Celo
+  alias EthereumJSONRPC.Celo.TransactionParsing
 
   @type elixir :: %{
           String.t() => EthereumJSONRPC.address() | EthereumJSONRPC.hash() | String.t() | non_neg_integer() | nil
@@ -174,16 +174,16 @@ defmodule EthereumJSONRPC.Transaction do
 
   # eip-1559 typed transaction parsing
   def elixir_to_params(%{"type" => "0x0"} = transaction),
-    do: Celo.TransactionParsing.parse_legacy_transaction(transaction)
+    do: TransactionParsing.parse_legacy_transaction(transaction)
 
   def elixir_to_params(%{"type" => "0x1"} = transaction),
-    do: Celo.TransactionParsing.parse_access_list_transaction(transaction)
+    do: TransactionParsing.parse_access_list_transaction(transaction)
 
   def elixir_to_params(%{"type" => "0x2"} = transaction),
-    do: Celo.TransactionParsing.parse_dynamic_fee_transaction(transaction)
+    do: TransactionParsing.parse_dynamic_fee_transaction(transaction)
 
   def elixir_to_params(%{"type" => "0x7c"} = transaction),
-    do: Celo.TransactionParsing.parse_celo_transaction(transaction)
+    do: TransactionParsing.parse_celo_transaction(transaction)
 
   # fall back to legacy parsing when type does not match
 
