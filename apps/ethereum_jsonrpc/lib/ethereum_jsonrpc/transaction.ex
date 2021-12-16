@@ -173,16 +173,16 @@ defmodule EthereumJSONRPC.Transaction do
   end
 
   # eip-1559 typed transaction parsing
-  def elixir_to_params(%{"type" => "0x0"} = transaction),
+  def elixir_to_params(%{"type" => type} = transaction) when type in [0, "0x0"],
     do: TransactionParsing.parse_legacy_transaction(transaction)
 
-  def elixir_to_params(%{"type" => "0x1"} = transaction),
+  def elixir_to_params(%{"type" => type} = transaction) when type in [1, "0x1"],
     do: TransactionParsing.parse_access_list_transaction(transaction)
 
-  def elixir_to_params(%{"type" => "0x2"} = transaction),
+  def elixir_to_params(%{"type" => type} = transaction) when type in [2, "0x2", "0x02"],
     do: TransactionParsing.parse_dynamic_fee_transaction(transaction)
 
-  def elixir_to_params(%{"type" => "0x7c"} = transaction),
+  def elixir_to_params(%{"type" => type} = transaction) when type in [124, "0x7c"],
     do: TransactionParsing.parse_celo_transaction(transaction)
 
   # fall back to legacy parsing when type does not match

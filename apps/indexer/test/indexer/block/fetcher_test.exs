@@ -782,7 +782,7 @@ defmodule Indexer.Block.FetcherTest do
       assert t.type == 0
     end
 
-    test "imports blocks with dynamic fee (type 0x02) transactions", %{
+    test "imports blocks with dynamic fee (type 0x2) transactions", %{
       block_fetcher: %Fetcher{json_rpc_named_arguments: json_rpc_named_arguments} = block_fetcher
     } do
       celo_token_address = insert(:contract_address)

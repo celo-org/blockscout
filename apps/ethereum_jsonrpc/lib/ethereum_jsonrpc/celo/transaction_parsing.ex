@@ -1,11 +1,6 @@
 defmodule EthereumJSONRPC.Celo.TransactionParsing do
   @moduledoc "Functions to parse and normalise keys of typed transactions"
 
-  @legacy_type "0x0"
-  @access_list_type "0x1"
-  @dynamic_fee_type "0x2"
-  @celo_custom_type "0x7c"
-
   @optional_parameters %{
     "created" => :created_contract_address_hash,
     # type is optional for legacy transactions
@@ -15,19 +10,18 @@ defmodule EthereumJSONRPC.Celo.TransactionParsing do
     "accessList" => :access_list
   }
 
-  def parse_legacy_transaction(%{"type" => @legacy_type} = transaction) do
+  def parse_legacy_transaction(transaction) do
     transaction
     |> base_transaction()
   end
 
-  def parse_access_list_transaction(%{"type" => @access_list_type} = transaction) do
+  def parse_access_list_transaction(transaction) do
     transaction
     |> base_transaction()
   end
 
   def parse_dynamic_fee_transaction(
         %{
-          "type" => @dynamic_fee_type,
           "maxFeePerGas" => max_fee_per_gas,
           "maxPriorityFeePerGas" => max_priority_fee_per_gas
         } = transaction
@@ -39,7 +33,7 @@ defmodule EthereumJSONRPC.Celo.TransactionParsing do
 
   # supposed to always be on the response object, but isn't...
   @celo_optional_parameters %{"maxFeePerGas" => :max_fee_per_gas, "maxPriorityFeePerGas" => :max_priority_fee_per_gas}
-  def parse_celo_transaction(%{"type" => @celo_custom_type} = transaction) do
+  def parse_celo_transaction(transaction) do
     celo_transaction = transaction |> base_transaction()
 
     @celo_optional_parameters
