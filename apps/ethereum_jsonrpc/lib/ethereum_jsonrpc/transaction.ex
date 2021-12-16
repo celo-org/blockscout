@@ -172,6 +172,7 @@ defmodule EthereumJSONRPC.Transaction do
     elixir_to_params(%{transaction | "input" => "0x"})
   end
 
+  # eip-1559 typed transaction parsing
   def elixir_to_params(%{"type" => "0x0"} = transaction),
     do: Celo.TransactionParsing.parse_legacy_transaction(transaction)
 
@@ -184,7 +185,7 @@ defmodule EthereumJSONRPC.Transaction do
   def elixir_to_params(%{"type" => "0x7c"} = transaction),
     do: Celo.TransactionParsing.parse_celo_transaction(transaction)
 
-  # fall back to legacy parsing below when type does not match
+  # fall back to legacy parsing when type does not match
 
   def elixir_to_params(
         %{

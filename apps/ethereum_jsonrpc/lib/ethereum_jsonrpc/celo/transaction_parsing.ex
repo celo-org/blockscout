@@ -9,6 +9,7 @@ defmodule EthereumJSONRPC.Celo.TransactionParsing do
   @optional_parameters %{
     "created" => :created_contract_address_hash,
     "type" => :type, #type is optional for legacy transactions
+    "gasPrice" => :gas_price, #this is currently included for all celo transaction types but may be removed in future
     "accessList" => :access_list
   }
 
@@ -34,8 +35,8 @@ defmodule EthereumJSONRPC.Celo.TransactionParsing do
     |> Map.merge(%{max_fee_per_gas: max_fee_per_gas, max_priority_fee_per_gas: max_priority_fee_per_gas})
   end
 
+  #supposed to always be on the response object, but isn't...
   @celo_optional_parameters %{"maxFeePerGas" => :max_fee_per_gas, "maxPriorityFeePerGas" => :max_priority_fee_per_gas}
-
   def parse_celo_transaction(transaction = %{"type" => @celo_custom_type}) do
     celo_transaction = transaction |> base_transaction()
 
@@ -52,7 +53,6 @@ defmodule EthereumJSONRPC.Celo.TransactionParsing do
           "from" => from_address_hash,
           "feeCurrency" => gas_currency_hash,
           "gas" => gas,
-          "gasPrice" => gas_price,
           "gatewayFee" => gateway_fee,
           "gatewayFeeRecipient" => gas_fee_recipient_hash,
           "hash" => hash,
@@ -71,7 +71,6 @@ defmodule EthereumJSONRPC.Celo.TransactionParsing do
       block_number: block_number,
       from_address_hash: from_address_hash,
       gas: gas,
-      gas_price: gas_price,
       gas_currency_hash: gas_currency_hash,
       gas_fee_recipient_hash: gas_fee_recipient_hash,
       gateway_fee: gateway_fee,
