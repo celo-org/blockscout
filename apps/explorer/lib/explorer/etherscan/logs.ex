@@ -118,6 +118,7 @@ defmodule Explorer.Etherscan.Logs do
       from(log_transaction_data in subquery(all_transaction_logs_query),
         join: block in Block,
         on: block.number == log_transaction_data.block_number,
+        where: log_transaction_data.address_hash == ^address_hash,
         order_by: block.number,
         limit: 1000,
         select_merge: %{
