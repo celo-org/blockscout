@@ -70,6 +70,41 @@ defmodule Explorer.Etherscan.LogsTest do
       assert found_log.block_timestamp == block.timestamp
     end
 
+    test "with transaction address different than logs address" do
+      contract_address = insert(:contract_address)
+      another_address = insert(:address)
+
+      transaction =
+        %Transaction{block: block} =
+        :transaction
+        |> insert(to_address: contract_address)
+        |> with_block()
+
+      log = insert(:log, address: another_address, transaction: transaction, block: block, block_number: block.number)
+
+      filter = %{
+        from_block: block.number,
+        to_block: block.number,
+        address_hash: another_address.hash
+      }
+
+      [found_log] = Logs.list_logs(filter)
+
+      assert found_log.data == log.data
+      assert found_log.first_topic == log.first_topic
+      assert found_log.second_topic == log.second_topic
+      assert found_log.third_topic == log.third_topic
+      assert found_log.fourth_topic == log.fourth_topic
+      assert found_log.index == log.index
+      assert found_log.address_hash == log.address_hash
+      assert found_log.transaction_hash == log.transaction_hash
+      assert found_log.gas_price == transaction.gas_price
+      assert found_log.gas_used == transaction.gas_used
+      assert found_log.transaction_index == transaction.index
+      assert found_log.block_number == block.number
+      assert found_log.block_timestamp == block.timestamp
+    end
+
     test "with address with two logs" do
       contract_address = insert(:contract_address)
 
