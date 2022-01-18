@@ -255,7 +255,7 @@ defmodule Explorer.Etherscan do
     subquery =
       from(
         tt in TokenTransfer,
-        left_join: t in Transaction,
+        inner_join: t in Transaction,
         on: t.hash == tt.transaction_hash,
         left_join: l in Log,
         on: l.transaction_hash == t.hash and l.address_hash == ^params.address_hash and l.index == tt.log_index,
