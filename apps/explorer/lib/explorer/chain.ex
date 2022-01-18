@@ -754,6 +754,18 @@ defmodule Explorer.Chain do
     |> Enum.into(%{})
   end
 
+  def timestamp_by_block_hash(block_hash) do
+    query =
+      from(
+        block in Block,
+        where: block.hash == ^block_hash and block.consensus == true,
+        select: block.timestamp
+      )
+
+    query
+    |> Repo.one()
+  end
+
   @doc """
   Finds all `t:Explorer.Chain.Transaction.t/0`s in the `t:Explorer.Chain.Block.t/0`.
 
