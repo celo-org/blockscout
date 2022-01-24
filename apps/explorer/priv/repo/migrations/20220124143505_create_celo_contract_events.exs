@@ -9,6 +9,8 @@ defmodule Explorer.Repo.Migrations.CreateCeloContractEvents do
       add(:contract_address_hash, :bytea, null: false)
       add(:log_index, :integer)
       add(:event_params, :map, default: %{})
+
+      timestamps()
     end
 
     #constraint to prevent duplicate events
