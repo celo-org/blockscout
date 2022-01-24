@@ -25,6 +25,6 @@ defmodule Explorer.Chain.CeloContractEvent do
     item
     |> cast(attrs, @attrs)
     |> validate_required(@attrs)
-    |> unique_constraint(:celo_contract_events_duplicate_event, name: :celo_contract_events_log_transaction_index)
+    |> unique_constraint(:transaction_hash, name: :celo_contract_events_log_index_transaction_hash_index)
   end
 end
