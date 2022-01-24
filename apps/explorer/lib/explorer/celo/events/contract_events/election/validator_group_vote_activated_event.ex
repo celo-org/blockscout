@@ -1,4 +1,5 @@
 alias Explorer.Chain.Log
+alias Explorer.Celo.ContractEvents.EventTransformer
 
 defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent do
   @moduledoc """
@@ -21,17 +22,35 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
     name: "ValidatorGroupVoteActivatedEvent"
   ]
 
-  def from(log = %Log{first_topic: "0x45aac85f38083b18efe2d441a65b9c1ae177c78307cb5a5d4aec8f7dbcaeabfe"}) do
-    #account and group a
+  defimpl EventTransformer do
+    alias Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
 
+    def from_log(_, log = %Log{}) do
+      [value, units] = ABI.TypeDecoder.decode_raw(log.data.bytes, [{:uint, 256}, {:uint, 256}])
+      account = ABI.TypeDecoder.decode(log.second_topic, [:address])
+      group = ABI.TypeDecoder.decode(log.third_topic, [:address])
 
-    %__MODULE__{
-      transaction_hash: log.transaction_hash,
-      block_hash: log.block_hash,
-      contract_address_hash: log.address_hash,
-      log_index: log.index,
+      %ValidatorGroupVoteActivatedEvent{
+        transaction_hash: log.transaction_hash,
+        block_hash: log.block_hash,
+        contract_address_hash: log.address_hash,
+        log_index: log.index,
+        #event specific parameters
+        account: account,
+        group: group,
+        value: value,
+        units: units
+      }
+    end
+    def from_params(_, _params) do
+      "lol"
+    end
+    def from_contract_event(_, _contract) do
+      "lol"
+    end
 
-      #event specific parameters
-    }
+    def to_celo_contract_event(_) do
+      "lol"
+    end
   end
 end
