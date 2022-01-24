@@ -7878,10 +7878,21 @@ defmodule Explorer.Chain do
     |> Repo.one()
   end
 
-  @spec delete_celo_pending_epoch_operation(Hash.Full.t()) :: CeloPendingEpochOperation.t()
-  def delete_celo_pending_epoch_operation(block_hash) do
+  @spec falsify_or_delete_celo_pending_epoch_operation(Hash.Full.t(), :fetch_epoch_rewards | :fetch_validator_group_data) :: CeloPendingEpochOperation.t()
+  def falsify_or_delete_celo_pending_epoch_operation(block_hash, operation_type) do
     celo_pending_operation = Repo.get(CeloPendingEpochOperation, block_hash)
-    Repo.delete(celo_pending_operation)
+    new_celo_pending_operation = Map.update!(celo_pending_operation, operation_type, fn(_) -> false end)
+
+    new_fetch_epoch_rewards = Map.fetch!(new_celo_pending_operation, :fetch_epoch_rewards)
+    new_fetch_validator_group_data = Map.fetch!(new_celo_pending_operation, :fetch_validator_group_data)
+
+    if new_fetch_epoch_rewards || new_fetch_validator_group_data == true do
+      celo_pending_operation
+      |> Changeset.change(%{block_hash: block_hash, fetch_epoch_rewards: new_fetch_epoch_rewards, fetch_validator_group_data: new_fetch_validator_group_data})
+      |> Repo.update()
+    else
+      Repo.delete(celo_pending_operation)
+    end
   end
 
   def import_epoch_rewards_and_delete_pending_celo_epoch_operations(import_params, success) do
@@ -7892,7 +7903,7 @@ defmodule Explorer.Chain do
     end)
     |> Multi.run(:delete_celo_pending, fn _, _ ->
       success
-      |> Enum.each(fn reward -> Chain.delete_celo_pending_epoch_operation(reward.block_hash) end)
+      |> Enum.each(fn reward -> Chain.falsify_or_delete_celo_pending_epoch_operation(reward.block_hash) end)
 
       {:ok, success}
     end)
