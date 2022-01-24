@@ -320,7 +320,8 @@ defmodule Explorer.Factory do
     %CeloPendingEpochOperation{
       # caller MUST supply block
       # all operations will default to false
-      fetch_epoch_rewards: false
+      fetch_epoch_rewards: false,
+      fetch_validator_group_data: false
     }
   end
 

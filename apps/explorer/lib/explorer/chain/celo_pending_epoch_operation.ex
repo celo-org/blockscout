@@ -21,6 +21,7 @@ defmodule Explorer.Chain.CeloPendingEpochOperation do
   @primary_key false
   schema "celo_pending_epoch_operations" do
     field(:fetch_epoch_rewards, :boolean)
+    field(:fetch_validator_group_data, :boolean)
 
     timestamps()
 
