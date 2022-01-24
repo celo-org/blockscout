@@ -501,8 +501,7 @@ defmodule Explorer.Etherscan do
       from(
         t in Transaction,
         order_by: [{^options.order_by_direction, t.block_number}],
-        limit: ^options.page_size,
-        offset: ^offset(options),
+        limit: ^options.page_size * 3,
         select: %{
           hash: t.hash
         }
