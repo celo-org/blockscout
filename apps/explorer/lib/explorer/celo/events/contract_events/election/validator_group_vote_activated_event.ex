@@ -13,45 +13,59 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
     );
   """
 
+  @name "ValidatorGroupVoteActivatedEvent"
+  @topic "0x45aac85f38083b18efe2d441a65b9c1ae177c78307cb5a5d4aec8f7dbcaeabfe"
+
+  def name, do: @name
+  def topic, do: @topic
+
   defstruct [
     :transaction_hash, :block_hash, :contract_address_hash, :log_index,
     :account,
     :group,
     :value,
     :units,
-    name: "ValidatorGroupVoteActivatedEvent"
+    name: @name
   ]
 
   defimpl EventTransformer do
     alias Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
+    alias Explorer.Chain.CeloContractEvent
+
     import Explorer.Celo.ContractEvents.Common
 
     def from_log(_, log = %Log{}) do
-      [value, units] = ABI.TypeDecoder.decode_raw(log.data.bytes, [{:uint, 256}, {:uint, 256}])
-      account = decode_event(log.second_topic, :address)
-      group = decode_event(log.third_topic, :address)
+      params = log |> Map.from_struct()
+      from_params(nil, params)
+    end
+
+    def from_params(_, params) do
+      [value, units] = decode_data(params.data, [{:uint, 256}, {:uint, 256}])
+      account = decode_event(params.second_topic, :address)
+      group = decode_event(params.third_topic, :address)
 
       %ValidatorGroupVoteActivatedEvent{
-        transaction_hash: log.transaction_hash,
-        block_hash: log.block_hash,
-        contract_address_hash: log.address_hash,
-        log_index: log.index,
-        #event specific parameters
+        transaction_hash: params.transaction_hash,
+        block_hash: params.block_hash,
+        contract_address_hash: params.address_hash,
+        log_index: params.index,
         account: account,
         group: group,
         value: value,
         units: units
       }
     end
-    def from_params(_, _params) do
-      "lol"
-    end
-    def from_contract_event(_, _contract) do
+
+    def from_celo_contract_event(_, _contract = %CeloContractEvent{}) do
       "lol"
     end
 
-    def to_celo_contract_event(_) do
-      "lol"
+    def to_celo_contract_event_params(event) do
+      event_params = %{params: %{account: event.account, group: event.group, value: event.value, units: event.units}}
+
+      event
+      |> extract_common_event_params()
+      |> Map.merge(event_params)
     end
   end
 end
