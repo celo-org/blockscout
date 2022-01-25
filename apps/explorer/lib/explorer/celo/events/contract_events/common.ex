@@ -1,8 +1,16 @@
-defprotocol Explorer.Celo.ContractEvents.EventTransformer do
+defmodule Explorer.Celo.ContractEvents.Common do
+  def decode_event(topic, type) do
+    topic
+    |> extract_hash()
+    |> ABI.TypeDecoder.decode_raw([type])
+    |> List.first()
+    |> convert_result(type)
+  end
 
-  def from_log(event, log)
-  def from_params(event, eth_jsonrpc_log_params)
-  def from_contract_event(event, celo_event)
+  defp extract_hash(event_data), do: event_data |> String.trim_leading("0x") |> Base.decode16!(case: :lower)
 
-  def to_celo_contract_event(event)
+  def convert_result(result, :address) do
+    {:ok, address} = Explorer.Chain.Hash.Address.cast(result)
+    address
+  end
 end

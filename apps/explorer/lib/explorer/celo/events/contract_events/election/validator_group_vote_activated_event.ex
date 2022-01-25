@@ -24,11 +24,12 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
 
   defimpl EventTransformer do
     alias Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
+    import Explorer.Celo.ContractEvents.Common
 
     def from_log(_, log = %Log{}) do
       [value, units] = ABI.TypeDecoder.decode_raw(log.data.bytes, [{:uint, 256}, {:uint, 256}])
-      account = ABI.TypeDecoder.decode(log.second_topic, [:address])
-      group = ABI.TypeDecoder.decode(log.third_topic, [:address])
+      account = decode_event(log.second_topic, :address)
+      group = decode_event(log.third_topic, :address)
 
       %ValidatorGroupVoteActivatedEvent{
         transaction_hash: log.transaction_hash,
