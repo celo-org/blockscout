@@ -32,6 +32,7 @@ defmodule Explorer.ChainTest do
   alias Explorer.Chain
   alias Explorer.Chain.InternalTransaction.Type
 
+  alias Explorer.Celo.{Events, Util}
   alias Explorer.Chain.Supply.ProofOfAuthority
   alias Explorer.Counters.AddressesWithBalanceCounter
   alias Explorer.Counters.AddressesCounter
@@ -6007,6 +6008,58 @@ defmodule Explorer.ChainTest do
     test "https://github.com/celo-org/data-services/issues/136" do
       # Would create invalid ts_search statement and crash at the db layer
       Chain.list_top_tokens("tsSLAueP<esi:include%20src=\"http://bxss.me/rpb.png\"/>")
+    end
+  end
+
+  describe "elected_groups_for_block/1" do
+    test "fetches validator group hashes for a block hash" do
+      [epoch_rewards_distributed_to_voters] = Events.validator_group_voter_reward_events()
+      block_1 = insert(:block, number: 172_800)
+      block_2 = insert(:block, number: 190_080)
+      %Address{hash: group_address_1_hash} = insert(:address)
+      %Address{hash: group_address_2_hash} = insert(:address)
+      election_contract_address = insert(:address)
+
+      insert(:log,
+        address: election_contract_address,
+        block: block_1,
+        data: Chain.raw_abi_encode_integers([650, 10000]),
+        first_topic: epoch_rewards_distributed_to_voters,
+        second_topic: to_string(group_address_1_hash),
+        index: 1,
+      )
+
+      insert(:log,
+        address: election_contract_address,
+        block: block_1,
+        data: Chain.raw_abi_encode_integers([650, 10000]),
+        first_topic: "other topic",
+        second_topic: to_string(group_address_1_hash),
+        index: 2,
+      )
+
+      insert(:log,
+        address: election_contract_address,
+        block: block_1,
+        data: Chain.raw_abi_encode_integers([650, 10000]),
+        first_topic: epoch_rewards_distributed_to_voters,
+        second_topic: to_string(group_address_2_hash),
+        index: 3,
+      )
+
+      insert(:log,
+        address: election_contract_address,
+        block: block_2,
+        data: Chain.raw_abi_encode_integers([650, 10000]),
+        first_topic: epoch_rewards_distributed_to_voters,
+        second_topic: to_string(group_address_2_hash),
+        index: 1,
+      )
+
+      assert Chain.elected_groups_for_block(block_1.hash) == [
+               to_string(group_address_1_hash),
+               to_string(group_address_2_hash)
+             ]
     end
   end
 

@@ -36,6 +36,7 @@ defmodule Explorer.Chain do
 
   alias Explorer.Chain
 
+  alias Explorer.Celo.{Events, Util}
   alias Explorer.Chain.{
     Address,
     Address.CoinBalance,
@@ -7909,6 +7910,18 @@ defmodule Explorer.Chain do
     end)
     |> Explorer.Repo.transaction()
   end
+
+  def elected_groups_for_block(block_hash) do
+   [epoch_rewards_distributed_to_voters] = Events.validator_group_voter_reward_events()
+
+   query =
+    from(l in Log,
+    select: l.second_topic,
+    where: l.first_topic == ^epoch_rewards_distributed_to_voters and l.block_hash == ^block_hash
+     )
+     Repo.all(query, timeout: :infinity)
+
+     end
 
   def pending_withdrawals_for_account(account_address) do
     query =
