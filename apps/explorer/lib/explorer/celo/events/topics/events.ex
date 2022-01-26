@@ -1,6 +1,6 @@
 defmodule Explorer.Celo.Events do
   @moduledoc """
-    Helper methods and event groups which define Celo contract events
+    Helper methods and event groups which define Celo contract event topics
   """
 
   use Explorer.Celo.EventTypes
