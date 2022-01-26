@@ -1,11 +1,11 @@
 alias Explorer.Chain.Log
 alias Explorer.Celo.ContractEvents.EventTransformer
 
-defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent do
+defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupActiveVoteRevokedEvent do
   @moduledoc """
-  Struct modelling the Election.ValidatorGroupVoteActivated event
+  Struct modelling the Election.ValidatorGroupActiveVoteRevoked event
 
-  ValidatorGroupVoteActivated(
+  ValidatorGroupActiveVoteRevoked(
       address indexed account,
       address indexed group,
       uint256 value,
@@ -13,8 +13,8 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
     );
   """
 
-  @name "ValidatorGroupVoteActivated"
-  @topic "0x45aac85f38083b18efe2d441a65b9c1ae177c78307cb5a5d4aec8f7dbcaeabfe"
+  @name "ValidatorGroupActiveVoteRevoked"
+  @topic "0xae7458f8697a680da6be36406ea0b8f40164915ac9cc40c0dad05a2ff6e8c6a8"
 
   def name, do: @name
   def topic, do: @topic
@@ -29,7 +29,7 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
   ]
 
   defimpl EventTransformer do
-    alias Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
+    alias Explorer.Celo.ContractEvents.Election.ValidatorGroupActiveVoteRevokedEvent
     alias Explorer.Chain.CeloContractEvent
 
     import Explorer.Celo.ContractEvents.Common
@@ -44,7 +44,7 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
       account = decode_event(params.second_topic, :address)
       group = decode_event(params.third_topic, :address)
 
-      %ValidatorGroupVoteActivatedEvent{
+      %ValidatorGroupActiveVoteRevokedEvent{
         transaction_hash: params.transaction_hash,
         block_hash: params.block_hash,
         contract_address_hash: params.address_hash,
@@ -59,7 +59,7 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
     def from_celo_contract_event(_, contract = %CeloContractEvent{params: params}) do
       %{account: account, group: group, value: value, units: units} = params
 
-      %ValidatorGroupVoteActivatedEvent{
+      %ValidatorGroupActiveVoteRevokedEvent{
         transaction_hash: contract.transaction_hash,
         block_hash: contract.block_hash,
         contract_address_hash: contract.contract_address_hash,

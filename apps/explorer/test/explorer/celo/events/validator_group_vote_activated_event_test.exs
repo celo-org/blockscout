@@ -62,7 +62,6 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
         transaction_hash: "0xb8960575a898afa8a124cd7414f1261109a119dba3bed4489393952a1556a5f0"
       }
 
-
       result = %ValidatorGroupVoteActivatedEvent{} |> EventTransformer.from_params(test_params)
 
       assert result.value == 66980000000000000000

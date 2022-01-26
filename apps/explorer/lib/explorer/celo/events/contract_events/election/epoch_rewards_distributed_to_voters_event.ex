@@ -1,35 +1,31 @@
 alias Explorer.Chain.Log
 alias Explorer.Celo.ContractEvents.EventTransformer
 
-defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent do
+defmodule Explorer.Celo.ContractEvents.Election.EpochRewardsDistributedToVotersEvent do
   @moduledoc """
-  Struct modelling the Election.ValidatorGroupVoteActivated event
+  Struct modelling the Election.EpochRewardsDistributedToVoters event
 
-  ValidatorGroupVoteActivated(
-      address indexed account,
+  EpochRewardsDistributedToVoters(
       address indexed group,
-      uint256 value,
-      uint256 units
+      uint256 value
     );
   """
 
-  @name "ValidatorGroupVoteActivated"
-  @topic "0x45aac85f38083b18efe2d441a65b9c1ae177c78307cb5a5d4aec8f7dbcaeabfe"
+  @name "EpochRewardsDistributedToVoters"
+  @topic "0x91ba34d62474c14d6c623cd322f4256666c7a45b7fdaa3378e009d39dfcec2a7"
 
   def name, do: @name
   def topic, do: @topic
 
   defstruct [
     :transaction_hash, :block_hash, :contract_address_hash, :log_index,
-    :account,
     :group,
     :value,
-    :units,
     name: @name
   ]
 
   defimpl EventTransformer do
-    alias Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
+    alias Explorer.Celo.ContractEvents.Election.EpochRewardsDistributedToVotersEvent
     alias Explorer.Chain.CeloContractEvent
 
     import Explorer.Celo.ContractEvents.Common
@@ -40,39 +36,34 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
     end
 
     def from_params(_, params) do
-      [value, units] = decode_data(params.data, [{:uint, 256}, {:uint, 256}])
-      account = decode_event(params.second_topic, :address)
-      group = decode_event(params.third_topic, :address)
+      [value] = decode_data(params.data, [{:uint, 256}])
+      group = decode_event(params.second_topic, :address)
 
-      %ValidatorGroupVoteActivatedEvent{
+      %EpochRewardsDistributedToVotersEvent{
         transaction_hash: params.transaction_hash,
         block_hash: params.block_hash,
         contract_address_hash: params.address_hash,
         log_index: params.index,
-        account: account,
         group: group,
         value: value,
-        units: units
       }
     end
 
     def from_celo_contract_event(_, contract = %CeloContractEvent{params: params}) do
-      %{account: account, group: group, value: value, units: units} = params
+      %{ group: group, value: value} = params
 
-      %ValidatorGroupVoteActivatedEvent{
+      %EpochRewardsDistributedToVotersEvent{
         transaction_hash: contract.transaction_hash,
         block_hash: contract.block_hash,
         contract_address_hash: contract.contract_address_hash,
         log_index: contract.log_index,
-        account: account,
         group: group,
-        value: value,
-        units: units
+        value: value
       }
     end
 
     def to_celo_contract_event_params(event) do
-      event_params = %{params: %{account: event.account, group: event.group, value: event.value, units: event.units}}
+      event_params = %{params: %{group: event.group, value: event.value}}
 
       event
       |> extract_common_event_params()

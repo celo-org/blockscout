@@ -3,7 +3,7 @@ defprotocol Explorer.Celo.ContractEvents.EventTransformer do
   @doc "Create a concrete event instance from Explorer.Chain.Log instance"
   def from_log(event, log)
 
-  @doc "Create a concrete event instance from log params as output by EthereumJSONRPC"
+  @doc "Create a concrete event instance from log params as output by `EthereumJSONRPC.fetch_logs`"
   def from_params(event, eth_jsonrpc_log_params)
 
   @doc "Create a concrete event instance from a generic CeloContractEvent"
