@@ -24,7 +24,6 @@ defmodule Explorer.Chain.CeloContractEvent do
   def changeset(%__MODULE__{} = item, attrs) do
     item
     |> cast(attrs, @attrs)
-    |> validate_required(@attrs)
-    |> unique_constraint(:transaction_hash, name: :celo_contract_events_log_index_transaction_hash_index)
+    |> validate_required(@attrs)#transaction hash not required
   end
 end

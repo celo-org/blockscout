@@ -18,6 +18,8 @@ defmodule Explorer.Celo.ContractEvents.Common do
   def decode_data(data, types) when is_binary(data), do: data |> ABI.TypeDecoder.decode_raw(types)
 
   defp extract_hash(event_data), do: event_data |> String.trim_leading("0x") |> Base.decode16!(case: :lower)
+
+  #todo: search abis for indexed values that are not addresses
   defp convert_result(result, :address) do
     {:ok, address} = Explorer.Chain.Hash.Address.cast(result)
     address
