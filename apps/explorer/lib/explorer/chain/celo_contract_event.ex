@@ -9,6 +9,7 @@ defmodule Explorer.Chain.CeloContractEvent do
   alias Explorer.Chain.Hash.Address
 
   @attrs ~w( name contract_address_hash transaction_hash block_hash index params)a
+  @required ~w( name contract_address_hash block_hash index)a
 
   schema "celo_contract_events" do
     field(:name, :string)
@@ -24,6 +25,6 @@ defmodule Explorer.Chain.CeloContractEvent do
   def changeset(%__MODULE__{} = item, attrs) do
     item
     |> cast(attrs, @attrs)
-    |> validate_required(@attrs)#transaction hash not required
+    |> validate_required(@required)
   end
 end
