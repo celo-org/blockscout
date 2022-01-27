@@ -1,22 +1,34 @@
 defmodule Explorer.Celo.ContractEvents.EventMap do
+  @moduledoc "Map event names and event topics to concrete contract event structs"
   alias Explorer.Celo.ContractEvents.EventTransformer
 
-  @topics_to_structs EventTransformer.__protocol__(:impls)
-                     |> then(fn {:consolidated, modules} -> modules
-                        :not_consolidated -> []
-                      end)
-                     |> Enum.map(fn module ->  {module.topic, struct(module)} end)
-                     |> Map.new()
+  def event_for_topic(topic), do: filter_events(fn module -> module.topic == topic end)
 
-  @names_to_structs EventTransformer.__protocol__(:impls)
-                    |> then(fn {:consolidated, modules} -> modules
-                                :not_consolidated -> []
-                    end)
-                    |> Enum.map(fn module ->  {module.name, struct(module)} end)
-                    |> Map.new()
+  def event_for_name(name), do: filter_events(fn module -> module.name == name end)
 
+  defp filter_events(filter) do
+    EventTransformer.__protocol__(:impls)
+    |> then(fn {:consolidated, modules} -> modules
+      _ ->
+        Protocol.extract_impls(
+          Explorer.Celo.ContractEvents.EventTransformer,
+          :code.lib_dir(:explorer)
+        )
+    end)
+    |> Enum.find(filter)
+  end
 
-  def event_for_topic(topic), do: Map.get(@topics_to_structs,topic)
-
-  def event_for_name(name), do: Map.get(@names_to_structs,name)
+  def rpc_to_event_params(logs) when is_list(logs) do
+    logs
+    |> Enum.map(fn params = %{first_topic: event_topic} ->
+      case event_for_topic(event_topic) do
+        nil -> nil
+        event -> event
+                 |> struct!()
+                 |> EventTransformer.from_params(params)
+                 |> EventTransformer.to_celo_contract_event_params()
+      end
+    end)
+    |> Enum.reject(&is_nil/1)
+  end
 end

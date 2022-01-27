@@ -21,8 +21,9 @@ defmodule Explorer.Celo.ContractEvents.Common do
 
   #todo: search abis for indexed values that are not addresses
   defp convert_result(result, :address) do
-    {:ok, address} = Explorer.Chain.Hash.Address.cast(result)
-    address
+    "0x" <> Base.encode16(result, case: :lower)
+    #{:ok, address} = Explorer.Chain.Hash.Address.cast(result)
+    #address
   end
 
   def extract_common_event_params(event) do
