@@ -2846,6 +2846,23 @@ defmodule Explorer.Chain do
     Repo.stream_reduce(query, initial, reducer)
   end
 
+  @spec stream_blocks_with_unfetched_validator_group_data(
+          initial :: accumulator,
+          reducer :: (entry :: term(), accumulator -> accumulator)
+        ) :: {:ok, accumulator}
+        when accumulator: term()
+  def stream_blocks_with_unfetched_validator_group_data(initial, reducer) when is_function(reducer, 2) do
+    query =
+      from(
+        b in Block,
+        join: celo_pending_ops in assoc(b, :celo_pending_epoch_operations),
+        where: celo_pending_ops.fetch_validator_group_data,
+        select: %{block_number: b.number, block_hash: b.hash}
+      )
+
+    Repo.stream_reduce(query, initial, reducer)
+  end
+
   def remove_nonconsensus_blocks_from_pending_ops(block_hashes) do
     query =
       from(
@@ -7879,17 +7896,24 @@ defmodule Explorer.Chain do
     |> Repo.one()
   end
 
-  @spec falsify_or_delete_celo_pending_epoch_operation(Hash.Full.t(), :fetch_epoch_rewards | :fetch_validator_group_data) :: CeloPendingEpochOperation.t()
+  @spec falsify_or_delete_celo_pending_epoch_operation(
+          Hash.Full.t(),
+          :fetch_epoch_rewards | :fetch_validator_group_data
+        ) :: CeloPendingEpochOperation.t()
   def falsify_or_delete_celo_pending_epoch_operation(block_hash, operation_type) do
     celo_pending_operation = Repo.get(CeloPendingEpochOperation, block_hash)
-    new_celo_pending_operation = Map.update!(celo_pending_operation, operation_type, fn(_) -> false end)
+    new_celo_pending_operation = Map.update!(celo_pending_operation, operation_type, fn _ -> false end)
 
     new_fetch_epoch_rewards = Map.fetch!(new_celo_pending_operation, :fetch_epoch_rewards)
     new_fetch_validator_group_data = Map.fetch!(new_celo_pending_operation, :fetch_validator_group_data)
 
     if new_fetch_epoch_rewards || new_fetch_validator_group_data == true do
       celo_pending_operation
-      |> Changeset.change(%{block_hash: block_hash, fetch_epoch_rewards: new_fetch_epoch_rewards, fetch_validator_group_data: new_fetch_validator_group_data})
+      |> Changeset.change(%{
+        block_hash: block_hash,
+        fetch_epoch_rewards: new_fetch_epoch_rewards,
+        fetch_validator_group_data: new_fetch_validator_group_data
+      })
       |> Repo.update()
     else
       Repo.delete(celo_pending_operation)
@@ -7904,7 +7928,26 @@ defmodule Explorer.Chain do
     end)
     |> Multi.run(:delete_celo_pending, fn _, _ ->
       success
-      |> Enum.each(fn reward -> Chain.falsify_or_delete_celo_pending_epoch_operation(reward.block_hash) end)
+      |> Enum.each(fn reward ->
+        Chain.falsify_or_delete_celo_pending_epoch_operation(reward.block_hash, :fetch_epoch_rewards)
+      end)
+
+      {:ok, success}
+    end)
+    |> Explorer.Repo.transaction()
+  end
+
+  def import_group_votes_and_delete_pending_celo_epoch_operations(import_params, success) do
+    Multi.new()
+    |> Multi.run(:import_group_votes, fn _, _ ->
+      result = Chain.import(import_params)
+      {:ok, result}
+    end)
+    |> Multi.run(:delete_celo_pending, fn _, _ ->
+      success
+      |> Enum.each(fn reward ->
+        Chain.falsify_or_delete_celo_pending_epoch_operation(reward.block_hash, :fetch_validator_group_data)
+      end)
 
       {:ok, success}
     end)
@@ -7912,16 +7955,15 @@ defmodule Explorer.Chain do
   end
 
   def elected_groups_for_block(block_hash) do
-   [epoch_rewards_distributed_to_voters] = Events.validator_group_voter_reward_events()
+    [epoch_rewards_distributed_to_voters] = Events.validator_group_voter_reward_events()
 
-   query =
-    from(l in Log,
-    select: l.second_topic,
-    where: l.first_topic == ^epoch_rewards_distributed_to_voters and l.block_hash == ^block_hash
-     )
-     Repo.all(query, timeout: :infinity)
-
-     end
+    query =
+      from(l in Log,
+        select: l.second_topic,
+        where: l.first_topic == ^epoch_rewards_distributed_to_voters and l.block_hash == ^block_hash
+      )
+    Repo.all(query, timeout: :infinity)
+  end
 
   def pending_withdrawals_for_account(account_address) do
     query =
