@@ -4,6 +4,7 @@ defmodule Explorer.Chain.Import.Runner.CeloContractEvent do
   """
   alias Explorer.Chain.CeloContractEvent
   alias Explorer.Chain.Import.Runner.Util
+  alias Explorer.Chain.Import
 
   alias Ecto.{Changeset, Multi, Repo}
 
@@ -42,6 +43,8 @@ defmodule Explorer.Chain.Import.Runner.CeloContractEvent do
   end
 
 
+  @spec insert(Repo.t(), [map()], Util.insert_options()) ::
+          {:ok, [CeloContractEvent.t()]} | {:error, [Changeset.t()]}
   defp insert(repo, changes_list, %{timeout: timeout, timestamps: timestamps} = options) when is_list(changes_list) do
     on_conflict = Map.get(options, :on_conflict, :nothing)
 
