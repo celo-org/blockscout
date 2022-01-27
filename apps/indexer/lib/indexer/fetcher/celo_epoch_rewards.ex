@@ -54,7 +54,7 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
   def fetch_from_blockchain(blocks) do
     blocks
     |> Enum.map(fn block ->
-      case AccountReader.validator_group_reward_data(block) do
+      case AccountReader.epoch_reward_data(block) do
         {:ok, data} ->
           data
 
@@ -97,7 +97,7 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
         :ok
 
       {:error, reason} ->
-        Logger.error(fn -> ["failed to import Celo voter reward data: ", inspect(reason)] end,
+        Logger.error(fn -> ["failed to import Celo epoch reward data: ", inspect(reason)] end,
           error_count: Enum.count(rewards)
         )
     end

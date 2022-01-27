@@ -57,7 +57,7 @@ defmodule Explorer.Celo.AccountReader do
     end
   end
 
-  def validator_group_reward_data(%{block_number: bn, block_hash: block_hash}) do
+  def epoch_reward_data(%{block_number: bn, block_hash: block_hash}) do
     methods = [
       {:epochrewards, "calculateTargetEpochRewards", [], bn},
       {:epochrewards, "getTargetGoldTotalSupply", [], bn},

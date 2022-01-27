@@ -319,7 +319,7 @@ defmodule Explorer.Factory do
   def celo_pending_epoch_operations_factory do
     %CeloPendingEpochOperation{
       # caller MUST supply block
-      # all operations will default to false
+      # all operations will default to true
       fetch_epoch_rewards: true,
       fetch_validator_group_data: true
     }
