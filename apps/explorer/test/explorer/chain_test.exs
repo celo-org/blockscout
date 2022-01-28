@@ -6092,7 +6092,10 @@ defmodule Explorer.ChainTest do
     test "returns all rewards for a voter voting for a specific group" do
       {voter_address_1_hash, group_address_hash} = SetupVoterRewardsTest.setup()
 
-      assert Chain.voter_rewards_for_group(Hash.to_string(voter_address_1_hash), Hash.to_string(group_address_hash)) ==
+      {:ok, rewards} =
+        Chain.voter_rewards_for_group(Hash.to_string(voter_address_1_hash), Hash.to_string(group_address_hash))
+
+      assert rewards ==
                %{
                  total: 350,
                  epochs: [
