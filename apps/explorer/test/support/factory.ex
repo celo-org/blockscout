@@ -22,6 +22,7 @@ defmodule Explorer.Factory do
     CeloAccount,
     CeloContractEvent,
     CeloPendingEpochOperation,
+    CeloValidatorGroupVotes,
     ContractMethod,
     Data,
     DecompiledSmartContract,
@@ -322,6 +323,12 @@ defmodule Explorer.Factory do
       # all operations will default to true
       fetch_epoch_rewards: true,
       fetch_validator_group_data: true
+    }
+  end
+
+  def celo_validator_group_votes_factory do
+    %CeloValidatorGroupVotes{
+      previous_block_active_votes: 3_309_559_737_470_045_295_626_384
     }
   end
 

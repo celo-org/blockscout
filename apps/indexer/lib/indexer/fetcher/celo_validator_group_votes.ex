@@ -85,6 +85,7 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotes do
             Logger.error(fn -> "changeset errors" end,
               errors: changeset.errors
             )
+
             {[reward | failed], success}
           end
       end)
