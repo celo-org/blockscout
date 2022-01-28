@@ -7,6 +7,7 @@ defmodule Explorer.Repo.Migrations.AddCeloValidatorGroupVotes do
         null: false,
         primary_key: true
       )
+
       add(:group_hash, references(:addresses, column: :hash, type: :bytea), null: false)
       add(:previous_block_active_votes, :numeric, precision: 100)
 
