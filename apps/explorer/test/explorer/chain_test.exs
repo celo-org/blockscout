@@ -6119,11 +6119,7 @@ defmodule Explorer.ChainTest do
             bytes: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>
           },
           block_number: 10_692_863,
-          amount_activated_or_revoked: %Explorer.Chain.Data{
-            bytes:
-              <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 138, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 138>>
-          },
+          amount_activated_or_revoked: 650,
           event: "0x45aac85f38083b18efe2d441a65b9c1ae177c78307cb5a5d4aec8f7dbcaeabfe",
           group_hash: "0x0000000000000000000000000000000000000003",
           voter_hash: "0x0000000000000000000000000000000000000001"
@@ -6134,11 +6130,7 @@ defmodule Explorer.ChainTest do
             bytes: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 8>>
           },
           block_number: 10_695_496,
-          amount_activated_or_revoked: %Explorer.Chain.Data{
-            bytes:
-              <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 138, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 138>>
-          },
+          amount_activated_or_revoked: 650,
           event: "0x45aac85f38083b18efe2d441a65b9c1ae177c78307cb5a5d4aec8f7dbcaeabfe",
           group_hash: "0x0000000000000000000000000000000000000003",
           voter_hash: "0x0000000000000000000000000000000000000001"
@@ -6149,11 +6141,7 @@ defmodule Explorer.ChainTest do
             bytes: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16>>
           },
           block_number: 10_706_524,
-          amount_activated_or_revoked: %Explorer.Chain.Data{
-            bytes:
-              <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 94, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 94>>
-          },
+          amount_activated_or_revoked: 350,
           event: "0xae7458f8697a680da6be36406ea0b8f40164915ac9cc40c0dad05a2ff6e8c6a8",
           group_hash: "0x0000000000000000000000000000000000000003",
           voter_hash: "0x0000000000000000000000000000000000000001"
@@ -6164,11 +6152,7 @@ defmodule Explorer.ChainTest do
             bytes: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 16>>
           },
           block_number: 10_796_524,
-          amount_activated_or_revoked: %Explorer.Chain.Data{
-            bytes:
-              <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 94, 0, 0,
-                0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 94>>
-          },
+          amount_activated_or_revoked: 350,
           event: "0xae7458f8697a680da6be36406ea0b8f40164915ac9cc40c0dad05a2ff6e8c6a8",
           group_hash: "0x0000000000000000000000000000000000000003",
           voter_hash: "0x0000000000000000000000000000000000000001"

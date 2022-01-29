@@ -54,20 +54,25 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotes do
   def fetch_from_blockchain(blocks) do
     blocks
     |> Enum.flat_map(fn block ->
-      Chain.elected_groups_for_block(block.block_hash)
-      |> Enum.map(fn group_hash_string ->
-        {:ok, group_hash} = Hash.Address.cast(group_hash_string)
+      elected_groups = Chain.elected_groups_for_block(block.block_hash)
 
-        case AccountReader.validator_group_votes(block, group_hash) do
-          {:ok, data} ->
-            data
-
-          error ->
-            Logger.debug(inspect(error))
-            Map.put(block, :error, error)
-        end
+      Enum.map(elected_groups, fn group_hash_string ->
+        do_fetch_from_blockchain(block, group_hash_string)
       end)
     end)
+  end
+
+  def do_fetch_from_blockchain(block, group_hash_string) do
+    {:ok, group_hash} = Hash.Address.cast(group_hash_string)
+
+    case AccountReader.validator_group_votes(block, group_hash) do
+      {:ok, data} ->
+        data
+
+      error ->
+        Logger.debug(inspect(error))
+        Map.put(block, :error, error)
+    end
   end
 
   def import_items(rewards) do

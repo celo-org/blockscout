@@ -7999,22 +7999,25 @@ defmodule Explorer.Chain do
     [validator_group_active_vote_revoked, _, validator_group_vote_activated, _] = Events.voter_events()
     [epoch_rewards_distributed_to_voters] = Events.distributed_events()
 
-    from(log in Log,
-      select: %{
-        block_hash: log.block_hash,
-        block_number: log.block_number,
-        amount_activated_or_revoked: log.data,
-        event: log.first_topic,
-        voter_hash: log.second_topic,
-        group_hash: log.third_topic
-      },
-      order_by: [asc: log.block_number],
-      where:
-        log.first_topic == ^validator_group_active_vote_revoked or
-          log.first_topic == ^validator_group_vote_activated,
-      where: log.second_topic == ^voter_address_hash,
-      where: log.third_topic == ^group_address_hash
-    )
+    query =
+      from(log in Log,
+        select: %{
+          block_hash: log.block_hash,
+          block_number: log.block_number,
+          amount_activated_or_revoked: log.data,
+          event: log.first_topic,
+          voter_hash: log.second_topic,
+          group_hash: log.third_topic
+        },
+        order_by: [asc: log.block_number],
+        where:
+          log.first_topic == ^validator_group_active_vote_revoked or
+            log.first_topic == ^validator_group_vote_activated,
+        where: log.second_topic == ^voter_address_hash,
+        where: log.third_topic == ^group_address_hash
+      )
+
+    query
     |> Repo.all()
     |> Enum.map(fn x ->
       %Explorer.Chain.Data{bytes: amount_activated_or_revoked_bytes} = x.amount_activated_or_revoked
@@ -8031,7 +8034,7 @@ defmodule Explorer.Chain do
       voter_activated_or_revoked ->
         [voter_activated_earliest_block | _] = voter_activated_or_revoked
 
-        {epochs, total} =
+        query =
           from(log in Log,
             inner_join: votes in CeloValidatorGroupVotes,
             on: log.block_hash == votes.block_hash,
@@ -8051,18 +8054,16 @@ defmodule Explorer.Chain do
                 log.first_topic == ^epoch_rewards_distributed_to_voters and
                 log.second_topic == ^group_address_hash
           )
+
+        {epochs, total} =
+          query
           |> Repo.all()
           |> Enum.map_reduce(voter_activated_earliest_block.amount_activated_or_revoked, fn curr, amount ->
             amount_activated_or_revoked =
               amount_activated_or_revoked_last_day(voter_activated_or_revoked, curr.block_number)
 
             amount =
-              if voter_activated_earliest_block.amount_activated_or_revoked != amount &&
-                   amount_activated_or_revoked != 0 do
-                amount + amount_activated_or_revoked
-              else
-                amount
-              end
+              amount_after_activated_or_revoked(amount_activated_or_revoked, amount, voter_activated_earliest_block)
 
             %Explorer.Chain.Data{bytes: epoch_reward_bytes} = curr.epoch_reward
             [epoch_reward] = TypeDecoder.decode_raw(epoch_reward_bytes, [{:uint, 256}])
@@ -8091,5 +8092,14 @@ defmodule Explorer.Chain do
         acc - x.amount_activated_or_revoked
       end
     end)
+  end
+
+  def amount_after_activated_or_revoked(amount_activated_or_revoked, amount, voter_activated_earliest_block) do
+    if voter_activated_earliest_block.amount_activated_or_revoked != amount &&
+         amount_activated_or_revoked != 0 do
+      amount + amount_activated_or_revoked
+    else
+      amount
+    end
   end
 end

@@ -135,7 +135,11 @@ defmodule Indexer.Fetcher.CeloEpochRewardsTest do
           number: 9_434_880
         )
 
-      insert(:celo_pending_epoch_operations, block_hash: block.hash, fetch_epoch_rewards: true)
+      insert(:celo_pending_epoch_operations,
+        block_hash: block.hash,
+        fetch_epoch_rewards: true,
+        fetch_validator_group_data: false
+      )
 
       rewards = [
         %{

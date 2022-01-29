@@ -141,6 +141,8 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotesTest do
         }
       ]
 
+      CeloValidatorGroupVotesFetcher.import_items(votes)
+
       assert count(CeloPendingEpochOperation) == 1
       assert count(CeloValidatorGroupVotes) == 2
     end
@@ -163,7 +165,7 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotesTest do
              id: getActiveVotesForGroup,
              jsonrpc: "2.0",
              method: "eth_call",
-             params: [%{data: "0x926d00ca0000000000000000000000000000000000000000000000000000000000000003", to: _}, _]
+             params: [%{data: _, to: _}, _]
            }
          ],
          _ ->
@@ -188,7 +190,7 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotesTest do
              id: getActiveVotesForGroup,
              jsonrpc: "2.0",
              method: "eth_call",
-             params: [%{data: "0x926d00ca0000000000000000000000000000000000000000000000000000000000000004", to: _}, _]
+             params: [%{data: _, to: _}, _]
            }
          ],
          _ ->
