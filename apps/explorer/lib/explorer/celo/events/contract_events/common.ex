@@ -27,12 +27,15 @@ defmodule Explorer.Celo.ContractEvents.Common do
   end
 
   def extract_common_event_params(event) do
-    %{
-      name: event.name,
-      log_index: event.log_index,
-      transaction_hash: event.transaction_hash |> to_string(),
-      contract_address_hash: event.contract_address_hash |> to_string(),
-      block_hash: event.block_hash |> to_string()
-    }
+    #set hashes explicitly to nil rather than empty string when they do not exist
+    params = [:transaction_hash, :contract_address_hash, :block_hash]
+    |> Enum.into(%{}, fn key ->
+      case Map.get(event, key)  do
+        nil -> {key, nil}
+        v -> {key, to_string(v)}
+      end
+    end)
+    |> Map.put(:name, event.name)
+    |> Map.put(:log_index, event.log_index)
   end
 end
