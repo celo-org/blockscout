@@ -20,7 +20,10 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupActiveVoteRevokedE
   def topic, do: @topic
 
   defstruct [
-    :transaction_hash, :block_hash, :contract_address_hash, :log_index,
+    :transaction_hash,
+    :block_hash,
+    :contract_address_hash,
+    :log_index,
     :account,
     :group,
     :value,
@@ -72,7 +75,9 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupActiveVoteRevokedE
     end
 
     def to_celo_contract_event_params(event) do
-      event_params = %{params: %{account: event.account |> fa(), group: event.group |> fa(), value: event.value, units: event.units}}
+      event_params = %{
+        params: %{account: event.account |> fa(), group: event.group |> fa(), value: event.value, units: event.units}
+      }
 
       event
       |> extract_common_event_params()

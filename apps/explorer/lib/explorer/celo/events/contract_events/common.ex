@@ -24,17 +24,17 @@ defmodule Explorer.Celo.ContractEvents.Common do
 
   defp extract_hash(event_data), do: event_data |> String.trim_leading("0x") |> Base.decode16!(case: :lower)
 
-  #todo: search abis for indexed values that are not addresses
+  # todo: search abis for indexed values that are not addresses
   defp convert_result(result, :address) do
     {:ok, address} = Explorer.Chain.Hash.Address.cast(result)
     address
   end
 
   def extract_common_event_params(event) do
-    #set hashes explicitly to nil rather than empty string when they do not exist
+    # set hashes explicitly to nil rather than empty string when they do not exist
     [:transaction_hash, :contract_address_hash, :block_hash]
     |> Enum.into(%{}, fn key ->
-      case Map.get(event, key)  do
+      case Map.get(event, key) do
         nil -> {key, nil}
         v -> {key, v}
       end
@@ -44,10 +44,12 @@ defmodule Explorer.Celo.ContractEvents.Common do
   end
 
   @doc "Store address in postgres json format to make joins work with indices"
-  def format_address_for_postgres_json(address = %Hash{}),  do: address |> to_string() |> format_address_for_postgres_json()
-  def format_address_for_postgres_json(address = "\\x" <> _rest),  do: address
-  def format_address_for_postgres_json("0x" <> rest),  do: format_address_for_postgres_json(rest)
-  def format_address_for_postgres_json(address),  do: "\\x" <> address
+  def format_address_for_postgres_json(address = %Hash{}),
+    do: address |> to_string() |> format_address_for_postgres_json()
+
+  def format_address_for_postgres_json(address = "\\x" <> _rest), do: address
+  def format_address_for_postgres_json("0x" <> rest), do: format_address_for_postgres_json(rest)
+  def format_address_for_postgres_json(address), do: "\\x" <> address
 
   @doc "Alias for format_address_for_postgres_json/1"
   defdelegate fa(address), to: __MODULE__, as: :format_address_for_postgres_json

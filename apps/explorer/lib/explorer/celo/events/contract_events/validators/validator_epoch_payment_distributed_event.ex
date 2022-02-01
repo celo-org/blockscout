@@ -20,7 +20,10 @@ defmodule Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistribut
   def topic, do: @topic
 
   defstruct [
-    :transaction_hash, :block_hash, :contract_address_hash, :log_index,
+    :transaction_hash,
+    :block_hash,
+    :contract_address_hash,
+    :log_index,
     :validator,
     :validator_payment,
     :group,
@@ -40,7 +43,7 @@ defmodule Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistribut
     end
 
     def from_params(_, params) do
-      [validator_payment, group_payment] = decode_data(params.data, [{:uint, 256},{:uint, 256}])
+      [validator_payment, group_payment] = decode_data(params.data, [{:uint, 256}, {:uint, 256}])
       validator = decode_event(params.second_topic, :address)
       group = decode_event(params.third_topic, :address)
 
@@ -57,7 +60,7 @@ defmodule Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistribut
     end
 
     def from_celo_contract_event(_, contract = %CeloContractEvent{params: params}) do
-      %{ group: group, validator_payment: validator_payment, validator: validator, group_payment: group_payment} = params
+      %{group: group, validator_payment: validator_payment, validator: validator, group_payment: group_payment} = params
 
       %ValidatorEpochPaymentDistributedEvent{
         transaction_hash: contract.transaction_hash,
@@ -72,10 +75,14 @@ defmodule Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistribut
     end
 
     def to_celo_contract_event_params(event) do
-      event_params = %{params: %{group: event.group |> fa(),
-        validator_payment: event.validator_payment,
-        group_payment: event.group_payment,
-        validator: event.validator |> fa()}}
+      event_params = %{
+        params: %{
+          group: event.group |> fa(),
+          validator_payment: event.validator_payment,
+          group_payment: event.group_payment,
+          validator: event.validator |> fa()
+        }
+      }
 
       event
       |> extract_common_event_params()

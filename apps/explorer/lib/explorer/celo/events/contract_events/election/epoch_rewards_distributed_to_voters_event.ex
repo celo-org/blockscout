@@ -18,7 +18,10 @@ defmodule Explorer.Celo.ContractEvents.Election.EpochRewardsDistributedToVotersE
   def topic, do: @topic
 
   defstruct [
-    :transaction_hash, :block_hash, :contract_address_hash, :log_index,
+    :transaction_hash,
+    :block_hash,
+    :contract_address_hash,
+    :log_index,
     :group,
     :value,
     name: @name
@@ -45,12 +48,12 @@ defmodule Explorer.Celo.ContractEvents.Election.EpochRewardsDistributedToVotersE
         contract_address_hash: params.address_hash,
         log_index: params.index,
         group: group,
-        value: value,
+        value: value
       }
     end
 
     def from_celo_contract_event(_, contract = %CeloContractEvent{params: params}) do
-      %{ group: group, value: value} = params
+      %{group: group, value: value} = params
 
       %EpochRewardsDistributedToVotersEvent{
         transaction_hash: contract.transaction_hash,

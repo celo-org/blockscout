@@ -2,8 +2,12 @@ defmodule Explorer.Repo.Migrations.FillCeloContractEvents do
   use Ecto.Migration
   import Ecto.Query
 
-  alias Explorer.Celo.ContractEvents.Election.{ValidatorGroupActiveVoteRevokedEvent, ValidatorGroupVoteActivatedEvent,
-                                               EpochRewardsDistributedToVotersEvent}
+  alias Explorer.Celo.ContractEvents.Election.{
+    ValidatorGroupActiveVoteRevokedEvent,
+    ValidatorGroupVoteActivatedEvent,
+    EpochRewardsDistributedToVotersEvent
+  }
+
   alias Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent
 
   @disable_ddl_transaction true
@@ -11,12 +15,13 @@ defmodule Explorer.Repo.Migrations.FillCeloContractEvents do
   @batch_size 1000
   @throttle_ms 100
 
-
-  @topics [ValidatorGroupVoteActivatedEvent,
+  @topics [
+            ValidatorGroupVoteActivatedEvent,
             ValidatorEpochPaymentDistributedEvent,
             ValidatorGroupActiveVoteRevokedEvent,
-            EpochRewardsDistributedToVotersEvent]
-          |> Enum.map(&(&1.topic))
+            EpochRewardsDistributedToVotersEvent
+          ]
+          |> Enum.map(& &1.topic)
 
   def up do
     throttle_change_in_batches(&page_query/1, &do_change/1)
@@ -25,42 +30,48 @@ defmodule Explorer.Repo.Migrations.FillCeloContractEvents do
   def down, do: execute("delete from celo_contract_events")
 
   def do_change(to_change) do
-    #map block hashes to numbers so we can index into the migration from a given blocknumber + log index for the next
-    #batch
-    hash_to_number = to_change
-    |> Enum.reduce(%{},fn %{block_number: bn, block_hash: bh}, acc ->
-      Map.put(acc, bh, bn)
-    end)
+    # map block hashes to numbers so we can index into the migration from a given blocknumber + log index for the next
+    # batch
+    hash_to_number =
+      to_change
+      |> Enum.reduce(%{}, fn %{block_number: bn, block_hash: bh}, acc ->
+        Map.put(acc, bh, bn)
+      end)
 
-    params = to_change
-             |> Explorer.Celo.ContractEvents.EventMap.rpc_to_event_params()
-             |> then(fn events -> # explicitly set timestamps as insert_all doesn't do this automatically
-               t = Timex.now()
-               events
-               |> Enum.map(fn e ->
-                e
-                |> Map.put(:inserted_at, t)
-                |> Map.put(:updated_at, t)
-               end)
-             end)
+    params =
+      to_change
+      |> Explorer.Celo.ContractEvents.EventMap.rpc_to_event_params()
+      # explicitly set timestamps as insert_all doesn't do this automatically
+      |> then(fn events ->
+        t = Timex.now()
+
+        events
+        |> Enum.map(fn e ->
+          e
+          |> Map.put(:inserted_at, t)
+          |> Map.put(:updated_at, t)
+        end)
+      end)
 
     {inserted_count, results} = repo().insert_all("celo_contract_events", params, returning: [:block_hash, :log_index])
 
     if inserted_count != length(to_change) do
-      not_inserted = to_change
-                    |> Map.take([:block_hash, :log_index])
-                    |> MapSet.new()
-                    |> MapSet.difference(MapSet.new(results))
-                    |> MapSet.to_list()
+      not_inserted =
+        to_change
+        |> Map.take([:block_hash, :log_index])
+        |> MapSet.new()
+        |> MapSet.difference(MapSet.new(results))
+        |> MapSet.to_list()
 
       not_inserted |> Enum.each(&handle_non_update/1)
     end
 
-    last_key = results
-    |> Enum.map(fn %{block_hash: hsh, log_index: index} ->
-       {Map.get(hash_to_number, hsh), index}
-    end)
-    |> Enum.max()
+    last_key =
+      results
+      |> Enum.map(fn %{block_hash: hsh, log_index: index} ->
+        {Map.get(hash_to_number, hsh), index}
+      end)
+      |> Enum.max()
 
     [last_key]
   end
@@ -88,8 +99,9 @@ defmodule Explorer.Repo.Migrations.FillCeloContractEvents do
 
   defp throttle_change_in_batches(query_fun, change_fun, last_pos \\ {0, 0})
   defp throttle_change_in_batches(_query_fun, _change_fun, nil), do: :ok
+
   defp throttle_change_in_batches(query_fun, change_fun, last_pos) do
-    case repo().all(query_fun.(last_pos), [log: :info, timeout: :infinity]) do
+    case repo().all(query_fun.(last_pos), log: :info, timeout: :infinity) do
       [] ->
         :ok
 

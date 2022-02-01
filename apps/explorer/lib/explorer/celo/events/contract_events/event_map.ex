@@ -8,7 +8,10 @@ defmodule Explorer.Celo.ContractEvents.EventMap do
 
   defp filter_events(filter) do
     EventTransformer.__protocol__(:impls)
-    |> then(fn {:consolidated, modules} -> modules
+    |> then(fn
+      {:consolidated, modules} ->
+        modules
+
       _ ->
         Protocol.extract_impls(
           Explorer.Celo.ContractEvents.EventTransformer,
@@ -22,11 +25,14 @@ defmodule Explorer.Celo.ContractEvents.EventMap do
     logs
     |> Enum.map(fn params = %{first_topic: event_topic} ->
       case event_for_topic(event_topic) do
-        nil -> nil
-        event -> event
-                 |> struct!()
-                 |> EventTransformer.from_params(params)
-                 |> EventTransformer.to_celo_contract_event_params()
+        nil ->
+          nil
+
+        event ->
+          event
+          |> struct!()
+          |> EventTransformer.from_params(params)
+          |> EventTransformer.to_celo_contract_event_params()
       end
     end)
     |> Enum.reject(&is_nil/1)

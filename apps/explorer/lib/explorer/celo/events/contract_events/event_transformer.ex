@@ -1,5 +1,4 @@
 defprotocol Explorer.Celo.ContractEvents.EventTransformer do
-
   @doc "Create a concrete event instance from `Explorer.Chain.Log` instance"
   def from_log(event, log)
 
