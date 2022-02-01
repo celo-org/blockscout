@@ -48,7 +48,7 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
       assert result.log_index == 8
     end
 
-    test "converts from ethjsonrpc log to db params" do
+    test "converts from ethjsonrpc log to event type" do
       test_params = %{
         address_hash: "0x765de816845861e75a25fca122bb6898b8b1282a",
         block_hash: "0x42b21f09e9956d1a01195b1ca461059b2705fe850fc1977bd7182957e1b390d3",
@@ -66,8 +66,8 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
 
       assert result.value == 66980000000000000000
       assert result.units == 6136281451163456507329304650157103347504
-      assert result.account == "0x88c1c759600ec3110af043c183a2472ab32d099c"
-      assert result.group == "0x47b2db6af05a55d42ed0f3731735f9479abf0673"
+      assert result.account |> to_string() == "0x88c1c759600ec3110af043c183a2472ab32d099c"
+      assert result.group |> to_string() == "0x47b2db6af05a55d42ed0f3731735f9479abf0673"
       assert result.log_index == 8
     end
   end

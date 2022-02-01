@@ -1,4 +1,7 @@
 defmodule Explorer.Celo.ContractEvents.Common do
+  alias Explorer.Chain.Hash.Address
+  alias Explorer.Chain.Hash
+
   @doc "Decode a single point of event data of a given type from a given topic"
   def decode_event(topic, type) do
     topic
@@ -23,9 +26,8 @@ defmodule Explorer.Celo.ContractEvents.Common do
 
   #todo: search abis for indexed values that are not addresses
   defp convert_result(result, :address) do
-    Base.encode16(result, case: :lower)
-    #{:ok, address} = Explorer.Chain.Hash.Address.cast(result)
-    #address
+    {:ok, address} = Explorer.Chain.Hash.Address.cast(result)
+    address
   end
 
   def extract_common_event_params(event) do
@@ -42,6 +44,7 @@ defmodule Explorer.Celo.ContractEvents.Common do
   end
 
   @doc "Store address in postgres json format to make joins work with indices"
+  def format_address_for_postgres_json(address = %Hash{}),  do: address |> to_string() |> format_address_for_postgres_json()
   def format_address_for_postgres_json(address = "\\x" <> _rest),  do: address
   def format_address_for_postgres_json("0x" <> rest),  do: format_address_for_postgres_json(rest)
   def format_address_for_postgres_json(address),  do: "\\x" <> address
@@ -51,7 +54,7 @@ defmodule Explorer.Celo.ContractEvents.Common do
 
   @doc "Convert postgres hex string to Explorer.Chain.Hash.Address instance"
   def cast_address("\\x" <> hash) do
-    Explorer.Chain.Hash.Address.cast(hash)
+    Address.cast(hash)
   end
 
   @doc "Alias for cast_address/1"
