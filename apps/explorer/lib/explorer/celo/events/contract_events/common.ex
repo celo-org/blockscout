@@ -1,18 +1,21 @@
 defmodule Explorer.Celo.ContractEvents.Common do
+  @moduledoc "Common functionality for import in Celo contract event structs"
+
+  alias ABI.TypeDecoder
   alias Explorer.Chain.Hash.Address
-  alias Explorer.Chain.Hash
+  alias Explorer.Chain.{Data, Hash}
 
   @doc "Decode a single point of event data of a given type from a given topic"
   def decode_event(topic, type) do
     topic
     |> extract_hash()
-    |> ABI.TypeDecoder.decode_raw([type])
+    |> TypeDecoder.decode_raw([type])
     |> List.first()
     |> convert_result(type)
   end
 
   @doc "Decode event data of given types from log data"
-  def decode_data(%Explorer.Chain.Data{bytes: bytes}, types), do: decode_data(bytes, types)
+  def decode_data(%Data{bytes: bytes}, types), do: decode_data(bytes, types)
 
   def decode_data("0x" <> data, types) do
     data
@@ -20,13 +23,12 @@ defmodule Explorer.Celo.ContractEvents.Common do
     |> decode_data(types)
   end
 
-  def decode_data(data, types) when is_binary(data), do: data |> ABI.TypeDecoder.decode_raw(types)
+  def decode_data(data, types) when is_binary(data), do: data |> TypeDecoder.decode_raw(types)
 
   defp extract_hash(event_data), do: event_data |> String.trim_leading("0x") |> Base.decode16!(case: :lower)
 
-  # todo: search abis for indexed values that are not addresses
   defp convert_result(result, :address) do
-    {:ok, address} = Explorer.Chain.Hash.Address.cast(result)
+    {:ok, address} = Address.cast(result)
     address
   end
 
@@ -44,10 +46,10 @@ defmodule Explorer.Celo.ContractEvents.Common do
   end
 
   @doc "Store address in postgres json format to make joins work with indices"
-  def format_address_for_postgres_json(address = %Hash{}),
+  def format_address_for_postgres_json(%Hash{} = address),
     do: address |> to_string() |> format_address_for_postgres_json()
 
-  def format_address_for_postgres_json(address = "\\x" <> _rest), do: address
+  def format_address_for_postgres_json("\\x" <> _rest = address), do: address
   def format_address_for_postgres_json("0x" <> rest), do: format_address_for_postgres_json(rest)
   def format_address_for_postgres_json(address), do: "\\x" <> address
 

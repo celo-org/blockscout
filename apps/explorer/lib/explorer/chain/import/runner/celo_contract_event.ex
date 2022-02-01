@@ -2,9 +2,8 @@ defmodule Explorer.Chain.Import.Runner.CeloContractEvent do
   @moduledoc """
   Bulk imports Celo contract events
   """
-  alias Explorer.Chain.CeloContractEvent
+  alias Explorer.Chain.{CeloContractEvent, Import}
   alias Explorer.Chain.Import.Runner.Util
-  alias Explorer.Chain.Import
 
   alias Ecto.{Changeset, Multi, Repo}
 

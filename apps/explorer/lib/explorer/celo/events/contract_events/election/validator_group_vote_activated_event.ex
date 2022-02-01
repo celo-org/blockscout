@@ -1,4 +1,4 @@
-alias Explorer.Chain.Log
+alias Explorer.Chain.{CeloContractEvent, Log}
 alias Explorer.Celo.ContractEvents.EventTransformer
 
 defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent do
@@ -33,11 +33,10 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
 
   defimpl EventTransformer do
     alias Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
-    alias Explorer.Chain.CeloContractEvent
 
     import Explorer.Celo.ContractEvents.Common
 
-    def from_log(_, log = %Log{}) do
+    def from_log(_, %Log{} = log) do
       params = log |> Map.from_struct()
       from_params(nil, params)
     end
@@ -59,7 +58,7 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
       }
     end
 
-    def from_celo_contract_event(_, contract = %CeloContractEvent{params: params}) do
+    def from_celo_contract_event(_, %CeloContractEvent{params: params} = contract) do
       %{account: account, group: group, value: value, units: units} = params
 
       %ValidatorGroupVoteActivatedEvent{

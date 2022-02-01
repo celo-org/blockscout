@@ -7,7 +7,8 @@ defmodule Explorer.Celo.ContractEvents.EventMap do
   def event_for_name(name), do: filter_events(fn module -> module.name == name end)
 
   defp filter_events(filter) do
-    EventTransformer.__protocol__(:impls)
+    :impls
+    |> EventTransformer.__protocol__()
     |> then(fn
       {:consolidated, modules} ->
         modules
