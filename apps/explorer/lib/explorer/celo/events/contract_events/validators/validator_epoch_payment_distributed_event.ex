@@ -64,9 +64,9 @@ defmodule Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistribut
         block_hash: contract.block_hash,
         contract_address_hash: contract.contract_address_hash,
         log_index: contract.log_index,
-        validator: validator,
+        validator: validator |> ca(),
         validator_payment: validator_payment,
-        group: group,
+        group: group |> ca(),
         group_payment: group_payment
       }
     end

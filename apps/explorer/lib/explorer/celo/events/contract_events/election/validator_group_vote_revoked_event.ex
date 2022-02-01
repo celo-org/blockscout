@@ -64,8 +64,8 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupActiveVoteRevokedE
         block_hash: contract.block_hash,
         contract_address_hash: contract.contract_address_hash,
         log_index: contract.log_index,
-        account: account,
-        group: group,
+        account: account |> ca(),
+        group: group |> ca(),
         value: value,
         units: units
       }

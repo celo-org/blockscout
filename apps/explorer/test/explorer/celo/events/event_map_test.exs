@@ -45,8 +45,8 @@ defmodule Explorer.Celo.ContractEvents.EventMapTest do
 
       assert params.value == 66980000000000000000
       assert params.units == 6136281451163456507329304650157103347504
-      assert params.account == "0x88c1c759600ec3110af043c183a2472ab32d099c"
-      assert params.group == "0x47b2db6af05a55d42ed0f3731735f9479abf0673"
+      assert params.account == "\\x88c1c759600ec3110af043c183a2472ab32d099c"
+      assert params.group == "\\x47b2db6af05a55d42ed0f3731735f9479abf0673"
     end
   end
 end

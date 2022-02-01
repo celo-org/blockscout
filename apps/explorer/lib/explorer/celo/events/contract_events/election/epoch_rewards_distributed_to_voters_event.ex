@@ -57,7 +57,7 @@ defmodule Explorer.Celo.ContractEvents.Election.EpochRewardsDistributedToVotersE
         block_hash: contract.block_hash,
         contract_address_hash: contract.contract_address_hash,
         log_index: contract.log_index,
-        group: group,
+        group: group |> ca(),
         value: value
       }
     end

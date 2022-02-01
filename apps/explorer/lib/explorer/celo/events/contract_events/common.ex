@@ -48,4 +48,12 @@ defmodule Explorer.Celo.ContractEvents.Common do
 
   @doc "Alias for format_address_for_postgres_json/1"
   defdelegate fa(address), to: __MODULE__, as: :format_address_for_postgres_json
+
+  @doc "Convert postgres hex string to Explorer.Chain.Hash.Address instance"
+  def cast_address("\\x" <> hash) do
+    Explorer.Chain.Hash.Address.cast(hash)
+  end
+
+  @doc "Alias for cast_address/1"
+  defdelegate ca(address), to: __MODULE__, as: :cast_address
 end
