@@ -633,6 +633,28 @@ defmodule BlockScoutWeb.Etherscan do
     "result" => nil
   }
 
+  @reward_getvoterrewardsforgroup_example_value %{
+    "status" => "1",
+    "message" => "OK",
+    "result" => %{
+      "total" => "350",
+      "epochs" => [
+        %{"amount" => "80", "date" => "2022-01-01 17:42:43", "epoch_number" => "619"},
+        %{"amount" => "20", "date" => "2022-01-02 17:42:43", "epoch_number" => "620"},
+        %{"amount" => "75", "date" => "2022-01-03 17:42:43", "epoch_number" => "621"},
+        %{"amount" => "31", "date" => "2022-01-04 17:42:43", "epoch_number" => "622"},
+        %{"amount" => "77", "date" => "2022-01-05 17:42:43", "epoch_number" => "623"},
+        %{"amount" => "67", "date" => "2022-01-06 17:42:43", "epoch_number" => "624"}
+      ]
+    }
+  }
+
+  @reward_getvoterrewardsforgroup_example_value_error %{
+    "status" => "0",
+    "message" => "Voter or group address does not exist",
+    "result" => []
+  }
+
   @status_type %{
     type: "status",
     enum: ~s(["0", "1"]),
@@ -1294,6 +1316,26 @@ defmodule BlockScoutWeb.Etherscan do
         type: "total_fees",
         definition: "Total transaction fees in Wei are paid by users to validators per day.",
         example: ~s("75411956011480008034")
+      }
+    }
+  }
+
+  @epoch_voter_rewards %{
+    name: "EpochVoterRewards",
+    fields: %{
+      amount: @wei_type,
+      date: "timestamp",
+      epoch: "integer"
+    }
+  }
+
+  @voter_rewards %{
+    name: "VoterRewards",
+    fields: %{
+      total: @wei_type,
+      epochs: %{
+        type: "array",
+        array_type: @epoch_voter_rewards
       }
     }
   }
@@ -3019,6 +3061,49 @@ defmodule BlockScoutWeb.Etherscan do
     ]
   }
 
+  @reward_getvoterrewardsforgroup_action %{
+    name: "getvoterrewardsforgroup",
+    description: "Get a voter's rewards for a given group",
+    required_params: [
+      %{
+        key: "voterAddress",
+        placeholder: "voterAddress",
+        type: "string",
+        description: "Voter address hash for which you wish to get the rewards."
+      },
+      %{
+        key: "groupAddress",
+        placeholder: "groupAddress",
+        type: "string",
+        description: "Group address hash for which the voter has voted."
+      }
+    ],
+    optional_params: [],
+    responses: [
+      %{
+        code: "200",
+        description: "successful operation",
+        example_value: Jason.encode!(@reward_getvoterrewardsforgroup_example_value),
+        model: %{
+          name: "Result",
+          fields: %{
+            status: @status_type,
+            message: @message_type,
+            result: %{
+              type: "model",
+              model: @voter_rewards
+            }
+          }
+        }
+      },
+      %{
+        code: "200",
+        description: "error",
+        example_value: Jason.encode!(@reward_getvoterrewardsforgroup_example_value_error)
+      }
+    ]
+  }
+
   @account_module %{
     name: "account",
     actions: [
@@ -3091,6 +3176,13 @@ defmodule BlockScoutWeb.Etherscan do
     ]
   }
 
+  @reward_module %{
+    name: "reward",
+    actions: [
+      @reward_getvoterrewardsforgroup_action
+    ]
+  }
+
   @documentation [
     @account_module,
     @logs_module,
@@ -3098,7 +3190,8 @@ defmodule BlockScoutWeb.Etherscan do
     @stats_module,
     @block_module,
     @contract_module,
-    @transaction_module
+    @transaction_module,
+    @reward_module
   ]
 
   def get_documentation do
