@@ -6,7 +6,17 @@ defmodule Explorer.Chain.CeloContractEvent do
 
   use Explorer.Schema
 
+  alias Explorer.Chain.Hash
   alias Explorer.Chain.Hash.Address
+
+  @type t :: %__MODULE__{
+          block_hash: Hash.Full.t(),
+          name: String.t(),
+          log_index: non_neg_integer(),
+          contract_address_hash: Hash.Address.t(),
+          transaction_hash: Hash.t(),
+          params: map()
+        }
 
   @attrs ~w( name contract_address_hash transaction_hash block_hash index params)a
   @required ~w( name contract_address_hash block_hash index)a

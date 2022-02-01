@@ -1,5 +1,9 @@
 defmodule Explorer.Celo.ContractEvents.EventMap do
   @moduledoc "Map event names and event topics to concrete contract event structs"
+
+  # suppress warning for function clause matching too much
+  @dialyzer {:nowarn_function, filter_events: 1}
+
   alias Explorer.Celo.ContractEvents.EventTransformer
 
   def event_for_topic(topic), do: filter_events(fn module -> module.topic == topic end)
