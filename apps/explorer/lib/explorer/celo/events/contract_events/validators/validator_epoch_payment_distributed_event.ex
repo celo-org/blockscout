@@ -72,10 +72,10 @@ defmodule Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistribut
     end
 
     def to_celo_contract_event_params(event) do
-      event_params = %{params: %{group: event.group,
+      event_params = %{params: %{group: event.group |> fa(),
         validator_payment: event.validator_payment,
         group_payment: event.group_payment,
-        validator: event.validator}}
+        validator: event.validator |> fa()}}
 
       event
       |> extract_common_event_params()

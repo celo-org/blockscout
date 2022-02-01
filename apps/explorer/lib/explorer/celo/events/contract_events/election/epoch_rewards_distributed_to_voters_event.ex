@@ -63,7 +63,7 @@ defmodule Explorer.Celo.ContractEvents.Election.EpochRewardsDistributedToVotersE
     end
 
     def to_celo_contract_event_params(event) do
-      event_params = %{params: %{group: event.group, value: event.value}}
+      event_params = %{params: %{group: event.group |> fa(), value: event.value}}
 
       event
       |> extract_common_event_params()

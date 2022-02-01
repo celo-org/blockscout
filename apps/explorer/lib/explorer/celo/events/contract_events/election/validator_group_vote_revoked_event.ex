@@ -72,7 +72,7 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupActiveVoteRevokedE
     end
 
     def to_celo_contract_event_params(event) do
-      event_params = %{params: %{account: event.account, group: event.group, value: event.value, units: event.units}}
+      event_params = %{params: %{account: event.account |> fa(), group: event.group |> fa(), value: event.value, units: event.units}}
 
       event
       |> extract_common_event_params()
