@@ -60,7 +60,8 @@ defmodule Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistribut
     end
 
     def from_celo_contract_event(_, %CeloContractEvent{params: params} = contract) do
-      %{group: group, validator_payment: validator_payment, validator: validator, group_payment: group_payment} = params |> normalise_map()
+      %{group: group, validator_payment: validator_payment, validator: validator, group_payment: group_payment} =
+        params |> normalise_map()
 
       %ValidatorEpochPaymentDistributedEvent{
         transaction_hash: contract.transaction_hash,

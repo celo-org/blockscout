@@ -2313,14 +2313,12 @@ defmodule Explorer.Chain.ImportTest do
     end
 
     test "inserts celo contract events " do
-
       %Block{number: block_number} = insert(:block, consensus: true)
       %Address{hash: address_hash} = address = insert(:address)
 
       miner_hash_after = address_hash()
       from_address_hash_after = address_hash()
       block_hash_after = block_hash()
-
 
       log = %{
         address_hash: address_hash,
@@ -2338,7 +2336,7 @@ defmodule Explorer.Chain.ImportTest do
 
       events = EventMap.rpc_to_event_params([log])
 
-      #require IEx; IEx.pry
+      # require IEx; IEx.pry
       assert {:ok, _} =
                Import.all(%{
                  addresses: %{
@@ -2366,16 +2364,18 @@ defmodule Explorer.Chain.ImportTest do
                      }
                    ]
                  },
-               celo_contract_events: %{
-                  params: events
-               }
-             })
+                 celo_contract_events: %{
+                   params: events
+                 }
+               })
 
-             result = CeloContractEvent
-                        |> Repo.all()
-                        |> EventMap.celo_contract_event_to_concrete_event()
+      result =
+        CeloContractEvent
+        |> Repo.all()
+        |> EventMap.celo_contract_event_to_concrete_event()
 
-             require IEx; IEx.pry
+      require IEx
+      IEx.pry()
     end
   end
 end
