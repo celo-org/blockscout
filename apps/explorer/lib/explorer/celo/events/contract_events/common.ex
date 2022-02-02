@@ -65,6 +65,7 @@ defmodule Explorer.Celo.ContractEvents.Common do
   @doc "Alias for cast_address/1"
   defdelegate ca(address), to: __MODULE__, as: :cast_address
 
+  # sobelow_skip ["DOS.StringToAtom"]
   @doc "Ensure that map has atom keys (not json string)"
   def normalise_map(map) do
     needs_conversion =
