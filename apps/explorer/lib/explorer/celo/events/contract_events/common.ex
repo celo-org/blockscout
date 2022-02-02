@@ -58,9 +58,24 @@ defmodule Explorer.Celo.ContractEvents.Common do
 
   @doc "Convert postgres hex string to Explorer.Chain.Hash.Address instance"
   def cast_address("\\x" <> hash) do
-    Address.cast(hash)
+    {:ok, address} = Address.cast("0x" <> hash)
+    address
   end
 
   @doc "Alias for cast_address/1"
   defdelegate ca(address), to: __MODULE__, as: :cast_address
+
+
+  @doc "Ensure that map has atom keys (not json string)"
+  def normalise_map(map) do
+    needs_conversion = map
+    |> Map.keys()
+    |> Enum.all?(&( ! is_atom(&1)))
+
+    if needs_conversion do
+      map |> Map.new(fn {k, v} -> {String.to_atom(k), v}  end)
+    else
+      map
+    end
+  end
 end

@@ -42,4 +42,20 @@ defmodule Explorer.Celo.ContractEvents.EventMap do
     end)
     |> Enum.reject(&is_nil/1)
   end
+
+  def celo_contract_event_to_concrete_event(events) when is_list(events) do
+    events
+    |> Enum.map(fn params = %{name: name} ->
+      case event_for_name(name) do
+        nil ->
+          nil
+
+        event ->
+          event
+          |> struct!()
+          |> EventTransformer.from_celo_contract_event(params)
+      end
+    end)
+    |> Enum.reject(&is_nil/1)
+  end
 end

@@ -59,7 +59,7 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupActiveVoteRevokedE
     end
 
     def from_celo_contract_event(_, %CeloContractEvent{params: params} = contract) do
-      %{account: account, group: group, value: value, units: units} = params
+      %{account: account, group: group, value: value, units: units} = params |> normalise_map()
 
       %ValidatorGroupActiveVoteRevokedEvent{
         transaction_hash: contract.transaction_hash,

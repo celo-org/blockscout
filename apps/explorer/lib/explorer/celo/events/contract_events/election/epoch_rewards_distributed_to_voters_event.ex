@@ -52,7 +52,7 @@ defmodule Explorer.Celo.ContractEvents.Election.EpochRewardsDistributedToVotersE
     end
 
     def from_celo_contract_event(_, %CeloContractEvent{params: params} = contract) do
-      %{group: group, value: value} = params
+      %{group: group, value: value} = params |> normalise_map()
 
       %EpochRewardsDistributedToVotersEvent{
         transaction_hash: contract.transaction_hash,

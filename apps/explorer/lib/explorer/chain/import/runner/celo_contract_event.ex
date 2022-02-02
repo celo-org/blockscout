@@ -47,13 +47,13 @@ defmodule Explorer.Chain.Import.Runner.CeloContractEvent do
     on_conflict = Map.get(options, :on_conflict, :nothing)
 
     # Enforce Log ShareLocks order (see docs: sharelocks.md)
-    ordered_changes_list = Enum.sort_by(changes_list, &{&1.block_hash, &1.index})
+    ordered_changes_list = Enum.sort_by(changes_list, &{&1.block_hash, &1.log_index})
 
     {:ok, _} =
       Import.insert_changes_list(
         repo,
         ordered_changes_list,
-        conflict_target: [:block_hash, :index],
+        conflict_target: [:block_hash, :log_index],
         on_conflict: on_conflict,
         for: CeloContractEvent,
         returning: true,
