@@ -2336,7 +2336,6 @@ defmodule Explorer.Chain.ImportTest do
 
       events = EventMap.rpc_to_event_params([log])
 
-      # require IEx; IEx.pry
       assert {:ok, _} =
                Import.all(%{
                  addresses: %{
@@ -2373,9 +2372,6 @@ defmodule Explorer.Chain.ImportTest do
         CeloContractEvent
         |> Repo.all()
         |> EventMap.celo_contract_event_to_concrete_event()
-
-      require IEx
-      IEx.pry()
     end
   end
 end
