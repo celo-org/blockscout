@@ -2373,7 +2373,7 @@ defmodule Explorer.Chain.ImportTest do
         |> Repo.all()
         |> EventMap.celo_contract_event_to_concrete_event()
 
-        assert result.name == "ValidatorGroupVoteActivated"
+      assert result = [%Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent{}]
     end
   end
 end
