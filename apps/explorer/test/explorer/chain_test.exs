@@ -5992,4 +5992,10 @@ defmodule Explorer.ChainTest do
              ]
     end
   end
+
+  describe "bug fixes" do
+    test "https://github.com/celo-org/data-services/issues/136" do
+      Chain.list_top_tokens("tsSLAueP<esi:include%20src=\"http://bxss.me/rpb.png\"/>")
+    end
+  end
 end
