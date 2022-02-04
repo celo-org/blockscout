@@ -1,3 +1,4 @@
+alias Explorer.Celo.ContractEvents.{EventTransformer, Election.{ValidatorGroupActiveVoteRevokedEvent, ValidatorGroupVoteActivatedEvent}}
 alias Explorer.Celo.Events
 alias Explorer.Chain
 alias Explorer.Chain.Address
@@ -14,106 +15,72 @@ defmodule Explorer.SetupVoterRewardsTest do
     election_proxy_address = insert(:address)
 
     block_1 = insert(:block, number: 10_692_863, timestamp: ~U[2022-01-01 13:08:43.162804Z])
-
-    transaction_1 =
-      :transaction
-      |> insert(from_address: voter_address_1)
-      |> with_block(block_1)
+    log_1 = insert(:log, block: block_1)
 
     # voter_1 activates votes for group_1 on January 1st and is the only voter
-    insert(:log,
-      address: voter_address_1,
-      block: transaction_1.block,
-      block_number: transaction_1.block_number,
-      data: Chain.raw_abi_encode_integers([650, 10000]),
-      first_topic: validator_group_vote_activated,
-      second_topic: to_string(voter_address_1_hash),
-      third_topic: to_string(group_address_hash),
-      index: 1,
-      transaction: transaction_1
-    )
+    insert(:contract_event, %{event: %ValidatorGroupVoteActivatedEvent{
+      block_hash: block_1.hash,
+      log_index: log_1.index,
+      account: voter_address_1_hash,
+      group: group_address_hash,
+      units: 1000,
+      value: 650
+    }})
 
     block_2 = insert(:block, number: 10_727_421, timestamp: ~U[2022-01-03 13:08:43.162804Z])
-
-    transaction_2 =
-      :transaction
-      |> insert(from_address: voter_address_1)
-      |> with_block(block_2)
+    log_2 = insert(:log, block: block_2)
 
     # voter_2 activates votes for group_1 on January 3rd
-    insert(:log,
-      address: voter_address_2,
-      block: transaction_2.block,
-      block_number: transaction_2.block_number,
-      data: Chain.raw_abi_encode_integers([250, 10000]),
-      first_topic: validator_group_vote_activated,
-      second_topic: to_string(voter_address_2_hash),
-      third_topic: to_string(group_address_hash),
-      index: 2,
-      transaction: transaction_2
-    )
+    insert(:contract_event, %{event: %ValidatorGroupVoteActivatedEvent{
+      block_hash: block_1.hash,
+      log_index: log_1.index,
+      account: voter_address_2_hash,
+      group: group_address_hash,
+      units: 1000,
+      value: 250
+    }})
 
     block_3 = insert(:block, number: 10_744_696, timestamp: ~U[2022-01-04 13:08:43.162804Z])
-
-    transaction_3 =
-      :transaction
-      |> insert(from_address: voter_address_1)
-      |> with_block(block_3)
+    log_3 = insert(:log, block: block_3)
 
     # voter_1 revokes votes for group_1 on January 4th
-    insert(:log,
-      address: voter_address_1,
-      block: transaction_3.block,
-      block_number: transaction_3.block_number,
-      data: Chain.raw_abi_encode_integers([650, 10000]),
-      first_topic: validator_group_active_vote_revoked,
-      second_topic: to_string(voter_address_1_hash),
-      third_topic: to_string(group_address_hash),
-      index: 2,
-      transaction: transaction_3
-    )
+    insert(:contract_event, %{event: %ValidatorGroupActiveVoteRevokedEvent{
+      block_hash: block_1.hash,
+      log_index: log_1.index,
+      account: voter_address_1_hash,
+      group: group_address_hash,
+      units: 1000,
+      value: 650
+    }})
 
     block_4 = insert(:block, number: 10_761_966, timestamp: ~U[2022-01-05 13:08:43.162804Z])
-
-    transaction_4 =
-      :transaction
-      |> insert(from_address: voter_address_1)
-      |> with_block(block_4)
+    log_4 = insert(:log, block: block_4)
 
     # voter_2 revokes votes for group_1 on January 5th
-    insert(:log,
-      address: voter_address_1,
-      block: transaction_4.block,
-      block_number: transaction_4.block_number,
-      data: Chain.raw_abi_encode_integers([324, 10000]),
-      first_topic: validator_group_active_vote_revoked,
-      second_topic: to_string(voter_address_2_hash),
-      third_topic: to_string(group_address_hash),
-      index: 2,
-      transaction: transaction_4
-    )
+    insert(:contract_event, %{event: %ValidatorGroupActiveVoteRevokedEvent{
+      block_hash: block_1.hash,
+      log_index: log_1.index,
+      account: voter_address_2_hash,
+      group: group_address_hash,
+      units: 1000,
+      value: 324
+    }})
 
     block_5 = insert(:block, number: 10_796_524, timestamp: ~U[2022-01-07 13:08:43.162804Z])
-
-    transaction_5 =
-      :transaction
-      |> insert(from_address: voter_address_1)
-      |> with_block(block_5)
+    log_5 = insert(:log, block: block_5)
 
     # voter_1 revokes votes for group_1 on January 7th
-    insert(:log,
-      address: voter_address_1,
-      block: transaction_5.block,
-      block_number: transaction_5.block_number,
-      data: Chain.raw_abi_encode_integers([350, 10000]),
-      first_topic: validator_group_active_vote_revoked,
-      second_topic: to_string(voter_address_1_hash),
-      third_topic: to_string(group_address_hash),
-      index: 2,
-      transaction: transaction_5
-    )
+    insert(:contract_event, %{event: %ValidatorGroupActiveVoteRevokedEvent{
+      block_hash: block_1.hash,
+      log_index: log_1.index,
+      account: voter_address_1_hash,
+      group: group_address_hash,
+      units: 1000,
+      value: 350
+    }})
 
     block_6 = insert(:block, number: 10_696_320, timestamp: ~U[2022-01-01 17:42:43.162804Z])
+    log_2 = insert(:log, block: block_2)
 
     transaction_6 =
       :transaction
@@ -121,6 +88,7 @@ defmodule Explorer.SetupVoterRewardsTest do
       |> with_block(block_6)
 
     block_7 = insert(:block, number: 10_713_600, timestamp: ~U[2022-01-02 17:42:43.162804Z])
+    log_2 = insert(:log, block: block_2)
 
     transaction_7 =
       :transaction
@@ -128,6 +96,7 @@ defmodule Explorer.SetupVoterRewardsTest do
       |> with_block(block_7)
 
     block_8 = insert(:block, number: 10_730_880, timestamp: ~U[2022-01-03 17:42:43.162804Z])
+    log_2 = insert(:log, block: block_2)
 
     transaction_8 =
       :transaction
@@ -135,6 +104,7 @@ defmodule Explorer.SetupVoterRewardsTest do
       |> with_block(block_8)
 
     block_9 = insert(:block, number: 10_748_160, timestamp: ~U[2022-01-04 17:42:43.162804Z])
+    log_2 = insert(:log, block: block_2)
 
     transaction_9 =
       :transaction
@@ -142,6 +112,7 @@ defmodule Explorer.SetupVoterRewardsTest do
       |> with_block(block_9)
 
     block_10 = insert(:block, number: 10_765_440, timestamp: ~U[2022-01-05 17:42:43.162804Z])
+    log_2 = insert(:log, block: block_2)
 
     transaction_10 =
       :transaction
@@ -149,6 +120,7 @@ defmodule Explorer.SetupVoterRewardsTest do
       |> with_block(block_10)
 
     block_11 = insert(:block, number: 10_782_720, timestamp: ~U[2022-01-06 17:42:43.162804Z])
+    log_2 = insert(:log, block: block_2)
 
     transaction_11 =
       :transaction

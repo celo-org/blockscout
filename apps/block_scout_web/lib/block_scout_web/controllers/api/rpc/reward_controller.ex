@@ -2,13 +2,14 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
   use BlockScoutWeb, :controller
 
   alias Explorer.Chain
+  alias Explorer.Celo.VoterRewardsForGroup
 
   def getvoterrewardsforgroup(conn, params) do
     with {:voter_address_param, {:ok, voter_address_param}} <- fetch_address(params, "voterAddress"),
          {:group_address_param, {:ok, group_address_param}} <- fetch_address(params, "groupAddress"),
          {:voter_format, {:ok, voter_address_hash}} <- to_address_hash(voter_address_param, "voterAddress"),
          {:group_format, {:ok, group_address_hash}} <- to_address_hash(group_address_param, "groupAddress"),
-         {:ok, rewards} <- Chain.voter_rewards_for_group(to_string(voter_address_hash), to_string(group_address_hash)) do
+         {:ok, rewards} <- VoterRewardsForGroup.calculate(to_string(voter_address_hash), to_string(group_address_hash)) do
       render(conn, :getvoterrewardsforgroup, rewards: rewards)
     else
       {:voter_address_param, :error} ->
