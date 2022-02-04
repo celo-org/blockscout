@@ -2452,7 +2452,7 @@ defmodule Explorer.Chain do
     case prepare_search_term(filter) do
       {:some, term} ->
         query =
-          if String.length(term) > 0
+          if String.length(term) > 0 do
             base_query_with_paging
             |> where(fragment("to_tsvector('english', symbol || ' ' || name ) @@ to_tsquery(?)", ^term))
           else
