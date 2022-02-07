@@ -75,6 +75,7 @@ defmodule Mix.Tasks.EventMap do
     File.write(@path, event_map)
   end
 
+  @dialyzer {:nowarn_function, get_events: 0}
   defp get_events do
     :impls
     |> EventTransformer.__protocol__()

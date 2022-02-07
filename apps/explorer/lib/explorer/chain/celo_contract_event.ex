@@ -7,6 +7,7 @@ defmodule Explorer.Chain.CeloContractEvent do
   use Explorer.Schema
   import Ecto.Query
 
+  alias Explorer.Celo.ContractEvents.EventMap
   alias Explorer.Chain.Hash
   alias Explorer.Chain.Hash.Address
   alias Explorer.Repo
@@ -67,7 +68,7 @@ defmodule Explorer.Chain.CeloContractEvent do
       batch
       |> fetch_params()
       |> Repo.all()
-      |> Explorer.Celo.ContractEvents.EventMap.rpc_to_event_params()
+      |> EventMap.rpc_to_event_params()
     end)
   end
 
