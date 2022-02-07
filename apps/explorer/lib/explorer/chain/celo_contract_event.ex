@@ -56,7 +56,7 @@ defmodule Explorer.Chain.CeloContractEvent do
   @throttle_ms 100
   @batch_size 1000
   def insert_unprocessed_events(events, batch_size \\ @batch_size) do
-    #fetch ids of missing events
+    # fetch ids of missing events
     ids =
       events
       |> Enum.map(& &1.topic)
@@ -67,10 +67,11 @@ defmodule Explorer.Chain.CeloContractEvent do
     ids
     |> Enum.chunk_every(batch_size)
     |> Enum.map(fn batch ->
-      to_insert = batch
-      |> fetch_params()
-      |> Repo.all()
-      |> EventMap.rpc_to_event_params()
+      to_insert =
+        batch
+        |> fetch_params()
+        |> Repo.all()
+        |> EventMap.rpc_to_event_params()
 
       result = Repo.insert_all(__MODULE__, to_insert, returning: [:block_hash, :log_index])
 
