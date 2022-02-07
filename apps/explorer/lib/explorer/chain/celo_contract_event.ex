@@ -5,9 +5,11 @@ defmodule Explorer.Chain.CeloContractEvent do
   require Logger
 
   use Explorer.Schema
+  import Ecto.Query
 
   alias Explorer.Chain.Hash
   alias Explorer.Chain.Hash.Address
+  alias Explorer.Repo
 
   @type t :: %__MODULE__{
           block_hash: Hash.Full.t(),
@@ -23,12 +25,12 @@ defmodule Explorer.Chain.CeloContractEvent do
 
   @primary_key false
   schema "celo_contract_events" do
+    field(:block_hash, Hash.Full, primary_key: true)
+    field(:log_index, :integer, primary_key: true)
     field(:name, :string)
     field(:params, :map)
-    field(:log_index, :integer)
     field(:contract_address_hash, Address)
     field(:transaction_hash, Address)
-    field(:block_hash, Hash.Full)
 
     timestamps(null: false, type: :utc_datetime_usec)
   end
@@ -37,5 +39,55 @@ defmodule Explorer.Chain.CeloContractEvent do
     item
     |> cast(attrs, @attrs)
     |> validate_required(@required)
+  end
+
+  @doc "returns ids of entries in log table that contain events not yet included in CeloContractEvents table"
+  def fetch_unprocessed_log_ids_query(topics) when is_list(topics) do
+    from(l in "logs",
+      select: {l.block_hash, l.index},
+      left_join: cce in CeloContractEvent,
+      on: {cce.block_hash, cce.log_index} == {l.block_hash, l.index},
+      where: l.first_topic in ^topics and is_nil(cce.block_hash),
+      order_by: [asc: l.block_number, asc: l.index]
+    )
+  end
+
+  @batch_size 1000
+  def insert_unprocessed_events(events, batch_size \\ @batch_size) do
+    ids =
+      events
+      |> Enum.map(& &1.topic)
+      |> fetch_unprocessed_log_ids_query()
+      |> Repo.all()
+
+    # insert in batches
+    ids
+    |> Enum.chunk_every(@batch_size)
+    |> Enum.map(fn batch ->
+      batch
+      |> fetch_params()
+      |> Repo.all()
+      |> Explorer.Celo.ContractEvents.EventMap.rpc_to_event_params()
+    end)
+  end
+
+  def fetch_params(ids) do
+    from(
+      l in "logs",
+      select: %{
+        first_topic: l.first_topic,
+        second_topic: l.second_topic,
+        third_topic: l.third_topic,
+        fourth_topic: l.fourth_topic,
+        data: l.data,
+        address_hash: l.address_hash,
+        transaction_hash: l.transaction_hash,
+        block_number: l.block_number,
+        block_hash: l.block_hash,
+        index: l.index
+      },
+      join: v in fragment("(VALUES ?) AS j(bytea block_hash, int index)", ^ids),
+      on: v.block_hash == l.block_hash and v.index == l.index
+    )
   end
 end
