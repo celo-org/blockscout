@@ -46,14 +46,19 @@ defmodule Mix.Tasks.EventMap do
       |> Enum.reject(&is_nil/1)
     end
 
-  <%= for module <- @modules do %>
-    def event_for_topic("<%= module.topic %>"),
-      do: <%= module %>
-  <% end %>
-  <%= for module <- @modules do %>
-    def event_for_name("<%= module.name %>"),
-      do: <%= module %>
-  <% end %>
+    @topic_to_event %{
+    <%= for module <- @modules do %>  "<%= module.topic %>" =>
+      <%= module %>,
+    <% end %>}
+
+    @name_to_event %{
+    <%= for module <- @modules do %>  "<%= module.name %>" =>
+      <%= module %>,
+    <% end %>}
+
+    def event_for_topic(topic), do: Map.get(@topic_to_event, topic)
+    def event_for_name(name), do: Map.get(@name_to_event, name)
+
   end
 
   """
@@ -65,11 +70,12 @@ defmodule Mix.Tasks.EventMap do
     modules = get_events()
     event_map = EEx.eval_string(@template, assigns: [modules: modules])
 
+    IO.puts(event_map)
     _ = File.rm(@path)
     File.write(@path, event_map)
   end
 
-  defp get_events() do
+  defp get_events do
     :impls
     |> EventTransformer.__protocol__()
     |> then(fn
