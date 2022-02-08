@@ -38,7 +38,7 @@ defmodule Mix.Tasks.EventMap do
       |> Enum.reject(&is_nil/1)
     end
 
-    def celo_contract_event_to_concrete_event(params = %{name: name}) do
+    def celo_contract_event_to_concrete_event(%{name: name} = params) do
       case event_for_name(name) do
         nil ->
           nil
