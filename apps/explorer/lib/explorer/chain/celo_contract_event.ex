@@ -17,7 +17,7 @@ defmodule Explorer.Chain.CeloContractEvent do
           name: String.t(),
           log_index: non_neg_integer(),
           contract_address_hash: Hash.Address.t(),
-          transaction_hash: Hash.Address.t(),
+          transaction_hash: Hash.Full.t(),
           params: map()
         }
 
@@ -31,7 +31,7 @@ defmodule Explorer.Chain.CeloContractEvent do
     field(:name, :string)
     field(:params, :map)
     field(:contract_address_hash, Address)
-    field(:transaction_hash, Address)
+    field(:transaction_hash, Hash.Full)
 
     timestamps(null: false, type: :utc_datetime_usec)
   end
@@ -46,7 +46,7 @@ defmodule Explorer.Chain.CeloContractEvent do
   def fetch_unprocessed_log_ids_query(topics) when is_list(topics) do
     from(l in "logs",
       select: {l.block_hash, l.index},
-      left_join: cce in CeloContractEvent,
+      left_join: cce in __MODULE__,
       on: {cce.block_hash, cce.log_index} == {l.block_hash, l.index},
       where: l.first_topic in ^topics and is_nil(cce.block_hash),
       order_by: [asc: l.block_number, asc: l.index]
@@ -81,6 +81,14 @@ defmodule Explorer.Chain.CeloContractEvent do
   end
 
   def fetch_params(ids) do
+    # convert list of {block_hash, index} tuples to two lists of [block_hash] and [index] because ecto can't handle
+    # direct tuple comparisons with a WHERE IN clause
+    {blocks, indices} = ids
+    |> Enum.reduce([[],[]], fn {block, index}, [blocks, indices] ->
+     [ [ block | blocks], [index | indices]]
+    end)
+    |> then(fn [blocks, indices] -> {Enum.reverse(blocks), Enum.reverse(indices)} end)
+
     from(
       l in "logs",
       select: %{
@@ -95,7 +103,7 @@ defmodule Explorer.Chain.CeloContractEvent do
         block_hash: l.block_hash,
         index: l.index
       },
-      join: v in fragment("(VALUES ?) AS j(bytea block_hash, int index)", ^ids),
+      join: v in fragment("SELECT * FROM unnest(?::bytea[], ?::int[]) AS v(block_hash,index)", ^blocks, ^indices),
       on: v.block_hash == l.block_hash and v.index == l.index
     )
   end
