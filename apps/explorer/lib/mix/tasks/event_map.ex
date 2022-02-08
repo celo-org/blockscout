@@ -13,6 +13,7 @@ defmodule Mix.Tasks.EventMap do
 
     alias Explorer.Celo.ContractEvents.EventTransformer
 
+    @doc "Convert ethrpc log parameters to CeloContractEvent insertion parameters"
     def rpc_to_event_params(logs) when is_list(logs) do
       logs
       |> Enum.map(fn params = %{first_topic: event_topic} ->
@@ -30,20 +31,32 @@ defmodule Mix.Tasks.EventMap do
       |> Enum.reject(&is_nil/1)
     end
 
+    @doc "Convert CeloContractEvent instance to their concrete types"
     def celo_contract_event_to_concrete_event(events) when is_list(events) do
       events
-      |> Enum.map(fn params = %{name: name} ->
-        case event_for_name(name) do
-          nil ->
-            nil
-
-          event ->
-            event
-            |> struct!()
-            |> EventTransformer.from_celo_contract_event(params)
-        end
-      end)
+      |> Enum.map(&celo_contract_event_to_concrete_event/1)
       |> Enum.reject(&is_nil/1)
+    end
+
+    def celo_contract_event_to_concrete_event(params = %{name: name}) do
+      case event_for_name(name) do
+        nil ->
+          nil
+
+        event ->
+          event
+          |> struct!()
+          |> EventTransformer.from_celo_contract_event(params)
+      end
+    end
+
+    @doc "Convert concrete event to CeloContractEvent insertion parameters"
+    def event_to_contract_event_params(events) when is_list(events) do
+      events |> Enum.map(&event_to_contract_event_params/1)
+    end
+
+    def event_to_contract_event_params(event) do
+      event |> EventTransformer.to_celo_contract_event_params()
     end
 
     @topic_to_event %{
@@ -66,11 +79,16 @@ defmodule Mix.Tasks.EventMap do
   @path "lib/explorer/celo/events/contract_events/event_map.ex"
 
   @shortdoc "Creates a module mapping topics to event names and vice versa"
-  def run(_) do
+  def run(args) do
+    {options, _, _} = OptionParser.parse(args, strict: [verbose: :boolean])
+
     modules = get_events()
     event_map = EEx.eval_string(@template, assigns: [modules: modules])
 
-    IO.puts(event_map)
+    if Keyword.get(options, :verbose) do
+      IO.puts(event_map)
+    end
+
     _ = File.rm(@path)
     File.write(@path, event_map)
   end
