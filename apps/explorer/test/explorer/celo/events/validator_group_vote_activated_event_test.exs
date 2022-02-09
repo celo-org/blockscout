@@ -82,17 +82,19 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
       assert result.group |> to_string() == "0x47b2db6af05a55d42ed0f3731735f9479abf0673"
       assert result.log_index == 8
 
-      #explictly setting timestamps as insert_all doesn't do this
-      r = result
-          |> EventMap.event_to_contract_event_params()
-          |> Map.put(:inserted_at, Timex.now())
-          |> Map.put(:updated_at, Timex.now())
+      # explictly setting timestamps as insert_all doesn't do this
+      r =
+        result
+        |> EventMap.event_to_contract_event_params()
+        |> Map.put(:inserted_at, Timex.now())
+        |> Map.put(:updated_at, Timex.now())
 
-      {1,_} = Explorer.Repo.insert_all(CeloContractEvent, [r])
+      {1, _} = Explorer.Repo.insert_all(CeloContractEvent, [r])
 
-      [result] = ValidatorGroupVoteActivatedEvent.query()
-                 |> Repo.all()
-                 |> EventMap.celo_contract_event_to_concrete_event()
+      [result] =
+        ValidatorGroupVoteActivatedEvent.query()
+        |> Repo.all()
+        |> EventMap.celo_contract_event_to_concrete_event()
 
       assert result.value == 66_980_000_000_000_000_000
       assert result.units == 6_136_281_451_163_456_507_329_304_650_157_103_347_504

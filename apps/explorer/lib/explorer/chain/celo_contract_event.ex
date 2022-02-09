@@ -8,8 +8,7 @@ defmodule Explorer.Chain.CeloContractEvent do
   import Ecto.Query
 
   alias Explorer.Celo.ContractEvents.EventMap
-  alias Explorer.Chain.Log
-  alias Explorer.Chain.Hash
+  alias Explorer.Chain.{Hash, Log}
   alias Explorer.Chain.Hash.Address
   alias Explorer.Repo
 
@@ -74,15 +73,7 @@ defmodule Explorer.Chain.CeloContractEvent do
         |> fetch_params()
         |> Repo.all()
         |> EventMap.rpc_to_event_params()
-        |> then(fn events ->
-          #Insert all does not handle timestamps, set explicitly here
-          timestamp = Timex.now()
-          Enum.map(events, fn e ->
-            e
-            |> Map.put(:inserted_at, timestamp)
-            |> Map.put(:updated_at, timestamp)
-          end)
-        end)
+        |> set_timestamps()
 
       result = Repo.insert_all(__MODULE__, to_insert, returning: [:block_hash, :log_index])
 
@@ -94,11 +85,12 @@ defmodule Explorer.Chain.CeloContractEvent do
   def fetch_params(ids) do
     # convert list of {block_hash, index} tuples to two lists of [block_hash] and [index] because ecto can't handle
     # direct tuple comparisons with a WHERE IN clause
-    {blocks, indices} = ids
-    |> Enum.reduce([[],[]], fn {block, index}, [blocks, indices] ->
-     [ [ block | blocks], [index | indices]]
-    end)
-    |> then(fn [blocks, indices] -> {Enum.reverse(blocks), Enum.reverse(indices)} end)
+    {blocks, indices} =
+      ids
+      |> Enum.reduce([[], []], fn {block, index}, [blocks, indices] ->
+        [[block | blocks], [index | indices]]
+      end)
+      |> then(fn [blocks, indices] -> {Enum.reverse(blocks), Enum.reverse(indices)} end)
 
     from(
       l in Log,
@@ -107,4 +99,14 @@ defmodule Explorer.Chain.CeloContractEvent do
     )
   end
 
+  defp set_timestamps(events) do
+    # Repo.insert_all does not handle timestamps, set explicitly here
+    timestamp = Timex.now()
+
+    Enum.map(events, fn e ->
+      e
+      |> Map.put(:inserted_at, timestamp)
+      |> Map.put(:updated_at, timestamp)
+    end)
+  end
 end

@@ -5,7 +5,6 @@ defmodule Explorer.Celo.ContractEvents.Common do
   alias Explorer.Chain.Hash.Address
   alias Explorer.Chain.{Data, Hash, Hash.Full}
 
-
   @doc "Decode a single point of event data of a given type from a given topic"
   def decode_event(topic, type) do
     topic
@@ -34,19 +33,23 @@ defmodule Explorer.Celo.ContractEvents.Common do
   end
 
   def extract_common_event_params(event) do
-    [:transaction_hash, :block_hash] #set full hashes
+    # set full hashes
+    [:transaction_hash, :block_hash]
     |> Enum.into(%{}, fn key ->
       case Map.get(event, key) do
-        nil -> {key, nil}
+        nil ->
+          {key, nil}
+
         v ->
           {:ok, hsh} = Full.cast(v)
           {key, hsh}
       end
     end)
-    |> then(fn map -> #set contract address hash
-       {:ok, hsh} = Address.cast(event.contract_address_hash)
-       Map.put(map, :contract_address_hash, hsh)
-     end)
+    # set contract address hash
+    |> then(fn map ->
+      {:ok, hsh} = Address.cast(event.contract_address_hash)
+      Map.put(map, :contract_address_hash, hsh)
+    end)
     |> Map.put(:name, event.name)
     |> Map.put(:log_index, event.log_index)
   end
