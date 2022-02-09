@@ -8,6 +8,7 @@ defmodule Explorer.Chain.CeloContractEvent do
   import Ecto.Query
 
   alias Explorer.Celo.ContractEvents.EventMap
+  alias Explorer.Chain.Log
   alias Explorer.Chain.Hash
   alias Explorer.Chain.Hash.Address
   alias Explorer.Repo
@@ -55,6 +56,7 @@ defmodule Explorer.Chain.CeloContractEvent do
 
   @throttle_ms 100
   @batch_size 1000
+  @doc "Insert events as yet unprocessed from Log table into CeloContractEvents"
   def insert_unprocessed_events(events, batch_size \\ @batch_size) do
     # fetch ids of missing events
     ids =
@@ -72,6 +74,15 @@ defmodule Explorer.Chain.CeloContractEvent do
         |> fetch_params()
         |> Repo.all()
         |> EventMap.rpc_to_event_params()
+        |> then(fn events ->
+          #Insert all does not handle timestamps, set explicitly here
+          timestamp = Timex.now()
+          Enum.map(events, fn e ->
+            e
+            |> Map.put(:inserted_at, timestamp)
+            |> Map.put(:updated_at, timestamp)
+          end)
+        end)
 
       result = Repo.insert_all(__MODULE__, to_insert, returning: [:block_hash, :log_index])
 
@@ -90,21 +101,10 @@ defmodule Explorer.Chain.CeloContractEvent do
     |> then(fn [blocks, indices] -> {Enum.reverse(blocks), Enum.reverse(indices)} end)
 
     from(
-      l in "logs",
-      select: %{
-        first_topic: l.first_topic,
-        second_topic: l.second_topic,
-        third_topic: l.third_topic,
-        fourth_topic: l.fourth_topic,
-        data: l.data,
-        address_hash: l.address_hash,
-        transaction_hash: l.transaction_hash,
-        block_number: l.block_number,
-        block_hash: l.block_hash,
-        index: l.index
-      },
+      l in Log,
       join: v in fragment("SELECT * FROM unnest(?::bytea[], ?::int[]) AS v(block_hash,index)", ^blocks, ^indices),
       on: v.block_hash == l.block_hash and v.index == l.index
     )
   end
+
 end
