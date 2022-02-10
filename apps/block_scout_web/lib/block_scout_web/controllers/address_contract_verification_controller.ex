@@ -238,6 +238,7 @@ defmodule BlockScoutWeb.AddressContractVerificationController do
         |> Map.put("secondary_sources", secondary_sources)
       else
         to_publish = Map.get(full_params_acc, "params_to_publish")
+
         secondary_sources = [
           prepare_additional_source(address_hash_string, param) | Map.get(full_params_acc, "secondary_sources")
         ]
@@ -249,13 +250,12 @@ defmodule BlockScoutWeb.AddressContractVerificationController do
     end)
   end
 
-  defp file_is_compilation_target(name,target_name) do
+  defp file_is_compilation_target(name, target_name) do
     name = String.downcase(name)
     target_name = String.downcase(target_name)
 
     cond do
       name == target_name -> true
-
       # compilation target appears to be replace spaces with underscores
       # https://github.com/celo-org/data-services/issues/151
       String.replace(target_name, ~r/\s/, "_") == name -> true
