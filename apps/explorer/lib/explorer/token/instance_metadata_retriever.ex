@@ -48,7 +48,7 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
   end
 
   def query_contract(contract_address_hash, contract_functions) do
-    Reader.query_contract(contract_address_hash, @abi, contract_functions)
+    Reader.query_contract(contract_address_hash, @abi, contract_functions, false)
   end
 
   def fetch_json(%{@token_uri => {:ok, [""]}}) do
