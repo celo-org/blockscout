@@ -151,6 +151,9 @@ defmodule BlockScoutWeb.AddressContractVerificationController do
 
       {:error, %{"error" => error}} ->
         {:error, error: error}
+
+      {:error, :timeout} ->
+        {:error, error: :timeout}
     end
   end
 
