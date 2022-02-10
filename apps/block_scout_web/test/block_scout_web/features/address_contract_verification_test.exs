@@ -64,12 +64,6 @@ defmodule BlockScoutWeb.AddressContractVerificationTest do
     |> ContractVerifyPage.has_message?("There was an error validating your contract, please try again.")
   end
 
-  test "decodes sourcify response correctly", %{session: session, bypass: bypass} do
-    Bypass.expect(bypass, fn conn -> Conn.resp(conn, 200, failing_sourcify_metadata()) end)
-
-    AddressContractVerificationController.get_metadata_and_publish("0x0E7a0c8FAb504dbB94F1e33E0A09ab4506Ea2e9b", nil)
-  end
-
   defp solc_bin_versions do
     File.read!("./test/support/fixture/smart_contract/solc_bin.json")
   end
