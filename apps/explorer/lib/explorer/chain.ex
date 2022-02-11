@@ -36,7 +36,7 @@ defmodule Explorer.Chain do
 
   alias Explorer.Chain
 
-  alias Explorer.Celo.{ContractEvents, Events, Util}
+  alias Explorer.Celo.ContractEvents
 
   alias Explorer.Chain.{
     Address,
@@ -55,7 +55,6 @@ defmodule Explorer.Chain do
     CeloUnlocked,
     CeloValidator,
     CeloValidatorGroup,
-    CeloValidatorGroupVotes,
     CeloValidatorHistory,
     CeloVoters,
     CurrencyHelpers,
@@ -8017,8 +8016,10 @@ defmodule Explorer.Chain do
            voter_rewards_for_group.calculate(voter_address_hash, group_address_hash)
          end)
          |> Enum.map(fn {:ok, rewards} ->
-           group = Map.fetch!(rewards, :group)
-           Map.fetch!(rewards, :epochs) |> Enum.map(fn x -> Map.put(x, :group, group) end)
+             group = Map.fetch!(rewards, :group)
+             epochs = Map.fetch!(rewards, :epochs)
+             Enum.map(epochs, fn x -> Map.put(x, :group, group)
+           end)
          end)
          |> List.flatten()
          |> Enum.filter(fn x ->

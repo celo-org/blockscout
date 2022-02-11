@@ -1,4 +1,4 @@
-alias Explorer.Celo.ContractEvents.{EventTransformer, Election}
+alias Explorer.Celo.ContractEvents.Election
 
 alias Election.{
   EpochRewardsDistributedToVotersEvent,
@@ -6,21 +6,16 @@ alias Election.{
   ValidatorGroupVoteActivatedEvent
 }
 
-alias Explorer.Celo.Events
-alias Explorer.Chain
 alias Explorer.Chain.{Address, Hash}
 
 import Explorer.Factory
 
 defmodule Explorer.SetupVoterRewardsTest do
   def setup do
-    validator_group_vote_activated = ValidatorGroupVoteActivatedEvent.name()
     validator_group_active_vote_revoked = ValidatorGroupActiveVoteRevokedEvent.name()
-    epoch_rewards_distributed_to_voters = EpochRewardsDistributedToVotersEvent.name()
-    %Address{hash: voter_address_1_hash} = voter_address_1 = insert(:address)
-    %Address{hash: voter_address_2_hash} = voter_address_2 = insert(:address)
-    %Address{hash: group_address_hash} = group_address = insert(:address)
-    election_proxy_address = insert(:address)
+    %Address{hash: voter_address_1_hash} = insert(:address)
+    %Address{hash: voter_address_2_hash} = insert(:address)
+    %Address{hash: group_address_hash} = insert(:address)
 
     block_1 = insert(:block, number: 10_692_863, timestamp: ~U[2022-01-01 13:08:43.162804Z])
     log_1 = insert(:log, block: block_1)

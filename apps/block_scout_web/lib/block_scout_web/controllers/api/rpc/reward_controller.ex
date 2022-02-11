@@ -1,8 +1,8 @@
 defmodule BlockScoutWeb.API.RPC.RewardController do
   use BlockScoutWeb, :controller
 
-  alias Explorer.Chain
   alias Explorer.Celo.VoterRewardsForGroup
+  alias Explorer.Chain
 
   def getvoterrewardsforgroup(conn, params) do
     with {:voter_address_param, {:ok, voter_address_param}} <- fetch_address(params, "voterAddress"),

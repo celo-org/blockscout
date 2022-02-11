@@ -8,9 +8,8 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
       from: 2
     ]
 
-  alias ABI.TypeDecoder
   alias Explorer.Celo.{ContractEvents, Events, Util}
-  alias Explorer.Chain.{Block, CeloContractEvent, CeloValidatorGroupVotes, Log, Wei}
+  alias Explorer.Chain.{Block, CeloContractEvent, CeloValidatorGroupVotes, Wei}
   alias Explorer.Repo
 
   alias ContractEvents.Election
