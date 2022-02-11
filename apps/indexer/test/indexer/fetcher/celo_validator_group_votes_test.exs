@@ -67,6 +67,7 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotesTest do
     test "fetches validator group votes from blockchain" do
       %Address{hash: group_1_hash} = insert(:address)
       %Address{hash: group_2_hash} = insert(:address)
+      %Address{hash: contract_address_hash} = insert(:address)
 
       block_1 = %Block{hash: block_1_hash, number: block_1_number} = insert(:block, number: 172_800)
       log_1 = insert(:log, block: block_1)
@@ -74,6 +75,7 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotesTest do
       insert(:contract_event, %{
         event: %EpochRewardsDistributedToVotersEvent{
           block_hash: block_1.hash,
+          contract_address_hash: contract_address_hash,
           log_index: log_1.index,
           group: group_1_hash,
           value: 650
@@ -86,6 +88,7 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotesTest do
       insert(:contract_event, %{
         event: %EpochRewardsDistributedToVotersEvent{
           block_hash: block_2.hash,
+          contract_address_hash: contract_address_hash,
           log_index: log_2.index,
           group: group_2_hash,
           value: 650

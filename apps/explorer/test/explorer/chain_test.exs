@@ -6026,11 +6026,13 @@ defmodule Explorer.ChainTest do
       log_2 = insert(:log, block: block_2, index: 1)
       %Address{hash: group_address_1_hash} = insert(:address)
       %Address{hash: group_address_2_hash} = insert(:address)
+      %Address{hash: contract_address_hash} = insert(:address)
 
       insert(:contract_event, %{
         event: %EpochRewardsDistributedToVotersEvent{
           block_hash: block_1.hash,
           log_index: log_1_1.index,
+          contract_address_hash: contract_address_hash,
           group: group_address_1_hash,
           value: 650
         }
@@ -6041,6 +6043,7 @@ defmodule Explorer.ChainTest do
           block_hash: block_1.hash,
           log_index: log_1_2.index,
           account: group_address_1_hash,
+          contract_address_hash: contract_address_hash,
           group: group_address_1_hash,
           units: 10000,
           value: 650
@@ -6051,6 +6054,7 @@ defmodule Explorer.ChainTest do
         event: %EpochRewardsDistributedToVotersEvent{
           block_hash: block_1.hash,
           log_index: log_1_3.index,
+          contract_address_hash: contract_address_hash,
           group: group_address_2_hash,
           value: 650
         }
@@ -6060,6 +6064,7 @@ defmodule Explorer.ChainTest do
         event: %EpochRewardsDistributedToVotersEvent{
           block_hash: block_2.hash,
           log_index: log_2.index,
+          contract_address_hash: contract_address_hash,
           group: group_address_2_hash,
           value: 650
         }

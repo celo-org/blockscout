@@ -1429,7 +1429,7 @@ defmodule BlockScoutWeb.Etherscan do
             amount: @wei_type,
             blockHash: @block_hash_type,
             blockNumber: @block_number_type,
-            date: "timestamp",
+            date: %{type: "timestamp"},
             epochNumber: "integer"
           }
         }
@@ -1441,8 +1441,8 @@ defmodule BlockScoutWeb.Etherscan do
     name: "VoterRewards",
     fields: %{
       totalRewardsCelo: @wei_type,
-      from: "timestamp",
-      to: "timestamp",
+      from: %{type: "timestamp"},
+      to: %{type: "timestamp"},
       voterAccount: @address_hash_type,
       rewards: %{
         type: "array",
@@ -1452,7 +1452,7 @@ defmodule BlockScoutWeb.Etherscan do
             amount: @wei_type,
             blockHash: @block_hash_type,
             blockNumber: @block_number_type,
-            date: "timestamp",
+            date: %{type: "timestamp"},
             epochNumber: "integer",
             group: @address_hash_type
           }

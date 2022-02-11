@@ -16,6 +16,7 @@ defmodule Explorer.SetupVoterRewardsTest do
     %Address{hash: voter_address_1_hash} = insert(:address)
     %Address{hash: voter_address_2_hash} = insert(:address)
     %Address{hash: group_address_hash} = insert(:address)
+    %Address{hash: contract_address_hash} = insert(:address)
 
     block_1 = insert(:block, number: 10_692_863, timestamp: ~U[2022-01-01 13:08:43.162804Z])
     log_1 = insert(:log, block: block_1)
@@ -26,6 +27,7 @@ defmodule Explorer.SetupVoterRewardsTest do
         block_hash: block_1.hash,
         log_index: log_1.index,
         account: voter_address_1_hash,
+        contract_address_hash: contract_address_hash,
         group: group_address_hash,
         units: 1000,
         value: 650
@@ -41,6 +43,7 @@ defmodule Explorer.SetupVoterRewardsTest do
         block_hash: block_2.hash,
         log_index: log_2.index,
         account: voter_address_2_hash,
+        contract_address_hash: contract_address_hash,
         group: group_address_hash,
         units: 1000,
         value: 250
@@ -56,6 +59,7 @@ defmodule Explorer.SetupVoterRewardsTest do
         block_hash: block_3.hash,
         log_index: log_3.index,
         account: voter_address_1_hash,
+        contract_address_hash: contract_address_hash,
         group: group_address_hash,
         units: 1000,
         value: 650
@@ -71,6 +75,7 @@ defmodule Explorer.SetupVoterRewardsTest do
         block_hash: block_4.hash,
         log_index: log_4.index,
         account: voter_address_2_hash,
+        contract_address_hash: contract_address_hash,
         group: group_address_hash,
         units: 1000,
         value: 324
@@ -86,6 +91,7 @@ defmodule Explorer.SetupVoterRewardsTest do
         block_hash: block_5.hash,
         log_index: log_5.index,
         account: voter_address_1_hash,
+        contract_address_hash: contract_address_hash,
         group: group_address_hash,
         units: 1000,
         value: 350
@@ -115,6 +121,7 @@ defmodule Explorer.SetupVoterRewardsTest do
       event: %EpochRewardsDistributedToVotersEvent{
         block_hash: block_6.hash,
         log_index: log_6.index,
+        contract_address_hash: contract_address_hash,
         group: group_address_hash,
         value: 80
       }
@@ -143,6 +150,7 @@ defmodule Explorer.SetupVoterRewardsTest do
       event: %EpochRewardsDistributedToVotersEvent{
         block_hash: block_7.hash,
         log_index: log_7.index,
+        contract_address_hash: contract_address_hash,
         group: group_address_hash,
         value: 20
       }
@@ -171,6 +179,7 @@ defmodule Explorer.SetupVoterRewardsTest do
       event: %EpochRewardsDistributedToVotersEvent{
         block_hash: block_8.hash,
         log_index: log_8.index,
+        contract_address_hash: contract_address_hash,
         group: group_address_hash,
         value: 100
       }
@@ -199,6 +208,7 @@ defmodule Explorer.SetupVoterRewardsTest do
       event: %EpochRewardsDistributedToVotersEvent{
         block_hash: block_9.hash,
         log_index: log_9.index,
+        contract_address_hash: contract_address_hash,
         group: group_address_hash,
         value: 80
       }
@@ -227,6 +237,7 @@ defmodule Explorer.SetupVoterRewardsTest do
       event: %EpochRewardsDistributedToVotersEvent{
         block_hash: block_10.hash,
         log_index: log_10.index,
+        contract_address_hash: contract_address_hash,
         group: group_address_hash,
         value: 77
       }
@@ -255,6 +266,7 @@ defmodule Explorer.SetupVoterRewardsTest do
       event: %EpochRewardsDistributedToVotersEvent{
         block_hash: block_11.hash,
         log_index: log_11.index,
+        contract_address_hash: contract_address_hash,
         group: group_address_hash,
         value: 67
       }
@@ -266,6 +278,7 @@ defmodule Explorer.SetupVoterRewardsTest do
   def setup_for_all_groups do
     %Address{hash: voter_address_1_hash} = insert(:address)
     %Address{hash: voter_address_2_hash} = insert(:address)
+    %Address{hash: contract_address_hash} = insert(:address)
 
     %Address{hash: group_address_1_hash} =
       insert(:address,
@@ -291,6 +304,7 @@ defmodule Explorer.SetupVoterRewardsTest do
         block_hash: block_1.hash,
         log_index: log_1.index,
         account: voter_address_1_hash,
+        contract_address_hash: contract_address_hash,
         group: group_address_1_hash,
         units: 1000,
         value: 650
@@ -305,6 +319,7 @@ defmodule Explorer.SetupVoterRewardsTest do
         block_hash: block_2.hash,
         log_index: log_2.index,
         account: voter_address_1_hash,
+        contract_address_hash: contract_address_hash,
         group: group_address_2_hash,
         units: 1000,
         value: 250
@@ -319,6 +334,7 @@ defmodule Explorer.SetupVoterRewardsTest do
         block_hash: block_3.hash,
         log_index: log_3.index,
         account: voter_address_2_hash,
+        contract_address_hash: contract_address_hash,
         group: group_address_1_hash,
         units: 1000,
         value: 650
