@@ -171,6 +171,44 @@ defmodule Explorer.SmartContract.Reader do
     EthereumJSONRPC.execute_contract_functions(requests, abi, json_rpc_named_arguments, leave_error_as_map)
   end
 
+  @spec query_contracts_by_name([Contract.call_by_name()], term(), contract_call_options()) :: [Contract.call_result()]
+  def query_contracts_by_name(requests, abi, opts \\ []) do
+    json_rpc_named_arguments =
+      Keyword.get(opts, :json_rpc_named_arguments) || Application.get_env(:explorer, :json_rpc_named_arguments)
+
+    EthereumJSONRPC.execute_contract_functions_by_name(requests, abi, json_rpc_named_arguments)
+  end
+
+  def get_contract_abi(contract_address_hash) do
+    contract =
+      contract_address_hash
+      |> Chain.address_hash_to_smart_contract()
+
+    impl_abi =
+      with {:ok, implementation_address} <- Chain.get_proxied_address(contract_address_hash),
+           implementation_contract <- Chain.address_hash_to_smart_contract(implementation_address) do
+        implementation_contract.abi
+      else
+        _ -> nil
+      end
+
+    abi = contract.abi
+
+    case {abi, impl_abi} do
+      {nil, nil} ->
+        []
+
+      {a, nil} ->
+        a
+
+      {nil, a} ->
+        a
+
+      {b, a} ->
+        b ++ a
+    end
+  end
+
   @doc """
   List all the smart contract functions with its current value from the
   blockchain, following the ABI order.
@@ -411,14 +449,14 @@ defmodule Explorer.SmartContract.Reader do
       abi
       |> ABI.parse_specification()
 
-    %{outputs: outputs, method_id: method_id} = proccess_abi(parsed_final_abi, method_id)
+    %{outputs: outputs, method_id: method_id} = process_abi(parsed_final_abi, method_id)
 
     query_contract_and_link_outputs(contract_address_hash, args, from, abi, outputs, method_id, leave_error_as_map)
   end
 
-  defp proccess_abi(nil, _method_id), do: nil
+  defp process_abi(nil, _method_id), do: nil
 
-  defp proccess_abi(abi, method_id) do
+  defp process_abi(abi, method_id) do
     function_object = find_function_by_method(abi, method_id)
     %ABI.FunctionSelector{returns: returns, method_id: method_id} = function_object
     outputs = extract_outputs(returns)
