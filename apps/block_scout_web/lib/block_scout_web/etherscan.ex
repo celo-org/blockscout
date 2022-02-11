@@ -639,19 +639,114 @@ defmodule BlockScoutWeb.Etherscan do
     "result" => %{
       "total" => "350",
       "rewards" => [
-        %{"amount" => "80", "date" => "2022-01-01 17:42:43", "epoch_number" => "619"},
-        %{"amount" => "20", "date" => "2022-01-02 17:42:43", "epoch_number" => "620"},
-        %{"amount" => "75", "date" => "2022-01-03 17:42:43", "epoch_number" => "621"},
-        %{"amount" => "31", "date" => "2022-01-04 17:42:43", "epoch_number" => "622"},
-        %{"amount" => "77", "date" => "2022-01-05 17:42:43", "epoch_number" => "623"},
-        %{"amount" => "67", "date" => "2022-01-06 17:42:43", "epoch_number" => "624"}
+        %{
+          "amount" => "80",
+          "block_hash" => "0x0100000000000000000000000000000000000000000000000000000000000001",
+          "block_number" => "10696320",
+          "date" => "2022-01-01T17:42:43.162804Z",
+          "epochNumber" => "619"
+        },
+        %{
+          "amount" => "20",
+          "block_hash" => "0x0100000000000000000000000000000000000000000000000000000000000002",
+          "block_number" => "10713600",
+          "date" => "2022-01-02T17:42:43.162804Z",
+          "epochNumber" => "620"
+        },
+        %{
+          "amount" => "75",
+          "block_hash" => "0x0100000000000000000000000000000000000000000000000000000000000003",
+          "block_number" => "10730880",
+          "date" => "2022-01-03T17:42:43.162804Z",
+          "epochNumber" => "621"
+        },
+        %{
+          "amount" => "31",
+          "block_hash" => "0x0100000000000000000000000000000000000000000000000000000000000004",
+          "block_number" => "10748160",
+          "date" => "2022-01-04T17:42:43.162804Z",
+          "epochNumber" => "622"
+        },
+        %{
+          "amount" => "77",
+          "block_hash" => "0x0100000000000000000000000000000000000000000000000000000000000005",
+          "block_number" => "10765440",
+          "date" => "2022-01-05T17:42:43.162804Z",
+          "epochNumber" => "623"
+        },
+        %{
+          "amount" => "67",
+          "block_hash" => "0x0100000000000000000000000000000000000000000000000000000000000006",
+          "block_number" => "10782720",
+          "date" => "2022-01-06T17:42:43.162804Z",
+          "epochNumber" => "624"
+        }
       ]
+    }
+  }
+
+  @reward_getvoterrewards_example_value %{
+    "status" => "1",
+    "message" => "OK",
+    "result" => %{
+      "rewards" => [
+        %{
+          "amount" => "75",
+          "date" => "2022-01-03T17:42:43.162804Z",
+          "blockNumber" => "10730880",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000003",
+          "epochNumber" => "621",
+          "group" => to_string(group_address_1_hash)
+        },
+        %{
+          "amount" => "31",
+          "date" => "2022-01-04T17:42:43.162804Z",
+          "blockNumber" => "10748160",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000004",
+          "epochNumber" => "622",
+          "group" => to_string(group_address_1_hash)
+        },
+        %{
+          "amount" => "77",
+          "date" => "2022-01-05T17:42:43.162804Z",
+          "blockNumber" => "10765440",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000005",
+          "epochNumber" => "623",
+          "group" => to_string(group_address_1_hash)
+        },
+        %{
+          "amount" => "39",
+          "date" => "2022-01-04T17:42:43.162804Z",
+          "blockNumber" => "10748160",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000004",
+          "epochNumber" => "622",
+          "group" => to_string(group_address_2_hash)
+        },
+        %{
+          "amount" => "78",
+          "date" => "2022-01-05T17:42:43.162804Z",
+          "blockNumber" => "10765440",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000005",
+          "epochNumber" => "623",
+          "group" => to_string(group_address_2_hash)
+        }
+      ],
+      "totalRewardCelo" => "300",
+      "from" => "2022-01-03 00:00:00.000000Z",
+      "to" => "2022-01-06 00:00:00.000000Z",
+      "voterAccount" => "0x0000000000000000000000000000000000000001"
     }
   }
 
   @reward_getvoterrewardsforgroup_example_value_error %{
     "status" => "0",
     "message" => "Voter or group address does not exist",
+    "result" => []
+  }
+
+  @reward_getvoterrewards_example_value_error %{
+    "status" => "0",
+    "message" => "Voter address does not exist",
     "result" => []
   }
 
@@ -711,6 +806,12 @@ defmodule BlockScoutWeb.Etherscan do
     definition:
       "Either a 20-byte address hash or, in the case of being a contract creation transaction, it is the RLP empty byte sequence. Used for identifying transactions.",
     example: ~s("0x9c81f44c29ff0226f835cd0a8a2f2a7eca6db52a711f8211b566fd15d3e0e8d4")
+  }
+
+  @block_hash_type %{
+    type: "block hash",
+    definition: "A 32-byte hash used for identifying blocks.",
+    example: ~s("0xd3cabad6adab0b52eb632c386ea194036805713682c62cb589b5abcd76de2159")
   }
 
   @block_number_type %{
@@ -838,11 +939,7 @@ defmodule BlockScoutWeb.Etherscan do
         definition: "A scalar value equal to the number of transactions sent by the sender prior to this transaction.",
         example: ~s("0")
       },
-      blockHash: %{
-        type: "block hash",
-        definition: "A 32-byte hash used for identifying blocks.",
-        example: ~s("0xd3cabad6adab0b52eb632c386ea194036805713682c62cb589b5abcd76de2159")
-      },
+      blockHash: @block_hash_type,
       transactionIndex: @transaction_index_type,
       from: @address_hash_type,
       to: @address_hash_type,
@@ -1321,21 +1418,49 @@ defmodule BlockScoutWeb.Etherscan do
   }
 
   @epoch_voter_rewards %{
-    name: "EpochVoterRewards",
-    fields: %{
-      amount: @wei_type,
-      date: "timestamp",
-      epoch: "integer"
-    }
+
   }
 
-  @voter_rewards %{
+  @voter_rewards_for_group %{
     name: "VoterRewards",
     fields: %{
       total: @wei_type,
       rewards: %{
         type: "array",
-        array_type: @epoch_voter_rewards
+        array_type: %{
+          name: "VoterReward",
+          fields: %{
+            amount: @wei_type,
+            blockHash: @block_hash_type,
+            blockNumber: @block_number_type,
+            date: "timestamp",
+            epochNumber: "integer"
+          }
+        }
+      }
+    }
+  }
+
+  @voter_rewards_for_all_groups %{
+    name: "VoterRewards",
+    fields: %{
+      totalRewardsCelo: @wei_type,
+      from: "timestamp",
+      to: "timestamp",
+      voterAccount: @address_hash_type,
+      rewards: %{
+        type: "array",
+        array_type: %{
+          name: "VoterReward",
+          fields: %{
+            amount: @wei_type,
+            blockHash: @block_hash_type,
+            blockNumber: @block_number_type,
+            date: "timestamp",
+            epochNumber: "integer",
+            group: @address_hash_type
+          }
+        }
       }
     }
   }
@@ -3091,7 +3216,7 @@ defmodule BlockScoutWeb.Etherscan do
             message: @message_type,
             result: %{
               type: "model",
-              model: @voter_rewards
+              model: @voter_rewards_for_group
             }
           }
         }
@@ -3100,6 +3225,56 @@ defmodule BlockScoutWeb.Etherscan do
         code: "200",
         description: "error",
         example_value: Jason.encode!(@reward_getvoterrewardsforgroup_example_value_error)
+      }
+    ]
+  }
+
+  @reward_getvoterrewards_action %{
+    name: "getvoterrewards",
+    description: "Get a voter's rewards for all groups the have voted for",
+    required_params: [
+      %{
+        key: "voterAddress",
+        placeholder: "voterAddress",
+        type: "string",
+        description: "Voter address hash for which you wish to get the rewards."
+      }
+    ],
+    optional_params: [
+      %{
+        key: "from",
+        placeholder: "startDate",
+        type: "string",
+        description: "Starting date of period you're interested in"
+      },
+      %{
+        key: "to",
+        placeholder: "endDate",
+        type: "string",
+        description: "End date of period you're interested in"
+      },
+    ],
+    responses: [
+      %{
+        code: "200",
+        description: "successful operation",
+        example_value: Jason.encode!(@reward_getvoterrewards_example_value),
+        model: %{
+          name: "Result",
+          fields: %{
+            status: @status_type,
+            message: @message_type,
+            result: %{
+              type: "model",
+              model: @voter_rewards_for_all_groups
+            }
+          }
+        }
+      },
+      %{
+        code: "200",
+        description: "error",
+        example_value: Jason.encode!(@reward_getvoterrewards_example_value_error)
       }
     ]
   }

@@ -205,7 +205,7 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
         })
         |> json_response(200)
 
-      assert response["message"] =~ "Voter or group address does not exist"
+      assert response["message"] =~ "Voter address does not exist"
       assert response["status"] == "0"
       assert Map.has_key?(response, "result")
       refute response["result"]
