@@ -6090,13 +6090,6 @@ defmodule Explorer.ChainTest do
     end
   end
 
-  describe "raw_abi_encode_integers/1" do
-    test "encodes 2 integers" do
-      assert Chain.raw_abi_encode_integers([100, 1000]) ==
-               "0x000000000000000000000000000000000000000000000000000000000000006400000000000000000000000000000000000000000000000000000000000003e8"
-    end
-  end
-
   describe "voter_rewards/1" do
     test "returns all rewards for a voter" do
       validator_group_vote_activated = ValidatorGroupVoteActivatedEvent.name()

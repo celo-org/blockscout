@@ -7986,20 +7986,6 @@ defmodule Explorer.Chain do
     Repo.all(query, timeout: :infinity)
   end
 
-  def raw_abi_encode_integers(integers) when length(integers) == 2 do
-    integers
-    |> TypeEncoder.encode_raw([{:uint, 256}, {:uint, 256}])
-    |> Base.encode16(case: :lower)
-    |> then(&("0x" <> &1))
-  end
-
-  def raw_abi_encode_integers(integers) when length(integers) == 1 do
-    integers
-    |> TypeEncoder.encode_raw([{:uint, 256}])
-    |> Base.encode16(case: :lower)
-    |> then(&("0x" <> &1))
-  end
-
   def voter_rewards(voter_address_hash, from_date \\ ~U[2020-04-22 16:00:00.000000Z], to_date \\ DateTime.utc_now()) do
     voter_rewards_for_group = Application.get_env(:explorer, :voter_rewards_for_group)
     validator_group_vote_activated = ValidatorGroupVoteActivatedEvent.name()
