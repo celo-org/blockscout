@@ -15,7 +15,7 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
                %{
                  group: group_address_hash,
                  total: 350,
-                 epochs: [
+                 rewards: [
                    %{
                      amount: 80,
                      block_hash: %Hash{

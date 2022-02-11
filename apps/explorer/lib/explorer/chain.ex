@@ -8017,8 +8017,8 @@ defmodule Explorer.Chain do
          end)
          |> Enum.map(fn {:ok, rewards} ->
              group = Map.fetch!(rewards, :group)
-             epochs = Map.fetch!(rewards, :epochs)
-             Enum.map(epochs, fn x -> Map.put(x, :group, group)
+             rewards = Map.fetch!(rewards, :rewards)
+             Enum.map(rewards, fn x -> Map.put(x, :group, group)
            end)
          end)
          |> List.flatten()

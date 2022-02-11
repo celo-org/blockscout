@@ -44,7 +44,7 @@ defmodule Explorer.Fakes.VoterRewardsForGroup do
      %{
        group: group_address_hash,
        total: 350,
-       epochs: [
+       rewards: [
          %{
            amount: 80,
            block_hash: @block_1_hash,
@@ -96,7 +96,7 @@ defmodule Explorer.Fakes.VoterRewardsForGroup do
      %{
        group: group_address_hash,
        total: 175,
-       epochs: [
+       rewards: [
          %{
            amount: 39,
            block_hash: @block_4_hash,

@@ -48,7 +48,6 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
     |> case do
       [] ->
         {:error, :not_found}
-        10_696_320
 
       voter_activated_or_revoked ->
         [voter_activated_earliest_block | _] = voter_activated_or_revoked
@@ -72,7 +71,7 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
                 event.name == ^epoch_rewards_distributed_to_voters
           )
 
-        {epochs, total} =
+        {rewards, total} =
           query
           |> CeloContractEvent.query_by_group_param(group_address_hash)
           |> Repo.all()
@@ -101,7 +100,7 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
             }
           end)
 
-        {:ok, %{epochs: epochs, total: total, group: group_address_hash}}
+        {:ok, %{rewards: rewards, total: total, group: group_address_hash}}
     end
   end
 

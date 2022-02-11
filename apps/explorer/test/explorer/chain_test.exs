@@ -38,7 +38,6 @@ defmodule Explorer.ChainTest do
     ValidatorGroupVoteActivatedEvent
   }
 
-  alias Explorer.Celo.Events
   alias Explorer.Chain.Supply.ProofOfAuthority
   alias Explorer.Counters.AddressesWithBalanceCounter
   alias Explorer.Counters.AddressesCounter
@@ -6019,7 +6018,6 @@ defmodule Explorer.ChainTest do
 
   describe "elected_groups_for_block/1" do
     test "fetches validator group hashes for a block hash" do
-      epoch_rewards_distributed_to_voters = EpochRewardsDistributedToVotersEvent.name()
       block_1 = insert(:block, number: 172_800)
       log_1_1 = insert(:log, block: block_1, index: 1)
       log_1_2 = insert(:log, block: block_1, index: 2)
@@ -6028,7 +6026,6 @@ defmodule Explorer.ChainTest do
       log_2 = insert(:log, block: block_2, index: 1)
       %Address{hash: group_address_1_hash} = insert(:address)
       %Address{hash: group_address_2_hash} = insert(:address)
-      election_contract_address = insert(:address)
 
       insert(:contract_event, %{
         event: %EpochRewardsDistributedToVotersEvent{
@@ -6092,13 +6089,10 @@ defmodule Explorer.ChainTest do
 
   describe "voter_rewards/1" do
     test "returns all rewards for a voter" do
-      validator_group_vote_activated = ValidatorGroupVoteActivatedEvent.name()
-      validator_group_active_vote_revoked = ValidatorGroupActiveVoteRevokedEvent.name()
-      %Address{hash: voter_address_1_hash} = voter_address_1 = insert(:address)
-      %Address{hash: voter_address_2_hash} = voter_address_2 = insert(:address)
+      %Address{hash: voter_address_1_hash} = insert(:address)
+      %Address{hash: voter_address_2_hash} = insert(:address)
 
       %Address{hash: group_address_1_hash} =
-        group_address_1 =
         insert(:address,
           hash: %Explorer.Chain.Hash{
             byte_count: 20,
@@ -6107,7 +6101,6 @@ defmodule Explorer.ChainTest do
         )
 
       %Address{hash: group_address_2_hash} =
-        group_address_2 =
         insert(:address,
           hash: %Explorer.Chain.Hash{
             byte_count: 20,

@@ -16,11 +16,17 @@ defmodule BlockScoutWeb.API.RPC.RewardView do
   defp prepare_rewards(rewards) do
     %{
       total: to_string(rewards.total),
-      epochs: Enum.map(rewards.epochs, &prepare_epoch(&1))
+      rewards: Enum.map(rewards.rewards, &prepare_reward(&1))
     }
   end
 
-  defp prepare_epoch(epoch) do
-    %{amount: to_string(epoch.amount), date: epoch.date, epochNumber: to_string(epoch.epoch_number)}
+  defp prepare_reward(reward) do
+    %{
+      amount: to_string(reward.amount),
+      block_hash: to_string(reward.block_hash),
+      block_number: to_string(reward.block_number),
+      date: reward.date,
+      epochNumber: to_string(reward.epoch_number)
+     }
   end
 end

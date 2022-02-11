@@ -97,7 +97,7 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
       {voter_address_1_hash, group_address_hash} = SetupVoterRewardsTest.setup()
 
       expected_result = %{
-        "epochs" => [
+        "rewards" => [
           %{"amount" => "80", "date" => "2022-01-01T17:42:43.162804Z", "epochNumber" => "619"},
           %{"amount" => "20", "date" => "2022-01-02T17:42:43.162804Z", "epochNumber" => "620"},
           %{"amount" => "75", "date" => "2022-01-03T17:42:43.162804Z", "epochNumber" => "621"},
@@ -131,7 +131,7 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
       "type" => ["object", "null"],
       "properties" => %{
         "total" => %{"type" => "string"},
-        "epochs" => %{
+        "rewards" => %{
           "type" => "array",
           "items" => %{
             "type" => "object",

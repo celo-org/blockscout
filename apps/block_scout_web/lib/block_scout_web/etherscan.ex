@@ -638,7 +638,7 @@ defmodule BlockScoutWeb.Etherscan do
     "message" => "OK",
     "result" => %{
       "total" => "350",
-      "epochs" => [
+      "rewards" => [
         %{"amount" => "80", "date" => "2022-01-01 17:42:43", "epoch_number" => "619"},
         %{"amount" => "20", "date" => "2022-01-02 17:42:43", "epoch_number" => "620"},
         %{"amount" => "75", "date" => "2022-01-03 17:42:43", "epoch_number" => "621"},
@@ -1333,7 +1333,7 @@ defmodule BlockScoutWeb.Etherscan do
     name: "VoterRewards",
     fields: %{
       total: @wei_type,
-      epochs: %{
+      rewards: %{
         type: "array",
         array_type: @epoch_voter_rewards
       }
