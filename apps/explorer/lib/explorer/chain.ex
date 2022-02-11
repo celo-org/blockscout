@@ -36,7 +36,7 @@ defmodule Explorer.Chain do
 
   alias Explorer.Chain
 
-  alias Explorer.Celo.{Events, Util}
+  alias Explorer.Celo.{ContractEvents, Events, Util}
 
   alias Explorer.Chain.{
     Address,
@@ -48,6 +48,7 @@ defmodule Explorer.Chain do
     BridgedToken,
     CeloAccount,
     CeloClaims,
+    CeloContractEvent,
     CeloParams,
     CeloPendingEpochOperation,
     CeloSigners,
@@ -92,6 +93,8 @@ defmodule Explorer.Chain do
     Uncles
   }
 
+  alias ContractEvents.Common
+  alias ContractEvents.Election.{EpochRewardsDistributedToVotersEvent, ValidatorGroupVoteActivatedEvent}
   alias Explorer.Chain.Import.Runner
   alias Explorer.Chain.InternalTransaction.{CallType, Type}
   alias Explorer.Chain.Transaction.History.TransactionStats
@@ -7957,15 +7960,17 @@ defmodule Explorer.Chain do
   end
 
   def elected_groups_for_block(block_hash) do
-    [epoch_rewards_distributed_to_voters] = Events.validator_group_voter_reward_events()
+    epoch_rewards_distributed_to_voters = EpochRewardsDistributedToVotersEvent.name()
 
     query =
-      from(l in Log,
-        select: l.second_topic,
-        where: l.first_topic == ^epoch_rewards_distributed_to_voters and l.block_hash == ^block_hash
+      from(event in CeloContractEvent,
+        select: json_extract_path(event.params, ["group"]),
+        where: event.name == ^epoch_rewards_distributed_to_voters and event.block_hash == ^block_hash
       )
 
-    Repo.all(query, timeout: :infinity)
+    query
+    |> Repo.all(timeout: :infinity)
+    |> Enum.map(&Common.ca/1)
   end
 
   def pending_withdrawals_for_account(account_address) do
@@ -7996,14 +8001,50 @@ defmodule Explorer.Chain do
   end
 
   def voter_rewards(voter_address_hash, from_date \\ ~U[2020-04-22 16:00:00.000000Z], to_date \\ DateTime.utc_now()) do
-    from(l in Log,
-    select: [l.third_topic],
-    distinct: [l.second_topic, l.third_topic],
-    order_by: [asc: l.block_number],
-    where: l.second_topic == ^voter_address_hash)
-    |> Repo.all()
-    |> IO.inspect()
-#    voter_rewards_for_group = Application.get_env(:explorer, :voter_rewards_for_group)
-#    voter_rewards_for_group.calculate()
+    voter_rewards_for_group = Application.get_env(:explorer, :voter_rewards_for_group)
+    validator_group_vote_activated = ValidatorGroupVoteActivatedEvent.name()
+
+    query =
+      from(event in CeloContractEvent,
+        inner_join: block in Block,
+        on: event.block_hash == block.hash,
+        select: json_extract_path(event.params, ["group"]),
+        distinct: [json_extract_path(event.params, ["voter"]), json_extract_path(event.params, ["group"])],
+        order_by: [asc: block.number],
+        where: event.name == ^validator_group_vote_activated
+      )
+
+    activated_votes_for_group =
+      query
+      |> CeloContractEvent.query_by_voter_param(voter_address_hash)
+      |> Repo.all()
+
+    case activated_votes_for_group do
+      [] ->
+        {:error, :not_found}
+
+      group ->
+        {:ok,
+         group
+         |> Enum.map(&Common.ca/1)
+         |> Enum.map(fn group_address_hash ->
+           voter_rewards_for_group.calculate(voter_address_hash, group_address_hash)
+         end)
+         |> Enum.map(fn {:ok, rewards} ->
+           group = Map.fetch!(rewards, :group)
+           Map.fetch!(rewards, :epochs) |> Enum.map(fn x -> Map.put(x, :group, group) end)
+         end)
+         |> List.flatten()
+         |> Enum.filter(fn x -> DateTime.compare(x.date, from_date) != :lt && DateTime.compare(x.date, to_date) == :lt end)
+         |> Enum.map_reduce(0, fn x, acc -> {x, acc + x.amount} end)
+         |> then(fn {rewards, total} -> %{
+           from: from_date,
+           rewards: rewards,
+           to: to_date,
+           total_reward_celo: total,
+           voter_account: voter_address_hash
+         } end)
+        }
+    end
   end
 end

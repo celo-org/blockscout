@@ -32,6 +32,12 @@ defmodule Explorer.ChainTest do
   alias Explorer.Chain
   alias Explorer.Chain.InternalTransaction.Type
 
+  alias Explorer.Celo.ContractEvents.Election.{
+    EpochRewardsDistributedToVotersEvent,
+    ValidatorGroupActiveVoteRevokedEvent,
+    ValidatorGroupVoteActivatedEvent
+  }
+
   alias Explorer.Celo.Events
   alias Explorer.Chain.Supply.ProofOfAuthority
   alias Explorer.Counters.AddressesWithBalanceCounter
@@ -6013,53 +6019,56 @@ defmodule Explorer.ChainTest do
 
   describe "elected_groups_for_block/1" do
     test "fetches validator group hashes for a block hash" do
-      [epoch_rewards_distributed_to_voters] = Events.validator_group_voter_reward_events()
+      epoch_rewards_distributed_to_voters = EpochRewardsDistributedToVotersEvent.name()
       block_1 = insert(:block, number: 172_800)
+      log_1_1 = insert(:log, block: block_1, index: 1)
+      log_1_2 = insert(:log, block: block_1, index: 2)
+      log_1_3 = insert(:log, block: block_1, index: 3)
       block_2 = insert(:block, number: 190_080)
+      log_2 = insert(:log, block: block_2, index: 1)
       %Address{hash: group_address_1_hash} = insert(:address)
       %Address{hash: group_address_2_hash} = insert(:address)
       election_contract_address = insert(:address)
 
-      insert(:log,
-        address: election_contract_address,
-        block: block_1,
-        data: Chain.raw_abi_encode_integers([650, 10000]),
-        first_topic: epoch_rewards_distributed_to_voters,
-        second_topic: to_string(group_address_1_hash),
-        index: 1
-      )
+      insert(:contract_event, %{
+        event: %EpochRewardsDistributedToVotersEvent{
+          block_hash: block_1.hash,
+          log_index: log_1_1.index,
+          group: group_address_1_hash,
+          value: 650
+        }
+      })
 
-      insert(:log,
-        address: election_contract_address,
-        block: block_1,
-        data: Chain.raw_abi_encode_integers([650, 10000]),
-        first_topic: "other topic",
-        second_topic: to_string(group_address_1_hash),
-        index: 2
-      )
+      insert(:contract_event, %{
+        event: %ValidatorGroupVoteActivatedEvent{
+          block_hash: block_1.hash,
+          log_index: log_1_2.index,
+          account: group_address_1_hash,
+          group: group_address_1_hash,
+          units: 10000,
+          value: 650
+        }
+      })
 
-      insert(:log,
-        address: election_contract_address,
-        block: block_1,
-        data: Chain.raw_abi_encode_integers([650, 10000]),
-        first_topic: epoch_rewards_distributed_to_voters,
-        second_topic: to_string(group_address_2_hash),
-        index: 3
-      )
+      insert(:contract_event, %{
+        event: %EpochRewardsDistributedToVotersEvent{
+          block_hash: block_1.hash,
+          log_index: log_1_3.index,
+          group: group_address_2_hash,
+          value: 650
+        }
+      })
 
-      insert(:log,
-        address: election_contract_address,
-        block: block_2,
-        data: Chain.raw_abi_encode_integers([650, 10000]),
-        first_topic: epoch_rewards_distributed_to_voters,
-        second_topic: to_string(group_address_2_hash),
-        index: 1
-      )
+      insert(:contract_event, %{
+        event: %EpochRewardsDistributedToVotersEvent{
+          block_hash: block_2.hash,
+          log_index: log_2.index,
+          group: group_address_2_hash,
+          value: 650
+        }
+      })
 
-      assert Chain.elected_groups_for_block(block_1.hash) == [
-               to_string(group_address_1_hash),
-               to_string(group_address_2_hash)
-             ]
+      assert Chain.elected_groups_for_block(block_1.hash) == [group_address_1_hash, group_address_2_hash]
     end
   end
 
@@ -6090,103 +6099,149 @@ defmodule Explorer.ChainTest do
 
   describe "voter_rewards/1" do
     test "returns all rewards for a voter" do
-      [validator_group_active_vote_revoked, _, validator_group_vote_activated, _] = Events.voter_events()
+      validator_group_vote_activated = ValidatorGroupVoteActivatedEvent.name()
+      validator_group_active_vote_revoked = ValidatorGroupActiveVoteRevokedEvent.name()
       %Address{hash: voter_address_1_hash} = voter_address_1 = insert(:address)
       %Address{hash: voter_address_2_hash} = voter_address_2 = insert(:address)
-      %Address{hash: group_address_1_hash} = group_address_1 = insert(:address)
-      %Address{hash: group_address_2_hash} = group_address_2 = insert(:address)
 
+      %Address{hash: group_address_1_hash} =
+        group_address_1 =
+        insert(:address,
+          hash: %Explorer.Chain.Hash{
+            byte_count: 20,
+            bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1>>
+          }
+        )
+
+      %Address{hash: group_address_2_hash} =
+        group_address_2 =
+        insert(:address,
+          hash: %Explorer.Chain.Hash{
+            byte_count: 20,
+            bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2>>
+          }
+        )
 
       block_1 = insert(:block, number: 10_692_863, timestamp: ~U[2022-01-01 13:08:43.162804Z])
+      log_1 = insert(:log, block: block_1)
 
-      transaction_1 =
-        :transaction
-        |> insert(from_address: voter_address_1)
-        |> with_block(block_1)
+      insert(:contract_event, %{
+        event: %ValidatorGroupVoteActivatedEvent{
+          block_hash: block_1.hash,
+          log_index: log_1.index,
+          account: voter_address_1_hash,
+          group: group_address_1_hash,
+          units: 1000,
+          value: 650
+        }
+      })
 
-      insert(:log,
-        address: voter_address_1,
-        block: transaction_1.block,
-        block_number: transaction_1.block_number,
-        data: Chain.raw_abi_encode_integers([650, 10000]),
-        first_topic: validator_group_vote_activated,
-        second_topic: to_string(voter_address_1_hash),
-        third_topic: to_string(group_address_1_hash),
-        index: 1,
-        transaction: transaction_1
-      )
+      block_2 = insert(:block, number: 10_744_703, timestamp: ~U[2022-01-04 13:08:43.162804Z])
+      log_2 = insert(:log, block: block_2)
 
-      block_2 = insert(:block, number: 10744703, timestamp: ~U[2022-01-04 13:08:43.162804Z])
+      insert(:contract_event, %{
+        event: %ValidatorGroupVoteActivatedEvent{
+          block_hash: block_2.hash,
+          log_index: log_2.index,
+          account: voter_address_1_hash,
+          group: group_address_2_hash,
+          units: 1000,
+          value: 250
+        }
+      })
 
-      transaction_2 =
-        :transaction
-        |> insert(from_address: voter_address_1)
-        |> with_block(block_2)
+      block_3 = insert(:block, number: 10_779_263, timestamp: ~U[2022-01-06 13:08:43.162804Z])
+      log_3 = insert(:log, block: block_3)
 
-      insert(:log,
-        address: voter_address_1,
-        block: transaction_2.block,
-        block_number: transaction_2.block_number,
-        data: Chain.raw_abi_encode_integers([650, 10000]),
-        first_topic: validator_group_vote_activated,
-        second_topic: to_string(voter_address_1_hash),
-        third_topic: to_string(group_address_2_hash),
-        index: 1,
-        transaction: transaction_2
-      )
-
-      block_3 = insert(:block, number: 10779263, timestamp: ~U[2022-01-06 13:08:43.162804Z])
-
-      transaction_3 =
-        :transaction
-        |> insert(from_address: voter_address_1)
-        |> with_block(block_3)
-
-      insert(:log,
-        address: voter_address_2,
-        block: transaction_3.block,
-        block_number: transaction_3.block_number,
-        data: Chain.raw_abi_encode_integers([650, 10000]),
-        first_topic: validator_group_vote_activated,
-        second_topic: to_string(voter_address_2_hash),
-        third_topic: to_string(group_address_2_hash),
-        index: 1,
-        transaction: transaction_3
-      )
+      insert(:contract_event, %{
+        event: %ValidatorGroupVoteActivatedEvent{
+          block_hash: block_3.hash,
+          log_index: log_3.index,
+          account: voter_address_2_hash,
+          group: group_address_1_hash,
+          units: 1000,
+          value: 650
+        }
+      })
 
       {:ok, rewards} =
-        Chain.voter_rewards(Hash.to_string(voter_address_1_hash))
+        Chain.voter_rewards(
+          voter_address_1_hash,
+          ~U[2022-01-03 00:00:00.000000Z],
+          ~U[2022-01-06 00:00:00.000000Z]
+        )
 
       assert rewards ==
                %{
-                 total_reward_celo: 350,
-                 voter_account: to_string(voter_address_1_hash),
+                 total_reward_celo: 300,
+                 voter_account: voter_address_1_hash,
                  from: ~U[2022-01-03 00:00:00.000000Z],
                  to: ~U[2022-01-06 00:00:00.000000Z],
                  rewards: [
                    %{
-                     amount: 80,
-                     date: ~U[2022-01-01 17:42:43.162804Z],
-                     block_number: 619,
-                     block_hash: 619,
-                     epoch_number: 619,
-                     group: to_string(group_address_1_hash)
-                   },
-                   %{
-                     amount: 20,
-                     date: ~U[2022-01-02 17:42:43.162804Z],
-                     block_number: 620,
-                     block_hash: 620,
-                     epoch_number: 620,
-                     group: to_string(group_address_2_hash)
-                   },
-                   %{
                      amount: 75,
                      date: ~U[2022-01-03 17:42:43.162804Z],
-                     block_number: 621,
-                     block_hash: 621,
+                     block_number: 10_730_880,
+                     block_hash: %Explorer.Chain.Hash{
+                       byte_count: 32,
+                       bytes:
+                         <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                           3>>
+                     },
                      epoch_number: 621,
-                     group: to_string(group_address_2_hash)
+                     group: group_address_1_hash
+                   },
+                   %{
+                     amount: 31,
+                     date: ~U[2022-01-04 17:42:43.162804Z],
+                     block_number: 10_748_160,
+                     block_hash: %Explorer.Chain.Hash{
+                       byte_count: 32,
+                       bytes:
+                         <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                           4>>
+                     },
+                     epoch_number: 622,
+                     group: group_address_1_hash
+                   },
+                   %{
+                     amount: 77,
+                     date: ~U[2022-01-05 17:42:43.162804Z],
+                     block_number: 10_765_440,
+                     block_hash: %Explorer.Chain.Hash{
+                       byte_count: 32,
+                       bytes:
+                         <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                         5>>
+                     },
+                     epoch_number: 623,
+                     group: group_address_1_hash
+                   },
+                   %{
+                     amount: 39,
+                     date: ~U[2022-01-04 17:42:43.162804Z],
+                     block_number: 10_748_160,
+                     block_hash: %Explorer.Chain.Hash{
+                       byte_count: 32,
+                       bytes:
+                         <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                           4>>
+                     },
+                     epoch_number: 622,
+                     group: group_address_2_hash
+                   },
+                   %{
+                     amount: 78,
+                     date: ~U[2022-01-05 17:42:43.162804Z],
+                     block_number: 10_765_440,
+                     block_hash: %Explorer.Chain.Hash{
+                       byte_count: 32,
+                       bytes:
+                         <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                           5>>
+                     },
+                     epoch_number: 623,
+                     group: group_address_2_hash
                    }
                  ]
                }

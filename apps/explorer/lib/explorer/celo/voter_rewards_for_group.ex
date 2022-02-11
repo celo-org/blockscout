@@ -4,98 +4,105 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
   """
 
   import Ecto.Query,
-         only: [
-           from: 2
-         ]
+    only: [
+      from: 2
+    ]
 
   alias ABI.TypeDecoder
-  alias Explorer.Celo.{Events, Util}
-  alias Explorer.Chain.{Block, CeloValidatorGroupVotes, Log, Wei}
+  alias Explorer.Celo.{ContractEvents, Events, Util}
+  alias Explorer.Chain.{Block, CeloContractEvent, CeloValidatorGroupVotes, Log, Wei}
   alias Explorer.Repo
 
+  alias ContractEvents.Election
+
+  alias Election.{
+    EpochRewardsDistributedToVotersEvent,
+    ValidatorGroupActiveVoteRevokedEvent,
+    ValidatorGroupVoteActivatedEvent
+  }
+
   def calculate(voter_address_hash, group_address_hash) do
-    [validator_group_active_vote_revoked, _, validator_group_vote_activated, _] = Events.voter_events()
-    [epoch_rewards_distributed_to_voters] = Events.distributed_events()
+    validator_group_vote_activated = ValidatorGroupVoteActivatedEvent.name()
+    validator_group_active_vote_revoked = ValidatorGroupActiveVoteRevokedEvent.name()
+    epoch_rewards_distributed_to_voters = EpochRewardsDistributedToVotersEvent.name()
 
     query =
-      from(log in Log,
+      from(event in CeloContractEvent,
+        inner_join: block in Block,
+        on: event.block_hash == block.hash,
         select: %{
-          block_hash: log.block_hash,
-          block_number: log.block_number,
-          amount_activated_or_revoked: log.data,
-          event: log.first_topic,
-          voter_hash: log.second_topic,
-          group_hash: log.third_topic
+          block_hash: event.block_hash,
+          block_number: block.number,
+          amount_activated_or_revoked: json_extract_path(event.params, ["value"]),
+          event: event.name
         },
-        order_by: [asc: log.block_number],
+        order_by: [asc: block.number],
         where:
-          log.first_topic == ^validator_group_active_vote_revoked or
-          log.first_topic == ^validator_group_vote_activated,
-        where: log.second_topic == ^voter_address_hash,
-        where: log.third_topic == ^group_address_hash
+          event.name == ^validator_group_active_vote_revoked or
+            event.name == ^validator_group_vote_activated
       )
 
     query
+    |> CeloContractEvent.query_by_voter_param(voter_address_hash)
+    |> CeloContractEvent.query_by_group_param(group_address_hash)
     |> Repo.all()
-    |> Enum.map(fn x ->
-      %Explorer.Chain.Data{bytes: amount_activated_or_revoked_bytes} = x.amount_activated_or_revoked
-
-      [amount_activated_or_revoked_int | _] =
-        TypeDecoder.decode_raw(amount_activated_or_revoked_bytes, [{:uint, 256}, {:uint, 256}])
-
-      Map.put(x, :amount_activated_or_revoked, amount_activated_or_revoked_int)
-    end)
     |> case do
-         [] ->
-           {:error, :not_found}
+      [] ->
+        {:error, :not_found}
+        10696320
+      voter_activated_or_revoked ->
+        [voter_activated_earliest_block | _] = voter_activated_or_revoked
 
-         voter_activated_or_revoked ->
-           [voter_activated_earliest_block | _] = voter_activated_or_revoked
+        query =
+          from(event in CeloContractEvent,
+            inner_join: votes in CeloValidatorGroupVotes,
+            on: event.block_hash == votes.block_hash,
+            inner_join: block in Block,
+            on: event.block_hash == block.hash,
+            select: %{
+              block_hash: event.block_hash,
+              block_number: block.number,
+              date: block.timestamp,
+              epoch_reward: json_extract_path(event.params, ["value"]),
+              event: event.name,
+              previous_block_group_votes: votes.previous_block_active_votes
+            },
+            where:
+              event.block_hash >= ^voter_activated_earliest_block.block_hash and
+                event.name == ^epoch_rewards_distributed_to_voters
+          )
 
-           query =
-             from(log in Log,
-               inner_join: votes in CeloValidatorGroupVotes,
-               on: log.block_hash == votes.block_hash,
-               inner_join: block in Block,
-               on: log.block_hash == block.hash,
-               select: %{
-                 block_hash: log.block_hash,
-                 block_number: log.block_number,
-                 date: block.timestamp,
-                 epoch_reward: log.data,
-                 event: log.first_topic,
-                 group_hash: log.second_topic,
-                 previous_block_group_votes: votes.previous_block_active_votes
-               },
-               where:
-                 log.block_number >= ^voter_activated_earliest_block.block_number and
-                 log.first_topic == ^epoch_rewards_distributed_to_voters and
-                 log.second_topic == ^group_address_hash
-             )
+        {epochs, total} =
+          query
+          |> CeloContractEvent.query_by_group_param(group_address_hash)
+          |> Repo.all()
+          |> Enum.map_reduce(voter_activated_earliest_block.amount_activated_or_revoked, fn curr, amount ->
+            amount_activated_or_revoked =
+              amount_activated_or_revoked_last_day(voter_activated_or_revoked, curr.block_number)
 
-           {epochs, total} =
-             query
-             |> Repo.all()
-             |> Enum.map_reduce(voter_activated_earliest_block.amount_activated_or_revoked, fn curr, amount ->
-               amount_activated_or_revoked =
-                 amount_activated_or_revoked_last_day(voter_activated_or_revoked, curr.block_number)
+            amount =
+              amount_after_activated_or_revoked(amount_activated_or_revoked, amount, voter_activated_earliest_block)
 
-               amount =
-                 amount_after_activated_or_revoked(amount_activated_or_revoked, amount, voter_activated_earliest_block)
+            epoch_reward = curr.epoch_reward
 
-               %Explorer.Chain.Data{bytes: epoch_reward_bytes} = curr.epoch_reward
-               [epoch_reward] = TypeDecoder.decode_raw(epoch_reward_bytes, [{:uint, 256}])
+            {:ok, previous_block_group_votes_decimal} = Wei.dump(curr.previous_block_group_votes)
 
-               {:ok, previous_block_group_votes_decimal} = Wei.dump(curr.previous_block_group_votes)
+            current_amount = div(epoch_reward * amount, Decimal.to_integer(previous_block_group_votes_decimal))
 
-               current_amount = div(epoch_reward * amount, Decimal.to_integer(previous_block_group_votes_decimal))
+            {
+              %{
+                amount: current_amount,
+                block_hash: curr.block_hash,
+                block_number: curr.block_number,
+                date: curr.date,
+                epoch_number: Util.epoch_by_block_number(curr.block_number)
+              },
+              amount + current_amount
+            }
+          end)
 
-               {%{amount: current_amount, date: curr.date, epoch_number: Util.epoch_by_block_number(curr.block_number)},
-                 amount + current_amount}
-             end)
-
-           {:ok, %{epochs: epochs, total: total}}
-       end
+        {:ok, %{epochs: epochs, total: total, group: group_address_hash}}
+    end
   end
 
   def amount_activated_or_revoked_last_day(voter_activated_or_revoked, block_number) do
