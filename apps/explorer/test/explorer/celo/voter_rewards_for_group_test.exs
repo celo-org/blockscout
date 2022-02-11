@@ -7,7 +7,7 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
 
   describe "calculate/2" do
     test "returns all rewards for a voter voting for a specific group" do
-      {voter_address_1_hash, group_address_hash} = SetupVoterRewardsTest.setup()
+      {voter_address_1_hash, group_address_hash} = SetupVoterRewardsTest.setup_for_group()
 
       {:ok, rewards} = VoterRewardsForGroup.calculate(voter_address_1_hash, group_address_hash)
 

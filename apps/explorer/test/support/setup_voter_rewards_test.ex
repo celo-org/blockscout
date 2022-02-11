@@ -11,7 +11,7 @@ alias Explorer.Chain.{Address, Hash}
 import Explorer.Factory
 
 defmodule Explorer.SetupVoterRewardsTest do
-  def setup do
+  def setup_for_group do
     validator_group_active_vote_revoked = ValidatorGroupActiveVoteRevokedEvent.name()
     %Address{hash: voter_address_1_hash} = insert(:address)
     %Address{hash: voter_address_2_hash} = insert(:address)
@@ -261,5 +261,70 @@ defmodule Explorer.SetupVoterRewardsTest do
     })
 
     {voter_address_1_hash, group_address_hash}
+  end
+
+  def setup_for_all_groups do
+    %Address{hash: voter_address_1_hash} = insert(:address)
+    %Address{hash: voter_address_2_hash} = insert(:address)
+
+    %Address{hash: group_address_1_hash} =
+      insert(:address,
+        hash: %Explorer.Chain.Hash{
+          byte_count: 20,
+          bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1>>
+        }
+      )
+
+    %Address{hash: group_address_2_hash} =
+      insert(:address,
+        hash: %Explorer.Chain.Hash{
+          byte_count: 20,
+          bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2>>
+        }
+      )
+
+    block_1 = insert(:block, number: 10_692_863, timestamp: ~U[2022-01-01 13:08:43.162804Z])
+    log_1 = insert(:log, block: block_1)
+
+    insert(:contract_event, %{
+      event: %ValidatorGroupVoteActivatedEvent{
+        block_hash: block_1.hash,
+        log_index: log_1.index,
+        account: voter_address_1_hash,
+        group: group_address_1_hash,
+        units: 1000,
+        value: 650
+      }
+    })
+
+    block_2 = insert(:block, number: 10_744_703, timestamp: ~U[2022-01-04 13:08:43.162804Z])
+    log_2 = insert(:log, block: block_2)
+
+    insert(:contract_event, %{
+      event: %ValidatorGroupVoteActivatedEvent{
+        block_hash: block_2.hash,
+        log_index: log_2.index,
+        account: voter_address_1_hash,
+        group: group_address_2_hash,
+        units: 1000,
+        value: 250
+      }
+    })
+
+    block_3 = insert(:block, number: 10_779_263, timestamp: ~U[2022-01-06 13:08:43.162804Z])
+    log_3 = insert(:log, block: block_3)
+
+    insert(:contract_event, %{
+      event: %ValidatorGroupVoteActivatedEvent{
+        block_hash: block_3.hash,
+        log_index: log_3.index,
+        account: voter_address_2_hash,
+        group: group_address_1_hash,
+        units: 1000,
+        value: 650
+      }
+    })
+
+    {voter_address_1_hash, group_address_1_hash, group_address_2_hash}
   end
 end
