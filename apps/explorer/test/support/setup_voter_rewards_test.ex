@@ -97,15 +97,17 @@ defmodule Explorer.SetupVoterRewardsTest do
       }
     })
 
-    block_6 = insert(
-      :block,
-      hash: %Hash{
-        byte_count: 32,
-        bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1>>
-      },
-      number: 10_696_320,
-      timestamp: ~U[2022-01-01 17:42:43.162804Z]
-    )
+    block_6 =
+      insert(
+        :block,
+        hash: %Hash{
+          byte_count: 32,
+          bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1>>
+        },
+        number: 10_696_320,
+        timestamp: ~U[2022-01-01 17:42:43.162804Z]
+      )
+
     log_6 = insert(:log, block: block_6)
 
     insert(:celo_validator_group_votes, %{
@@ -123,15 +125,17 @@ defmodule Explorer.SetupVoterRewardsTest do
       }
     })
 
-    block_7 = insert(
-      :block,
-      hash: %Hash{
-        byte_count: 32,
-        bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2>>
-      },
-      number: 10_713_600,
-      timestamp: ~U[2022-01-02 17:42:43.162804Z]
-    )
+    block_7 =
+      insert(
+        :block,
+        hash: %Hash{
+          byte_count: 32,
+          bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2>>
+        },
+        number: 10_713_600,
+        timestamp: ~U[2022-01-02 17:42:43.162804Z]
+      )
+
     log_7 = insert(:log, block: block_7)
 
     insert(:celo_validator_group_votes, %{
@@ -149,15 +153,17 @@ defmodule Explorer.SetupVoterRewardsTest do
       }
     })
 
-    block_8 = insert(
-      :block,
-      hash: %Hash{
-        byte_count: 32,
-        bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3>>
-      },
-      number: 10_730_880,
-      timestamp: ~U[2022-01-03 17:42:43.162804Z]
-    )
+    block_8 =
+      insert(
+        :block,
+        hash: %Hash{
+          byte_count: 32,
+          bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3>>
+        },
+        number: 10_730_880,
+        timestamp: ~U[2022-01-03 17:42:43.162804Z]
+      )
+
     log_8 = insert(:log, block: block_8)
 
     insert(:celo_validator_group_votes, %{
@@ -175,15 +181,17 @@ defmodule Explorer.SetupVoterRewardsTest do
       }
     })
 
-    block_9 = insert(
-      :block,
-      hash: %Hash{
-        byte_count: 32,
-        bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4>>
-      },
-      number: 10_748_160,
-      timestamp: ~U[2022-01-04 17:42:43.162804Z]
-    )
+    block_9 =
+      insert(
+        :block,
+        hash: %Hash{
+          byte_count: 32,
+          bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4>>
+        },
+        number: 10_748_160,
+        timestamp: ~U[2022-01-04 17:42:43.162804Z]
+      )
+
     log_9 = insert(:log, block: block_9)
 
     insert(:celo_validator_group_votes, %{
@@ -201,15 +209,17 @@ defmodule Explorer.SetupVoterRewardsTest do
       }
     })
 
-    block_10 = insert(
-      :block,
-      hash: %Hash{
-        byte_count: 32,
-        bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5>>
-      },
-      number: 10_765_440,
-      timestamp: ~U[2022-01-05 17:42:43.162804Z]
-    )
+    block_10 =
+      insert(
+        :block,
+        hash: %Hash{
+          byte_count: 32,
+          bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5>>
+        },
+        number: 10_765_440,
+        timestamp: ~U[2022-01-05 17:42:43.162804Z]
+      )
+
     log_10 = insert(:log, block: block_10)
 
     insert(:celo_validator_group_votes, %{
@@ -227,15 +237,17 @@ defmodule Explorer.SetupVoterRewardsTest do
       }
     })
 
-    block_11 = insert(
-      :block,
-      hash: %Hash{
-        byte_count: 32,
-        bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6>>
-      },
-      number: 10_782_720,
-      timestamp: ~U[2022-01-06 17:42:43.162804Z]
-    )
+    block_11 =
+      insert(
+        :block,
+        hash: %Hash{
+          byte_count: 32,
+          bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6>>
+        },
+        number: 10_782_720,
+        timestamp: ~U[2022-01-06 17:42:43.162804Z]
+      )
+
     log_11 = insert(:log, block: block_11)
 
     insert(:celo_validator_group_votes, %{

@@ -49,7 +49,8 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
     |> case do
       [] ->
         {:error, :not_found}
-        10696320
+        10_696_320
+
       voter_activated_or_revoked ->
         [voter_activated_earliest_block | _] = voter_activated_or_revoked
 

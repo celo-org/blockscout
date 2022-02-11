@@ -6205,7 +6205,7 @@ defmodule Explorer.ChainTest do
                        byte_count: 32,
                        bytes:
                          <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                         5>>
+                           5>>
                      },
                      epoch_number: 623,
                      group: group_address_1_hash

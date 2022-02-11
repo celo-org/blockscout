@@ -8021,16 +8021,19 @@ defmodule Explorer.Chain do
            Map.fetch!(rewards, :epochs) |> Enum.map(fn x -> Map.put(x, :group, group) end)
          end)
          |> List.flatten()
-         |> Enum.filter(fn x -> DateTime.compare(x.date, from_date) != :lt && DateTime.compare(x.date, to_date) == :lt end)
+         |> Enum.filter(fn x ->
+           DateTime.compare(x.date, from_date) != :lt && DateTime.compare(x.date, to_date) == :lt
+         end)
          |> Enum.map_reduce(0, fn x, acc -> {x, acc + x.amount} end)
-         |> then(fn {rewards, total} -> %{
-           from: from_date,
-           rewards: rewards,
-           to: to_date,
-           total_reward_celo: total,
-           voter_account: voter_address_hash
-         } end)
-        }
+         |> then(fn {rewards, total} ->
+           %{
+             from: from_date,
+             rewards: rewards,
+             to: to_date,
+             total_reward_celo: total,
+             voter_account: voter_address_hash
+           }
+         end)}
     end
   end
 end

@@ -20,7 +20,9 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
                      amount: 80,
                      block_hash: %Hash{
                        byte_count: 32,
-                       bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1>>
+                       bytes:
+                         <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                           1>>
                      },
                      block_number: 10_696_320,
                      date: ~U[2022-01-01 17:42:43.162804Z],
@@ -30,7 +32,9 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
                      amount: 20,
                      block_hash: %Hash{
                        byte_count: 32,
-                       bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2>>
+                       bytes:
+                         <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                           2>>
                      },
                      block_number: 10_713_600,
                      date: ~U[2022-01-02 17:42:43.162804Z],
@@ -40,7 +44,9 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
                      amount: 75,
                      block_hash: %Hash{
                        byte_count: 32,
-                       bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3>>
+                       bytes:
+                         <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                           3>>
                      },
                      block_number: 10_730_880,
                      date: ~U[2022-01-03 17:42:43.162804Z],
@@ -50,7 +56,9 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
                      amount: 31,
                      block_hash: %Hash{
                        byte_count: 32,
-                       bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4>>
+                       bytes:
+                         <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                           4>>
                      },
                      block_number: 10_748_160,
                      date: ~U[2022-01-04 17:42:43.162804Z],
@@ -60,7 +68,9 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
                      amount: 77,
                      block_hash: %Hash{
                        byte_count: 32,
-                       bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5>>
+                       bytes:
+                         <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                           5>>
                      },
                      block_number: 10_765_440,
                      date: ~U[2022-01-05 17:42:43.162804Z],
@@ -70,7 +80,9 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
                      amount: 67,
                      block_hash: %Hash{
                        byte_count: 32,
-                       bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6>>
+                       bytes:
+                         <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+                           6>>
                      },
                      block_number: 10_782_720,
                      date: ~U[2022-01-06 17:42:43.162804Z],

@@ -70,6 +70,7 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotesTest do
 
       block_1 = %Block{hash: block_1_hash, number: block_1_number} = insert(:block, number: 172_800)
       log_1 = insert(:log, block: block_1)
+
       insert(:contract_event, %{
         event: %EpochRewardsDistributedToVotersEvent{
           block_hash: block_1.hash,
@@ -81,6 +82,7 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotesTest do
 
       block_2 = %Block{hash: block_2_hash, number: block_2_number} = insert(:block, number: 190_080)
       log_2 = insert(:log, block: block_2)
+
       insert(:contract_event, %{
         event: %EpochRewardsDistributedToVotersEvent{
           block_hash: block_2.hash,
