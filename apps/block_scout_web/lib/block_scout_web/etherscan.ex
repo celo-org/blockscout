@@ -696,7 +696,7 @@ defmodule BlockScoutWeb.Etherscan do
           "blockNumber" => "10730880",
           "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000003",
           "epochNumber" => "621",
-          "group" => to_string(group_address_1_hash)
+          "group" => "0x3fb1cd2cd96c6d5c0b5eb3322d807b34482481d4"
         },
         %{
           "amount" => "31",
@@ -704,7 +704,7 @@ defmodule BlockScoutWeb.Etherscan do
           "blockNumber" => "10748160",
           "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000004",
           "epochNumber" => "622",
-          "group" => to_string(group_address_1_hash)
+          "group" => "0x3fb1cd2cd96c6d5c0b5eb3322d807b34482481d4"
         },
         %{
           "amount" => "77",
@@ -712,7 +712,7 @@ defmodule BlockScoutWeb.Etherscan do
           "blockNumber" => "10765440",
           "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000005",
           "epochNumber" => "623",
-          "group" => to_string(group_address_1_hash)
+          "group" => "0x3fb1cd2cd96c6d5c0b5eb3322d807b34482481d4"
         },
         %{
           "amount" => "39",
@@ -720,7 +720,7 @@ defmodule BlockScoutWeb.Etherscan do
           "blockNumber" => "10748160",
           "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000004",
           "epochNumber" => "622",
-          "group" => to_string(group_address_2_hash)
+          "group" => "0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae"
         },
         %{
           "amount" => "78",
@@ -728,7 +728,7 @@ defmodule BlockScoutWeb.Etherscan do
           "blockNumber" => "10765440",
           "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000005",
           "epochNumber" => "623",
-          "group" => to_string(group_address_2_hash)
+          "group" => "0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae"
         }
       ],
       "totalRewardCelo" => "300",
@@ -3350,7 +3350,8 @@ defmodule BlockScoutWeb.Etherscan do
   @reward_module %{
     name: "reward",
     actions: [
-      @reward_getvoterrewardsforgroup_action
+      @reward_getvoterrewardsforgroup_action,
+      @reward_getvoterrewards_action
     ]
   }
 

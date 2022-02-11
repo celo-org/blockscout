@@ -7,10 +7,7 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
   def getvoterrewardsforgroup(conn, params) do
     with {:voter_address_param, {:ok, voter_address_param}} <- fetch_address(params, "voterAddress"),
          {:group_address_param, {:ok, group_address_param}} <- fetch_address(params, "groupAddress"),
-         {:group_address_param, {:ok, group_address_param}} <- fetch_address(params, "groupAddress"),
          {:voter_format, {:ok, voter_address_hash}} <- to_address_hash(voter_address_param, "voterAddress"),
-         {:group_format, {:ok, group_address_hash}} <- to_address_hash(group_address_param, "groupAddress"),
-         {:group_format, {:ok, group_address_hash}} <- to_address_hash(group_address_param, "groupAddress"),
          {:group_format, {:ok, group_address_hash}} <- to_address_hash(group_address_param, "groupAddress"),
          {:ok, rewards} <- VoterRewardsForGroup.calculate(voter_address_hash, group_address_hash) do
       render(conn, :getvoterrewardsforgroup, rewards: rewards)
@@ -34,23 +31,20 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
 
   def getvoterrewards(conn, params) do
     with {:voter_address_param, {:ok, voter_address_param}} <- fetch_address(params, "voterAddress"),
-         {:ok, from, _} <- fetch_date(params["from"]),
-         {:ok, to, _} <- fetch_date(params["to"]),
          {:voter_format, {:ok, voter_address_hash}} <- to_address_hash(voter_address_param, "voterAddress"),
+         {:date_param, {:ok, from, _}} <- fetch_date(params["from"]),
+         {:date_param, {:ok, to, _}} <- fetch_date(params["to"]),
          {:ok, rewards} <- VoterRewards.calculate(voter_address_hash, from, to) do
       render(conn, :getvoterrewards, rewards: rewards)
     else
       {:voter_address_param, :error} ->
         render(conn, :error, error: "Query parameter 'voterAddress' is required")
 
-      {:group_address_param, :error} ->
-        render(conn, :error, error: "Query parameter 'groupAddress' is required")
-
       {:voter_format, :error} ->
         render(conn, :error, error: "Invalid voter address hash")
 
-      {:group_format, :error} ->
-        render(conn, :error, error: "Invalid group address hash")
+      {:date_param, {:error, _}} ->
+        render(conn, :error, error: "Please only ISO 8601 formatted dates")
 
       {:error, :not_found} ->
         render(conn, :error, error: "Voter address does not exist")
@@ -67,8 +61,8 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
 
   defp fetch_date(date) do
     case date do
-      nil -> {:ok, nil, nil}
-      date -> DateTime.from_iso8601(date)
+      nil -> {:date_param, {:ok, nil, nil}}
+      date -> {:date_param, DateTime.from_iso8601(date)}
     end
   end
 
