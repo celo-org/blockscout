@@ -183,7 +183,7 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
         |> get("/api", %{
           "module" => "reward",
           "action" => "getvoterrewards",
-          "voterAddress" => "bad_hash",
+          "voterAddress" => "bad_hash"
         })
         |> json_response(200)
 
@@ -201,7 +201,7 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
         |> get("/api", %{
           "module" => "reward",
           "action" => "getvoterrewards",
-          "voterAddress" => "0x8bf38d4764929064f2d4d3a56520a76ab3df415b",
+          "voterAddress" => "0x8bf38d4764929064f2d4d3a56520a76ab3df415b"
         })
         |> json_response(200)
 

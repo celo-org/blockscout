@@ -1417,10 +1417,6 @@ defmodule BlockScoutWeb.Etherscan do
     }
   }
 
-  @epoch_voter_rewards %{
-
-  }
-
   @voter_rewards_for_group %{
     name: "VoterRewards",
     fields: %{
@@ -3252,7 +3248,7 @@ defmodule BlockScoutWeb.Etherscan do
         placeholder: "endDate",
         type: "string",
         description: "End date of period you're interested in"
-      },
+      }
     ],
     responses: [
       %{

@@ -7,6 +7,7 @@ defmodule Explorer.Celo.VoterRewardsTest do
   describe "calculate/1" do
     test "returns all rewards for a voter" do
       {voter_address_1_hash, group_address_1_hash, group_address_2_hash} = SetupVoterRewardsTest.setup_for_all_groups()
+
       {:ok, rewards} =
         VoterRewards.calculate(
           voter_address_1_hash,
@@ -29,7 +30,7 @@ defmodule Explorer.Celo.VoterRewardsTest do
                        byte_count: 32,
                        bytes:
                          <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                         3>>
+                           3>>
                      },
                      epoch_number: 621,
                      group: group_address_1_hash
@@ -42,7 +43,7 @@ defmodule Explorer.Celo.VoterRewardsTest do
                        byte_count: 32,
                        bytes:
                          <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                         4>>
+                           4>>
                      },
                      epoch_number: 622,
                      group: group_address_1_hash
@@ -55,7 +56,7 @@ defmodule Explorer.Celo.VoterRewardsTest do
                        byte_count: 32,
                        bytes:
                          <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                         5>>
+                           5>>
                      },
                      epoch_number: 623,
                      group: group_address_1_hash
@@ -68,7 +69,7 @@ defmodule Explorer.Celo.VoterRewardsTest do
                        byte_count: 32,
                        bytes:
                          <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                         4>>
+                           4>>
                      },
                      epoch_number: 622,
                      group: group_address_2_hash
@@ -81,7 +82,7 @@ defmodule Explorer.Celo.VoterRewardsTest do
                        byte_count: 32,
                        bytes:
                          <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-                         5>>
+                           5>>
                      },
                      epoch_number: 623,
                      group: group_address_2_hash

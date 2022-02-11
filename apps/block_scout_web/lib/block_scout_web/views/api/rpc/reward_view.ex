@@ -33,7 +33,7 @@ defmodule BlockScoutWeb.API.RPC.RewardView do
       blockNumber: to_string(reward.block_number),
       date: reward.date,
       epochNumber: to_string(reward.epoch_number)
-     }
+    }
   end
 
   defp prepare_rewards_for_all_groups(rewards) do
@@ -54,6 +54,6 @@ defmodule BlockScoutWeb.API.RPC.RewardView do
       date: reward.date,
       epochNumber: to_string(reward.epoch_number),
       group: to_string(reward.group)
-     }
+    }
   end
 end
