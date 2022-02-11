@@ -20,7 +20,16 @@ defmodule Explorer.Celo.VoterRewards do
     ValidatorGroupVoteActivatedEvent
   }
 
-  def calculate(voter_address_hash, from_date \\ ~U[2020-04-22 16:00:00.000000Z], to_date \\ DateTime.utc_now()) do
+  def calculate(voter_address_hash, from_date, to_date) do
+    from_date = case from_date do
+      nil -> ~U[2020-04-22 16:00:00.000000Z]
+      from_date -> from_date
+    end
+    to_date = case to_date do
+      nil -> DateTime.utc_now()
+      to_date -> to_date
+    end
+
     voter_rewards_for_group = Application.get_env(:explorer, :voter_rewards_for_group)
     validator_group_vote_activated = ValidatorGroupVoteActivatedEvent.name()
 
