@@ -4,13 +4,11 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotesTest do
   use EthereumJSONRPC.Case, async: false
   use Explorer.DataCase
 
-  import EthereumJSONRPC, only: [integer_to_quantity: 1]
   import Explorer.Celo.CacheHelper
   import Mox
 
-  alias Explorer.Celo.Events
-  alias Explorer.Chain
-  alias Explorer.Chain.{Address, Block, CeloPendingEpochOperation, CeloValidatorGroupVotes, Hash}
+  alias Explorer.Celo.ContractEvents.Election.EpochRewardsDistributedToVotersEvent
+  alias Explorer.Chain.{Address, Block, CeloPendingEpochOperation, CeloValidatorGroupVotes}
   alias Indexer.Fetcher.CeloValidatorGroupVotes, as: CeloValidatorGroupVotesFetcher
 
   @moduletag :capture_log
@@ -66,33 +64,31 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotesTest do
   end
 
   describe "fetch_from_blockchain/1" do
-    test "fetches validator group votes from blockchain", %{
-      json_rpc_named_arguments: json_rpc_named_arguments
-    } do
-      [epoch_rewards_distributed_to_voters] = Events.validator_group_voter_reward_events()
-      block_1 = %Block{hash: block_1_hash, number: block_1_number} = insert(:block, number: 172_800)
-      block_2 = %Block{hash: block_2_hash, number: block_2_number} = insert(:block, number: 190_080)
+    test "fetches validator group votes from blockchain" do
       %Address{hash: group_1_hash} = insert(:address)
       %Address{hash: group_2_hash} = insert(:address)
-      election_contract_address = insert(:address)
 
-      insert(:log,
-        address: election_contract_address,
-        block: block_1,
-        data: Chain.raw_abi_encode_integers([650, 10000]),
-        first_topic: epoch_rewards_distributed_to_voters,
-        second_topic: to_string(group_1_hash),
-        index: 1
-      )
+      block_1 = %Block{hash: block_1_hash, number: block_1_number} = insert(:block, number: 172_800)
+      log_1 = insert(:log, block: block_1)
+      insert(:contract_event, %{
+        event: %EpochRewardsDistributedToVotersEvent{
+          block_hash: block_1.hash,
+          log_index: log_1.index,
+          group: group_1_hash,
+          value: 650
+        }
+      })
 
-      insert(:log,
-        address: election_contract_address,
-        block: block_2,
-        data: Chain.raw_abi_encode_integers([650, 10000]),
-        first_topic: epoch_rewards_distributed_to_voters,
-        second_topic: to_string(group_2_hash),
-        index: 1
-      )
+      block_2 = %Block{hash: block_2_hash, number: block_2_number} = insert(:block, number: 190_080)
+      log_2 = insert(:log, block: block_2)
+      insert(:contract_event, %{
+        event: %EpochRewardsDistributedToVotersEvent{
+          block_hash: block_2.hash,
+          log_index: log_2.index,
+          group: group_2_hash,
+          value: 650
+        }
+      })
 
       setup_mox()
 
@@ -118,8 +114,8 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotesTest do
 
   describe "import_items/1" do
     test "saves epoch rewards and deletes celo pending epoch operations" do
-      block_1 = %Block{hash: block_1_hash, number: block_1_number} = insert(:block, number: 172_800)
-      block_2 = %Block{hash: block_2_hash, number: block_2_number} = insert(:block, number: 190_080)
+      %Block{hash: block_1_hash, number: block_1_number} = insert(:block, number: 172_800)
+      %Block{hash: block_2_hash, number: block_2_number} = insert(:block, number: 190_080)
       %Address{hash: group_1_hash} = insert(:address)
       %Address{hash: group_2_hash} = insert(:address)
 
