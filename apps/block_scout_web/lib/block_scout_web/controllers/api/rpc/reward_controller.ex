@@ -51,13 +51,8 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
     end
   end
 
-  defp fetch_address(params, key) when key == "voterAddress" do
-    {:voter_address_param, Map.fetch(params, key)}
-  end
-
-  defp fetch_address(params, key) when key == "groupAddress" do
-    {:group_address_param, Map.fetch(params, key)}
-  end
+  defp fetch_address(%{"voterAddress" => address}, "voterAddress"), do: {:voter_address_param, address}
+  defp fetch_address(%{"groupAddress" => address}, "groupAddress"), do: {:group_address_param, address}
 
   defp fetch_date(date) do
     case date do
