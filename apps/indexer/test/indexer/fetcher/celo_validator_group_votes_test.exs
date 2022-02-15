@@ -1,6 +1,4 @@
 defmodule Indexer.Fetcher.CeloValidatorGroupVotesTest do
-  # MUST be `async: false` so that {:shared, pid} is set for connection to allow CoinBalanceFetcher's self-send to have
-  # connection allowed immediately.
   use EthereumJSONRPC.Case, async: false
   use Explorer.DataCase
 
