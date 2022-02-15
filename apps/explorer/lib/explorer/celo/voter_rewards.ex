@@ -62,9 +62,7 @@ defmodule Explorer.Celo.VoterRewards do
          |> Enum.map(fn group_address_hash ->
            voter_rewards_for_group.calculate(voter_address_hash, group_address_hash)
          end)
-         |> Enum.map(fn {:ok, rewards} ->
-           group = Map.fetch!(rewards, :group)
-           rewards = Map.fetch!(rewards, :rewards)
+         |> Enum.map(fn {:ok, %{group: group, rewards: rewards}} ->
            Enum.map(rewards, fn x -> Map.put(x, :group, group) end)
          end)
          |> List.flatten()

@@ -92,7 +92,6 @@ defmodule Explorer.Chain do
     Uncles
   }
 
-  alias ContractEvents.Common
   alias ContractEvents.Election.{EpochRewardsDistributedToVotersEvent, ValidatorGroupVoteActivatedEvent}
   alias Explorer.Chain.Import.Runner
   alias Explorer.Chain.InternalTransaction.{CallType, Type}
@@ -7906,7 +7905,7 @@ defmodule Explorer.Chain do
         ) :: CeloPendingEpochOperation.t()
   def falsify_or_delete_celo_pending_epoch_operation(block_hash, operation_type) do
     celo_pending_operation = Repo.get(CeloPendingEpochOperation, block_hash)
-    new_celo_pending_operation = Map.update!(celo_pending_operation, operation_type, fn _ -> false end)
+    new_celo_pending_operation = Map.put(celo_pending_operation, operation_type, fn _ -> false end)
 
     new_fetch_epoch_rewards = Map.fetch!(new_celo_pending_operation, :fetch_epoch_rewards)
     new_fetch_validator_group_data = Map.fetch!(new_celo_pending_operation, :fetch_validator_group_data)
@@ -7956,20 +7955,6 @@ defmodule Explorer.Chain do
       {:ok, success}
     end)
     |> Explorer.Repo.transaction()
-  end
-
-  def elected_groups_for_block(block_hash) do
-    epoch_rewards_distributed_to_voters = EpochRewardsDistributedToVotersEvent.name()
-
-    query =
-      from(event in CeloContractEvent,
-        select: json_extract_path(event.params, ["group"]),
-        where: event.name == ^epoch_rewards_distributed_to_voters and event.block_hash == ^block_hash
-      )
-
-    query
-    |> Repo.all(timeout: :infinity)
-    |> Enum.map(&Common.ca/1)
   end
 
   def pending_withdrawals_for_account(account_address) do

@@ -10,6 +10,7 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotes do
   alias Explorer.Celo.AccountReader
   alias Explorer.Chain
   alias Explorer.Chain.{CeloValidatorGroupVotes, Hash}
+  alias ContractEvents.Election.EpochRewardsDistributedToVotersEvent
 
   alias Indexer.BufferedTask
   alias Indexer.Fetcher.Util
@@ -54,7 +55,7 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotes do
   def fetch_from_blockchain(blocks) do
     blocks
     |> Enum.flat_map(fn block ->
-      elected_groups = Chain.elected_groups_for_block(block.block_hash)
+      elected_groups = EpochRewardsDistributedToVotersEvent.elected_groups_for_block(block.block_hash)
 
       Enum.map(elected_groups, fn group_hash_string ->
         do_fetch_from_blockchain(block, group_hash_string)

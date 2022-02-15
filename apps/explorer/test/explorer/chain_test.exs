@@ -6016,64 +6016,6 @@ defmodule Explorer.ChainTest do
     end
   end
 
-  describe "elected_groups_for_block/1" do
-    test "fetches validator group hashes for a block hash" do
-      block_1 = insert(:block, number: 172_800)
-      log_1_1 = insert(:log, block: block_1, index: 1)
-      log_1_2 = insert(:log, block: block_1, index: 2)
-      log_1_3 = insert(:log, block: block_1, index: 3)
-      block_2 = insert(:block, number: 190_080)
-      log_2 = insert(:log, block: block_2, index: 1)
-      %Address{hash: group_address_1_hash} = insert(:address)
-      %Address{hash: group_address_2_hash} = insert(:address)
-      %Address{hash: contract_address_hash} = insert(:address)
-
-      insert(:contract_event, %{
-        event: %EpochRewardsDistributedToVotersEvent{
-          block_hash: block_1.hash,
-          log_index: log_1_1.index,
-          contract_address_hash: contract_address_hash,
-          group: group_address_1_hash,
-          value: 650
-        }
-      })
-
-      insert(:contract_event, %{
-        event: %ValidatorGroupVoteActivatedEvent{
-          block_hash: block_1.hash,
-          log_index: log_1_2.index,
-          account: group_address_1_hash,
-          contract_address_hash: contract_address_hash,
-          group: group_address_1_hash,
-          units: 10000,
-          value: 650
-        }
-      })
-
-      insert(:contract_event, %{
-        event: %EpochRewardsDistributedToVotersEvent{
-          block_hash: block_1.hash,
-          log_index: log_1_3.index,
-          contract_address_hash: contract_address_hash,
-          group: group_address_2_hash,
-          value: 650
-        }
-      })
-
-      insert(:contract_event, %{
-        event: %EpochRewardsDistributedToVotersEvent{
-          block_hash: block_2.hash,
-          log_index: log_2.index,
-          contract_address_hash: contract_address_hash,
-          group: group_address_2_hash,
-          value: 650
-        }
-      })
-
-      assert Chain.elected_groups_for_block(block_1.hash) == [group_address_1_hash, group_address_2_hash]
-    end
-  end
-
   describe "get_last_fetched_counter/1" do
     test "it returns zero if doesn't exist in db" do
       value = Chain.get_last_fetched_counter("total_transaction_count")
