@@ -20,8 +20,9 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
     ValidatorGroupVoteActivatedEvent
   }
 
+  @validator_group_vote_activated ValidatorGroupVoteActivatedEvent.name()
+
   def calculate(voter_address_hash, group_address_hash) do
-    validator_group_vote_activated = ValidatorGroupVoteActivatedEvent.name()
     validator_group_active_vote_revoked = ValidatorGroupActiveVoteRevokedEvent.name()
     epoch_rewards_distributed_to_voters = EpochRewardsDistributedToVotersEvent.name()
 
@@ -38,7 +39,7 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
         order_by: [asc: block.number],
         where:
           event.name == ^validator_group_active_vote_revoked or
-            event.name == ^validator_group_vote_activated
+            event.name == ^@validator_group_vote_activated
       )
 
     query
@@ -75,12 +76,11 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
           query
           |> CeloContractEvent.query_by_group_param(group_address_hash)
           |> Repo.all()
-          |> Enum.map_reduce(voter_activated_earliest_block.amount_activated_or_revoked, fn curr, amount ->
+          |> Enum.map_reduce(0, fn curr, amount ->
             amount_activated_or_revoked =
               amount_activated_or_revoked_last_day(voter_activated_or_revoked, curr.block_number)
 
-            amount =
-              amount_after_activated_or_revoked(amount_activated_or_revoked, amount, voter_activated_earliest_block)
+            amount = amount + amount_activated_or_revoked
 
             epoch_reward = curr.epoch_reward
 
@@ -105,25 +105,15 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
   end
 
   def amount_activated_or_revoked_last_day(voter_activated_or_revoked, block_number) do
-    [_, _, validator_group_vote_activated, _] = Events.voter_events()
 
     voter_activated_or_revoked
     |> Enum.filter(&(&1.block_number < block_number && &1.block_number >= block_number - 17280))
     |> Enum.reduce(0, fn x, acc ->
-      if x.event == validator_group_vote_activated do
+      if x.event == @validator_group_vote_activated do
         acc + x.amount_activated_or_revoked
       else
         acc - x.amount_activated_or_revoked
       end
     end)
-  end
-
-  def amount_after_activated_or_revoked(amount_activated_or_revoked, amount, voter_activated_earliest_block) do
-    if voter_activated_earliest_block.amount_activated_or_revoked != amount &&
-         amount_activated_or_revoked != 0 do
-      amount + amount_activated_or_revoked
-    else
-      amount
-    end
   end
 end

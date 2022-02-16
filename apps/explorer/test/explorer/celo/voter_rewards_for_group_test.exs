@@ -2,6 +2,7 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
   use Explorer.DataCase
 
   alias Explorer.Celo.VoterRewardsForGroup
+  alias Explorer.Celo.ContractEvents.Election.{ValidatorGroupActiveVoteRevokedEvent, ValidatorGroupVoteActivatedEvent}
   alias Explorer.Chain.Hash
   alias Explorer.SetupVoterRewardsTest
 
@@ -95,6 +96,9 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
 
   describe "amount_activated_or_revoked_last_day/2" do
     test "sums a voter's activated and revoked CELO for the previous day of the block passed" do
+      validator_group_vote_activated = ValidatorGroupVoteActivatedEvent.name()
+      validator_group_active_vote_revoked = ValidatorGroupActiveVoteRevokedEvent.name()
+
       voter_activated_or_revoked = [
         %{
           block_hash: %Hash{
@@ -103,7 +107,7 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
           },
           block_number: 10_692_863,
           amount_activated_or_revoked: 650,
-          event: "0x45aac85f38083b18efe2d441a65b9c1ae177c78307cb5a5d4aec8f7dbcaeabfe",
+          event: validator_group_vote_activated,
           group_hash: "0x0000000000000000000000000000000000000003",
           voter_hash: "0x0000000000000000000000000000000000000001"
         },
@@ -114,7 +118,7 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
           },
           block_number: 10_695_496,
           amount_activated_or_revoked: 650,
-          event: "0x45aac85f38083b18efe2d441a65b9c1ae177c78307cb5a5d4aec8f7dbcaeabfe",
+          event: validator_group_vote_activated,
           group_hash: "0x0000000000000000000000000000000000000003",
           voter_hash: "0x0000000000000000000000000000000000000001"
         },
@@ -125,7 +129,7 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
           },
           block_number: 10_706_524,
           amount_activated_or_revoked: 350,
-          event: "0xae7458f8697a680da6be36406ea0b8f40164915ac9cc40c0dad05a2ff6e8c6a8",
+          event: validator_group_active_vote_revoked,
           group_hash: "0x0000000000000000000000000000000000000003",
           voter_hash: "0x0000000000000000000000000000000000000001"
         },
@@ -136,7 +140,7 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
           },
           block_number: 10_796_524,
           amount_activated_or_revoked: 350,
-          event: "0xae7458f8697a680da6be36406ea0b8f40164915ac9cc40c0dad05a2ff6e8c6a8",
+          event: validator_group_active_vote_revoked,
           group_hash: "0x0000000000000000000000000000000000000003",
           voter_hash: "0x0000000000000000000000000000000000000001"
         }
