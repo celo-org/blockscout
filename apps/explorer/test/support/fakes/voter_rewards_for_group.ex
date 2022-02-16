@@ -39,7 +39,8 @@ defmodule Explorer.Fakes.VoterRewardsForGroup do
     bytes: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6>>
   }
 
-  def calculate(voter_address_hash, group_address_hash) when group_address_hash == @group_address_1_hash do
+  def calculate(voter_address_hash, group_address_hash, to_date \\ DateTime.utc_now())
+  def calculate(voter_address_hash, group_address_hash, to_date) when group_address_hash == @group_address_1_hash do
     {:ok,
      %{
        group: group_address_hash,
@@ -79,19 +80,12 @@ defmodule Explorer.Fakes.VoterRewardsForGroup do
            block_number: @block_5_number,
            date: ~U[2022-01-05 17:42:43.162804Z],
            epoch_number: 623
-         },
-         %{
-           amount: 67,
-           block_hash: @block_6_hash,
-           block_number: @block_6_number,
-           date: ~U[2022-01-06 17:42:43.162804Z],
-           epoch_number: 624
          }
        ]
      }}
   end
 
-  def calculate(voter_address_hash, group_address_hash) when group_address_hash == @group_address_2_hash do
+  def calculate(voter_address_hash, group_address_hash, to_date) when group_address_hash == @group_address_2_hash do
     {:ok,
      %{
        group: group_address_hash,
@@ -110,13 +104,6 @@ defmodule Explorer.Fakes.VoterRewardsForGroup do
            block_number: @block_5_number,
            date: ~U[2022-01-05 17:42:43.162804Z],
            epoch_number: 623
-         },
-         %{
-           amount: 69,
-           block_hash: @block_6_hash,
-           block_number: @block_6_number,
-           date: ~U[2022-01-06 17:42:43.162804Z],
-           epoch_number: 624
          }
        ]
      }}

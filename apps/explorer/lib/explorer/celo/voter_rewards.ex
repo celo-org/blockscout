@@ -68,9 +68,7 @@ defmodule Explorer.Celo.VoterRewards do
            Enum.map(rewards, fn x -> Map.put(x, :group, group) end)
          end)
          |> List.flatten()
-         |> Enum.filter(fn x ->
-           DateTime.compare(x.date, from_date) != :lt && DateTime.compare(x.date, to_date) == :lt
-         end)
+         |> Enum.filter(fn x -> DateTime.compare(x.date, from_date) != :lt end)
          |> Enum.map_reduce(0, fn x, acc -> {x, acc + x.amount} end)
          |> then(fn {rewards, total} ->
            %{

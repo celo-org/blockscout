@@ -22,7 +22,7 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
 
   @validator_group_vote_activated ValidatorGroupVoteActivatedEvent.name()
 
-  def calculate(voter_address_hash, group_address_hash) do
+  def calculate(voter_address_hash, group_address_hash, to_date \\ DateTime.utc_now()) do
     validator_group_active_vote_revoked = ValidatorGroupActiveVoteRevokedEvent.name()
     epoch_rewards_distributed_to_voters = EpochRewardsDistributedToVotersEvent.name()
 
@@ -67,9 +67,9 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
               event: event.name,
               previous_block_group_votes: votes.previous_block_active_votes
             },
-            where:
-              event.block_hash >= ^voter_activated_earliest_block.block_hash and
-                event.name == ^epoch_rewards_distributed_to_voters
+            where: block.number >= ^voter_activated_earliest_block.block_number,
+            where: event.name == ^epoch_rewards_distributed_to_voters,
+            where: block.timestamp < ^to_date,
           )
 
         {rewards, total} =
