@@ -15,7 +15,6 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
 
       missing_events = MapSet.difference(exportisto_events, blockscout_events)
 
-
       assert MapSet.equal?(MapSet.new(), missing_events), "Blockscout events should be a superset of exsportisto events, found #{Enum.count(missing_events)} missing events: #{Enum.join(missing_events, ", ")}"
     end
   end

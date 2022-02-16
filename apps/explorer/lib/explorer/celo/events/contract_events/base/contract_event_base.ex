@@ -31,55 +31,90 @@ defmodule Explorer.Celo.ContractEvents.Base do
     end
   end
 
-  defmacro __before_compile__(_env) do
-    #query methods
+  defmacro __before_compile__(env) do
+    #referencing module within derived methods of protocol implementation
+    event_module = env.module
+
+    #retrieve event properties at compile time
+    events = Module.get_attribute(env.module, :params)
+
+    #finding all properties for the event struct
+    common_event_properties = [
+      :transaction_hash,
+      :block_hash,
+      :contract_address_hash,
+      :log_index,
+      name: Module.get_attribute(env.module, :name)
+    ]
+
+    struct_properties = events
+      |> Enum.map(&(&1.name))
+      |> Enum.concat(common_event_properties)
+
+
+    #sorting proprties into indexed and unindexed
+    unindexed_properties = events
+                      |> Enum.filter(&(&1.indexed == :unindexed))
+
+    unindexed_types = unindexed_properties
+      |> Enum.map(&(&1.type))
+
+    indexed_types_with_topics = events
+                      |> Enum.filter(&(&1.indexed == :indexed))
+                      |> Enum.zip([:second_topic, :third_topic, :fourth_topic])
 
     quote do
       alias Explorer.Celo.ContractEvents.EventTransformer
 
-      # define event struct based on event params
-      common_event_properties = [
-        :transaction_hash,
-        :block_hash,
-        :contract_address_hash,
-        :log_index,
-        name: @name
-      ]
-
-      specific_event_properties = @params |> Enum.map(&(&1.name))
-
-      defstruct common_event_properties ++ specific_event_properties
+      #define a struct based on declared event properties
+      defstruct unquote(struct_properties)
 
       # Implement EventTransformer protocol to convert between CeloContractEvent, Chain.Log, and this generated type
-      event_module = __MODULE__
       defimpl EventTransformer do
-        @event event_module
         import Explorer.Celo.ContractEvents.Common
         alias Explorer.Chain.{CeloContractEvent, Log}
 
+        # coerce an Explorer.Chain.Log instance into a Map and treat the same as EthereumJSONRPC log params
         def from_log(_, %Log{} = log) do
           params = log |> Map.from_struct()
           from_params(nil, params)
         end
 
+        # decode blockchain log data into event relevant properties
         def from_params(_, params) do
-          [value] = decode_data(params.data, [{:uint, 256}])
-          group = decode_event(params.second_topic, :address)
+          #creating a map of unindexed (appear in event data) event properties %{name => value}
+          unindexed_event_properties =
+            decode_data(params.data, unquote(Macro.escape(unindexed_types)))
+            |> Enum.zip(unquote(Macro.escape(unindexed_properties)))
+            |> Enum.map(fn {data, %{name: name}} -> {name, data} end)
+            |> Enum.into(%{})
 
-          %@event{
+          #creating a map of indexed (appear in event topics) event properties %{name => value}
+          indexed_event_properties = unquote(Macro.escape(indexed_types_with_topics))
+            |> Enum.map( fn  {%{name: name, type: type}, topic} ->
+              {name, decode_event(params[topic], type)}
+            end)
+            |> Enum.into(%{})
+
+          #mapping common event properties
+          common_event_properties = %{
             transaction_hash: params.transaction_hash,
             block_hash: params.block_hash,
             contract_address_hash: params.address_hash,
-            log_index: params.index,
-            group: group,
-            value: value
+            log_index: params.index
           }
+
+          #instantiate a struct from properties
+          common_event_properties
+          |> Map.merge(indexed_event_properties)
+          |> Map.merge(unindexed_event_properties)
+          |> then(&(struct(unquote(event_module), &1)))
         end
 
         def from_celo_contract_event(_, %CeloContractEvent{params: params} = contract) do
           %{group: group, value: value} = params |> normalise_map()
 
-          %@event{
+          %unquote(event_module){
             transaction_hash: contract.transaction_hash,
             block_hash: contract.block_hash,
             contract_address_hash: contract.contract_address_hash,
