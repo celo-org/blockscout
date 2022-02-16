@@ -7905,14 +7905,14 @@ defmodule Explorer.Chain do
         ) :: CeloPendingEpochOperation.t()
   def falsify_or_delete_celo_pending_epoch_operation(block_hash, operation_type) do
     celo_pending_operation = Repo.get(CeloPendingEpochOperation, block_hash)
-    new_celo_pending_operation = Map.put(celo_pending_operation, operation_type, fn _ -> false end)
+    new_celo_pending_operation = Map.put(celo_pending_operation, operation_type, false)
 
-    new_fetch_epoch_rewards = Map.fetch!(new_celo_pending_operation, :fetch_epoch_rewards)
-    new_fetch_validator_group_data = Map.fetch!(new_celo_pending_operation, :fetch_validator_group_data)
+    %{fetch_epoch_rewards: new_fetch_epoch_rewards, fetch_validator_group_data: new_fetch_validator_group_data} =
+      new_celo_pending_operation
 
     if new_fetch_epoch_rewards || new_fetch_validator_group_data == true do
       celo_pending_operation
-      |> Changeset.change(%{
+      |> CeloPendingEpochOperation.changeset(%{
         block_hash: block_hash,
         fetch_epoch_rewards: new_fetch_epoch_rewards,
         fetch_validator_group_data: new_fetch_validator_group_data
