@@ -5,14 +5,19 @@ defmodule Explorer.Celo.VoterRewards do
 
   import Ecto.Query,
     only: [
-      from: 2
+      distinct: 3,
+      from: 2,
+      join: 5,
+      order_by: 3,
+      select: 3,
+      where: 3
     ]
 
   alias Explorer.Celo.{ContractEvents, Events, Util}
   alias Explorer.Chain.{Block, CeloContractEvent, CeloValidatorGroupVotes, Wei}
   alias Explorer.Repo
 
-  alias ContractEvents.{Common, Election}
+  alias ContractEvents.{Election, EventMap}
 
   alias Election.{
     EpochRewardsDistributedToVotersEvent,
@@ -37,30 +42,27 @@ defmodule Explorer.Celo.VoterRewards do
     validator_group_vote_activated = ValidatorGroupVoteActivatedEvent.name()
 
     query =
-      from(event in CeloContractEvent,
-        inner_join: block in Block,
-        on: event.block_hash == block.hash,
-        select: json_extract_path(event.params, ["group"]),
-        distinct: [json_extract_path(event.params, ["voter"]), json_extract_path(event.params, ["group"])],
-        order_by: [asc: block.number],
-        where: event.name == ^validator_group_vote_activated
-      )
+      ValidatorGroupVoteActivatedEvent.query()
+      |> join(:inner, [event], block in Block, on: event.block_hash == block.hash)
+      |> distinct([event], [json_extract_path(event.params, ["voter"]), json_extract_path(event.params, ["group"])])
+      |> order_by([_, block], block.number)
+      |> where([event], event.name == ^validator_group_vote_activated)
 
-    activated_votes_for_group =
+    validator_group_vote_activated_events =
       query
       |> CeloContractEvent.query_by_voter_param(voter_address_hash)
       |> Repo.all()
+      |> EventMap.celo_contract_event_to_concrete_event()
 
-    case activated_votes_for_group do
+    case validator_group_vote_activated_events do
       [] ->
         {:error, :not_found}
 
       group ->
         {:ok,
          group
-         |> Enum.map(&Common.ca/1)
-         |> Enum.map(fn group_address_hash ->
-           voter_rewards_for_group.calculate(voter_address_hash, group_address_hash)
+         |> Enum.map(fn %ValidatorGroupVoteActivatedEvent{group: group} ->
+           voter_rewards_for_group.calculate(voter_address_hash, group, to_date)
          end)
          |> Enum.map(fn {:ok, %{group: group, rewards: rewards}} ->
            Enum.map(rewards, fn x -> Map.put(x, :group, group) end)
