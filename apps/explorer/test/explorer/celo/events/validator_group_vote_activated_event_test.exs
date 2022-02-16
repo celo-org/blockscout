@@ -7,6 +7,7 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
   alias Explorer.Celo.ContractEvents.EventMap
   alias Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
 
+
   describe "Test conversion" do
     test "converts from db log to concrete event type" do
       test_log = %Log{

@@ -36,7 +36,8 @@ defmodule Explorer.Celo.ContractEvents.Base do
     event_module = env.module
 
     #retrieve event properties at compile time
-    events = Module.get_attribute(env.module, :params)
+    #reverse as elixir module attributes are pushed to top of list and we rely on defined event property order
+    properties = Module.get_attribute(env.module, :params) |> Enum.reverse()
 
     #finding all properties for the event struct
     common_event_properties = [
@@ -47,19 +48,18 @@ defmodule Explorer.Celo.ContractEvents.Base do
       name: Module.get_attribute(env.module, :name)
     ]
 
-    struct_properties = events
+    struct_properties = properties
       |> Enum.map(&(&1.name))
       |> Enum.concat(common_event_properties)
 
-
     #sorting proprties into indexed and unindexed
-    unindexed_properties = events
+    unindexed_properties = properties
                       |> Enum.filter(&(&1.indexed == :unindexed))
 
     unindexed_types = unindexed_properties
       |> Enum.map(&(&1.type))
 
-    indexed_types_with_topics = events
+    indexed_types_with_topics = properties
                       |> Enum.filter(&(&1.indexed == :indexed))
                       |> Enum.zip([:second_topic, :third_topic, :fourth_topic])
 
@@ -112,24 +112,37 @@ defmodule Explorer.Celo.ContractEvents.Base do
         end
 
         def from_celo_contract_event(_, %CeloContractEvent{params: params} = contract) do
-          %{group: group, value: value} = params |> normalise_map()
+          event_params = params
+             |> normalise_map()
+             |> Map.take(unquote(Macro.escape(struct_properties)))
+             |> Enum.map( fn
+                {k, v = "\\x" <> _rest} ->
+                  {k, cast_address(v)}
+                {k, v} -> {k, v}
+             end)
+            |> Enum.into(%{})
 
-          %unquote(event_module){
+          %{
             transaction_hash: contract.transaction_hash,
             block_hash: contract.block_hash,
             contract_address_hash: contract.contract_address_hash,
-            log_index: contract.log_index,
-            group: group |> ca(),
-            value: value
+            log_index: contract.log_index
           }
+          |> Map.merge(event_params)
+          |> then(&(struct(unquote(event_module), &1)))
         end
 
         def to_celo_contract_event_params(event) do
-          event_params = %{params: %{group: event.group |> fa(), value: event.value}}
+          event_params = unquote(Macro.escape(properties))
+          |> Enum.map(fn
+            %{name: name, type: :address} -> {name, Map.get(event,name) |> format_address_for_postgres_json()}
+            %{name: name} -> {name, Map.get(event, name)}
+          end)
+          |> Enum.into(%{})
 
           event
           |> extract_common_event_params()
-          |> Map.merge(event_params)
+          |> Map.merge(%{params: event_params})
         end
       end
     end
