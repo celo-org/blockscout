@@ -37,9 +37,12 @@ defmodule Explorer.Chain.Import.Runner.CeloEpochRewards do
     insert_options = Util.make_insert_options(option_key(), @timeout, options)
 
     # Enforce ShareLocks tables order (see docs: sharelocks.md)
-    Multi.run(multi, :insert_voter_reward_items, fn repo, _ ->
-      insert(repo, changes_list, insert_options)
-    end)
+    multi_chain =
+      Multi.run(multi, :insert_voter_reward_items, fn repo, _ ->
+        insert(repo, changes_list, insert_options)
+      end)
+
+    multi_chain
     |> Multi.run(:delete_celo_pending, fn _, _ ->
       changes_list
       |> Enum.each(fn reward ->
