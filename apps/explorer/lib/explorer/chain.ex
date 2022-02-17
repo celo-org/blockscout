@@ -50,7 +50,6 @@ defmodule Explorer.Chain do
     CeloClaims,
     CeloContractEvent,
     CeloParams,
-    CeloPendingEpochOperation,
     CeloSigners,
     CeloUnlocked,
     CeloValidator,
@@ -7897,30 +7896,6 @@ defmodule Explorer.Chain do
 
     query
     |> Repo.one()
-  end
-
-  @spec falsify_or_delete_celo_pending_epoch_operation(
-          Hash.Full.t(),
-          :fetch_epoch_rewards | :fetch_validator_group_data
-        ) :: CeloPendingEpochOperation.t()
-  def falsify_or_delete_celo_pending_epoch_operation(block_hash, operation_type) do
-    celo_pending_operation = Repo.get(CeloPendingEpochOperation, block_hash)
-    new_celo_pending_operation = Map.put(celo_pending_operation, operation_type, false)
-
-    %{fetch_epoch_rewards: new_fetch_epoch_rewards, fetch_validator_group_data: new_fetch_validator_group_data} =
-      new_celo_pending_operation
-
-    if new_fetch_epoch_rewards || new_fetch_validator_group_data == true do
-      celo_pending_operation
-      |> CeloPendingEpochOperation.changeset(%{
-        block_hash: block_hash,
-        fetch_epoch_rewards: new_fetch_epoch_rewards,
-        fetch_validator_group_data: new_fetch_validator_group_data
-      })
-      |> Repo.update()
-    else
-      Repo.delete(celo_pending_operation)
-    end
   end
 
   def import_epoch_rewards_and_delete_pending_celo_epoch_operations(import_params, success) do

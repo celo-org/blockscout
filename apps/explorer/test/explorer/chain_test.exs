@@ -14,7 +14,6 @@ defmodule Explorer.ChainTest do
   alias Explorer.Chain.{
     Address,
     Block,
-    CeloPendingEpochOperation,
     CeloUnlocked,
     Data,
     DecompiledSmartContract,
@@ -5969,27 +5968,6 @@ defmodule Explorer.ChainTest do
       Chain.insert_celo_unlocked(account_address.hash, 2, 1_639_103_736)
 
       assert Repo.aggregate(CeloUnlocked, :count) == 1
-    end
-  end
-
-  describe "falsify_or_delete_celo_pending_epoch_operation/2" do
-    test "sets fetch_epoch_rewards to false if validator group data is not yet indexed" do
-      block = insert(:block)
-      insert(:celo_pending_epoch_operations, block_hash: block.hash)
-
-      Chain.falsify_or_delete_celo_pending_epoch_operation(block.hash, :fetch_epoch_rewards)
-
-      celo_pending_operation = Repo.get(CeloPendingEpochOperation, block.hash)
-      assert Map.fetch!(celo_pending_operation, :fetch_epoch_rewards) == false
-    end
-
-    test "deletes an epoch block hash for which both epoch and validator group data have been indexed" do
-      block = insert(:block)
-      insert(:celo_pending_epoch_operations, block_hash: block.hash, fetch_epoch_rewards: false)
-
-      Chain.falsify_or_delete_celo_pending_epoch_operation(block.hash, :fetch_validator_group_data)
-
-      assert Repo.one!(select(CeloPendingEpochOperation, fragment("COUNT(*)"))) == 0
     end
   end
 
