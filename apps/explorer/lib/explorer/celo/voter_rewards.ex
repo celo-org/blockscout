@@ -59,26 +59,31 @@ defmodule Explorer.Celo.VoterRewards do
         {:error, :not_found}
 
       group ->
-        {:ok,
-         group
-         |> Enum.map(fn %ValidatorGroupVoteActivatedEvent{group: group} ->
-           voter_rewards_for_group.calculate(voter_address_hash, group, to_date)
-         end)
-         |> Enum.map(fn {:ok, %{group: group, rewards: rewards}} ->
-           Enum.map(rewards, fn x -> Map.put(x, :group, group) end)
-         end)
-         |> List.flatten()
-         |> Enum.filter(fn x -> DateTime.compare(x.date, from_date) != :lt end)
-         |> Enum.map_reduce(0, fn x, acc -> {x, acc + x.amount} end)
-         |> then(fn {rewards, total} ->
-           %{
-             from: from_date,
-             rewards: rewards,
-             to: to_date,
-             total_reward_celo: total,
-             voter_account: voter_address_hash
-           }
-         end)}
+        rewards_for_each_group =
+          group
+          |> Enum.map(fn %ValidatorGroupVoteActivatedEvent{group: group} ->
+            voter_rewards_for_group.calculate(voter_address_hash, group, to_date)
+          end)
+
+        structured_rewards_for_given_period =
+          rewards_for_each_group
+          |> Enum.map(fn {:ok, %{group: group, rewards: rewards}} ->
+            Enum.map(rewards, fn x -> Map.put(x, :group, group) end)
+          end)
+          |> List.flatten()
+          |> Enum.filter(fn x -> DateTime.compare(x.date, from_date) != :lt end)
+          |> Enum.map_reduce(0, fn x, acc -> {x, acc + x.amount} end)
+          |> then(fn {rewards, total} ->
+            %{
+              from: from_date,
+              rewards: rewards,
+              to: to_date,
+              total_reward_celo: total,
+              voter_account: voter_address_hash
+            }
+          end)
+
+        {:ok, structured_rewards_for_given_period}
     end
   end
 end

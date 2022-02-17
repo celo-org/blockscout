@@ -42,11 +42,13 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
             event.name == ^@validator_group_vote_activated
       )
 
-    query
-    |> CeloContractEvent.query_by_voter_param(voter_address_hash)
-    |> CeloContractEvent.query_by_group_param(group_address_hash)
-    |> Repo.all()
-    |> case do
+    ordered_activated_or_revoked_events_for_voter_for_group =
+      query
+      |> CeloContractEvent.query_by_voter_param(voter_address_hash)
+      |> CeloContractEvent.query_by_group_param(group_address_hash)
+      |> Repo.all()
+
+    case ordered_activated_or_revoked_events_for_voter_for_group do
       [] ->
         {:error, :not_found}
 
@@ -69,43 +71,46 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
             },
             where: block.number >= ^voter_activated_earliest_block.block_number,
             where: event.name == ^epoch_rewards_distributed_to_voters,
-            where: block.timestamp < ^to_date,
+            where: block.timestamp < ^to_date
           )
 
-        {rewards, total} =
+        epoch_rewards_distributed_events_after_voter_first_activated_votes =
           query
           |> CeloContractEvent.query_by_group_param(group_address_hash)
           |> Repo.all()
-          |> Enum.map_reduce(0, fn curr, amount ->
-            amount_activated_or_revoked =
-              amount_activated_or_revoked_last_day(voter_activated_or_revoked, curr.block_number)
 
-            amount = amount + amount_activated_or_revoked
+        {rewards, total} =
+          Enum.map_reduce(
+            epoch_rewards_distributed_events_after_voter_first_activated_votes,
+            0,
+            fn curr, amount ->
+              amount_activated_or_revoked =
+                amount_activated_or_revoked_last_day(voter_activated_or_revoked, curr.block_number)
 
-            epoch_reward = curr.epoch_reward
+              amount = amount + amount_activated_or_revoked
 
-            {:ok, previous_block_group_votes_decimal} = Wei.dump(curr.previous_block_group_votes)
+              {:ok, previous_block_group_votes_decimal} = Wei.dump(curr.previous_block_group_votes)
 
-            current_amount = div(epoch_reward * amount, Decimal.to_integer(previous_block_group_votes_decimal))
+              current_amount = div(curr.epoch_reward * amount, Decimal.to_integer(previous_block_group_votes_decimal))
 
-            {
-              %{
-                amount: current_amount,
-                block_hash: curr.block_hash,
-                block_number: curr.block_number,
-                date: curr.date,
-                epoch_number: Util.epoch_by_block_number(curr.block_number)
-              },
-              amount + current_amount
-            }
-          end)
+              {
+                %{
+                  amount: current_amount,
+                  block_hash: curr.block_hash,
+                  block_number: curr.block_number,
+                  date: curr.date,
+                  epoch_number: Util.epoch_by_block_number(curr.block_number)
+                },
+                amount + current_amount
+              }
+            end
+          )
 
         {:ok, %{rewards: rewards, total: total, group: group_address_hash}}
     end
   end
 
   def amount_activated_or_revoked_last_day(voter_activated_or_revoked, block_number) do
-
     voter_activated_or_revoked
     |> Enum.filter(&(&1.block_number < block_number && &1.block_number >= block_number - 17280))
     |> Enum.reduce(0, fn x, acc ->

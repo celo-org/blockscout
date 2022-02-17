@@ -16,10 +16,11 @@ defmodule Explorer.Celo.ContractEvents.Election.EpochRewardsDistributedToVotersE
   event_param(:value, {:uint, 256}, :unindexed)
 
   def elected_groups_for_block(block_hash) do
-    events = query()
-             |> where([e], e.block_hash == ^block_hash)
-             |> Repo.all()
-             |> EventMap.celo_contract_event_to_concrete_event()
+    events =
+      query()
+      |> where([e], e.block_hash == ^block_hash)
+      |> Repo.all()
+      |> EventMap.celo_contract_event_to_concrete_event()
 
     events |> Enum.map(& &1.group)
   end

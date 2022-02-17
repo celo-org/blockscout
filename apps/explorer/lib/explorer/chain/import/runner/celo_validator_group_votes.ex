@@ -41,12 +41,14 @@ defmodule Explorer.Chain.Import.Runner.CeloValidatorGroupVotes do
       insert(repo, changes_list, insert_options)
     end)
     |> Multi.run(:delete_celo_pending, fn _, _ ->
-      changes = changes_list
-      |> Enum.each(fn reward ->
-        CeloPendingEpochOperation.falsify_or_delete_celo_pending_epoch_operation(
-          reward.block_hash, :fetch_validator_group_data
-        )
-      end)
+      changes =
+        changes_list
+        |> Enum.each(fn reward ->
+          CeloPendingEpochOperation.falsify_or_delete_celo_pending_epoch_operation(
+            reward.block_hash,
+            :fetch_validator_group_data
+          )
+        end)
 
       {:ok, changes}
     end)

@@ -97,7 +97,10 @@ defmodule Explorer.Celo.Events.EpochRewardsDistributedToVotersEventTest do
         }
       })
 
-      assert EpochRewardsDistributedToVotersEvent.elected_groups_for_block(block_1.hash) == [group_address_1_hash, group_address_2_hash]
+      assert EpochRewardsDistributedToVotersEvent.elected_groups_for_block(block_1.hash) == [
+               group_address_1_hash,
+               group_address_2_hash
+             ]
     end
   end
 end

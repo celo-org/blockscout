@@ -40,6 +40,7 @@ defmodule Explorer.Fakes.VoterRewardsForGroup do
   }
 
   def calculate(voter_address_hash, group_address_hash, to_date \\ DateTime.utc_now())
+
   def calculate(voter_address_hash, group_address_hash, to_date) when group_address_hash == @group_address_1_hash do
     {:ok,
      %{

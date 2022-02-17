@@ -26,5 +26,4 @@ defmodule Explorer.Chain.CeloPendingEpochOperationTest do
       assert Repo.one!(select(CeloPendingEpochOperation, fragment("COUNT(*)"))) == 0
     end
   end
-
 end
