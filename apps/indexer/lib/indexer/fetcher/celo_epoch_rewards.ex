@@ -92,7 +92,7 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
       )
     end
 
-    case Chain.import_epoch_rewards_and_delete_pending_celo_epoch_operations(import_params, success) do
+    case Chain.import(import_params) do
       {:ok, _} ->
         :ok
 

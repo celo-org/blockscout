@@ -36,8 +36,6 @@ defmodule Explorer.Chain do
 
   alias Explorer.Chain
 
-  alias Explorer.Celo.ContractEvents
-
   alias Explorer.Chain.{
     Address,
     Address.CoinBalance,
@@ -48,7 +46,6 @@ defmodule Explorer.Chain do
     BridgedToken,
     CeloAccount,
     CeloClaims,
-    CeloContractEvent,
     CeloParams,
     CeloSigners,
     CeloUnlocked,
@@ -91,7 +88,6 @@ defmodule Explorer.Chain do
     Uncles
   }
 
-  alias ContractEvents.Election.{EpochRewardsDistributedToVotersEvent, ValidatorGroupVoteActivatedEvent}
   alias Explorer.Chain.Import.Runner
   alias Explorer.Chain.InternalTransaction.{CallType, Type}
   alias Explorer.Chain.Transaction.History.TransactionStats
@@ -7896,40 +7892,6 @@ defmodule Explorer.Chain do
 
     query
     |> Repo.one()
-  end
-
-  def import_epoch_rewards_and_delete_pending_celo_epoch_operations(import_params, success) do
-    Multi.new()
-    |> Multi.run(:import_rewards, fn _, _ ->
-      result = Chain.import(import_params)
-      {:ok, result}
-    end)
-    |> Multi.run(:delete_celo_pending, fn _, _ ->
-      success
-      |> Enum.each(fn reward ->
-        Chain.falsify_or_delete_celo_pending_epoch_operation(reward.block_hash, :fetch_epoch_rewards)
-      end)
-
-      {:ok, success}
-    end)
-    |> Explorer.Repo.transaction()
-  end
-
-  def import_group_votes_and_delete_pending_celo_epoch_operations(import_params, success) do
-    Multi.new()
-    |> Multi.run(:import_group_votes, fn _, _ ->
-      result = Chain.import(import_params)
-      {:ok, result}
-    end)
-    |> Multi.run(:delete_celo_pending, fn _, _ ->
-      success
-      |> Enum.each(fn reward ->
-        Chain.falsify_or_delete_celo_pending_epoch_operation(reward.block_hash, :fetch_validator_group_data)
-      end)
-
-      {:ok, success}
-    end)
-    |> Explorer.Repo.transaction()
   end
 
   def pending_withdrawals_for_account(account_address) do

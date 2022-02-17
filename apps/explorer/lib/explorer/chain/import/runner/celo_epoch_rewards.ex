@@ -6,7 +6,7 @@ defmodule Explorer.Chain.Import.Runner.CeloEpochRewards do
   require Ecto.Query
 
   alias Ecto.{Changeset, Multi, Repo}
-  alias Explorer.Chain.{CeloEpochRewards, Import}
+  alias Explorer.Chain.{CeloEpochRewards, CeloPendingEpochOperation, Import}
   alias Explorer.Chain.Import.Runner.Util
 
   import Ecto.Query, only: [from: 2]
@@ -39,6 +39,16 @@ defmodule Explorer.Chain.Import.Runner.CeloEpochRewards do
     # Enforce ShareLocks tables order (see docs: sharelocks.md)
     Multi.run(multi, :insert_voter_reward_items, fn repo, _ ->
       insert(repo, changes_list, insert_options)
+    end)
+    |> Multi.run(:delete_celo_pending, fn _, _ ->
+      changes_list
+      |> Enum.each(fn reward ->
+        CeloPendingEpochOperation.falsify_or_delete_celo_pending_epoch_operation(
+          reward.block_hash, :fetch_epoch_rewards
+        )
+      end)
+
+      {:ok, changes_list}
     end)
   end
 

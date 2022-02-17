@@ -107,7 +107,7 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotes do
       )
     end
 
-    case Chain.import_group_votes_and_delete_pending_celo_epoch_operations(import_params, success) do
+    case Chain.import(import_params) do
       {:ok, _} ->
         :ok
 

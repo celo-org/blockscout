@@ -8,7 +8,7 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
       from: 2
     ]
 
-  alias Explorer.Celo.{ContractEvents, Events, Util}
+  alias Explorer.Celo.{ContractEvents, Util}
   alias Explorer.Chain.{Block, CeloContractEvent, CeloValidatorGroupVotes, Wei}
   alias Explorer.Repo
 
