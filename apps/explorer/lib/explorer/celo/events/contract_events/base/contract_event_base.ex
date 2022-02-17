@@ -95,9 +95,8 @@ defmodule Explorer.Celo.ContractEvents.Base do
     # Implement EventTransformer protocol to convert between CeloContractEvent, Chain.Log, and this generated type
     protocol_impl =
       quote do
-        defimpl EventTransformer do
+        defimpl Explorer.Celo.ContractEvents.EventTransformer do
           import Explorer.Celo.ContractEvents.Common
-          alias Explorer.Celo.ContractEvents.EventTransformer
           alias Explorer.Chain.{CeloContractEvent, Log}
 
           # coerce an Explorer.Chain.Log instance into a Map and treat the same as EthereumJSONRPC log params
