@@ -1,5 +1,5 @@
 defmodule Explorer.Celo.Events.EpochRewardsDistributedToVotersEventTest do
-  use ExUnit.Case, async: true
+  use Explorer.DataCase
 
   alias Explorer.Chain.{Address, Log}
   alias Explorer.Celo.ContractEvents.EventTransformer
