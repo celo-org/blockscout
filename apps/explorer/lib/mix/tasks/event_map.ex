@@ -50,6 +50,13 @@ defmodule Mix.Tasks.EventMap do
       end
     end
 
+    @doc "Run ecto query and convert all CeloContractEvents into their concrete types"
+    def query_all(query) do
+      query
+      |> Repo.all()
+      |> celo_contract_event_to_concrete_event()
+    end
+
     @doc "Convert concrete event to CeloContractEvent insertion parameters"
     def event_to_contract_event_params(events) when is_list(events) do
       events |> Enum.map(&event_to_contract_event_params/1)

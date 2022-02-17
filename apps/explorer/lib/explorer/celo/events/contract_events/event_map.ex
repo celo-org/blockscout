@@ -42,6 +42,13 @@ defmodule Explorer.Celo.ContractEvents.EventMap do
     end
   end
 
+  @doc "Run ecto query and convert all CeloContractEvents into their concrete types"
+  def query_all(query) do
+    query
+    |> Repo.all()
+    |> celo_contract_event_to_concrete_event()
+  end
+
   @doc "Convert concrete event to CeloContractEvent insertion parameters"
   def event_to_contract_event_params(events) when is_list(events) do
     events |> Enum.map(&event_to_contract_event_params/1)
@@ -53,25 +60,28 @@ defmodule Explorer.Celo.ContractEvents.EventMap do
 
   @topic_to_event %{
     "0x45aac85f38083b18efe2d441a65b9c1ae177c78307cb5a5d4aec8f7dbcaeabfe" =>
-      Elixir.Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent,
+    Elixir.Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent,
     "0x91ba34d62474c14d6c623cd322f4256666c7a45b7fdaa3378e009d39dfcec2a7" =>
-      Elixir.Explorer.Celo.ContractEvents.Election.EpochRewardsDistributedToVotersEvent,
+    Elixir.Explorer.Celo.ContractEvents.Election.EpochRewardsDistributedToVotersEvent,
     "0xae7458f8697a680da6be36406ea0b8f40164915ac9cc40c0dad05a2ff6e8c6a8" =>
-      Elixir.Explorer.Celo.ContractEvents.Election.ValidatorGroupActiveVoteRevokedEvent,
+    Elixir.Explorer.Celo.ContractEvents.Election.ValidatorGroupActiveVoteRevokedEvent,
     "0x6f5937add2ec38a0fa4959bccd86e3fcc2aafb706cd3e6c0565f87a7b36b9975" =>
-      Elixir.Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent
+    Elixir.Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent,
   }
 
   @name_to_event %{
-    "ValidatorGroupVoteActivated" => Elixir.Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent,
+    "ValidatorGroupVoteActivated" =>
+    Elixir.Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent,
     "EpochRewardsDistributedToVoters" =>
-      Elixir.Explorer.Celo.ContractEvents.Election.EpochRewardsDistributedToVotersEvent,
+    Elixir.Explorer.Celo.ContractEvents.Election.EpochRewardsDistributedToVotersEvent,
     "ValidatorGroupActiveVoteRevoked" =>
-      Elixir.Explorer.Celo.ContractEvents.Election.ValidatorGroupActiveVoteRevokedEvent,
+    Elixir.Explorer.Celo.ContractEvents.Election.ValidatorGroupActiveVoteRevokedEvent,
     "ValidatorEpochPaymentDistributed" =>
-      Elixir.Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent
+    Elixir.Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent,
   }
 
   def event_for_topic(topic), do: Map.get(@topic_to_event, topic)
   def event_for_name(name), do: Map.get(@name_to_event, name)
+
 end
+

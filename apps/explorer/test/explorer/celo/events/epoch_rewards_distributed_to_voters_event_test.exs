@@ -5,7 +5,6 @@ defmodule Explorer.Celo.Events.EpochRewardsDistributedToVotersEventTest do
   alias Explorer.Celo.ContractEvents.EventTransformer
   alias Explorer.Celo.ContractEvents.Election.EpochRewardsDistributedToVotersEvent
 
-
   describe "Test conversion" do
     test "converts from db log to concrete event type" do
       test_log = %Explorer.Chain.Log{
