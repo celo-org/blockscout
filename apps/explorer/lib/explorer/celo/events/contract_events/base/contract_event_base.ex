@@ -51,7 +51,6 @@ defmodule Explorer.Celo.ContractEvents.Base do
     end
   end
 
-  # sobelow_skip ["DOS.BinToAtom"]
   defmacro __before_compile__(env) do
     # retrieve event properties at compile time
     # reverse as elixir module attributes are pushed to top of list and we rely on defined event property order
@@ -189,6 +188,7 @@ defmodule Explorer.Celo.ContractEvents.Base do
           alias Explorer.Celo.ContractEvents.Common
           import Ecto.Query
 
+          # sobelow_skip ["DOS.BinToAtom"]
           def unquote(:"query_by_#{name}")(query, address) do
             address = Common.format_address_for_postgres_json(address)
 
