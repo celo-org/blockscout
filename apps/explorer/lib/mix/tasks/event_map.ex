@@ -12,6 +12,7 @@ defmodule Mix.Tasks.EventMap do
     @moduledoc "Map event names and event topics to concrete contract event structs"
 
     alias Explorer.Celo.ContractEvents.EventTransformer
+    alias Explorer.Repo
 
     @doc "Convert ethrpc log parameters to CeloContractEvent insertion parameters"
     def rpc_to_event_params(logs) when is_list(logs) do

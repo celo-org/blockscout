@@ -51,6 +51,7 @@ defmodule Explorer.Celo.ContractEvents.Base do
     end
   end
 
+  # sobelow_skip ["DOS.BinToAtom"]
   defmacro __before_compile__(env) do
     # retrieve event properties at compile time
     # reverse as elixir module attributes are pushed to top of list and we rely on defined event property order
