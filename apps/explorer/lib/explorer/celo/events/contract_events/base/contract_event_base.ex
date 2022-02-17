@@ -32,8 +32,6 @@ defmodule Explorer.Celo.ContractEvents.Base do
   end
 
   defmacro __before_compile__(env) do
-    #referencing module within derived methods of protocol implementation
-    event_module = env.module
 
     #retrieve event properties at compile time
     #reverse as elixir module attributes are pushed to top of list and we rely on defined event property order
@@ -52,24 +50,28 @@ defmodule Explorer.Celo.ContractEvents.Base do
       |> Enum.map(&(&1.name))
       |> Enum.concat(common_event_properties)
 
-    #sorting proprties into indexed and unindexed
+    #referencing module within derived methods of protocol implementation
+    event_module = env.module
+
     unindexed_properties = properties
-                      |> Enum.filter(&(&1.indexed == :unindexed))
+                           |> Enum.filter(&(&1.indexed == :unindexed))
 
     unindexed_types = unindexed_properties
-      |> Enum.map(&(&1.type))
+                      |> Enum.map(&(&1.type))
 
     indexed_types_with_topics = properties
-                      |> Enum.filter(&(&1.indexed == :indexed))
-                      |> Enum.zip([:second_topic, :third_topic, :fourth_topic])
+                                |> Enum.filter(&(&1.indexed == :indexed))
+                                |> Enum.zip([:second_topic, :third_topic, :fourth_topic])
 
-    quote do
+    #Define a struct based on declared event properties
+    struct_def = quote do
+      defstruct unquote(struct_properties)
+    end
+
+    # Implement EventTransformer protocol to convert between CeloContractEvent, Chain.Log, and this generated type
+    protocol_impl = quote do
       alias Explorer.Celo.ContractEvents.EventTransformer
 
-      #define a struct based on declared event properties
-      defstruct unquote(struct_properties)
-
-      # Implement EventTransformer protocol to convert between CeloContractEvent, Chain.Log, and this generated type
       defimpl EventTransformer do
         import Explorer.Celo.ContractEvents.Common
         alias Explorer.Chain.{CeloContractEvent, Log}
@@ -111,6 +113,7 @@ defmodule Explorer.Celo.ContractEvents.Base do
           |> then(&(struct(unquote(event_module), &1)))
         end
 
+        # create a concrete event instance from a CeloContractEvent
         def from_celo_contract_event(_, %CeloContractEvent{params: params} = contract) do
           event_params = params
              |> normalise_map()
@@ -132,6 +135,7 @@ defmodule Explorer.Celo.ContractEvents.Base do
           |> then(&(struct(unquote(event_module), &1)))
         end
 
+        # params to be provided to CeloContractEvent changeset
         def to_celo_contract_event_params(event) do
           event_params = unquote(Macro.escape(properties))
           |> Enum.map(fn
@@ -146,5 +150,26 @@ defmodule Explorer.Celo.ContractEvents.Base do
         end
       end
     end
+
+
+    #define queries for address types
+    dynamic_queries = properties
+    |> Enum.filter(&( &1.type == :address))
+    |> Enum.map(fn %{name: name}->
+      import Ecto.Query
+      alias Explorer.Celo.ContractEvents.Common
+      quote do
+        def unquote(:"query_by_#{name}")(query, address) do
+          address = Common.format_address_for_postgres_json(address)
+
+          from(c in query,
+            where: fragment("? ->> ? = ?", c.params, unquote(Atom.to_string(name)), ^address)
+          )
+        end
+      end
+    end)
+
+    # return multiple generated AST nodes - merge all the above `quote` statements into the module definition
+    [struct_def, protocol_impl, dynamic_queries] |> List.flatten()
   end
 end
