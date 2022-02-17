@@ -1,4 +1,24 @@
 defmodule Explorer.Celo.ContractEvents.Base do
+  @moduledoc """
+    Defines and generates functionality for Celo contract event structs.
+
+    After calling `use Explorer.Celo.ContractEvents.Base` and providing event name and topic, event parameters are set
+    with the `event_param` macro. This information is then used to generate the rest of the functionality for the event.
+
+    # Generated Properties
+
+    The following functionality is generated for a specific event
+
+    * A struct is created giving the object properties defined in the event parameters
+    * An implementation of the `Explorer.Celo.ContractEvents.EventTransformer` protocol to allow transformation between
+      Explorer.Chain.Log, Explorer.Chain.CeloContractEvent and the generated struct
+    * Ecto query functions for each parameter of type `:address` in the format `query_by_<property name>(query, address)`
+      * e.g. for an event with address properties called "owner" and "supplier", the functions `query_by_owner` and
+      `query_by_supplier` will be generated at compile time.
+  """
+
+  # credo complains about imports + aliases being scattered throughout the module, which shouldn't apply for macros
+  # credo:disable-for-this-file
   defmacro __using__(opts) do
     name = Keyword.get(opts, :name)
     topic = Keyword.get(opts, :topic)
@@ -34,7 +54,7 @@ defmodule Explorer.Celo.ContractEvents.Base do
   defmacro __before_compile__(env) do
     # retrieve event properties at compile time
     # reverse as elixir module attributes are pushed to top of list and we rely on defined event property order
-    properties = Module.get_attribute(env.module, :params) |> Enum.reverse()
+    properties = env.module |> Module.get_attribute(:params) |> Enum.reverse()
 
     # finding all properties for the event struct
     common_event_properties = [
@@ -75,10 +95,9 @@ defmodule Explorer.Celo.ContractEvents.Base do
     # Implement EventTransformer protocol to convert between CeloContractEvent, Chain.Log, and this generated type
     protocol_impl =
       quote do
-        alias Explorer.Celo.ContractEvents.EventTransformer
-
         defimpl EventTransformer do
           import Explorer.Celo.ContractEvents.Common
+          alias Explorer.Celo.ContractEvents.EventTransformer
           alias Explorer.Chain.{CeloContractEvent, Log}
 
           # coerce an Explorer.Chain.Log instance into a Map and treat the same as EthereumJSONRPC log params
@@ -166,10 +185,10 @@ defmodule Explorer.Celo.ContractEvents.Base do
       properties
       |> Enum.filter(&(&1.type == :address))
       |> Enum.map(fn %{name: name} ->
-        import Ecto.Query
-        alias Explorer.Celo.ContractEvents.Common
-
         quote do
+          alias Explorer.Celo.ContractEvents.Common
+          import Ecto.Query
+
           def unquote(:"query_by_#{name}")(query, address) do
             address = Common.format_address_for_postgres_json(address)
 
