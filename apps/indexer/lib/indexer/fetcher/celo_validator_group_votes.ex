@@ -7,9 +7,10 @@ defmodule Indexer.Fetcher.CeloValidatorGroupVotes do
 
   require Logger
 
-  alias Explorer.Celo.AccountReader
+  alias Explorer.Celo.{AccountReader, ContractEvents}
   alias Explorer.Chain
   alias Explorer.Chain.{CeloValidatorGroupVotes, Hash}
+
   alias ContractEvents.Election.EpochRewardsDistributedToVotersEvent
 
   alias Indexer.BufferedTask
