@@ -6000,7 +6000,7 @@ defmodule Explorer.ChainTest do
     end
   end
 
-  describe "get_last_fetched_counters/1" do
+  describe "get_last_fetched_counter/1" do
     test "it returns zero if doesn't exist in db" do
       value = Chain.get_last_fetched_counter("total_transaction_count")
       assert 0 == Decimal.to_integer(value)
