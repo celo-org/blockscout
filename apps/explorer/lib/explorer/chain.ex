@@ -3615,6 +3615,7 @@ defmodule Explorer.Chain do
 
         _ ->
           count
+          |> Decimal.to_integer()
       end
     else
       cached_value
