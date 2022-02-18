@@ -15,9 +15,8 @@ defmodule Explorer.Chain.Cache.TransactionCount do
 
   require Logger
 
-  alias Explorer.Chain
+  alias Explorer.{Chain, Repo}
   alias Explorer.Chain.Transaction
-  alias Explorer.Repo
 
   defp handle_fallback(:count) do
     # This will get the task PID if one exists and launch a new task if not
