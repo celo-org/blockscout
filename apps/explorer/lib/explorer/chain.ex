@@ -3609,10 +3609,12 @@ defmodule Explorer.Chain do
       case count do
         nil ->
           %Postgrex.Result{rows: [[rows]]} =
-          SQL.query!(Repo, "SELECT reltuples::BIGINT AS estimate FROM pg_class WHERE relname='transactions'")
+            SQL.query!(Repo, "SELECT reltuples::BIGINT AS estimate FROM pg_class WHERE relname='transactions'")
 
           rows
-        _ -> count
+
+        _ ->
+          count
       end
     else
       cached_value
