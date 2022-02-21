@@ -74,7 +74,7 @@ defmodule Explorer.Celo.ValidatorRewards do
              rewards: rewards,
              to: to_date,
              total_reward_celo: total,
-             validator_account: validator_address_hash
+             account: validator_address_hash
            }
          end)}
     end

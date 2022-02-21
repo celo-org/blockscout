@@ -10,7 +10,13 @@ defmodule BlockScoutWeb.API.RPC.RewardView do
   end
 
   def render("getvoterrewards.json", %{rewards: rewards}) do
-    prepared_rewards = prepare_rewards_for_all_groups(rewards)
+    prepared_rewards = prepare_generic_rewards(rewards)
+
+    RPCView.render("show.json", data: prepared_rewards)
+  end
+
+  def render("getvalidatorrewards.json", %{rewards: rewards}) do
+    prepared_rewards = prepare_generic_rewards(rewards)
 
     RPCView.render("show.json", data: prepared_rewards)
   end
@@ -36,10 +42,10 @@ defmodule BlockScoutWeb.API.RPC.RewardView do
     }
   end
 
-  defp prepare_rewards_for_all_groups(rewards) do
+  defp prepare_generic_rewards(rewards) do
     %{
       totalRewardCelo: to_string(rewards.total_reward_celo),
-      voterAccount: to_string(rewards.voter_account),
+      account: to_string(rewards.account),
       from: to_string(rewards.from),
       to: to_string(rewards.to),
       rewards: Enum.map(rewards.rewards, &prepare_reward_for_all_groups(&1))

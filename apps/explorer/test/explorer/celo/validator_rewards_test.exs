@@ -18,7 +18,7 @@ defmodule Explorer.Celo.ValidatorRewardsTest do
       assert rewards ==
                %{
                  total_reward_celo: 300_000,
-                 validator_account: validator_address_1_hash,
+                 account: validator_address_1_hash,
                  from: ~U[2022-01-03 00:00:00.000000Z],
                  to: ~U[2022-01-06 00:00:00.000000Z],
                  rewards: [
