@@ -148,6 +148,7 @@ function filterNightlyBuilds (filter) {
 if ($contractVerificationPage.length) {
   const store = createStore(reducer)
   const addressHash = $('#smart_contract_address_hash').val()
+  console.log(addressHash)
   const { filter, blockNumber } = humps.camelizeKeys(URI(window.location).query(true))
   const $form = $contractVerificationPage.find('form')
 

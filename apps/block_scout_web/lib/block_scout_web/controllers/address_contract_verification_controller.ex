@@ -45,6 +45,26 @@ defmodule BlockScoutWeb.AddressContractVerificationController do
     end
   end
 
+  def new(conn, _params) do
+    changeset =
+      SmartContract.changeset(
+        %SmartContract{address_hash: ""},
+        %{}
+      )
+
+    render(conn, "new2.html", changeset: changeset, address_hash: "")
+  end
+
+  def create(
+        conn,
+        params
+      ) do
+    IO.inspect(params)
+    # Que.add(SolidityPublisherWorker, {smart_contract["address_hash"], smart_contract, conn})
+
+    send_resp(conn, 204, "")
+  end
+
   def create(
         conn,
         %{

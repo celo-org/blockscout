@@ -356,6 +356,13 @@ defmodule BlockScoutWeb.WebRouter do
       as: :smart_contract
     )
 
+    resources(
+      "/contract_verification",
+      AddressContractVerificationController,
+      only: [:new],
+      as: :verify_contract
+    )
+
     get("/address-counters", AddressController, :address_counters)
 
     get("/search", ChainController, :search)
