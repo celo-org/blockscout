@@ -57,12 +57,15 @@ defmodule BlockScoutWeb.AddressContractVerificationController do
 
   def create(
         conn,
-        params
+        %{"smart_contract" => smart_contract}
       ) do
-    IO.inspect(params)
-    # Que.add(SolidityPublisherWorker, {smart_contract["address_hash"], smart_contract, conn})
-
-    send_resp(conn, 204, "")
+    if smart_contract["verify_via"] == "true" do
+        redirect(conn, to: "/address/" <> smart_contract["address_hash"] <> "/verify-via-json/new")
+        send_resp(conn, 204, "")
+    else
+      redirect(conn, to: "/address/" <> smart_contract["address_hash"] <> "/verify-vyper-contract/new")
+      send_resp(conn, 204, "")
+    end 
   end
 
   def create(
