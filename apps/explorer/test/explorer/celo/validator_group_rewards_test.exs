@@ -17,13 +17,13 @@ defmodule Explorer.Celo.ValidatorGroupRewardsTest do
 
       assert rewards ==
                %{
-                 total_reward_celo: 300_000,
+                 total_reward_celo: 700_000,
                  from: ~U[2022-01-03 00:00:00.000000Z],
                  group: group_address_1_hash,
                  to: ~U[2022-01-06 00:00:00.000000Z],
                  rewards: [
                    %{
-                     amount: 100_000,
+                     amount: 300_000,
                      date: ~U[2022-01-03 17:42:43.162804Z],
                      block_number: 10_730_880,
                      block_hash: block_2_hash,
@@ -31,7 +31,7 @@ defmodule Explorer.Celo.ValidatorGroupRewardsTest do
                      validator: validator_address_1_hash
                    },
                    %{
-                     amount: 200_000,
+                     amount: 400_000,
                      date: ~U[2022-01-04 17:42:43.162804Z],
                      block_number: 10_748_160,
                      block_hash: block_3_hash,

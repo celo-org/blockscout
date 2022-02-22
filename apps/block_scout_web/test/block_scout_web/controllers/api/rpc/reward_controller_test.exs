@@ -1,7 +1,7 @@
 defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
   use BlockScoutWeb.ConnCase
 
-  alias Explorer.{SetupValidatorRewardsTest, SetupVoterRewardsTest}
+  alias Explorer.{SetupValidatorAndGroupRewardsTest, SetupVoterRewardsTest}
 
   describe "getvoterrewardsforgroup" do
     test "with missing voter address", %{conn: conn} do
@@ -327,7 +327,7 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
         })
         |> json_response(200)
 
-      assert response["message"] =~ "Voter address does not exist"
+      assert response["message"] =~ "Validator address does not exist"
       assert response["status"] == "0"
       assert Map.has_key?(response, "result")
       refute response["result"]
@@ -335,8 +335,8 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
       assert :ok = ExJsonSchema.Validator.validate(schema, response)
     end
 
-    test "with valid validator and group address", %{conn: conn} do
-      {validator_address_1_hash, group_address_1_hash, block_2_hash, block_3_hash} = SetupValidatorRewardsTest.setup()
+    test "with valid validator address", %{conn: conn} do
+      {validator_address_1_hash, group_address_1_hash, block_2_hash, block_3_hash} = SetupValidatorAndGroupRewardsTest.setup()
 
       expected_result = %{
         "rewards" => [
@@ -382,6 +382,104 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
     end
   end
 
+  describe "getvalidatorgrouprewards" do
+    test "with missing group address", %{conn: conn} do
+      response =
+        conn
+        |> get("/api", %{"module" => "reward", "action" => "getvalidatorgrouprewards"})
+        |> json_response(200)
+
+      assert response["message"] =~ "'groupAddress' is required"
+      assert response["status"] == "0"
+      assert Map.has_key?(response, "result")
+      refute response["result"]
+      schema = group_rewards_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
+
+    test "with an invalid validator address hash", %{conn: conn} do
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "reward",
+          "action" => "getvalidatorgrouprewards",
+          "groupAddress" => "bad_hash"
+        })
+        |> json_response(200)
+
+      assert response["message"] =~ "Invalid group address hash"
+      assert response["status"] == "0"
+      assert Map.has_key?(response, "result")
+      refute response["result"]
+      schema = group_rewards_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
+
+    test "with an address that doesn't exist", %{conn: conn} do
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "reward",
+          "action" => "getvalidatorgrouprewards",
+          "groupAddress" => "0x8bf38d4764929064f2d4d3a56520a76ab3df415b"
+        })
+        |> json_response(200)
+
+      assert response["message"] =~ "Group address does not exist"
+      assert response["status"] == "0"
+      assert Map.has_key?(response, "result")
+      refute response["result"]
+      schema = group_rewards_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
+
+    test "with valid group address", %{conn: conn} do
+      {validator_address_1_hash, group_address_1_hash, block_2_hash, block_3_hash} = SetupValidatorAndGroupRewardsTest.setup()
+
+      expected_result = %{
+        "rewards" => [
+          %{
+            "amount" => "300000",
+            "date" => "2022-01-03T17:42:43.162804Z",
+            "blockNumber" => "10730880",
+            "blockHash" => to_string(block_2_hash),
+            "epochNumber" => "621",
+            "validator" => to_string(validator_address_1_hash)
+          },
+          %{
+            "amount" => "400000",
+            "date" => "2022-01-04T17:42:43.162804Z",
+            "blockNumber" => "10748160",
+            "blockHash" => to_string(block_3_hash),
+            "epochNumber" => "622",
+            "validator" => to_string(validator_address_1_hash)
+          }
+        ],
+        "totalRewardCelo" => "700000",
+        "from" => "2022-01-03 00:00:00.000000Z",
+        "to" => "2022-01-06 00:00:00.000000Z",
+        "group" => to_string(group_address_1_hash)
+      }
+
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "reward",
+          "action" => "getvalidatorgrouprewards",
+          "groupAddress" => to_string(group_address_1_hash),
+          "from" => "2022-01-03T00:00:00.000000Z",
+          "to" => "2022-01-06T00:00:00.000000Z"
+        })
+        |> json_response(200)
+
+      assert response["result"] == expected_result
+      assert response["status"] == "1"
+      assert response["message"] == "OK"
+      schema = group_rewards_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
+  end
+
   defp rewards_for_group_schema do
     %{
       "type" => "array",
@@ -415,12 +513,42 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
     }
   end
 
+  defp group_epoch_rewards_schema do
+    %{
+      "type" => "array",
+      "items" => %{
+        "type" => "object",
+        "properties" => %{
+          "amount" => %{"type" => "string"},
+          "block_hash" => %{"type" => "string"},
+          "block_number" => %{"type" => "string"},
+          "date" => %{"type" => "string"},
+          "epoch_number" => %{"type" => "string"},
+          "validator" => %{"type" => "string"}
+        }
+      }
+    }
+  end
+
   defp voter_rewards_for_group_schema do
     resolve_schema(%{
       "type" => ["object", "null"],
       "properties" => %{
         "total" => %{"type" => "string"},
         "rewards" => rewards_for_group_schema()
+      }
+    })
+  end
+
+  defp group_rewards_schema do
+    resolve_schema(%{
+      "type" => ["object", "null"],
+      "properties" => %{
+        "total_reward_celo" => %{"type" => "string"},
+        "group" => %{"type" => "string"},
+        "from" => %{"type" => "string"},
+        "to" => %{"type" => "string"},
+        "rewards" => group_epoch_rewards_schema()
       }
     })
   end

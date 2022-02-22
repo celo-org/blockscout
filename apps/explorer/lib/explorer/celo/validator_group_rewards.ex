@@ -39,7 +39,7 @@ defmodule Explorer.Celo.ValidatorGroupRewards do
         inner_join: block in Block,
         on: event.block_hash == block.hash,
         select: %{
-          amount: json_extract_path(event.params, ["validator_payment"]),
+          amount: json_extract_path(event.params, ["group_payment"]),
           date: block.timestamp,
           block_number: block.number,
           block_hash: block.hash,

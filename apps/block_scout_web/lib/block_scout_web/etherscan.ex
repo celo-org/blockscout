@@ -767,6 +767,35 @@ defmodule BlockScoutWeb.Etherscan do
     }
   }
 
+  @reward_getvalidatorgrouprewards_example_value %{
+    "status" => "1",
+    "message" => "OK",
+    "result" => %{
+      "rewards" => [
+        %{
+          "amount" => "100000",
+          "date" => "2022-01-03T17:42:43.162804Z",
+          "blockNumber" => "10730880",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000004",
+          "epochNumber" => "621",
+          "validator" => "0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae"
+        },
+        %{
+          "amount" => "200000",
+          "date" => "2022-01-04T17:42:43.162804Z",
+          "blockNumber" => "10748160",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000005",
+          "epochNumber" => "622",
+          "validator" => "0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae"
+        }
+      ],
+      "totalRewardCelo" => "300",
+      "from" => "2022-01-03 00:00:00.000000Z",
+      "to" => "2022-01-06 00:00:00.000000Z",
+      "group" => "0x0000000000000000000000000000000000000001"
+    }
+  }
+
   @reward_getvoterrewardsforgroup_example_value_error %{
     "status" => "0",
     "message" => "Voter or group address does not exist",
@@ -782,6 +811,12 @@ defmodule BlockScoutWeb.Etherscan do
   @reward_getvalidatorrewards_example_value_error %{
     "status" => "0",
     "message" => "Validator address does not exist",
+    "result" => []
+  }
+
+  @reward_getvalidatorgrouprewards_example_value_error %{
+    "status" => "0",
+    "message" => "Group address does not exist",
     "result" => []
   }
 
@@ -1475,7 +1510,7 @@ defmodule BlockScoutWeb.Etherscan do
   @generic_epoch_rewards %{
     type: "array",
     array_type: %{
-      name: "VoterReward",
+      name: "Reward",
       fields: %{
         amount: @wei_type,
         blockHash: @block_hash_type,
@@ -1487,6 +1522,21 @@ defmodule BlockScoutWeb.Etherscan do
     }
   }
 
+  @group_epoch_rewards %{
+    type: "array",
+    array_type: %{
+      name: "Reward",
+      fields: %{
+        amount: @wei_type,
+        blockHash: @block_hash_type,
+        blockNumber: @block_number_type,
+        date: %{type: "timestamp"},
+        epochNumber: "integer",
+        validator: @address_hash_type
+      }
+    }
+  }
+
   @generic_rewards %{
     name: "Rewards",
     fields: %{
@@ -1494,6 +1544,17 @@ defmodule BlockScoutWeb.Etherscan do
       from: %{type: "timestamp"},
       to: %{type: "timestamp"},
       account: @address_hash_type,
+      rewards: @generic_epoch_rewards
+    }
+  }
+
+  @group_rewards %{
+    name: "Rewards",
+    fields: %{
+      totalRewardsCelo: @wei_type,
+      from: %{type: "timestamp"},
+      to: %{type: "timestamp"},
+      group: @address_hash_type,
       rewards: @generic_epoch_rewards
     }
   }
@@ -3362,6 +3423,56 @@ defmodule BlockScoutWeb.Etherscan do
     ]
   }
 
+  @reward_getvalidatorgrouprewards_action %{
+    name: "getvalidatorgrouprewards",
+    description: "Get a validator group's rewards for a given time-span",
+    required_params: [
+      %{
+        key: "groupAddress",
+        placeholder: "groupAddress",
+        type: "string",
+        description: "Validator group address hash for which you wish to get the rewards."
+      }
+    ],
+    optional_params: [
+      %{
+        key: "from",
+        placeholder: "startDate",
+        type: "string",
+        description: "Starting date of period you're interested in"
+      },
+      %{
+        key: "to",
+        placeholder: "endDate",
+        type: "string",
+        description: "End date of period you're interested in"
+      }
+    ],
+    responses: [
+      %{
+        code: "200",
+        description: "successful operation",
+        example_value: Jason.encode!(@reward_getvalidatorgrouprewards_example_value),
+        model: %{
+          name: "Result",
+          fields: %{
+            status: @status_type,
+            message: @message_type,
+            result: %{
+              type: "model",
+              model: @group_rewards
+            }
+          }
+        }
+      },
+      %{
+        code: "200",
+        description: "error",
+        example_value: Jason.encode!(@reward_getvalidatorgrouprewards_example_value_error)
+      }
+    ]
+  }
+
   @account_module %{
     name: "account",
     actions: [
@@ -3439,7 +3550,8 @@ defmodule BlockScoutWeb.Etherscan do
     actions: [
       @reward_getvoterrewardsforgroup_action,
       @reward_getvoterrewards_action,
-      @reward_getvalidatorrewards_action
+      @reward_getvalidatorrewards_action,
+      @reward_getvalidatorgrouprewards_action
     ]
   }
 
