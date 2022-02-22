@@ -17,20 +17,37 @@ defmodule Mix.Tasks.GenerateCeloEvents do
   end
 
   def extract_events(abi) do
-    require IEx; IEx.pry
-
     abi
     |> Enum.filter(&( &1["type"] == "event"))
-    |> to_event_properties()
+    |> Enum.map(&to_event_properties/1)
   end
 
   def to_event_properties(event_def = %{"name" => name}) do
+    #create tuples in the format expected by Explorer.Celo.ContractEvents.Base.event_param/3
+    params = event_def
+    |> Map.get("inputs", [])
+    |> Enum.map(fn %{"indexed" => indexed, "name" => name, "type" => type} ->
+      indexed = if indexed, do: :indexed, else: :unindexed
+
+      name = name
+      |> Macro.underscore()
+      |> String.to_atom()
+
+      type = extract_type(type)
+
+      {name, type, indexed}
+    end)
 
     %{
       name: name,
-      topic: generate_topic(event_def)
+      topic: generate_topic(event_def),
+      params: params
     }
   end
+
+  #convert to format expected by ABI library for decoding blockchain primitive types
+  def extract_type("uint256"), do: {:uint, 256}
+  def extract_type("address"), do: :address
 
   def generate_topic(event = %{"name" => name}) do
     types = event
