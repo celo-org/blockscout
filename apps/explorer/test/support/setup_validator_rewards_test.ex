@@ -1,9 +1,10 @@
-alias Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent
-alias Explorer.Chain.{Address, Block}
+defmodule Explorer.SetupValidatorAndGroupRewardsTest do
 
-import Explorer.Factory
+  alias Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent
+  alias Explorer.Chain.{Address, Block}
 
-defmodule Explorer.SetupValidatorRewardsTest do
+  import Explorer.Factory
+
   def setup do
     %Address{hash: validator_address_1_hash} = insert(:address)
     %Address{hash: validator_address_2_hash} = insert(:address)

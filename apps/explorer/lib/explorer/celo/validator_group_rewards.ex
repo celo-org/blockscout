@@ -1,4 +1,4 @@
-defmodule Explorer.Celo.ValidatorRewards do
+defmodule Explorer.Celo.ValidatorGroupRewards do
   @moduledoc """
     Module responsible for calculating a validator's rewards for a given time frame.
   """
@@ -19,7 +19,7 @@ defmodule Explorer.Celo.ValidatorRewards do
 
   alias Validators.ValidatorEpochPaymentDistributedEvent
 
-  def calculate(validator_address_hash, from_date, to_date) do
+  def calculate(group_address_hash, from_date, to_date) do
     from_date =
       case from_date do
         nil -> ~U[2020-04-22 16:00:00.000000Z]
@@ -43,7 +43,7 @@ defmodule Explorer.Celo.ValidatorRewards do
           date: block.timestamp,
           block_number: block.number,
           block_hash: block.hash,
-          group: json_extract_path(event.params, ["group"])
+          validator: json_extract_path(event.params, ["validator"])
         },
         order_by: [asc: block.number],
         where: event.name == ^validator_epoch_payment_distributed,
@@ -53,7 +53,7 @@ defmodule Explorer.Celo.ValidatorRewards do
 
     activated_votes_for_group =
       query
-      |> CeloContractEvent.query_by_validator_param(validator_address_hash)
+      |> CeloContractEvent.query_by_group_param(group_address_hash)
       |> Repo.all()
 
     case activated_votes_for_group do
@@ -64,7 +64,7 @@ defmodule Explorer.Celo.ValidatorRewards do
         {:ok,
          rewards
          |> Enum.map(fn x ->
-           Map.merge(x, %{group: Common.ca(x.group), epoch_number: epoch_by_block_number(x.block_number)})
+           Map.merge(x, %{validator: Common.ca(x.validator), epoch_number: epoch_by_block_number(x.block_number)})
          end)
          |> Enum.map_reduce(0, fn x, acc -> {x, acc + x.amount} end)
          |> then(fn {rewards, total} ->
@@ -73,7 +73,7 @@ defmodule Explorer.Celo.ValidatorRewards do
              rewards: rewards,
              to: to_date,
              total_reward_celo: total,
-             account: validator_address_hash
+             group: group_address_hash
            }
          end)}
     end
