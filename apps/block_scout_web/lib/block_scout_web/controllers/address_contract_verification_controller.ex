@@ -60,10 +60,19 @@ defmodule BlockScoutWeb.AddressContractVerificationController do
         %{"smart_contract" => smart_contract}
       ) do
     if smart_contract["verify_via"] == "true" do
-        redirect(conn, to: "/address/" <> smart_contract["address_hash"] <> "/verify-via-json/new")
-        send_resp(conn, 204, "")
+        if Chain.smart_contract_verified?(smart_contract["address_hash"]) do
+          address_path =
+            conn
+            |> address_path(:show, smart_contract["address_hash"])
+            |> Controller.full_path()
+    
+          redirect(conn, to: address_path)
+        else
+          redirect(conn, to: "/address/#{ smart_contract["address_hash"] }/verify-via-json/new")
+          send_resp(conn, 204, "")
+        end
     else
-      redirect(conn, to: "/address/" <> smart_contract["address_hash"] <> "/verify-vyper-contract/new")
+      redirect(conn, to: "/address/#{smart_contract["address_hash"]}/verify-vyper-contract/new")
       send_resp(conn, 204, "")
     end 
   end
