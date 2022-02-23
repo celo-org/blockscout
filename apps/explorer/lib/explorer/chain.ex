@@ -1261,6 +1261,7 @@ defmodule Explorer.Chain do
   end
 
   def prepare_search_term(nil), do: ""
+
   def prepare_search_term(string) do
     case Regex.scan(~r/[a-zA-Z0-9]+/, string) do
       [_ | _] = words ->
