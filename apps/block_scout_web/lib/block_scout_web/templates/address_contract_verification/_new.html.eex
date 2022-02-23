@@ -29,7 +29,7 @@
           <div class="smart-contract-form-group-inner-wrapper">
             <%= label f, :license, gettext("License") %>
             <div class="center-column">
-                <%= select f, :license, 18..100 %> 
+                <%= select f, :license, @licenses  %> 
             </div>
             <div class="smart-contract-form-group-tooltip">The license.</div>
           </div>
