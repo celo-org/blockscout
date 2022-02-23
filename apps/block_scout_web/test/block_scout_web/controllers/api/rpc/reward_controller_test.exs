@@ -336,7 +336,8 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
     end
 
     test "with valid validator address", %{conn: conn} do
-      {validator_address_1_hash, group_address_1_hash, block_2_hash, block_3_hash} = SetupValidatorAndGroupRewardsTest.setup()
+      {validator_address_1_hash, group_address_1_hash, block_2_hash, block_3_hash} =
+        SetupValidatorAndGroupRewardsTest.setup()
 
       expected_result = %{
         "rewards" => [
@@ -434,7 +435,8 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
     end
 
     test "with valid group address", %{conn: conn} do
-      {validator_address_1_hash, group_address_1_hash, block_2_hash, block_3_hash} = SetupValidatorAndGroupRewardsTest.setup()
+      {validator_address_1_hash, group_address_1_hash, block_2_hash, block_3_hash} =
+        SetupValidatorAndGroupRewardsTest.setup()
 
       expected_result = %{
         "rewards" => [

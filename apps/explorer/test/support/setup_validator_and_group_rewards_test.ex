@@ -1,5 +1,4 @@
 defmodule Explorer.SetupValidatorAndGroupRewardsTest do
-
   alias Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent
   alias Explorer.Chain.{Address, Block}
 

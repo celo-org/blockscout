@@ -53,7 +53,8 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
 
   def getvalidatorrewards(conn, params) do
     with {:validator_address_param, {:ok, validator_address_param}} <- fetch_address(params, "validatorAddress"),
-         {:validator_format, {:ok, validator_address_hash}} <- to_address_hash(validator_address_param, "validatorAddress"),
+         {:validator_format, {:ok, validator_address_hash}} <-
+           to_address_hash(validator_address_param, "validatorAddress"),
          {:date_param, {:ok, from, _}} <- fetch_date(params["from"]),
          {:date_param, {:ok, to, _}} <- fetch_date(params["to"]),
          {:ok, rewards} <- ValidatorRewards.calculate(validator_address_hash, from, to) do

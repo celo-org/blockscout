@@ -48,7 +48,7 @@ defmodule Explorer.Celo.ValidatorRewards do
         order_by: [asc: block.number],
         where: event.name == ^validator_epoch_payment_distributed,
         where: block.timestamp >= ^from_date,
-        where: block.timestamp < ^to_date,
+        where: block.timestamp < ^to_date
       )
 
     activated_votes_for_group =

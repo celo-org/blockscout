@@ -6,7 +6,8 @@ defmodule Explorer.Celo.ValidatorRewardsTest do
 
   describe "calculate/1" do
     test "returns all rewards for a validator" do
-      {validator_address_1_hash, group_address_1_hash, block_2_hash, block_3_hash} = SetupValidatorAndGroupRewardsTest.setup()
+      {validator_address_1_hash, group_address_1_hash, block_2_hash, block_3_hash} =
+        SetupValidatorAndGroupRewardsTest.setup()
 
       {:ok, rewards} =
         ValidatorRewards.calculate(
