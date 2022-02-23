@@ -1,0 +1,13 @@
+defmodule Explorer.Celo.ContractEvents.<%= module %> do
+  @moduledoc """
+  Struct modelling the <%= module %> event
+  """
+
+  use Explorer.Celo.ContractEvents.Base,
+    name: "<%= event.name %>",
+    topic: "<%= event.topic %>"
+
+  <%= for {name, type, indexed} <- event.params do %>
+  event_param(<%= inspect(name) %>,<%= inspect(type) %>, <%= inspect(indexed) %>)
+  <% end %>
+end

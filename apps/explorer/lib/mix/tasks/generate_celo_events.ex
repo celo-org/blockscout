@@ -63,4 +63,8 @@ defmodule Mix.Tasks.GenerateCeloEvents do
 
     "0x" <> topic
   end
+
+  def generate_event_struct(module, event_data) do
+    EEx.eval_file("lib/mix/tasks/event_struct.eex", module: module, event: event_data)
+  end
 end
