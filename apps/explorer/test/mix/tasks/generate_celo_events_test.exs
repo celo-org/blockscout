@@ -63,4 +63,22 @@ defmodule Explorer.GenerateCeloEventsTest do
       assert length(events) == 12
     end
   end
+
+  describe "event generation" do
+    test "should correctly generate event_param fields" do
+      test_event_def = %{
+        name: "TestGeneratedEvent",
+        params: [
+          {:test_param, {:struct, :size}, :indexed},
+        ],
+        topic: "0xcooltopic"
+      }
+
+      struct_string = GenerateCeloEvents.generate_event_struct(:"Test.Module.Name", test_event_def)
+
+      assert struct_string =~ "defmodule Explorer.Celo.ContractEvents.Test.Module.Name", "Should define the event module"
+      assert struct_string =~ "event_param(:test_param, {:struct, :size}, :indexed)", "Should define an event parameter"
+
+    end
+  end
 end
