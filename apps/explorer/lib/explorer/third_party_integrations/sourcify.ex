@@ -58,6 +58,7 @@ defmodule Explorer.ThirdPartyIntegrations.Sourcify do
     end
   end
 
+  # sobelow_skip ["Traversal"]
   defp get_missing_file_sources(files) do
     Enum.map(files, fn file ->
       if String.ends_with?(file.filename, ".json") do
