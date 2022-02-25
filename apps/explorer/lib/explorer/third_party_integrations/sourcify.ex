@@ -44,8 +44,34 @@ defmodule Explorer.ThirdPartyIntegrations.Sourcify do
           acc
         end
       end)
+    
+    case http_post_request(verify_url(), multipart_body) do 
+      {:error, unknown_status} ->
+        if String.starts_with?(unknown_status["error"], "Resource missing") do
+          {:error, %{"error" => "Resources missing: " <> Enum.join(get_missing_file_sources(files), ", ") }}
+        else
+          {:error, unknown_status}
+        end
+      {:ok, response} ->
+        {:ok, response}  
+    end
+  end 
 
-    http_post_request(verify_url(), multipart_body)
+  defp get_missing_file_sources(files) do 
+    Enum.map(files, fn file ->
+      if String.ends_with?(file.filename, ".json") do
+        {:ok, body} = File.read(file.path)
+        {:ok, json} = Jason.decode(body)
+        meatada = json 
+        |> Map.get("metadata")
+        {:ok, me} = Jason.decode(meatada)
+        me 
+          |> Map.get("sources") 
+          |> Map.keys()
+      else
+        nil
+      end
+    end)
   end
 
   def http_get_request(url, params) do
