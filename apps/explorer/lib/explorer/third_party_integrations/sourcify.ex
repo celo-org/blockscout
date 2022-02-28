@@ -46,15 +46,14 @@ defmodule Explorer.ThirdPartyIntegrations.Sourcify do
       end)
 
     case http_post_request(verify_url(), multipart_body) do
-      {:error, unknown_status} ->
-        if String.starts_with?(unknown_status["error"], "Resource missing") do
-          {:error, %{"error" => "Resources missing: " <> Enum.join(get_missing_file_sources(files), ", ")}}
-        else
-          {:error, unknown_status}
-        end
-
       {:ok, response} ->
         {:ok, response}
+      {:error, error} ->
+        if String.starts_with?(error["error"], "Resource missing") do
+          {:error, %{"error" => "Resources missing: " <> Enum.join(get_missing_file_sources(files), ", ")}}
+        else
+          {:error, error}
+        end
     end
   end
 
@@ -98,12 +97,6 @@ defmodule Explorer.ThirdPartyIntegrations.Sourcify do
 
       {:error, %Error{reason: reason}} ->
         {:error, reason}
-
-      {:error, :nxdomain} ->
-        {:error, "Sourcify is not responsive"}
-
-      {:error, _} ->
-        {:error, "Unexpected response from Sourcify"}
     end
   end
 
