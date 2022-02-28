@@ -48,6 +48,7 @@ defmodule Explorer.ThirdPartyIntegrations.Sourcify do
     case http_post_request(verify_url(), multipart_body) do
       {:ok, response} ->
         {:ok, response}
+
       {:error, error} ->
         if String.starts_with?(error["error"], "Resource missing") do
           {:error, %{"error" => "Resources missing: " <> Enum.join(get_missing_file_sources(files), ", ")}}
