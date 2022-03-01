@@ -14,25 +14,27 @@ defmodule Mix.Tasks.GenerateCeloEvents do
     path = options[:path] || @abi_path
     destination = options[:destination] || @destination_path
 
-    contract_name_to_event_defs = Path.wildcard(path <> "/*.json")
-    |> Enum.into(%{}, fn path ->
-      {Path.basename(path, ".json") |> String.capitalize() , parse_abi(path)}
-    end)
+    contract_name_to_event_defs =
+      Path.wildcard(path <> "/*.json")
+      |> Enum.into(%{}, fn path ->
+        {Path.basename(path, ".json") |> String.capitalize(), parse_abi(path)}
+      end)
 
-    #extract only provided event names if `only` flag given in cli
-    events_to_generate = if options[:only] do
-      contract_name_to_event_defs
-      |> Enum.map(fn {k, v} ->
-        {k,  v |> Enum.filter(&( Enum.member?(args, &1.name))) }
-      end)
-      |> Enum.filter( fn
-        {_, []} -> false
-        _ -> true
-      end)
-      |> Enum.into(%{})
-    else
-      contract_name_to_event_defs
-    end
+    # extract only provided event names if `only` flag given in cli
+    events_to_generate =
+      if options[:only] do
+        contract_name_to_event_defs
+        |> Enum.map(fn {k, v} ->
+          {k, v |> Enum.filter(&Enum.member?(args, &1.name))}
+        end)
+        |> Enum.filter(fn
+          {_, []} -> false
+          _ -> true
+        end)
+        |> Enum.into(%{})
+      else
+        contract_name_to_event_defs
+      end
 
     events_to_generate
     |> Enum.each(fn {contract_name, event_defs} ->
@@ -61,34 +63,37 @@ defmodule Mix.Tasks.GenerateCeloEvents do
   end
 
   def parse_abi(path) do
-    abi = path
-    |> File.read!()
-    |> Jason.decode!()
+    abi =
+      path
+      |> File.read!()
+      |> Jason.decode!()
 
     extract_events(abi)
   end
 
   def extract_events(abi) do
     abi
-    |> Enum.filter(&( &1["type"] == "event"))
+    |> Enum.filter(&(&1["type"] == "event"))
     |> Enum.map(&to_event_properties/1)
   end
 
   def to_event_properties(event_def = %{"name" => name}) do
-    #create tuples in the format expected by Explorer.Celo.ContractEvents.Base.event_param/3
-    params = event_def
-    |> Map.get("inputs", [])
-    |> Enum.map(fn %{"indexed" => indexed, "name" => name, "type" => type} ->
-      indexed = if indexed, do: :indexed, else: :unindexed
+    # create tuples in the format expected by Explorer.Celo.ContractEvents.Base.event_param/3
+    params =
+      event_def
+      |> Map.get("inputs", [])
+      |> Enum.map(fn %{"indexed" => indexed, "name" => name, "type" => type} ->
+        indexed = if indexed, do: :indexed, else: :unindexed
 
-      name = name
-      |> Macro.underscore()
-      |> String.to_atom()
+        name =
+          name
+          |> Macro.underscore()
+          |> String.to_atom()
 
-      type = extract_type(type)
+        type = extract_type(type)
 
-      {name, type, indexed}
-    end)
+        {name, type, indexed}
+      end)
 
     %{
       name: name,
@@ -97,7 +102,7 @@ defmodule Mix.Tasks.GenerateCeloEvents do
     }
   end
 
-  #convert to format expected by ABI library for decoding blockchain primitive types
+  # convert to format expected by ABI library for decoding blockchain primitive types
   def extract_type("uint256"), do: {:uint, 256}
   def extract_type("address"), do: :address
 
@@ -108,18 +113,19 @@ defmodule Mix.Tasks.GenerateCeloEvents do
   def extract_type("uint256[]"), do: {:array, {:uint, 256}}
   def extract_type("bytes4"), do: {:bytes, 4}
 
-
   def generate_topic(event = %{"name" => name}) do
-    types = event
-    |> Map.get("inputs", [])
-    |> Enum.map(&(&1["type"]))
-    |> Enum.join(",")
+    types =
+      event
+      |> Map.get("inputs", [])
+      |> Enum.map(& &1["type"])
+      |> Enum.join(",")
 
     function_signature = "#{name}(#{types})"
 
-    topic = function_signature
-    |> ExKeccak.hash_256()
-    |> Base.encode16(case: :lower)
+    topic =
+      function_signature
+      |> ExKeccak.hash_256()
+      |> Base.encode16(case: :lower)
 
     "0x" <> topic
   end
