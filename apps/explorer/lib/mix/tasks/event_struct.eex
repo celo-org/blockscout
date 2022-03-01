@@ -7,6 +7,5 @@ defmodule Explorer.Celo.ContractEvents.<%= module %> do
     name: "<%= event.name %>",
     topic: "<%= event.topic %>"
 
-  <%= for {name, type, indexed} <- event.params do %> event_param(<%= inspect(name) %>, <%= inspect(type) %>, <%= inspect(indexed) %>)
-  <% end %>
-end
+<%= for {name, type, indexed} <- event.params do %>  event_param(<%= inspect(name) %>, <%= inspect(type) %>, <%= inspect(indexed) %>)
+<% end %>end
