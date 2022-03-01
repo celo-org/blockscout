@@ -4,8 +4,20 @@ defmodule Mix.Tasks.GenerateCeloEvents do
   """
   use Mix.Task
 
+  @abi_path "priv/contracts_abi/celo/"
   @shortdoc "Create event structs for provided abi files"
-  def run(_) do
+
+  def run(args) do
+    {options, _, _} = OptionParser.parse(args, strict: [path: :string])
+    path = options[:path] || @abi_path
+
+    contract_name_to_event_defs = Path.wildcard(path <> "/*.json")
+    |> Enum.into(%{}, fn path ->
+      {Path.basename(path, ".json") |> String.capitalize() , parse_abi(path)}
+    end)
+
+    require IEx; IEx.pry
+
   end
 
   def parse_abi(path) do
@@ -48,6 +60,13 @@ defmodule Mix.Tasks.GenerateCeloEvents do
   #convert to format expected by ABI library for decoding blockchain primitive types
   def extract_type("uint256"), do: {:uint, 256}
   def extract_type("address"), do: :address
+  def extract_type("bytes"), do: :bytes
+  def extract_type("bytes32"), do: {:bytes, 32}
+  def extract_type("string"), do: :string
+  def extract_type("bytes32[]"), do: {:array, {:bytes, 32}}
+  def extract_type("uint256[]"), do: {:array, {:uint, 256}}
+  def extract_type("bytes4"), do: {:bytes, 4}
+
 
   def generate_topic(event = %{"name" => name}) do
     types = event
