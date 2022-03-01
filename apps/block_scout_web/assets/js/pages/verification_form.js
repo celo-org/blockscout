@@ -29,7 +29,7 @@ export function reducer (state = initialState, action) {
     }
     case 'RECEIVED_VERIFICATION_RESULT': {
       if (action.msg.verificationResult === 'ok') {
-        return window.location.replace(window.location.href.split('/contract_verifications')[0].split('/verify')[0] + '/contracts')
+        return window.location.replace(window.location.href.split('/contract-verifications')[0].split('/verify')[0] + '/contracts')
       } else {
 
         try {
