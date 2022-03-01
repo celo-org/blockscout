@@ -55,7 +55,7 @@ defmodule BlockScoutWeb.AddressContractVerificationController do
     render(conn, "_new.html",
       changeset: changeset,
       address_hash: ""
-      #, licenses: [
+      # , licenses: [
       #   " [ Please select ] ",
       #   " 1) No license (none) ",
       #   " 2) The Unlicensed (unlicensed) ",
