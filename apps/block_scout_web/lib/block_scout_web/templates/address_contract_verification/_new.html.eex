@@ -23,17 +23,6 @@
             <div class="smart-contract-form-group-tooltip">The 0x address supplied on contract creation.</div>
           </div>
           </div>
-        
-                <div class="smart-contract-form-group">
-
-          <div class="smart-contract-form-group-inner-wrapper">
-            <%= label f, :license, gettext("License") %>
-            <div class="center-column">
-                <%= select f, :license, @licenses  %> 
-            </div>
-            <div class="smart-contract-form-group-tooltip">The license.</div>
-          </div>
-          </div>
 
                           <div class="smart-contract-form-group">
 
