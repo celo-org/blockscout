@@ -46,21 +46,17 @@ defmodule Mix.Tasks.GenerateCeloEvents do
 
       event_defs
       |> Enum.each(fn event_def ->
-        module = "Explorer.Celo.ContractEvents.#{contract_name}.#{event_def.name}Event"
+        module = "#{contract_name}.#{event_def.name}Event"
         filename = Macro.underscore(event_def.name) <> "_event.ex"
-        event_content = generate_event_struct(module, event_def)
+        event_content = generate_event_struct(module, event_def, contract_name: contract_name)
 
         event_path = Path.join(dir, filename)
 
-        require IEx; IEx.pry
         case File.write(event_path, event_content) do
           :ok -> Logger.info("Generated #{event_path}")
           e -> raise("Error creating #{event_path}", e)
         end
       end)
-      # generate events in event defs
-      # write to file
-
     end)
   end
 
@@ -128,7 +124,8 @@ defmodule Mix.Tasks.GenerateCeloEvents do
     "0x" <> topic
   end
 
-  def generate_event_struct(module, event_data) do
-    EEx.eval_file("lib/mix/tasks/event_struct.eex", module: module, event: event_data)
+  def generate_event_struct(module, event_data, opts \\ []) do
+    contract_name = Keyword.get(opts, :contract_name) || "unknown"
+    EEx.eval_file("lib/mix/tasks/event_struct.eex", module: module, event: event_data, contract: contract_name)
   end
 end
