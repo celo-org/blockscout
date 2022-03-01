@@ -3,20 +3,23 @@ defmodule Mix.Tasks.GenerateCeloEvents do
     Create event structs from given abis
   """
   use Mix.Task
+  require Logger
 
   @abi_path "priv/contracts_abi/celo/"
+  @destination_path "lib/explorer/celo/events/contract_events"
   @shortdoc "Create event structs for provided abi files"
 
   def run(args) do
-    {options, args, _} = OptionParser.parse(args, strict: [path: :string, only: :boolean])
+    {options, args, _} = OptionParser.parse(args, strict: [path: :string, destination: :string, only: :boolean])
     path = options[:path] || @abi_path
+    destination = options[:destination] || @destination_path
 
     contract_name_to_event_defs = Path.wildcard(path <> "/*.json")
     |> Enum.into(%{}, fn path ->
       {Path.basename(path, ".json") |> String.capitalize() , parse_abi(path)}
     end)
 
-    #extract only provided event names if only flag given
+    #extract only provided event names if `only` flag given in cli
     events_to_generate = if options[:only] do
       contract_name_to_event_defs
       |> Enum.map(fn {k, v} ->
@@ -31,8 +34,34 @@ defmodule Mix.Tasks.GenerateCeloEvents do
       contract_name_to_event_defs
     end
 
-    require IEx; IEx.pry
+    events_to_generate
+    |> Enum.each(fn {contract_name, event_defs} ->
+      dir = Path.join(destination, String.downcase(contract_name))
 
+      case File.mkdir(dir) do
+        :ok -> nil
+        {:error, :eexist} -> nil
+        e -> raise("Error creating dir #{dir}", e)
+      end
+
+      event_defs
+      |> Enum.each(fn event_def ->
+        module = "Explorer.Celo.ContractEvents.#{contract_name}.#{event_def.name}Event"
+        filename = Macro.underscore(event_def.name) <> "_event.ex"
+        event_content = generate_event_struct(module, event_def)
+
+        event_path = Path.join(dir, filename)
+
+        require IEx; IEx.pry
+        case File.write(event_path, event_content) do
+          :ok -> Logger.info("Generated #{event_path}")
+          e -> raise("Error creating #{event_path}", e)
+        end
+      end)
+      # generate events in event defs
+      # write to file
+
+    end)
   end
 
   def parse_abi(path) do
