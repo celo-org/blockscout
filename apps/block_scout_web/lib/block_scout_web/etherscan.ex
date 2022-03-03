@@ -1264,26 +1264,6 @@ defmodule BlockScoutWeb.Etherscan do
     }
   }
 
-  @block_reward_model %{
-    name: "BlockReward",
-    fields: %{
-      blockNumber: @block_number_type,
-      timeStamp: %{
-        type: "timestamp",
-        definition: "When the block was collated.",
-        example: ~s("1480072029")
-      },
-      blockMiner: @address_hash_type,
-      blockReward: %{
-        type: "block reward",
-        definition: "The reward given to the miner of a block.",
-        example: ~s("5003251945421042780")
-      },
-      uncles: %{type: "null"},
-      uncleInclusionReward: %{type: "null"}
-    }
-  }
-
   @block_no_model %{
     name: "BlockNo",
     fields: %{
