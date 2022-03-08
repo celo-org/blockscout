@@ -10,6 +10,10 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
     );
   """
 
+  alias Explorer.Celo.ContractEvents.Common
+  alias Explorer.Chain.{Block, CeloContractEvent}
+  alias Explorer.Repo
+
   use Explorer.Celo.ContractEvents.Base,
     name: "ValidatorGroupVoteActivated",
     topic: "0x45aac85f38083b18efe2d441a65b9c1ae177c78307cb5a5d4aec8f7dbcaeabfe"
@@ -18,4 +22,23 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
   event_param(:group, :address, :indexed)
   event_param(:value, {:uint, 256}, :unindexed)
   event_param(:units, {:uint, 256}, :unindexed)
+
+  def voters_activated_votes_in_last_epoch(block_number) do
+    query = from(
+      event in CeloContractEvent,
+      inner_join: block in Block,
+      on: event.block_hash == block.hash,
+      where: block.number >= ^block_number - 17280 and block.number < ^block_number,
+      select: %{
+               account_hash: json_extract_path(event.params, ["account"]),
+               block_hash: block.hash,
+          block_number: block.number,
+          group_hash: json_extract_path(event.params, ["group"])
+        }
+      )
+
+    query
+    |> Repo.all()
+    |> Enum.map(&Map.merge(&1, %{account_hash: Common.ca(&1.account_hash), group_hash: Common.ca(&1.group_hash)}))
+  end
 end
