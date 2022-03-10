@@ -124,6 +124,7 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
 
       %Block{hash: block_1_hash} = block_1 = insert(:block, number: 10_692_863, timestamp: ~U[2022-01-01 13:08:43.162804Z])
       log_1 = insert(:log, block: block_1)
+
       insert(:contract_event, %{
         event: %ValidatorGroupVoteActivatedEvent{
           block_hash: block_1.hash,
@@ -138,6 +139,7 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
 
       block_2 = insert(:block, number: 10_692_864, timestamp: ~U[2022-01-03 13:08:48.162804Z])
       log_2 = insert(:log, block: block_2)
+
       insert(:contract_event, %{
         event: %ValidatorGroupVoteActivatedEvent{
           block_hash: block_2.hash,
@@ -152,6 +154,7 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
 
       block_3 = insert(:block, number: 10_710_144, timestamp: ~U[2022-01-04 13:08:48.162804Z])
       log_3 = insert(:log, block: block_3)
+
       insert(:contract_event, %{
         event: %ValidatorGroupVoteActivatedEvent{
           block_hash: block_3.hash,
@@ -164,20 +167,18 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
         }
       })
 
-      assert ValidatorGroupVoteActivatedEvent.voters_activated_votes_in_last_epoch(10696320) ==
+      assert ValidatorGroupVoteActivatedEvent.voters_activated_votes_in_last_epoch(10_696_320) ==
                [
-                 %{
-                   account_hash: voter_1_address_hash,
-                   block_number: 10_696_320,
+                 %{account_hash: voter_1_address_hash,block_number: 10_696_320,
                    block_hash: block_1_hash,
                    group_hash: group_address_hash
                  },
                  %{
-                   account_hash: voter_2_address_hash,
+                 account_hash: voter_2_address_hash,
                    block_number: 10_696_320,
                    block_hash: block_1_hash,
                    group_hash: group_address_hash
-                 }
+               }
                ]
     end
   end

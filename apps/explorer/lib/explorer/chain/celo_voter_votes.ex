@@ -6,6 +6,7 @@ defmodule Explorer.Chain.CeloVoterVotes do
   use Explorer.Schema
 
   alias Explorer.Chain.{Block, Hash, Wei}
+  alias Explorer.Repo
 
   @required_attrs ~w(account_hash block_hash block_number active_votes group_hash)a
 
@@ -17,12 +18,12 @@ defmodule Explorer.Chain.CeloVoterVotes do
    * `group_hash` - the hash of the group.
   """
   @type t :: %__MODULE__{
-               account_hash: Hash.Address.t(),
-               active_votes: Wei.t(),
-               block_hash: Hash.Full.t(),
-               block_number: integer,
-               group_hash: Hash.Address.t(),
-             }
+          account_hash: Hash.Address.t(),
+          active_votes: Wei.t(),
+          block_hash: Hash.Full.t(),
+          block_number: integer,
+          group_hash: Hash.Address.t()
+        }
 
   @primary_key false
   schema "celo_voter_votes" do
@@ -49,9 +50,29 @@ defmodule Explorer.Chain.CeloVoterVotes do
     |> foreign_key_constraint(:group_hash)
     |> foreign_key_constraint(:account_hash)
     |> unique_constraint(
-         [:account_hash, :block_hash, :group_hash],
-         name: :celo_voter_votes_account_hash_block_hash_group_hash_index
-       )
+      [:account_hash, :block_hash, :group_hash],
+      name: :celo_voter_votes_account_hash_block_hash_group_hash_index
+    )
+  end
+
+  def previous_epoch_non_zero_voter_votes(epoch_block_number) do
+    zero_votes = %Explorer.Chain.Wei{value: Decimal.new(0)}
+    previous_epoch_block_number = epoch_block_number - 17_280
+
+    query =
+      from(
+        votes in __MODULE__,
+        where: votes.block_number == ^previous_epoch_block_number,
+        where: votes.active_votes != ^zero_votes,
+        select: %{
+          account_hash: votes.account_hash,
+          group_hash: votes.group_hash
+        }
+      )
+
+    query
+    |> Repo.all()
+    |> Enum.map(fn x -> Map.put(x, :block_number, epoch_block_number) end)
   end
 
   def previous_epoch_non_zero_voter_votes(epoch_block_number) do

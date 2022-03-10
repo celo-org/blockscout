@@ -24,16 +24,16 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
   event_param(:units, {:uint, 256}, :unindexed)
 
   def voters_activated_votes_in_last_epoch(block_number) do
-    query = from(
-      event in CeloContractEvent,
-      inner_join: block in Block,
-      on: event.block_hash == block.hash,
-      where: block.number >= ^block_number - 17280 and block.number < ^block_number,
-      select: %{
-               account_hash: json_extract_path(event.params, ["account"]),
-               block_hash: block.hash,
-          block_number: block.number,
-          group_hash: json_extract_path(event.params, ["group"])
+    query =
+      from(
+        event in CeloContractEvent,
+        inner_join: block in Block,
+        on: event.block_hash == block.hash,
+        where: block.number >= ^block_number - 17280 and block.number < ^block_number,
+        select: %{
+          account_hash: json_extract_path(event.params, ["account"]),
+          block_hash: block.hash,
+          block_number: block.number,group_hash: json_extract_path(event.params, ["group"])
         }
       )
 
