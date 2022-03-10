@@ -10,7 +10,9 @@ defmodule Mix.Tasks.GenerateCeloEvents do
   @shortdoc "Create event structs for provided abi files"
 
   def run(args) do
-    {options, args, _} = OptionParser.parse(args, strict: [path: :string, destination: :string, only: :boolean, overwrite: :boolean])
+    {options, args, _} =
+      OptionParser.parse(args, strict: [path: :string, destination: :string, only: :boolean, overwrite: :boolean])
+
     path = options[:path] || @abi_path
     destination = options[:destination] || @destination_path
 
@@ -20,7 +22,6 @@ defmodule Mix.Tasks.GenerateCeloEvents do
         {Path.basename(path, ".json") |> String.capitalize(), parse_abi(path)}
       end)
       |> extract_common_events()
-
 
     # extract only provided event names if `only` flag given in cli
     events_to_generate =
@@ -44,7 +45,7 @@ defmodule Mix.Tasks.GenerateCeloEvents do
     end)
   end
 
-  #events with a list of contract names are part of "Common" package
+  # events with a list of contract names are part of "Common" package
   def write_events(destination, names, events, options) when is_list(names) do
     write_events(destination, names, "Common", events, options)
   end
@@ -97,44 +98,48 @@ defmodule Mix.Tasks.GenerateCeloEvents do
   end
 
   def extract_common_events(contract_name_to_event_defs = %{}) do
-    #create a map of all events grouped by topic
-    events_by_topic = contract_name_to_event_defs
-    |> Enum.reduce(%{}, fn {name, defs}, acc ->
-      defs |> Enum.reduce(acc, fn event, map ->
-        case Map.get(map, event.topic)  do
-          nil -> Map.put(map, event.topic, [{name, event}])
-          e -> Map.put(map, event.topic, [{name, event} | e])
-        end
+    # create a map of all events grouped by topic
+    events_by_topic =
+      contract_name_to_event_defs
+      |> Enum.reduce(%{}, fn {name, defs}, acc ->
+        defs
+        |> Enum.reduce(acc, fn event, map ->
+          case Map.get(map, event.topic) do
+            nil -> Map.put(map, event.topic, [{name, event}])
+            e -> Map.put(map, event.topic, [{name, event} | e])
+          end
+        end)
       end)
-    end)
 
-    #get events with more than one entry per topic
-    duplicates = events_by_topic
-                 |> Enum.filter(fn {_topic, events} -> Enum.count(events) > 1 end)
+    # get events with more than one entry per topic
+    duplicates =
+      events_by_topic
+      |> Enum.filter(fn {_topic, events} -> Enum.count(events) > 1 end)
 
     duplicate_topics = duplicates |> Enum.map(fn {topic, _events} -> topic end) |> MapSet.new()
 
+    # remove duplicates from existing contract names
+    deduped_contract_map =
+      contract_name_to_event_defs
+      |> Enum.map(fn {name, events} ->
+        {name, Enum.reject(events, &MapSet.member?(duplicate_topics, &1.topic))}
+      end)
+      |> Enum.into(%{})
 
-    #remove duplicates from existing contract names
-    deduped_contract_map = contract_name_to_event_defs
-    |> Enum.map(fn {name, events} ->
-      {name, Enum.reject(events, &(MapSet.member?(duplicate_topics, &1.topic)))}
-    end)
-   |> Enum.into(%{})
-
-    #create a "common" module for events with shared references
-    common_events = duplicates
-    |> Enum.map(fn {_topic, events} ->
-      contracts_with_event = Enum.map(events, fn {name, _defs} -> name end)
-      {_, event_def} = List.first(events)
-      {contracts_with_event, event_def}
-    end)
-    |> Enum.reduce(%{}, fn {names, def}, acc ->
-      case Map.get(acc, names) do
-        nil -> Map.put(acc, names, [def])
-        e -> Map.put(acc, names, [def | e])
-      end
-    end)
+    # create a "common" module for events with shared references
+    common_events =
+      duplicates
+      |> Enum.map(fn {_topic, events} ->
+        contracts_with_event = Enum.map(events, fn {name, _defs} -> name end)
+        {_, event_def} = List.first(events)
+        {contracts_with_event, event_def}
+      end)
+      |> Enum.reduce(%{}, fn {names, def}, acc ->
+        case Map.get(acc, names) do
+          nil -> Map.put(acc, names, [def])
+          e -> Map.put(acc, names, [def | e])
+        end
+      end)
 
     Map.merge(deduped_contract_map, common_events)
   end

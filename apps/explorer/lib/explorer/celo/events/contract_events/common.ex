@@ -28,9 +28,9 @@ defmodule Explorer.Celo.ContractEvents.Common do
     |> TypeDecoder.decode_raw(types)
     |> Enum.zip(types)
     |> Enum.map(fn
-      #list of bytes to 2d list of ints
-      {d, {:array, {:bytes, _}}} -> d |> Enum.map(&( :binary.bin_to_list(&1)))
-      #bytes to list of ints
+      # list of bytes to 2d list of ints
+      {d, {:array, {:bytes, _}}} -> d |> Enum.map(&:binary.bin_to_list(&1))
+      # bytes to list of ints
       {d, {:bytes, _}} -> :binary.bin_to_list(d)
       {d, _} -> d
     end)
