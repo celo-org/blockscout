@@ -10,7 +10,7 @@ defmodule Mix.Tasks.GenerateCeloEvents do
   @shortdoc "Create event structs for provided abi files"
 
   def run(args) do
-    {options, args, _} = OptionParser.parse(args, strict: [path: :string, destination: :string, only: :boolean])
+    {options, args, _} = OptionParser.parse(args, strict: [path: :string, destination: :string, only: :boolean, overwrite: :boolean])
     path = options[:path] || @abi_path
     destination = options[:destination] || @destination_path
 
@@ -20,6 +20,7 @@ defmodule Mix.Tasks.GenerateCeloEvents do
         {Path.basename(path, ".json") |> String.capitalize(), parse_abi(path)}
       end)
       |> extract_common_events()
+
 
     # extract only provided event names if `only` flag given in cli
     events_to_generate =
@@ -39,19 +40,20 @@ defmodule Mix.Tasks.GenerateCeloEvents do
 
     events_to_generate
     |> Enum.each(fn {contract_name, event_defs} ->
-      write_events(destination, contract_name, event_defs)
+      write_events(destination, contract_name, event_defs, options)
     end)
   end
 
-  def write_events(destination, names, events) when is_list(names) do
-    write_events(destination, names, "Common", events)
+  #events with a list of contract names are part of "Common" package
+  def write_events(destination, names, events, options) when is_list(names) do
+    write_events(destination, names, "Common", events, options)
   end
 
-  def write_events(destination, name, events) do
-    write_events(destination, name, name, events)
+  def write_events(destination, name, events, options) do
+    write_events(destination, name, name, events, options)
   end
 
-  def write_events(destination, name, module_name, events) do
+  def write_events(destination, name, module_name, events, options) do
     dir = Path.join(destination, String.downcase(module_name))
 
     case File.mkdir(dir) do
@@ -68,9 +70,13 @@ defmodule Mix.Tasks.GenerateCeloEvents do
 
       event_path = Path.join(dir, filename)
 
-      case File.write(event_path, event_content) do
-        :ok -> Logger.info("Generated #{event_path}")
-        e -> raise("Error creating #{event_path}", e)
+      if options[:overwrite] do
+        case File.write(event_path, event_content) do
+          :ok -> Logger.info("Generated #{event_path}")
+          e -> raise("Error creating #{event_path}", e)
+        end
+      else
+        Logger.info("Existing event found at #{event_path}, not replacing unless --overwrite flag provided")
       end
     end)
   end
@@ -114,16 +120,23 @@ defmodule Mix.Tasks.GenerateCeloEvents do
     |> Enum.map(fn {name, events} ->
       {name, Enum.reject(events, &(MapSet.member?(duplicate_topics, &1.topic)))}
     end)
+   |> Enum.into(%{})
 
     #create a "common" module for events with shared references
     common_events = duplicates
     |> Enum.map(fn {_topic, events} ->
-      contracts_with_event = Enum.reduce(events, fn {name, _defs} -> name end)
+      contracts_with_event = Enum.map(events, fn {name, _defs} -> name end)
       {_, event_def} = List.first(events)
       {contracts_with_event, event_def}
     end)
+    |> Enum.reduce(%{}, fn {names, def}, acc ->
+      case Map.get(acc, names) do
+        nil -> Map.put(acc, names, [def])
+        e -> Map.put(acc, names, [def | e])
+      end
+    end)
 
-    Map.put(deduped_contract_map, "Common", common_events)
+    Map.merge(deduped_contract_map, common_events)
   end
 
   def to_event_properties(event_def = %{"name" => name}) do
