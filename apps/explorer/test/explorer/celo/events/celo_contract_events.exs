@@ -33,6 +33,7 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
       %Address{hash: contract_address_hash} = insert(:address)
 
       #assets allocation set event from reserve contract
+      #has both uint32[] and bytes32[] parameters in log data
       test_log = %Log{
           address_hash:  contract_address_hash,
           block_hash: block_1.hash,
@@ -70,11 +71,13 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
 
       event =  %AssetAllocationSetEvent{}
                |> EventTransformer.from_log(test_log)
+
+      to_insert = event
                |> EventTransformer.to_celo_contract_event_params()
                |> Map.put(:inserted_at, Timex.now())
                |> Map.put(:updated_at, Timex.now())
 
-      {1, _} =  Explorer.Repo.insert_all(CeloContractEvent, [event])
+      {1, _} =  Explorer.Repo.insert_all(CeloContractEvent, [to_insert])
 
       [fetched_event] = AssetAllocationSetEvent.query() |> EventMap.query_all()
 
