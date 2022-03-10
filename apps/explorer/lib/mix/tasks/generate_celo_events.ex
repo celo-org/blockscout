@@ -16,10 +16,12 @@ defmodule Mix.Tasks.GenerateCeloEvents do
     path = options[:path] || @abi_path
     destination = options[:destination] || @destination_path
 
+    # glob all json files in path (assumed to be contract abis) and create a map of filename -> event defs
     contract_name_to_event_defs =
-      Path.wildcard(path <> "/*.json")
+      (path <> "/*.json")
+      |> Path.wildcard()
       |> Enum.into(%{}, fn path ->
-        {Path.basename(path, ".json") |> String.capitalize(), parse_abi(path)}
+        {path |> Path.basename(".json") |> String.capitalize(), parse_abi(path)}
       end)
       |> extract_common_events()
 
@@ -60,7 +62,7 @@ defmodule Mix.Tasks.GenerateCeloEvents do
     case File.mkdir(dir) do
       :ok -> nil
       {:error, :eexist} -> nil
-      e -> raise("Error creating dir #{dir}", e)
+      e -> raise("Error creating dir #{dir} - #{inspect(e)}")
     end
 
     events
@@ -74,7 +76,7 @@ defmodule Mix.Tasks.GenerateCeloEvents do
       if options[:overwrite] do
         case File.write(event_path, event_content) do
           :ok -> Logger.info("Generated #{event_path}")
-          e -> raise("Error creating #{event_path}", e)
+          e -> raise("Error creating #{event_path} - #{e}")
         end
       else
         Logger.info("Existing event found at #{event_path}, not replacing unless --overwrite flag provided")
@@ -97,19 +99,11 @@ defmodule Mix.Tasks.GenerateCeloEvents do
     |> Enum.map(&to_event_properties/1)
   end
 
-  def extract_common_events(contract_name_to_event_defs = %{}) do
+  def extract_common_events(%{} = contract_name_to_event_defs) do
     # create a map of all events grouped by topic
     events_by_topic =
       contract_name_to_event_defs
-      |> Enum.reduce(%{}, fn {name, defs}, acc ->
-        defs
-        |> Enum.reduce(acc, fn event, map ->
-          case Map.get(map, event.topic) do
-            nil -> Map.put(map, event.topic, [{name, event}])
-            e -> Map.put(map, event.topic, [{name, event} | e])
-          end
-        end)
-      end)
+      |> Enum.reduce(%{}, fn {name, defs}, acc -> reduce_contracts_to_map(name, acc, defs) end)
 
     # get events with more than one entry per topic
     duplicates =
@@ -144,7 +138,17 @@ defmodule Mix.Tasks.GenerateCeloEvents do
     Map.merge(deduped_contract_map, common_events)
   end
 
-  def to_event_properties(event_def = %{"name" => name}) do
+  defp reduce_contracts_to_map(contract_name, acc, defs) do
+    defs
+    |> Enum.reduce(acc, fn event, map ->
+      case Map.get(map, event.topic) do
+        nil -> Map.put(map, event.topic, [{contract_name, event}])
+        e -> Map.put(map, event.topic, [{contract_name, event} | e])
+      end
+    end)
+  end
+
+  def to_event_properties(%{"name" => name} = event_def) do
     # create tuples in the format expected by Explorer.Celo.ContractEvents.Base.event_param/3
     params =
       event_def
@@ -180,7 +184,7 @@ defmodule Mix.Tasks.GenerateCeloEvents do
   def extract_type("uint256[]"), do: {:array, {:uint, 256}}
   def extract_type("bytes4"), do: {:bytes, 4}
 
-  def generate_topic(event = %{"name" => name}) do
+  def generate_topic(%{"name" => name} = event) do
     types =
       event
       |> Map.get("inputs", [])
