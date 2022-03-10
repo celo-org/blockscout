@@ -107,6 +107,7 @@ defmodule Explorer.Celo.ContractEvents.EventMap do
 
   def event_for_topic(topic), do: Map.get(@topic_to_event, topic)
   def event_for_name(name), do: Map.get(@name_to_event, name)
+  def maps, do: {@name_to_event, @topic_to_event}
 
 end
 

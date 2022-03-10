@@ -1,6 +1,10 @@
 defmodule Explorer.Celo.ContractEvents.<%= module %> do
   @moduledoc """
-  Struct modelling the <%= event.name %> event from the <%= contract %> Celo core contract.
+  Struct modelling the <%= event.name %> event from the <%= case contract do
+    name when is_binary(name) -> "#{name} Celo core contract."
+    names when is_list(names) -> "#{Enum.join(names,", ")} Celo core contracts."
+  end
+  %>
   """
 
   use Explorer.Celo.ContractEvents.Base,
