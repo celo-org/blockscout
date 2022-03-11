@@ -73,13 +73,13 @@ defmodule Mix.Tasks.GenerateCeloEvents do
 
       event_path = Path.join(dir, filename)
 
-      if options[:overwrite] do
+      if File.exists?(event_path) and !options[:overwrite] do
+        Logger.info("Existing event found at #{event_path}, not replacing unless --overwrite flag provided")
+      else
         case File.write(event_path, event_content) do
           :ok -> Logger.info("Generated #{event_path}")
           e -> raise("Error creating #{event_path} - #{e}")
         end
-      else
-        Logger.info("Existing event found at #{event_path}, not replacing unless --overwrite flag provided")
       end
     end)
   end
