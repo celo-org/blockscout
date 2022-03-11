@@ -177,6 +177,7 @@ defmodule Mix.Tasks.GenerateCeloEvents do
   def extract_type("uint256"), do: {:uint, 256}
   def extract_type("address"), do: :address
 
+  def extract_type("bool"), do: :bool
   def extract_type("bytes"), do: :bytes
   def extract_type("bytes32"), do: {:bytes, 32}
   def extract_type("string"), do: :string
