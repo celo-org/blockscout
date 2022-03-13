@@ -66,26 +66,6 @@ defmodule Explorer.Chain.CeloVoterVotes do
         where: votes.active_votes != ^zero_votes,
         select: %{
           account_hash: votes.account_hash,
-          group_hash: votes.group_hash
-        }
-      )
-
-    query
-    |> Repo.all()
-    |> Enum.map(fn x -> Map.put(x, :block_number, epoch_block_number) end)
-  end
-
-  def previous_epoch_non_zero_voter_votes(epoch_block_number) do
-    zero_votes = %Explorer.Chain.Wei{value: Decimal.new(0)}
-    previous_epoch_block_number = epoch_block_number - 17_280
-
-    query =
-      from(
-        votes in __MODULE__,
-        where: votes.block_number == ^previous_epoch_block_number,
-        where: votes.active_votes != ^zero_votes,
-        select: %{
-          account_hash: votes.account_hash,
           block_hash: votes.block_hash,
           group_hash: votes.group_hash
         }

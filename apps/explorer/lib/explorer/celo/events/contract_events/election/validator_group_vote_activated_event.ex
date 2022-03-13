@@ -33,7 +33,8 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
         select: %{
           account_hash: json_extract_path(event.params, ["account"]),
           block_hash: block.hash,
-          block_number: block.number,group_hash: json_extract_path(event.params, ["group"])
+          block_number: block.number,
+          group_hash: json_extract_path(event.params, ["group"])
         }
       )
 

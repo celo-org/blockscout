@@ -1,0 +1,132 @@
+defmodule Indexer.Fetcher.CeloVoterVotes do
+  @moduledoc """
+  Fetches Celo voter votes.
+  """
+  use Indexer.Fetcher
+  use Spandex.Decorators
+
+  require Logger
+
+  alias Explorer.Celo.{AccountReader, ContractEvents}
+  alias Explorer.Chain
+  alias Explorer.Chain.CeloVoterVotes, as: CeloVoterVotesChain
+
+  alias ContractEvents.Election.ValidatorGroupVoteActivatedEvent
+
+  alias Indexer.BufferedTask
+  alias Indexer.Fetcher.Util
+
+  @behaviour BufferedTask
+
+  @spec async_fetch([%{block_hash: Hash.Full.t(), block_number: Block.block_number()}]) :: :ok
+  def async_fetch(blocks) when is_list(blocks) do
+    filtered_blocks =
+      blocks
+      |> Enum.filter(&(rem(&1.block_number, 17280) == 0))
+
+    BufferedTask.buffer(__MODULE__, filtered_blocks)
+  end
+
+  @doc false
+  def child_spec([init_options, gen_server_options]) do
+    init_options_with_polling =
+      init_options
+      |> Keyword.put(:poll, true)
+      |> Keyword.put(:poll_interval, :timer.minutes(60))
+
+    Util.default_child_spec(init_options_with_polling, gen_server_options, __MODULE__)
+  end
+
+  @impl BufferedTask
+  def init(initial, reducer, _json_rpc_named_arguments) do
+    {:ok, final} =
+      Chain.stream_blocks_with_unfetched_voter_votes(initial, fn block, acc ->
+        block
+        |> reducer.(acc)
+      end)
+
+    final
+  end
+
+  @impl BufferedTask
+  def run(entries, _json_rpc_named_arguments) do
+    failed_list =
+      entries
+      |> Enum.map(&get_previous_epoch_voters_and_groups/1)
+      |> List.flatten()
+      |> Enum.map(&fetch_from_blockchain/1)
+      |> import_items()
+
+    if failed_list == [] do
+      :ok
+    else
+      {:retry, failed_list}
+    end
+  end
+
+  def get_previous_epoch_voters_and_groups(%{block_number: block_number}) do
+    activated_in_previous_epoch = ValidatorGroupVoteActivatedEvent.voters_activated_votes_in_last_epoch(block_number)
+    voted_in_previous_epoch = CeloVoterVotesChain.previous_epoch_non_zero_voter_votes(block_number)
+    voted_in_previous_epoch ++ activated_in_previous_epoch
+  end
+
+  def fetch_from_blockchain(entry) do
+    case AccountReader.active_votes(entry) do
+      {:ok, data} ->
+        data
+
+      error ->
+        Logger.debug(inspect(error))
+        Map.put(entry, :error, error)
+    end
+  end
+
+  def import_items(votes) do
+    {failed, success} =
+      Enum.reduce(votes, {[], []}, fn
+        %{error: _error} = vote, {failed, success} ->
+          {[vote | failed], success}
+
+        vote, {failed, success} ->
+          changeset = CeloVoterVotesChain.changeset(%CeloVoterVotesChain{}, vote)
+
+          if changeset.valid? do
+            {failed, [changeset.changes | success]}
+          else
+            Logger.error(fn -> "changeset errors" end,
+              errors: changeset.errors
+            )
+
+            {[vote | failed], success}
+          end
+      end)
+
+    import_params = %{
+      celo_voter_votes: %{params: success},
+      timeout: :infinity
+    }
+
+    if failed != [] do
+      Logger.error(fn -> "requeuing voter votes" end,
+        block_numbers: Enum.map(failed, fn votes -> votes.block_number end)
+      )
+    end
+
+    case Chain.import(import_params) do
+      {:ok, yeah} ->
+        IO.inspect(yeah, label: "yeah")
+
+        :ok
+
+      {:error, reason} ->
+        IO.inspect(reason, label: "reason")
+
+        Logger.error(fn -> ["failed to import Celo voter votes data: ", inspect(reason)] end,
+          error_count: Enum.count(votes)
+        )
+    end
+    IO.inspect(failed, label: "failed")
+
+    failed
+  end
+end

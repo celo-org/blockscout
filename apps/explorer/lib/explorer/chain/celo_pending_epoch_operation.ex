@@ -69,16 +69,15 @@ defmodule Explorer.Chain.CeloPendingEpochOperation do
       fetch_epoch_rewards: new_fetch_epoch_rewards,
       fetch_validator_group_data: new_fetch_validator_group_data,
       fetch_voter_votes: new_fetch_voter_votes
-    } =
-      new_celo_pending_operation
+    } = new_celo_pending_operation
 
-      celo_pending_operation
-      |> changeset(%{
-        block_hash: block_hash,
-        fetch_epoch_rewards: new_fetch_epoch_rewards,
-        fetch_validator_group_data: new_fetch_validator_group_data,
-        fetch_voter_votes: new_fetch_voter_votes
-      })
-      |> Repo.update()
+    celo_pending_operation
+    |> changeset(%{
+      block_hash: block_hash,
+      fetch_epoch_rewards: new_fetch_epoch_rewards,
+      fetch_validator_group_data: new_fetch_validator_group_data,
+      fetch_voter_votes: new_fetch_voter_votes
+    })
+    |> Repo.update()
   end
 end
