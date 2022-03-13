@@ -497,12 +497,14 @@ defmodule Indexer.Block.Fetcher do
 
   def async_import_celo_epoch_rewards(blocks) do
     blocks
-    |> Enum.map(fn x -> CeloEpochRewards.async_fetch(%{block_hash: x.hash, block_number: x.number}) end)
+    |> Enum.map(&(%{block_hash: &1.hash, block_number: &1.number}))
+    |> CeloEpochRewards.async_fetch()
   end
 
   def async_import_celo_voter_votes(blocks) do
     blocks
-    |> Enum.map(fn x -> CeloVoterVotes.async_fetch(%{block_hash: x.hash, block_number: x.number}) end)
+    |> Enum.map(&(%{block_hash: &1.hash, block_number: &1.number}))
+    |> CeloVoterVotes.async_fetch()
   end
 
   def async_import_celo_accounts(%{celo_accounts: accounts}) do
