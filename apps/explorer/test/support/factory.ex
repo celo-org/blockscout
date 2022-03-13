@@ -323,7 +323,8 @@ defmodule Explorer.Factory do
       # caller MUST supply block
       # all operations will default to true
       fetch_epoch_rewards: true,
-      fetch_validator_group_data: true
+      fetch_validator_group_data: true,
+      fetch_voter_votes: true
     }
   end
 
