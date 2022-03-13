@@ -66,13 +66,11 @@ defmodule Explorer.Chain.CeloVoterVotes do
         where: votes.active_votes != ^zero_votes,
         select: %{
           account_hash: votes.account_hash,
-          block_hash: votes.block_hash,
           group_hash: votes.group_hash
         }
       )
 
     query
     |> Repo.all()
-    |> Enum.map(fn x -> Map.put(x, :block_number, epoch_block_number) end)
   end
 end

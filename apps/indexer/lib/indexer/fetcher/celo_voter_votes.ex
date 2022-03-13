@@ -64,10 +64,11 @@ defmodule Indexer.Fetcher.CeloVoterVotes do
     end
   end
 
-  def get_previous_epoch_voters_and_groups(%{block_number: block_number}) do
+  def get_previous_epoch_voters_and_groups(%{block_hash: block_hash, block_number: block_number}) do
     activated_in_previous_epoch = ValidatorGroupVoteActivatedEvent.voters_activated_votes_in_last_epoch(block_number)
     voted_in_previous_epoch = CeloVoterVotesChain.previous_epoch_non_zero_voter_votes(block_number)
     voted_in_previous_epoch ++ activated_in_previous_epoch
+    |> Enum.map(&(Map.merge(&1, %{block_hash: block_hash, block_number: block_number})))
   end
 
   def fetch_from_blockchain(entry) do

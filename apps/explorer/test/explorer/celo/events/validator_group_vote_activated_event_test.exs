@@ -122,8 +122,7 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
       %Address{hash: group_address_hash} = insert(:address)
       %Address{hash: contract_address_hash} = insert(:address)
 
-      %Block{hash: block_1_hash} =
-        block_1 = insert(:block, number: 10_692_863, timestamp: ~U[2022-01-01 13:08:43.162804Z])
+      block_1 = insert(:block, number: 10_692_863, timestamp: ~U[2022-01-01 13:08:43.162804Z])
 
       log_1 = insert(:log, block: block_1)
 
@@ -173,14 +172,10 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
                [
                  %{
                    account_hash: voter_1_address_hash,
-                   block_number: 10_696_320,
-                   block_hash: block_1_hash,
                    group_hash: group_address_hash
                  },
                  %{
                    account_hash: voter_2_address_hash,
-                   block_number: 10_696_320,
-                   block_hash: block_1_hash,
                    group_hash: group_address_hash
                  }
                ]

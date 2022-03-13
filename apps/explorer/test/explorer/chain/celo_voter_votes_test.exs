@@ -44,12 +44,10 @@ defmodule Explorer.Chain.CeloVoterVotesTest do
       assert CeloVoterVotes.previous_epoch_non_zero_voter_votes(34_560) == [
                %{
                  account_hash: voter_1_address_hash,
-                 block_number: 34_560,
                  group_hash: group_1_address_hash
                },
                %{
                  account_hash: voter_1_address_hash,
-                 block_number: 34_560,
                  group_hash: group_2_address_hash
                }
              ]

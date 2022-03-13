@@ -33,14 +33,12 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
         where: event.name == "ValidatorGroupVoteActivated",
         select: %{
           account_hash: json_extract_path(event.params, ["account"]),
-          block_hash: block.hash,
-          block_number: block.number,
           group_hash: json_extract_path(event.params, ["group"])
         }
       )
 
     query
     |> Repo.all()
-    |> Enum.map(&Map.merge(&1, %{account_hash: Common.ca(&1.account_hash), group_hash: Common.ca(&1.group_hash)}))
+    |> Enum.map(&(%{account_hash: Common.ca(&1.account_hash), group_hash: Common.ca(&1.group_hash)}))
   end
 end
