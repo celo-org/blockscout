@@ -115,19 +115,14 @@ defmodule Indexer.Fetcher.CeloVoterVotes do
     end
 
     case Chain.import(import_params) do
-      {:ok, yeah} ->
-        IO.inspect(yeah, label: "yeah")
-
+      {:ok, _} ->
         :ok
 
       {:error, reason} ->
-        IO.inspect(reason, label: "reason")
-
         Logger.error(fn -> ["failed to import Celo voter votes data: ", inspect(reason)] end,
           error_count: Enum.count(votes)
         )
     end
-    IO.inspect(failed, label: "failed")
 
     failed
   end
