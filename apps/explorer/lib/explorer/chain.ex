@@ -2874,7 +2874,8 @@ defmodule Explorer.Chain do
         b in Block,
         join: celo_pending_ops in assoc(b, :celo_pending_epoch_operations),
         where: celo_pending_ops.fetch_voter_votes,
-        select: %{block_number: b.number, block_hash: b.hash}
+        select: %{block_number: b.number, block_hash: b.hash},
+        order_by: [asc: b.number]
       )
 
     Repo.stream_reduce(query, initial, reducer)
