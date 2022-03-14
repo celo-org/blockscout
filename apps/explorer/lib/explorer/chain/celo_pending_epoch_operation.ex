@@ -8,7 +8,7 @@ defmodule Explorer.Chain.CeloPendingEpochOperation do
   alias Explorer.Chain.{Block, Hash}
   alias Explorer.Repo
 
-  @required_attrs ~w(block_hash fetch_epoch_rewards)a
+  @required_attrs ~w(block_hash fetch_epoch_rewards fetch_validator_group_data fetch_voter_votes)a
 
   @typedoc """
    * `block_hash` - the hash of the epoch block that has pending operations.
