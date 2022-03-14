@@ -9,7 +9,7 @@ defmodule Indexer.Fetcher.CeloEpochRewards do
 
   alias Explorer.Celo.AccountReader
   alias Explorer.Chain
-  alias Explorer.Chain.CeloEpochRewards
+  alias Explorer.Chain.{Block, CeloEpochRewards, Hash}
 
   alias Indexer.BufferedTask
   alias Indexer.Fetcher.Util

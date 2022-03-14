@@ -9,6 +9,7 @@ defmodule Indexer.Fetcher.CeloVoterVotes do
 
   alias Explorer.Celo.{AccountReader, ContractEvents}
   alias Explorer.Chain
+  alias Explorer.Chain.{Block, Hash}
   alias Explorer.Chain.CeloVoterVotes, as: CeloVoterVotesChain
 
   alias ContractEvents.Election.ValidatorGroupVoteActivatedEvent
@@ -33,7 +34,7 @@ defmodule Indexer.Fetcher.CeloVoterVotes do
       init_options
       |> Keyword.put(:poll, true)
       |> Keyword.put(:poll_interval, :timer.minutes(60))
-      |> Keyword.put(:max_batch_size, 10)
+      |> Keyword.put(:max_batch_size, 1)
 
     Util.default_child_spec(init_options_with_polling, gen_server_options, __MODULE__)
   end
