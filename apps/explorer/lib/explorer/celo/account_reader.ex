@@ -249,16 +249,17 @@ defmodule Explorer.Celo.AccountReader do
         {:election, "getActiveVotesForGroupByAccount", [to_string(group_hash), to_string(account_hash)], block_number}
       ])
 
-    with {:ok, [active]} <- data["getActiveVotesForGroupByAccount"] do
-      {:ok,
-       %{
-         account_hash: account_hash,
-         active_votes: active,
-         block_hash: block_hash,
-         block_number: block_number,
-         group_hash: group_hash
-       }}
-    else
+    case data["getActiveVotesForGroupByAccount"] do
+      {:ok, [active]} ->
+        {:ok,
+         %{
+           account_hash: account_hash,
+           active_votes: active,
+           block_hash: block_hash,
+           block_number: block_number,
+           group_hash: group_hash
+         }}
+
       _ ->
         :error
     end

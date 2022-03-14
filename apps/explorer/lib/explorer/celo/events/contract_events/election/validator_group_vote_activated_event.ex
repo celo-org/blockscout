@@ -39,6 +39,6 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
 
     query
     |> Repo.all()
-    |> Enum.map(&(%{account_hash: Common.ca(&1.account_hash), group_hash: Common.ca(&1.group_hash)}))
+    |> Enum.map(&%{account_hash: Common.ca(&1.account_hash), group_hash: Common.ca(&1.group_hash)})
   end
 end
