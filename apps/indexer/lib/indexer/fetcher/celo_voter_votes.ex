@@ -55,6 +55,7 @@ defmodule Indexer.Fetcher.CeloVoterVotes do
       entries
       |> Enum.map(&get_previous_epoch_voters_and_groups/1)
       |> List.flatten()
+      |> Enum.uniq_by(&{&1.block_hash, &1.account_hash, &1.group_hash})
       |> Enum.map(&fetch_from_blockchain/1)
       |> import_items()
 
