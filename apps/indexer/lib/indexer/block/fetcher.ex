@@ -23,12 +23,10 @@ defmodule Indexer.Block.Fetcher do
   alias Indexer.Fetcher.{
     BlockReward,
     CeloAccount,
-    CeloEpochRewards,
     CeloValidator,
     CeloValidatorGroup,
     CeloValidatorHistory,
     CeloVoters,
-    CeloVoterVotes,
     CoinBalance,
     ContractCode,
     InternalTransaction,

@@ -23,7 +23,7 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
   event_param(:value, {:uint, 256}, :unindexed)
   event_param(:units, {:uint, 256}, :unindexed)
 
-  def get_account_group_pairs_with_activated_votes() do
+  def get_account_group_pairs_with_activated_votes do
     query =
       from(
         event in CeloContractEvent,

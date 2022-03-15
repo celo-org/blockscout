@@ -65,6 +65,7 @@ defmodule Indexer.Fetcher.CeloVoterVotes do
       uniq_failed =
         failed_list
         |> Enum.uniq_by(&{&1.block_hash})
+
       {:retry, uniq_failed}
     end
   end
