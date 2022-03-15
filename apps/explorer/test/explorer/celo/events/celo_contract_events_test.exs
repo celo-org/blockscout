@@ -8,7 +8,6 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
   alias Explorer.Test.TestParamCollisionEvent
 
   describe "overall generic tests" do
-    @tag :skip
     test "exportisto event type parity" do
       # set of exportisto events taken from bigquery data set rc1_eksportisto_14
       exportisto_events =
