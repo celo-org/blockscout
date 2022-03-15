@@ -337,8 +337,6 @@ defmodule Indexer.Block.Fetcher do
 
       Market.bulk_insert_history(market_history)
 
-      async_import_celo_epoch_rewards(blocks)
-      async_import_celo_voter_votes(blocks)
       async_import_celo_validators(%{celo_validators: %{params: celo_validators}})
       async_import_celo_validator_groups(%{celo_validator_groups: %{params: celo_validator_groups}})
       async_import_celo_voters(%{celo_voters: %{params: celo_voters}})
@@ -494,18 +492,6 @@ defmodule Indexer.Block.Fetcher do
   end
 
   def async_import_token_balances(_), do: :ok
-
-  def async_import_celo_epoch_rewards(blocks) do
-    blocks
-    |> Enum.map(&%{block_hash: &1.hash, block_number: &1.number})
-    |> CeloEpochRewards.async_fetch()
-  end
-
-  def async_import_celo_voter_votes(blocks) do
-    blocks
-    |> Enum.map(&%{block_hash: &1.hash, block_number: &1.number})
-    |> CeloVoterVotes.async_fetch()
-  end
 
   def async_import_celo_accounts(%{celo_accounts: accounts}) do
     CeloAccount.async_fetch(accounts)

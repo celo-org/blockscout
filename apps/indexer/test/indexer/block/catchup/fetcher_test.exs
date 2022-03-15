@@ -24,8 +24,7 @@ defmodule Indexer.Block.Catchup.FetcherTest do
     CeloValidatorHistory,
     CeloValidatorGroup,
     CeloEpochRewards,
-    CeloVoters,
-    CeloVoterVotes
+    CeloVoters
   }
 
   defp start_supervisors(json_rpc_named_arguments) do
@@ -39,7 +38,6 @@ defmodule Indexer.Block.Catchup.FetcherTest do
     CeloValidatorGroup.Supervisor.Case.start_supervised!(json_rpc_named_arguments: json_rpc_named_arguments)
     CeloVoters.Supervisor.Case.start_supervised!(json_rpc_named_arguments: json_rpc_named_arguments)
     CeloEpochRewards.Supervisor.Case.start_supervised!(json_rpc_named_arguments: json_rpc_named_arguments)
-    CeloVoterVotes.Supervisor.Case.start_supervised!(json_rpc_named_arguments: json_rpc_named_arguments)
   end
 
   @moduletag capture_log: true
