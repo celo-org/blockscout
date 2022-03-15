@@ -15,20 +15,24 @@ defmodule Explorer.Chain.CeloContractEvent do
   @type t :: %__MODULE__{
           block_hash: Hash.Full.t(),
           name: String.t(),
+          topic: String.t(),
           log_index: non_neg_integer(),
+          block_number: non_neg_integer(),
           contract_address_hash: Hash.Address.t(),
           transaction_hash: Hash.Full.t(),
           params: map()
         }
 
-  @attrs ~w( name contract_address_hash transaction_hash block_hash log_index params)a
-  @required ~w( name contract_address_hash block_hash log_index)a
+  @attrs ~w( name contract_address_hash transaction_hash block_hash log_index params topic block_number)a
+  @required ~w( name contract_address_hash block_hash log_index topic block_number)a
 
   @primary_key false
   schema "celo_contract_events" do
     field(:block_hash, Hash.Full, primary_key: true)
     field(:log_index, :integer, primary_key: true)
     field(:name, :string)
+    field(:topic, :string)
+    field(:block_number, :integer)
     field(:params, :map)
     field(:contract_address_hash, Address)
     field(:transaction_hash, Hash.Full)
