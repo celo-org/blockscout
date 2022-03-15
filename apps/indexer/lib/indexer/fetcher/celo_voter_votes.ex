@@ -33,7 +33,7 @@ defmodule Indexer.Fetcher.CeloVoterVotes do
     init_options_with_polling =
       init_options
       |> Keyword.put(:poll, true)
-      |> Keyword.put(:poll_interval, :timer.seconds(60))
+      |> Keyword.put(:poll_interval, :timer.minutes(60))
       |> Keyword.put(:max_concurrency, 1)
       |> Keyword.put(:max_batch_size, 1)
 
