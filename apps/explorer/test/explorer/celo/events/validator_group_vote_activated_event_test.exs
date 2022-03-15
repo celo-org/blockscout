@@ -114,23 +114,20 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
     end
   end
 
-  describe "voters_activated_votes_in_last_epoch/1" do
-    test "returns only voters that have activated votes in the epoch previous to the one passed as argument" do
-      %Address{hash: voter_1_address_hash} = insert(:address)
-      %Address{hash: voter_2_address_hash} = insert(:address)
-      %Address{hash: voter_3_address_hash} = insert(:address)
+  describe "get_previous_epoch_voters_and_groups/1" do
+    test "returns accounts that have activated votes for groups" do
+      %Address{hash: voter_address_hash} = insert(:address)
       %Address{hash: group_address_hash} = insert(:address)
       %Address{hash: contract_address_hash} = insert(:address)
 
-      block_1 = insert(:block, number: 10_692_863, timestamp: ~U[2022-01-01 13:08:43.162804Z])
-
-      log_1 = insert(:log, block: block_1)
+      block = insert(:block, number: 10_692_863, timestamp: ~U[2022-01-01 13:08:43.162804Z])
+      log = insert(:log, block: block)
 
       insert(:contract_event, %{
         event: %ValidatorGroupVoteActivatedEvent{
-          block_hash: block_1.hash,
-          log_index: log_1.index,
-          account: voter_1_address_hash,
+          block_hash: block.hash,
+          log_index: log.index,
+          account: voter_address_hash,
           contract_address_hash: contract_address_hash,
           group: group_address_hash,
           units: 1000,
@@ -138,44 +135,10 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
         }
       })
 
-      block_2 = insert(:block, number: 10_692_864, timestamp: ~U[2022-01-03 13:08:48.162804Z])
-      log_2 = insert(:log, block: block_2)
-
-      insert(:contract_event, %{
-        event: %ValidatorGroupVoteActivatedEvent{
-          block_hash: block_2.hash,
-          log_index: log_2.index,
-          account: voter_2_address_hash,
-          contract_address_hash: contract_address_hash,
-          group: group_address_hash,
-          units: 1000,
-          value: 250
-        }
-      })
-
-      block_3 = insert(:block, number: 10_710_144, timestamp: ~U[2022-01-04 13:08:48.162804Z])
-      log_3 = insert(:log, block: block_3)
-
-      insert(:contract_event, %{
-        event: %ValidatorGroupVoteActivatedEvent{
-          block_hash: block_3.hash,
-          log_index: log_3.index,
-          account: voter_3_address_hash,
-          contract_address_hash: contract_address_hash,
-          group: group_address_hash,
-          units: 1000,
-          value: 250
-        }
-      })
-
-      assert ValidatorGroupVoteActivatedEvent.voters_activated_votes_in_last_epoch(10_696_320) ==
+      assert ValidatorGroupVoteActivatedEvent.get_previous_epoch_voters_and_groups(10_713_600) ==
                [
                  %{
-                   account_hash: voter_1_address_hash,
-                   group_hash: group_address_hash
-                 },
-                 %{
-                   account_hash: voter_2_address_hash,
+                   account_hash: voter_address_hash,
                    group_hash: group_address_hash
                  }
                ]
