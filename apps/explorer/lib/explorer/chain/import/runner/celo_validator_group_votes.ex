@@ -43,7 +43,7 @@ defmodule Explorer.Chain.Import.Runner.CeloValidatorGroupVotes do
       end)
 
     multi_chain
-    |> Multi.run(:delete_celo_pending, fn _, _ ->
+    |> Multi.run(:falsify_fetch_validator_group_data, fn _, _ ->
       changes =
         changes_list
         |> Enum.each(fn reward ->

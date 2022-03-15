@@ -43,7 +43,7 @@ defmodule Explorer.Chain.Import.Runner.CeloEpochRewards do
       end)
 
     multi_chain
-    |> Multi.run(:delete_celo_pending, fn _, _ ->
+    |> Multi.run(:falsify_fetch_epoch_rewards, fn _, _ ->
       changes_list
       |> Enum.each(fn reward ->
         CeloPendingEpochOperation.falsify_celo_pending_epoch_operation(

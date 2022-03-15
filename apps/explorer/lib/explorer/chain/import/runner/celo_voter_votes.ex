@@ -44,7 +44,7 @@ defmodule Explorer.Chain.Import.Runner.CeloVoterVotes do
       end)
 
     multi_chain
-    |> Multi.run(:delete_celo_pending, fn _, _ ->
+    |> Multi.run(:falsify_fetch_voter_votes, fn _, _ ->
       changes =
         changes_list
         |> Enum.each(fn votes ->
