@@ -29,7 +29,7 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
         event in CeloContractEvent,
         inner_join: block in Block,
         on: event.block_hash == block.hash,
-        where: block.number >= ^block_number - 17280 and block.number < ^block_number,
+        where: block.number >= ^block_number - 17_280 and block.number < ^block_number,
         where: event.name == "ValidatorGroupVoteActivated",
         select: %{
           account_hash: json_extract_path(event.params, ["account"]),

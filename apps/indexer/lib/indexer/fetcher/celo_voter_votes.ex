@@ -23,7 +23,7 @@ defmodule Indexer.Fetcher.CeloVoterVotes do
   def async_fetch(blocks) when is_list(blocks) do
     filtered_blocks =
       blocks
-      |> Enum.filter(&(rem(&1.block_number, 17280) == 0))
+      |> Enum.filter(&(rem(&1.block_number, 17_280) == 0))
 
     BufferedTask.buffer(__MODULE__, filtered_blocks)
   end
