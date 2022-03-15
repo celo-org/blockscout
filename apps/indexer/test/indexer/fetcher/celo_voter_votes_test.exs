@@ -48,7 +48,6 @@ defmodule Indexer.Fetcher.CeloVoterVotesTest do
              ) == [%{block_number: block.number, block_hash: block.hash}]
     end
 
-    @tag :no_geth
     test "does not buffer blocks with fetched epoch rewards", %{
       json_rpc_named_arguments: json_rpc_named_arguments
     } do
