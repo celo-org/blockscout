@@ -14,14 +14,6 @@ defmodule Explorer.Celo.ContractEvents.EventMapTest do
       assert result.name == "ValidatorGroupVoteActivated"
     end
 
-    test "Gets struct for name" do
-      result =
-        "ValidatorGroupVoteActivated"
-        |> EventMap.event_for_name()
-
-      assert result.topic == "0x45aac85f38083b18efe2d441a65b9c1ae177c78307cb5a5d4aec8f7dbcaeabfe"
-    end
-
     test "Converts jsonrpc log format to CeloContractEvent changeset params" do
       test_params = %{
         address_hash: "0x765de816845861e75a25fca122bb6898b8b1282a",
