@@ -122,21 +122,21 @@ defmodule Explorer.SetupVoterRewardsTest do
   end
 
   def setup_for_all_groups do
-    %Address{hash: voter_address_1_hash} = insert(:address)
-    %Address{hash: voter_address_2_hash} = insert(:address)
+    %Address{hash: voter_1_hash} = insert(:address)
+    %Address{hash: voter_2_hash} = insert(:address)
     %Address{hash: contract_address_hash} = insert(:address)
 
-    %Address{hash: group_address_1_hash} =
+    %Address{hash: group_1_hash} =
       insert(:address,
-        hash: %Explorer.Chain.Hash{
+        hash: %Hash{
           byte_count: 20,
           bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1>>
         }
       )
 
-    %Address{hash: group_address_2_hash} =
+    %Address{hash: group_2_hash} =
       insert(:address,
-        hash: %Explorer.Chain.Hash{
+        hash: %Hash{
           byte_count: 20,
           bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2>>
         }
@@ -149,9 +149,9 @@ defmodule Explorer.SetupVoterRewardsTest do
       event: %ValidatorGroupVoteActivatedEvent{
         block_hash: block_1.hash,
         log_index: log_1.index,
-        account: voter_address_1_hash,
+        account: voter_1_hash,
         contract_address_hash: contract_address_hash,
-        group: group_address_1_hash,
+        group: group_1_hash,
         units: 1000,
         value: 650
       }
@@ -164,9 +164,9 @@ defmodule Explorer.SetupVoterRewardsTest do
       event: %ValidatorGroupVoteActivatedEvent{
         block_hash: block_2.hash,
         log_index: log_2.index,
-        account: voter_address_1_hash,
+        account: voter_1_hash,
         contract_address_hash: contract_address_hash,
-        group: group_address_2_hash,
+        group: group_2_hash,
         units: 1000,
         value: 250
       }
@@ -179,14 +179,14 @@ defmodule Explorer.SetupVoterRewardsTest do
       event: %ValidatorGroupVoteActivatedEvent{
         block_hash: block_3.hash,
         log_index: log_3.index,
-        account: voter_address_2_hash,
+        account: voter_2_hash,
         contract_address_hash: contract_address_hash,
-        group: group_address_1_hash,
+        group: group_1_hash,
         units: 1000,
         value: 650
       }
     })
 
-    {voter_address_1_hash, group_address_1_hash, group_address_2_hash}
+    {voter_1_hash, group_1_hash, group_2_hash}
   end
 end
