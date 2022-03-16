@@ -22,7 +22,7 @@ defmodule Explorer.Celo.ContractEvents.Election.EpochRewardsDistributedToVotersE
     events =
       query()
       |> where([e], e.block_number == ^block_number)
-      |> order_by([e], [asc: e.log_index])
+      |> order_by([e], asc: e.log_index)
       |> Repo.all()
       |> EventMap.celo_contract_event_to_concrete_event()
 

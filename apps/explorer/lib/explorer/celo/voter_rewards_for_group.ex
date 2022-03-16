@@ -52,8 +52,6 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
       voter_activated_or_revoked ->
         [voter_activated_earliest_block | _] = voter_activated_or_revoked
 
-
-        require IEx; IEx.pry
         query =
           from(event in CeloContractEvent,
             inner_join: block in Block,

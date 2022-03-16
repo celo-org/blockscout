@@ -14,12 +14,13 @@ defmodule Explorer.Repo.Migrations.BlockNumberAndTopicOnEvents do
 
     # get block_number and event topic from "parent" log row and update existing event rows
     from(event in "celo_contract_events",
-    join: log in "logs",
-    on: {log.block_hash, log.index} == {event.block_hash, event.log_index},
-    update: [set: [block_number: log.block_number, topic: log.first_topic]])
+      join: log in "logs",
+      on: {log.block_hash, log.index} == {event.block_hash, event.log_index},
+      update: [set: [block_number: log.block_number, topic: log.first_topic]]
+    )
     |> repo().update_all([])
 
-    #use block_number in primary key
+    # use block_number in primary key
     alter table(:celo_contract_events) do
       remove(:block_hash)
       modify(:block_number, :integer, primary_key: true, null: false)
@@ -27,9 +28,9 @@ defmodule Explorer.Repo.Migrations.BlockNumberAndTopicOnEvents do
       modify(:topic, :string, null: false)
     end
 
-    #add indices to block_number and topic
-    create index(:celo_contract_events, :block_number)
-    create index(:celo_contract_events, :topic)
+    # add indices to block_number and topic
+    create(index(:celo_contract_events, :block_number))
+    create(index(:celo_contract_events, :topic))
   end
 
   def down do
@@ -42,7 +43,8 @@ defmodule Explorer.Repo.Migrations.BlockNumberAndTopicOnEvents do
     from(e in "celo_contract_events",
       join: l in "logs",
       on: {l.block_number, l.index} == {e.block_number, e.log_index},
-      update: [set: [block_hash: l.block_hash]])
+      update: [set: [block_hash: l.block_hash]]
+    )
     |> repo().update_all([])
 
     alter table(:celo_contract_events) do
