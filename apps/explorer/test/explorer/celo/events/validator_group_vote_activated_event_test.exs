@@ -135,7 +135,7 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
         }
       })
 
-      assert ValidatorGroupVoteActivatedEvent.get_previous_epoch_voters_and_groups(10_713_600) ==
+      assert ValidatorGroupVoteActivatedEvent.get_account_group_pairs_with_activated_votes() ==
                [
                  %{
                    account_hash: voter_address_hash,
