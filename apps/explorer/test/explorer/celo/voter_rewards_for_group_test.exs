@@ -149,4 +149,127 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
       assert VoterRewardsForGroup.amount_activated_or_revoked_last_day(voter_activated_or_revoked, 10_710_000) == 950
     end
   end
+
+  describe "merge_events_with_votes_and_chunk_by_epoch/2" do
+    test "when voter first activated on an epoch block" do
+      # Block hash is irrelevant in the context of the test so the same one is used everywhere for readability
+      block_hash = %Explorer.Chain.Hash{
+        byte_count: 32,
+        bytes: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0>>
+      }
+
+      events = [
+        %{
+          amount_activated_or_revoked: 650,
+          block_hash: block_hash,
+          block_number: 618 * 17_280,
+          event: "ValidatorGroupVoteActivated"
+        },
+        %{
+          amount_activated_or_revoked: 650,
+          block_hash: block_hash,
+          block_number: 618 * 17_280 + 1,
+          event: "ValidatorGroupActiveVoteRevoked"
+        },
+        %{
+          amount_activated_or_revoked: 250,
+          block_hash: block_hash,
+          block_number: 621 * 17_280 - 1,
+          event: "ValidatorGroupVoteActivated"
+        },
+        %{
+          amount_activated_or_revoked: 1075,
+          block_hash: block_hash,
+          block_number: 622 * 17_280 - 1,
+          event: "ValidatorGroupActiveVoteRevoked"
+        }
+      ]
+
+      votes = [
+        %{
+          block_hash: block_hash,
+          block_number: 619 * 17_280,
+          date: ~U[2022-01-01 17:42:43.162804Z],
+          votes: %Wei{value: 730}
+        },
+        %{
+          block_hash: block_hash,
+          block_number: 620 * 17_280,
+          date: ~U[2022-01-02 17:42:43.162804Z],
+          votes: %Wei{value: 750}
+        },
+        %{
+          block_hash: block_hash,
+          block_number: 621 * 17_280,
+          date: ~U[2022-01-03 17:42:43.162804Z],
+          votes: %Wei{value: 1075}
+        },
+        %{
+          block_hash: block_hash,
+          block_number: 622 * 17_280,
+          date: ~U[2022-01-04 17:42:43.162804Z],
+          votes: %Wei{value: 0}
+        }
+      ]
+
+      assert VoterRewardsForGroup.merge_events_with_votes_and_chunk_by_epoch(events, votes) == [
+               [
+                 %{
+                   amount_activated_or_revoked: 650,
+                   block_hash: block_hash,
+                   block_number: 618 * 17_280,
+                   event: "ValidatorGroupVoteActivated"
+                 },
+                 %{
+                   amount_activated_or_revoked: 650,
+                   block_hash: block_hash,
+                   block_number: 618 * 17_280 + 1,
+                   event: "ValidatorGroupActiveVoteRevoked"
+                 },
+                 %{
+                   block_hash: block_hash,
+                   block_number: 619 * 17_280,
+                   date: ~U[2022-01-01 17:42:43.162804Z],
+                   votes: %Wei{value: 730}
+                 }
+               ],
+               [
+                 %{
+                   block_hash: block_hash,
+                   block_number: 620 * 17_280,
+                   date: ~U[2022-01-02 17:42:43.162804Z],
+                   votes: %Wei{value: 750}
+                 }
+               ],
+               [
+                 %{
+                   amount_activated_or_revoked: 250,
+                   block_hash: block_hash,
+                   block_number: 621 * 17_280 - 1,
+                   event: "ValidatorGroupVoteActivated"
+                 },
+                 %{
+                   block_hash: block_hash,
+                   block_number: 621 * 17_280,
+                   date: ~U[2022-01-03 17:42:43.162804Z],
+                   votes: %Wei{value: 1075}
+                 }
+               ],
+               [
+                 %{
+                   amount_activated_or_revoked: 1075,
+                   block_hash: block_hash,
+                   block_number: 622 * 17_280 - 1,
+                   event: "ValidatorGroupActiveVoteRevoked"
+                 },
+                 %{
+                   block_hash: block_hash,
+                   block_number: 622 * 17_280,
+                   date: ~U[2022-01-04 17:42:43.162804Z],
+                   votes: %Wei{value: 0}
+                 }
+               ]
+             ]
+    end
+  end
 end

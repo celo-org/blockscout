@@ -121,4 +121,23 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
       end
     end)
   end
+
+  def merge_events_with_votes_and_chunk_by_epoch(events, votes) do
+    chunk_fun = fn
+      %{votes: _} = element, acc ->
+        {:cont, Enum.reverse([element | acc]), []}
+
+      element, acc ->
+        {:cont, [element | acc]}
+    end
+
+    after_fun = fn
+      [] -> {:cont, []}
+      acc -> {:cont, Enum.reverse(acc), []}
+    end
+
+    (events ++ votes)
+    |> Enum.sort_by(& &1.block_number)
+    |> Enum.chunk_while([], chunk_fun, after_fun)
+  end
 end
