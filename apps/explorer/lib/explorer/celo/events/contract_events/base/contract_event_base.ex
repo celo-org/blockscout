@@ -39,7 +39,7 @@ defmodule Explorer.Celo.ContractEvents.Base do
       def topic, do: @topic
 
       def query do
-        from(c in CeloContractEvent, where: c.name == ^@name)
+        from(c in CeloContractEvent, where: c.topic == ^@topic)
       end
     end
   end
