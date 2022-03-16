@@ -96,8 +96,8 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
 
   describe "amount_activated_or_revoked_last_day/2" do
     test "sums a voter's activated and revoked CELO for the previous day of the block passed" do
-      validator_group_vote_activated = ValidatorGroupVoteActivatedEvent.name()
-      validator_group_active_vote_revoked = ValidatorGroupActiveVoteRevokedEvent.name()
+      validator_group_vote_activated = ValidatorGroupVoteActivatedEvent.topic()
+      validator_group_active_vote_revoked = ValidatorGroupActiveVoteRevokedEvent.topic()
 
       voter_activated_or_revoked = [
         %{

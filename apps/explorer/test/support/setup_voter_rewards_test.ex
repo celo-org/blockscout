@@ -12,7 +12,6 @@ defmodule Explorer.SetupVoterRewardsTest do
   import Explorer.Factory
 
   def setup_for_group do
-    validator_group_active_vote_revoked = ValidatorGroupActiveVoteRevokedEvent.name()
     %Address{hash: voter_address_1_hash} = insert(:address)
     %Address{hash: voter_address_2_hash} = insert(:address)
     %Address{hash: group_address_hash} = insert(:address)
