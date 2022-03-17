@@ -23,11 +23,14 @@ defmodule Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
   event_param(:value, {:uint, 256}, :unindexed)
   event_param(:units, {:uint, 256}, :unindexed)
 
-  def get_account_group_pairs_with_activated_votes do
+  def get_account_group_pairs_with_activated_votes(block_number) do
     query =
       from(
         event in CeloContractEvent,
+        inner_join: block in Block,
+        on: event.block_hash == block.hash,
         where: event.name == "ValidatorGroupVoteActivated",
+        where: block.number < ^block_number,
         select: %{
           account_hash: json_extract_path(event.params, ["account"]),
           group_hash: json_extract_path(event.params, ["group"])

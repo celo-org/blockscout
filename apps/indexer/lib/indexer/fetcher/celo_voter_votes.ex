@@ -72,7 +72,7 @@ defmodule Indexer.Fetcher.CeloVoterVotes do
   end
 
   def get_previous_epoch_voters_and_groups(%{block_hash: block_hash, block_number: block_number}) do
-    ValidatorGroupVoteActivatedEvent.get_account_group_pairs_with_activated_votes()
+    ValidatorGroupVoteActivatedEvent.get_account_group_pairs_with_activated_votes(block_number)
     |> Enum.map(&Map.merge(&1, %{block_hash: block_hash, block_number: block_number}))
   end
 
