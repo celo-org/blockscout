@@ -32,7 +32,9 @@ defmodule Explorer.SetupVoterRewardsTest do
     })
 
     block_2_number = 619 * 17_280
-    %Block{hash: block_2_hash} = block_2 = insert(:block, number: block_2_number, timestamp: ~U[2022-01-01 17:42:43.162804Z])
+
+    %Block{hash: block_2_hash} =
+      block_2 = insert(:block, number: block_2_number, timestamp: ~U[2022-01-01 17:42:43.162804Z])
 
     insert(
       :celo_voter_votes,
@@ -44,7 +46,9 @@ defmodule Explorer.SetupVoterRewardsTest do
     )
 
     block_3_number = 620 * 17_280
-    %Block{hash: block_3_hash} = block_3 = insert(:block, number: block_3_number, timestamp: ~U[2022-01-02 17:42:43.162804Z])
+
+    %Block{hash: block_3_hash} =
+      block_3 = insert(:block, number: block_3_number, timestamp: ~U[2022-01-02 17:42:43.162804Z])
 
     insert(
       :celo_voter_votes,
@@ -72,7 +76,9 @@ defmodule Explorer.SetupVoterRewardsTest do
     })
 
     block_5_number = 621 * 17_280
-    %Block{hash: block_5_hash} = block_5 = insert(:block, number: block_5_number, timestamp: ~U[2022-01-03 17:42:43.162804Z])
+
+    %Block{hash: block_5_hash} =
+      block_5 = insert(:block, number: block_5_number, timestamp: ~U[2022-01-03 17:42:43.162804Z])
 
     insert(
       :celo_voter_votes,
@@ -100,7 +106,9 @@ defmodule Explorer.SetupVoterRewardsTest do
     })
 
     block_7_number = 622 * 17_280
-    %Block{hash: block_7_hash} = block_7 = insert(:block, number: block_7_number, timestamp: ~U[2022-01-04 17:42:43.162804Z])
+
+    %Block{hash: block_7_hash} =
+      block_7 = insert(:block, number: block_7_number, timestamp: ~U[2022-01-04 17:42:43.162804Z])
 
     insert(
       :celo_voter_votes,
