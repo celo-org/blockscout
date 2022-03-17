@@ -19,24 +19,21 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
     ValidatorGroupVoteActivatedEvent
   }
 
-  @validator_group_vote_activated ValidatorGroupVoteActivatedEvent.name()
-  @validator_group_active_vote_revoked ValidatorGroupActiveVoteRevokedEvent.name()
+  @validator_group_vote_activated ValidatorGroupVoteActivatedEvent.topic()
+  @validator_group_active_vote_revoked ValidatorGroupActiveVoteRevokedEvent.topic()
 
   def calculate(voter_address_hash, group_address_hash, to_date \\ DateTime.utc_now()) do
     query =
       from(event in CeloContractEvent,
-        inner_join: block in Block,
-        on: event.block_hash == block.hash,
         select: %{
-          block_hash: event.block_hash,
-          block_number: block.number,
+          block_number: event.block_number,
           amount_activated_or_revoked: json_extract_path(event.params, ["value"]),
-          event: event.name
+          event: event.topic
         },
-        order_by: [asc: block.number],
+        order_by: [asc: event.block_number],
         where:
-          event.name == ^@validator_group_active_vote_revoked or
-            event.name == ^@validator_group_vote_activated
+          event.topic == ^@validator_group_active_vote_revoked or
+            event.topic == ^@validator_group_vote_activated
       )
 
     voter_activated_or_revoked_votes_for_group_events =

@@ -21,7 +21,7 @@ defmodule Explorer.SetupVoterRewardsTest do
 
     insert(:contract_event, %{
       event: %ValidatorGroupVoteActivatedEvent{
-        block_hash: block_1.hash,
+        block_number: 10_692_863,
         log_index: log_1.index,
         account: voter_hash,
         contract_address_hash: contract_address_hash,
@@ -61,7 +61,7 @@ defmodule Explorer.SetupVoterRewardsTest do
 
     insert(:contract_event, %{
       event: %ValidatorGroupVoteActivatedEvent{
-        block_hash: block_4.hash,
+        block_number: 10_761_966,
         log_index: log_4.index,
         account: voter_hash,
         contract_address_hash: contract_address_hash,
@@ -89,7 +89,7 @@ defmodule Explorer.SetupVoterRewardsTest do
 
     insert(:contract_event, %{
       event: %ValidatorGroupActiveVoteRevokedEvent{
-        block_hash: block_6.hash,
+        block_number: 10_696_320,
         log_index: log_6.index,
         account: voter_hash,
         contract_address_hash: contract_address_hash,
@@ -147,7 +147,7 @@ defmodule Explorer.SetupVoterRewardsTest do
 
     insert(:contract_event, %{
       event: %ValidatorGroupVoteActivatedEvent{
-        block_hash: block_1.hash,
+        block_number: 10_692_863,
         log_index: log_1.index,
         account: voter_1_hash,
         contract_address_hash: contract_address_hash,
@@ -162,7 +162,7 @@ defmodule Explorer.SetupVoterRewardsTest do
 
     insert(:contract_event, %{
       event: %ValidatorGroupVoteActivatedEvent{
-        block_hash: block_2.hash,
+        block_number: 10_744_703,
         log_index: log_2.index,
         account: voter_1_hash,
         contract_address_hash: contract_address_hash,
@@ -177,7 +177,7 @@ defmodule Explorer.SetupVoterRewardsTest do
 
     insert(:contract_event, %{
       event: %ValidatorGroupVoteActivatedEvent{
-        block_hash: block_3.hash,
+        block_number: 10_779_263,
         log_index: log_3.index,
         account: voter_2_hash,
         contract_address_hash: contract_address_hash,

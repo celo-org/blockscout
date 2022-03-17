@@ -116,30 +116,47 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
 
   describe "get_previous_epoch_voters_and_groups/1" do
     test "returns accounts that have activated votes for groups" do
-      %Address{hash: voter_address_hash} = insert(:address)
-      %Address{hash: group_address_hash} = insert(:address)
+      %Address{hash: voter_1_address_hash} = insert(:address)
+      %Address{hash: group_1_address_hash} = insert(:address)
+      %Address{hash: voter_2_address_hash} = insert(:address)
+      %Address{hash: group_2_address_hash} = insert(:address)
       %Address{hash: contract_address_hash} = insert(:address)
 
-      block = insert(:block, number: 10_692_863, timestamp: ~U[2022-01-01 13:08:43.162804Z])
-      log = insert(:log, block: block)
+      block_1 = insert(:block, number: 10_692_863, timestamp: ~U[2022-01-01 13:08:43.162804Z])
+      log_1 = insert(:log, block: block_1)
 
       insert(:contract_event, %{
         event: %ValidatorGroupVoteActivatedEvent{
-          block_hash: block.hash,
-          log_index: log.index,
-          account: voter_address_hash,
+          block_number: block_1.number,
+          log_index: log_1.index,
+          account: voter_1_address_hash,
           contract_address_hash: contract_address_hash,
-          group: group_address_hash,
+          group: group_1_address_hash,
           units: 1000,
           value: 650
         }
       })
 
-      assert ValidatorGroupVoteActivatedEvent.get_account_group_pairs_with_activated_votes() ==
+      block_2 = insert(:block, number: 10_710_143, timestamp: ~U[2022-01-02 13:08:43.162814Z])
+      log_2 = insert(:log, block: block_2)
+
+      insert(:contract_event, %{
+        event: %ValidatorGroupVoteActivatedEvent{
+          block_number: block_2.number,
+          log_index: log_2.index,
+          account: voter_2_address_hash,
+          contract_address_hash: contract_address_hash,
+          group: group_2_address_hash,
+          units: 1000,
+          value: 650
+        }
+      })
+
+      assert ValidatorGroupVoteActivatedEvent.get_account_group_pairs_with_activated_votes(10_696_320) ==
                [
                  %{
-                   account_hash: voter_address_hash,
-                   group_hash: group_address_hash
+                   account_hash: voter_1_address_hash,
+                   group_hash: group_1_address_hash
                  }
                ]
     end
