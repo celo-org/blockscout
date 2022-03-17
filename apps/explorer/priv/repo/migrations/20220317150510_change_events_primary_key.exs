@@ -30,14 +30,15 @@ defmodule Explorer.Repo.Migrations.ChangeEventsPrimaryKey do
     )
     |> repo().update_all([])
 
+    drop(constraint(:celo_contract_events, :celo_contract_events_pkey))
+
     alter table(:celo_contract_events) do
-      modify(:block_number, :integer, null: true)
-      modify(:topic, :string, null: true)
+      modify(:block_number, :integer, primary_key: false)
       modify(:block_hash, :bytea, primary_key: true, null: false)
       modify(:log_index, :integer, primary_key: true, null: false)
+      modify(:topic, :string, null: true)
     end
 
-    drop(index(:celo_contract_events, :block_number))
     drop(index(:celo_contract_events, :topic))
   end
 end

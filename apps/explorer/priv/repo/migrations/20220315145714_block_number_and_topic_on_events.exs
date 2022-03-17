@@ -25,8 +25,6 @@ defmodule Explorer.Repo.Migrations.BlockNumberAndTopicOnEvents do
     alter table(:celo_contract_events) do
       remove(:block_number)
       remove(:topic)
-      modify(:block_hash, :bytea, primary_key: true, null: false)
-      modify(:log_index, :integer, primary_key: true, null: false)
     end
   end
 end
