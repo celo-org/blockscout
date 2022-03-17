@@ -32,7 +32,9 @@ defmodule Explorer.SetupVoterRewardsTest do
     })
 
     block_2_number = 619 * 17_280
-    %Block{hash: block_2_hash} = block_2 = insert(:block, number: block_2_number, timestamp: ~U[2022-01-01 17:42:43.162804Z])
+
+    %Block{hash: block_2_hash} =
+      block_2 = insert(:block, number: block_2_number, timestamp: ~U[2022-01-01 17:42:43.162804Z])
 
     insert(
       :celo_voter_votes,
@@ -44,7 +46,9 @@ defmodule Explorer.SetupVoterRewardsTest do
     )
 
     block_3_number = 620 * 17_280
-    %Block{hash: block_3_hash} = block_3 = insert(:block, number: block_3_number, timestamp: ~U[2022-01-02 17:42:43.162804Z])
+
+    %Block{hash: block_3_hash} =
+      block_3 = insert(:block, number: block_3_number, timestamp: ~U[2022-01-02 17:42:43.162804Z])
 
     insert(
       :celo_voter_votes,
@@ -72,7 +76,9 @@ defmodule Explorer.SetupVoterRewardsTest do
     })
 
     block_5_number = 621 * 17_280
-    %Block{hash: block_5_hash} = block_5 = insert(:block, number: block_5_number, timestamp: ~U[2022-01-03 17:42:43.162804Z])
+
+    %Block{hash: block_5_hash} =
+      block_5 = insert(:block, number: block_5_number, timestamp: ~U[2022-01-03 17:42:43.162804Z])
 
     insert(
       :celo_voter_votes,
@@ -100,7 +106,9 @@ defmodule Explorer.SetupVoterRewardsTest do
     })
 
     block_7_number = 622 * 17_280
-    %Block{hash: block_7_hash} = block_7 = insert(:block, number: block_7_number, timestamp: ~U[2022-01-04 17:42:43.162804Z])
+
+    %Block{hash: block_7_hash} =
+      block_7 = insert(:block, number: block_7_number, timestamp: ~U[2022-01-04 17:42:43.162804Z])
 
     insert(
       :celo_voter_votes,
@@ -122,8 +130,22 @@ defmodule Explorer.SetupVoterRewardsTest do
   end
 
   def setup_for_all_groups do
-    %Address{hash: voter_1_hash} = insert(:address)
-    %Address{hash: voter_2_hash} = insert(:address)
+    %Address{hash: voter_1_hash} =
+      insert(:address,
+        hash: %Hash{
+          byte_count: 20,
+          bytes: <<2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1>>
+        }
+      )
+
+    %Address{hash: voter_2_hash} =
+      insert(:address,
+        hash: %Hash{
+          byte_count: 20,
+          bytes: <<2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2>>
+        }
+      )
+
     %Address{hash: contract_address_hash} = insert(:address)
 
     %Address{hash: group_1_hash} =
@@ -188,5 +210,88 @@ defmodule Explorer.SetupVoterRewardsTest do
     })
 
     {voter_1_hash, group_1_hash, group_2_hash}
+  end
+
+  def setup_for_multiple_accounts do
+    %Address{hash: voter_1_hash} =
+      insert(:address,
+        hash: %Hash{
+          byte_count: 20,
+          bytes: <<2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1>>
+        }
+      )
+
+    %Address{hash: voter_2_hash} =
+      insert(:address,
+        hash: %Hash{
+          byte_count: 20,
+          bytes: <<2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2>>
+        }
+      )
+
+    %Address{hash: contract_address_hash} = insert(:address)
+
+    %Address{hash: group_1_hash} =
+      insert(:address,
+        hash: %Hash{
+          byte_count: 20,
+          bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1>>
+        }
+      )
+
+    %Address{hash: group_2_hash} =
+      insert(:address,
+        hash: %Hash{
+          byte_count: 20,
+          bytes: <<1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2>>
+        }
+      )
+
+    block_1 = insert(:block, number: 10_692_863, timestamp: ~U[2022-01-01 13:08:43.162804Z])
+    log_1 = insert(:log, block: block_1)
+
+    insert(:contract_event, %{
+      event: %ValidatorGroupVoteActivatedEvent{
+        block_number: 10_692_863,
+        log_index: log_1.index,
+        account: voter_1_hash,
+        contract_address_hash: contract_address_hash,
+        group: group_1_hash,
+        units: 1000,
+        value: 650
+      }
+    })
+
+    block_2 = insert(:block, number: 10_744_703, timestamp: ~U[2022-01-04 13:08:43.162804Z])
+    log_2 = insert(:log, block: block_2)
+
+    insert(:contract_event, %{
+      event: %ValidatorGroupVoteActivatedEvent{
+        block_number: 10_744_703,
+        log_index: log_2.index,
+        account: voter_1_hash,
+        contract_address_hash: contract_address_hash,
+        group: group_2_hash,
+        units: 1000,
+        value: 250
+      }
+    })
+
+    block_3 = insert(:block, number: 10_761_983, timestamp: ~U[2022-01-05 13:08:43.162804Z])
+    log_3 = insert(:log, block: block_3)
+
+    insert(:contract_event, %{
+      event: %ValidatorGroupVoteActivatedEvent{
+        block_number: 10_761_983,
+        log_index: log_3.index,
+        account: voter_2_hash,
+        contract_address_hash: contract_address_hash,
+        group: group_1_hash,
+        units: 1000,
+        value: 650
+      }
+    })
+
+    {voter_1_hash, voter_2_hash, group_1_hash, group_2_hash}
   end
 end

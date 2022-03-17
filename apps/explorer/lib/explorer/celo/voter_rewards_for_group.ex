@@ -69,31 +69,31 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
           query
           |> Repo.all()
 
-          events_and_votes_chunked_by_epoch = merge_events_with_votes_and_chunk_by_epoch(
+        events_and_votes_chunked_by_epoch =
+          merge_events_with_votes_and_chunk_by_epoch(
             voter_activated_or_revoked_votes_for_group_events,
             voter_votes_for_group
           )
 
         {rewards, {rewards_sum, _}} =
           Enum.map_reduce(events_and_votes_chunked_by_epoch, {0, 0}, fn epoch, {rewards_sum, previous_epoch_votes} ->
-              epoch_reward = calculate_single_epoch_reward(epoch, previous_epoch_votes)
+            epoch_reward = calculate_single_epoch_reward(epoch, previous_epoch_votes)
 
-              current_epoch_votes = epoch |> Enum.reverse() |> hd()
-              %Wei{value: current_votes} = current_epoch_votes.votes
-              current_votes_integer = Decimal.to_integer(current_votes)
+            current_epoch_votes = epoch |> Enum.reverse() |> hd()
+            %Wei{value: current_votes} = current_epoch_votes.votes
+            current_votes_integer = Decimal.to_integer(current_votes)
 
-              {
-                %{
-                  amount: epoch_reward,
-                  block_hash: current_epoch_votes.block_hash,
-                  block_number: current_epoch_votes.block_number,
-                  date: current_epoch_votes.date,
-                  epoch_number: Util.epoch_by_block_number(current_epoch_votes.block_number)
-                },
-                {epoch_reward + rewards_sum, current_votes_integer}
-              }
-            end
-          )
+            {
+              %{
+                amount: epoch_reward,
+                block_hash: current_epoch_votes.block_hash,
+                block_number: current_epoch_votes.block_number,
+                date: current_epoch_votes.date,
+                epoch_number: Util.epoch_by_block_number(current_epoch_votes.block_number)
+              },
+              {epoch_reward + rewards_sum, current_votes_integer}
+            }
+          end)
 
         {:ok, %{rewards: rewards, total: rewards_sum, group: group_address_hash}}
     end
@@ -103,8 +103,10 @@ defmodule Explorer.Celo.VoterRewardsForGroup do
     Enum.reduce(epoch, -previous_epoch_votes, fn
       %{votes: %Wei{value: votes}}, acc ->
         acc + Decimal.to_integer(votes)
+
       %{amount_activated_or_revoked: amount, event: @validator_group_vote_activated}, acc ->
         acc - amount
+
       %{amount_activated_or_revoked: amount, event: @validator_group_active_vote_revoked}, acc ->
         acc + amount
     end)

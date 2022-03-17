@@ -6,24 +6,17 @@ defmodule Explorer.Celo.VoterRewards do
   import Ecto.Query,
     only: [
       distinct: 3,
-      from: 2,
-      join: 5,
       order_by: 3,
-      select: 3,
       where: 3
     ]
 
-  alias Explorer.Celo.{ContractEvents, Events, Util}
-  alias Explorer.Chain.{Block, CeloContractEvent}
+  alias Explorer.Celo.ContractEvents
+  alias Explorer.Chain.CeloContractEvent
   alias Explorer.Repo
 
   alias ContractEvents.{Election, EventMap}
 
-  alias Election.{
-    EpochRewardsDistributedToVotersEvent,
-    ValidatorGroupActiveVoteRevokedEvent,
-    ValidatorGroupVoteActivatedEvent
-  }
+  alias Election.ValidatorGroupVoteActivatedEvent
 
   def calculate(voter_address_hash, from_date, to_date) do
     from_date =
@@ -84,5 +77,32 @@ defmodule Explorer.Celo.VoterRewards do
 
         {:ok, structured_rewards_for_given_period}
     end
+  end
+
+  def calculate_multiple_accounts(voter_address_hash_list, from_date, to_date) do
+    unfiltered_rewards_list =
+      voter_address_hash_list
+      |> Enum.map(fn hash -> calculate(hash, from_date, to_date) end)
+
+    {rewards, rewards_sum} =
+      unfiltered_rewards_list
+      |> Enum.map(fn {:ok, rewards} -> rewards end)
+      |> Enum.map(fn x ->
+        Map.put(
+          x,
+          :rewards,
+          Enum.map(x.rewards, fn reward ->
+            Map.put(reward, :account, x.account)
+          end)
+        )
+      end)
+      |> Enum.reduce([], fn curr, acc ->
+        [curr.rewards | acc]
+      end)
+      |> List.flatten()
+      |> Enum.sort_by(& &1.epoch_number)
+      |> Enum.map_reduce(0, fn x, acc -> {x, acc + x.amount} end)
+
+    {:ok, %{from: from_date, to: to_date, rewards: rewards, total_reward_celo: rewards_sum}}
   end
 end
