@@ -127,7 +127,7 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
 
       insert(:contract_event, %{
         event: %ValidatorGroupVoteActivatedEvent{
-          block_hash: block_1.hash,
+          block_number: block_1.number,
           log_index: log_1.index,
           account: voter_1_address_hash,
           contract_address_hash: contract_address_hash,
@@ -142,7 +142,7 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
 
       insert(:contract_event, %{
         event: %ValidatorGroupVoteActivatedEvent{
-          block_hash: block_2.hash,
+          block_number: block_2.number,
           log_index: log_2.index,
           account: voter_2_address_hash,
           contract_address_hash: contract_address_hash,
