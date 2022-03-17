@@ -39,6 +39,7 @@ defmodule Explorer.Repo.Migrations.ChangeEventsPrimaryKey do
       modify(:topic, :string, null: true)
     end
 
+    drop(index(:celo_contract_events, :block_number))
     drop(index(:celo_contract_events, :topic))
   end
 end
