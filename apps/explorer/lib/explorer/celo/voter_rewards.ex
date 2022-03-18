@@ -46,37 +46,31 @@ defmodule Explorer.Celo.VoterRewards do
       |> Repo.all()
       |> EventMap.celo_contract_event_to_concrete_event()
 
-    case validator_group_vote_activated_events do
-      [] ->
-        {:error, :not_found}
+    rewards_for_each_group =
+      validator_group_vote_activated_events
+      |> Enum.map(fn %ValidatorGroupVoteActivatedEvent{group: group} ->
+        voter_rewards_for_group.calculate(voter_address_hash, group, to_date)
+      end)
 
-      group ->
-        rewards_for_each_group =
-          group
-          |> Enum.map(fn %ValidatorGroupVoteActivatedEvent{group: group} ->
-            voter_rewards_for_group.calculate(voter_address_hash, group, to_date)
-          end)
+    structured_rewards_for_given_period =
+      rewards_for_each_group
+      |> Enum.map(fn {:ok, %{group: group, rewards: rewards}} ->
+        Enum.map(rewards, &Map.put(&1, :group, group))
+      end)
+      |> List.flatten()
+      |> Enum.filter(fn x -> DateTime.compare(x.date, from_date) != :lt end)
+      |> Enum.map_reduce(0, fn x, acc -> {x, acc + x.amount} end)
+      |> then(fn {rewards, total} ->
+        %{
+          from: from_date,
+          rewards: rewards,
+          to: to_date,
+          total_reward_celo: total,
+          account: voter_address_hash
+        }
+      end)
 
-        structured_rewards_for_given_period =
-          rewards_for_each_group
-          |> Enum.map(fn {:ok, %{group: group, rewards: rewards}} ->
-            Enum.map(rewards, &Map.put(&1, :group, group))
-          end)
-          |> List.flatten()
-          |> Enum.filter(fn x -> DateTime.compare(x.date, from_date) != :lt end)
-          |> Enum.map_reduce(0, fn x, acc -> {x, acc + x.amount} end)
-          |> then(fn {rewards, total} ->
-            %{
-              from: from_date,
-              rewards: rewards,
-              to: to_date,
-              total_reward_celo: total,
-              account: voter_address_hash
-            }
-          end)
-
-        {:ok, structured_rewards_for_given_period}
-    end
+    {:ok, structured_rewards_for_given_period}
   end
 
   def calculate_multiple_accounts(voter_address_hash_list, from_date, to_date) do
