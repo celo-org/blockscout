@@ -75,6 +75,11 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
     end
 
     test "with an address that doesn't exist", %{conn: conn} do
+      expected_result = %{
+        "rewards" => [],
+        "total" => "0"
+      }
+
       response =
         conn
         |> get("/api", %{
@@ -85,10 +90,9 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
         })
         |> json_response(200)
 
-      assert response["message"] =~ "Voter or group address does not exist"
-      assert response["status"] == "0"
-      assert Map.has_key?(response, "result")
-      refute response["result"]
+      assert response["result"] == expected_result
+      assert response["status"] == "1"
+      assert response["message"] == "OK"
       schema = voter_rewards_for_group_schema()
       assert :ok = ExJsonSchema.Validator.validate(schema, response)
     end

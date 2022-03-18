@@ -23,9 +23,6 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
 
       {:group_format, :error} ->
         render(conn, :error, error: "Invalid group address hash")
-
-      {:error, :not_found} ->
-        render(conn, :error, error: "Voter or group address does not exist")
     end
   end
 
