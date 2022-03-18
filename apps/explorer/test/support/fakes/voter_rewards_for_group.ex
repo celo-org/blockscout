@@ -43,9 +43,9 @@ defmodule Explorer.Fakes.VoterRewardsForGroup do
     bytes: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5>>
   }
 
-  def calculate(voter_address_hash, group_address_hash, to_date \\ DateTime.utc_now())
+  def calculate(voter_address_hash, group_address_hash, _to_date \\ DateTime.utc_now())
 
-  def calculate(voter_address_hash, group_address_hash, to_date)
+  def calculate(voter_address_hash, group_address_hash, _to_date)
       when group_address_hash == @group_address_1_hash and
              voter_address_hash == @voter_address_1_hash do
     {:ok,
@@ -92,7 +92,7 @@ defmodule Explorer.Fakes.VoterRewardsForGroup do
      }}
   end
 
-  def calculate(voter_address_hash, group_address_hash, to_date)
+  def calculate(voter_address_hash, group_address_hash, _to_date)
       when group_address_hash == @group_address_1_hash and
              voter_address_hash == @voter_address_2_hash do
     {:ok,
@@ -111,7 +111,7 @@ defmodule Explorer.Fakes.VoterRewardsForGroup do
      }}
   end
 
-  def calculate(voter_address_hash, group_address_hash, to_date) when group_address_hash == @group_address_2_hash do
+  def calculate(_voter_address_hash, group_address_hash, _to_date) when group_address_hash == @group_address_2_hash do
     {:ok,
      %{
        group: group_address_hash,
