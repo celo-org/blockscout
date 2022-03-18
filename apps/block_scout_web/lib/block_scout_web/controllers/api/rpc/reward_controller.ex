@@ -62,9 +62,6 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
 
       {:date_param, {:error, _}} ->
         render(conn, :error, error: "Please only ISO 8601 formatted dates")
-
-      {:error, :not_found} ->
-        render(conn, :error, error: "Validator address does not exist")
     end
   end
 

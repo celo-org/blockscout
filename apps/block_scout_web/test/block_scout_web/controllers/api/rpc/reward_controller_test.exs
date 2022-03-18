@@ -324,19 +324,28 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
     end
 
     test "with an address that doesn't exist", %{conn: conn} do
+      expected_result = %{
+        "rewards" => [],
+        "totalRewardCelo" => "0",
+        "from" => "2022-01-03 00:00:00.000000Z",
+        "to" => "2022-01-06 00:00:00.000000Z",
+        "account" => "0x8bf38d4764929064f2d4d3a56520a76ab3df415b"
+      }
+
       response =
         conn
         |> get("/api", %{
           "module" => "reward",
           "action" => "getvalidatorrewards",
-          "validatorAddress" => "0x8bf38d4764929064f2d4d3a56520a76ab3df415b"
+          "validatorAddress" => "0x8bf38d4764929064f2d4d3a56520a76ab3df415b",
+          "from" => "2022-01-03T00:00:00.000000Z",
+          "to" => "2022-01-06T00:00:00.000000Z"
         })
         |> json_response(200)
 
-      assert response["message"] =~ "Validator address does not exist"
-      assert response["status"] == "0"
-      assert Map.has_key?(response, "result")
-      refute response["result"]
+      assert response["result"] == expected_result
+      assert response["status"] == "1"
+      assert response["message"] == "OK"
       schema = generic_rewards_schema()
       assert :ok = ExJsonSchema.Validator.validate(schema, response)
     end
