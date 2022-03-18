@@ -56,26 +56,22 @@ defmodule Explorer.Celo.ValidatorGroupRewards do
       |> CeloContractEvent.query_by_group_param(group_address_hash)
       |> Repo.all()
 
-    case activated_votes_for_group do
-      [] ->
-        {:error, :not_found}
+    structured_activated_votes_for_group =
+      activated_votes_for_group
+      |> Enum.map(fn x ->
+        Map.merge(x, %{validator: Common.ca(x.validator), epoch_number: epoch_by_block_number(x.block_number)})
+      end)
+      |> Enum.map_reduce(0, fn x, acc -> {x, acc + x.amount} end)
+      |> then(fn {rewards, total} ->
+        %{
+          from: from_date,
+          rewards: rewards,
+          to: to_date,
+          total_reward_celo: total,
+          group: group_address_hash
+        }
+      end)
 
-      rewards ->
-        {:ok,
-         rewards
-         |> Enum.map(fn x ->
-           Map.merge(x, %{validator: Common.ca(x.validator), epoch_number: epoch_by_block_number(x.block_number)})
-         end)
-         |> Enum.map_reduce(0, fn x, acc -> {x, acc + x.amount} end)
-         |> then(fn {rewards, total} ->
-           %{
-             from: from_date,
-             rewards: rewards,
-             to: to_date,
-             total_reward_celo: total,
-             group: group_address_hash
-           }
-         end)}
-    end
+    {:ok, structured_activated_votes_for_group}
   end
 end
