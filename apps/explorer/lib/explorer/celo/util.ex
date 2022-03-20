@@ -92,4 +92,24 @@ defmodule Explorer.Celo.Util do
   def epoch_by_block_number(bn) do
     div(bn, 17_280)
   end
+
+  def add_input_account_to_individual_rewards_and_calculate_sum(reward_lists_chunked_by_account, key) do
+    reward_lists_chunked_by_account
+    |> Enum.map(fn {:ok, rewards} -> rewards end)
+    |> Enum.map(fn x ->
+      Map.put(
+        x,
+        :rewards,
+        Enum.map(x.rewards, fn reward ->
+          Map.put(reward, key, Map.get(x, key))
+        end)
+      )
+    end)
+    |> Enum.reduce([], fn curr, acc ->
+      [curr.rewards | acc]
+    end)
+    |> List.flatten()
+    |> Enum.sort_by(& &1.epoch_number)
+    |> Enum.map_reduce(0, fn x, acc -> {x, acc + x.amount} end)
+  end
 end

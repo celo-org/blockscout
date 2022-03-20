@@ -2,6 +2,10 @@ defmodule Explorer.Celo.VoterRewards do
   @moduledoc """
     Module responsible for calculating a voter's rewards for all groups the voter has voted for.
   """
+  import Explorer.Celo.Util,
+    only: [
+      add_input_account_to_individual_rewards_and_calculate_sum: 2
+    ]
 
   import Ecto.Query,
     only: [
@@ -74,28 +78,12 @@ defmodule Explorer.Celo.VoterRewards do
   end
 
   def calculate_multiple_accounts(voter_address_hash_list, from_date, to_date) do
-    unfiltered_rewards_list =
+    reward_lists_chunked_by_account =
       voter_address_hash_list
       |> Enum.map(fn hash -> calculate(hash, from_date, to_date) end)
 
     {rewards, rewards_sum} =
-      unfiltered_rewards_list
-      |> Enum.map(fn {:ok, rewards} -> rewards end)
-      |> Enum.map(fn x ->
-        Map.put(
-          x,
-          :rewards,
-          Enum.map(x.rewards, fn reward ->
-            Map.put(reward, :account, x.account)
-          end)
-        )
-      end)
-      |> Enum.reduce([], fn curr, acc ->
-        [curr.rewards | acc]
-      end)
-      |> List.flatten()
-      |> Enum.sort_by(& &1.epoch_number)
-      |> Enum.map_reduce(0, fn x, acc -> {x, acc + x.amount} end)
+      add_input_account_to_individual_rewards_and_calculate_sum(reward_lists_chunked_by_account, :account)
 
     {:ok, %{from: from_date, to: to_date, rewards: rewards, total_reward_celo: rewards_sum}}
   end

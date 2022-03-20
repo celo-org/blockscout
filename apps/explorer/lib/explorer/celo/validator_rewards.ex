@@ -4,6 +4,7 @@ defmodule Explorer.Celo.ValidatorRewards do
   """
   import Explorer.Celo.Util,
     only: [
+      add_input_account_to_individual_rewards_and_calculate_sum: 2,
       epoch_by_block_number: 1
     ]
 
@@ -73,5 +74,16 @@ defmodule Explorer.Celo.ValidatorRewards do
       end)
 
     {:ok, structured_activated_votes_for_group}
+  end
+
+  def calculate_multiple_accounts(voter_address_hash_list, from_date, to_date) do
+    reward_lists_chunked_by_account =
+      voter_address_hash_list
+      |> Enum.map(fn hash -> calculate(hash, from_date, to_date) end)
+
+    {rewards, rewards_sum} =
+      add_input_account_to_individual_rewards_and_calculate_sum(reward_lists_chunked_by_account, :account)
+
+    {:ok, %{from: from_date, to: to_date, rewards: rewards, total_reward_celo: rewards_sum}}
   end
 end
