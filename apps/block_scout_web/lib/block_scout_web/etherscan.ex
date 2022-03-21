@@ -760,7 +760,7 @@ defmodule BlockScoutWeb.Etherscan do
           "group" => "0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae"
         }
       ],
-      "totalRewardCelo" => "300",
+      "totalRewardCelo" => "300000",
       "from" => "2022-01-03 00:00:00.000000Z",
       "to" => "2022-01-06 00:00:00.000000Z",
       "account" => "0x0000000000000000000000000000000000000001"
@@ -796,27 +796,172 @@ defmodule BlockScoutWeb.Etherscan do
     }
   }
 
+
+  @reward_getvotersrewards_example_value %{
+    "status" => "1",
+    "message" => "OK",
+    "result" => %{
+      "rewards" => [
+        %{
+          "account" => "0x0000000000000000000000000000000000000001",
+          "amount" => "75",
+          "date" => "2022-01-03T17:42:43.162804Z",
+          "blockNumber" => "10730880",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000003",
+          "epochNumber" => "621",
+          "group" => "0x3fb1cd2cd96c6d5c0b5eb3322d807b34482481d4"
+        },
+        %{
+          "account" => "0x0000000000000000000000000000000000000001",
+          "amount" => "31",
+          "date" => "2022-01-04T17:42:43.162804Z",
+          "blockNumber" => "10748160",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000004",
+          "epochNumber" => "622",
+          "group" => "0x3fb1cd2cd96c6d5c0b5eb3322d807b34482481d4"
+        },
+        %{
+          "account" => "0x0000000000000000000000000000000000000001",
+          "amount" => "77",
+          "date" => "2022-01-05T17:42:43.162804Z",
+          "blockNumber" => "10765440",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000005",
+          "epochNumber" => "623",
+          "group" => "0x3fb1cd2cd96c6d5c0b5eb3322d807b34482481d4"
+        },
+        %{
+          "account" => "0x0000000000000000000000000000000000000001",
+          "amount" => "39",
+          "date" => "2022-01-04T17:42:43.162804Z",
+          "blockNumber" => "10748160",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000004",
+          "epochNumber" => "622",
+          "group" => "0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae"
+        },
+        %{
+          "account" => "0x0000000000000000000000000000000000000001",
+          "amount" => "78",
+          "date" => "2022-01-05T17:42:43.162804Z",
+          "blockNumber" => "10765440",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000005",
+          "epochNumber" => "623",
+          "group" => "0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae"
+        },
+        %{
+          "account" => "0x0000000000000000000000000000000000000002",
+          "amount" => "78",
+          "date" => "2022-01-05T17:42:43.162804Z",
+          "blockNumber" => "10765440",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000005",
+          "epochNumber" => "623",
+          "group" => "0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae"
+        }
+      ],
+      "totalRewardCelo" => "378",
+      "from" => "2022-01-03 00:00:00.000000Z",
+      "to" => "2022-01-06 00:00:00.000000Z"
+    }
+  }
+
+  @reward_getvalidatorsrewards_example_value %{
+    "status" => "1",
+    "message" => "OK",
+    "result" => %{
+      "rewards" => [
+        %{
+          "account" => "0x0000000000000000000000000000000000000001",
+          "amount" => "100000",
+          "date" => "2022-01-03T17:42:43.162804Z",
+          "blockNumber" => "10730880",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000004",
+          "epochNumber" => "621",
+          "group" => "0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae"
+        },
+        %{
+          "account" => "0x0000000000000000000000000000000000000002",
+          "amount" => "200000",
+          "date" => "2022-01-04T17:42:43.162804Z",
+          "blockNumber" => "10748160",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000005",
+          "epochNumber" => "622",
+          "group" => "0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae"
+        }
+      ],
+      "totalRewardCelo" => "300000",
+      "from" => "2022-01-03 00:00:00.000000Z",
+      "to" => "2022-01-06 00:00:00.000000Z"
+    }
+  }
+
+  @reward_getvalidatorgroupsrewards_example_value %{
+    "status" => "1",
+    "message" => "OK",
+    "result" => %{
+      "rewards" => [
+        %{
+          "amount" => "100000",
+          "date" => "2022-01-03T17:42:43.162804Z",
+          "blockNumber" => "10730880",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000004",
+          "epochNumber" => "621",
+          "group" => "0x0000000000000000000000000000000000000001",
+          "validator" => "0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae"
+        },
+        %{
+          "amount" => "200000",
+          "date" => "2022-01-04T17:42:43.162804Z",
+          "blockNumber" => "10748160",
+          "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000005",
+          "epochNumber" => "622",
+          "group" => "0x0000000000000000000000000000000000000002",
+          "validator" => "0xde0b295669a9fd93d5f28d9ec85e40f4cb697bae"
+        }
+      ],
+      "totalRewardCelo" => "300000",
+      "from" => "2022-01-03 00:00:00.000000Z",
+      "to" => "2022-01-06 00:00:00.000000Z"
+    }
+  }
+
   @reward_getvoterrewardsforgroup_example_value_error %{
     "status" => "0",
-    "message" => "Voter or group address does not exist",
+    "message" => "Invalid voter address hash",
     "result" => []
   }
 
   @reward_getvoterrewards_example_value_error %{
     "status" => "0",
-    "message" => "Voter address does not exist",
+    "message" => "Invalid voter address hash",
     "result" => []
   }
 
   @reward_getvalidatorrewards_example_value_error %{
     "status" => "0",
-    "message" => "Validator address does not exist",
+    "message" => "Invalid validator address hash",
     "result" => []
   }
 
   @reward_getvalidatorgrouprewards_example_value_error %{
     "status" => "0",
-    "message" => "Group address does not exist",
+    "message" => "Invalid group address hash",
+    "result" => []
+  }
+
+  @reward_getvotersrewards_example_value_error %{
+    "status" => "0",
+    "message" => "One or more voter addresses are invalid",
+    "result" => []
+  }
+
+  @reward_getvalidatorsrewards_example_value_error %{
+    "status" => "0",
+    "message" => "One or more validator addresses are invalid",
+    "result" => []
+  }
+
+  @reward_getvalidatorgroupsrewards_example_value_error %{
+    "status" => "0",
+    "message" => "One or more group addresses are invalid",
     "result" => []
   }
 
@@ -1502,6 +1647,22 @@ defmodule BlockScoutWeb.Etherscan do
     }
   }
 
+  @generic_epoch_rewards_multiple_accounts %{
+    type: "array",
+    array_type: %{
+      name: "Reward multiple accounts",
+      fields: %{
+        account: @address_hash_type,
+        amount: @wei_type,
+        blockHash: @block_hash_type,
+        blockNumber: @block_number_type,
+        date: %{type: "timestamp"},
+        epochNumber: "integer",
+        group: @address_hash_type
+      }
+    }
+  }
+
   @group_epoch_rewards %{
     type: "array",
     array_type: %{
@@ -1512,6 +1673,22 @@ defmodule BlockScoutWeb.Etherscan do
         blockNumber: @block_number_type,
         date: %{type: "timestamp"},
         epochNumber: "integer",
+        validator: @address_hash_type
+      }
+    }
+  }
+
+  @group_epoch_rewards_multiple_accounts %{
+    type: "array",
+    array_type: %{
+      name: "Reward",
+      fields: %{
+        amount: @wei_type,
+        blockHash: @block_hash_type,
+        blockNumber: @block_number_type,
+        date: %{type: "timestamp"},
+        epochNumber: "integer",
+        group: @address_hash_type,
         validator: @address_hash_type
       }
     }
@@ -1528,6 +1705,16 @@ defmodule BlockScoutWeb.Etherscan do
     }
   }
 
+  @generic_rewards_multiple_accounts %{
+    name: "Rewards",
+    fields: %{
+      totalRewardsCelo: @wei_type,
+      from: %{type: "timestamp"},
+      to: %{type: "timestamp"},
+      rewards: @generic_epoch_rewards_multiple_accounts
+    }
+  }
+
   @group_rewards %{
     name: "Rewards",
     fields: %{
@@ -1535,7 +1722,18 @@ defmodule BlockScoutWeb.Etherscan do
       from: %{type: "timestamp"},
       to: %{type: "timestamp"},
       group: @address_hash_type,
-      rewards: @generic_epoch_rewards
+      rewards: @group_epoch_rewards
+    }
+  }
+
+  @group_rewards_multiple_accounts %{
+    name: "Rewards",
+    fields: %{
+      totalRewardsCelo: @wei_type,
+      from: %{type: "timestamp"},
+      to: %{type: "timestamp"},
+      group: @address_hash_type,
+      rewards: @group_epoch_rewards_multiple_accounts
     }
   }
 
@@ -3453,6 +3651,156 @@ defmodule BlockScoutWeb.Etherscan do
     ]
   }
 
+  @reward_getvotersrewards_action %{
+    name: "getvotersrewards",
+    description: "Get multiple voters' rewards for a given time-span",
+    required_params: [
+      %{
+        key: "voterAddresses",
+        placeholder: "voterAddresses",
+        type: "string",
+        description: "List of coma separated voter address hashes for which you wish to get the rewards. Example: ?module=reward&action=getvotersrewards&voterAddresses=0x0000000000000000000000000000000000000001, 0x0000000000000000000000000000000000000002"
+      }
+    ],
+    optional_params: [
+      %{
+        key: "from",
+        placeholder: "startDate",
+        type: "string",
+        description: "Starting date of period you're interested in"
+      },
+      %{
+        key: "to",
+        placeholder: "endDate",
+        type: "string",
+        description: "End date of period you're interested in"
+      }
+    ],
+    responses: [
+      %{
+        code: "200",
+        description: "successful operation",
+        example_value: Jason.encode!(@reward_getvotersrewards_example_value),
+        model: %{
+          name: "Result",
+          fields: %{
+            status: @status_type,
+            message: @message_type,
+            result: %{
+              type: "model",
+              model: @generic_rewards_multiple_accounts
+            }
+          }
+        }
+      },
+      %{
+        code: "200",
+        description: "error",
+        example_value: Jason.encode!(@reward_getvotersrewards_example_value_error)
+      }
+    ]
+  }
+
+  @reward_getvalidatorsrewards_action %{
+    name: "getvalidatorsrewards",
+    description: "Get multiple validators' rewards for a given time-span",
+    required_params: [
+      %{
+        key: "validatorAddresses",
+        placeholder: "validatorAddresses",
+        type: "string",
+        description: "List of comma separated validator address hashes for which you wish to get the rewards. Example: ?module=reward&action=getvalidatorrewards&validatorAddresses=0x0000000000000000000000000000000000000001, 0x0000000000000000000000000000000000000002"
+      }
+    ],
+    optional_params: [
+      %{
+        key: "from",
+        placeholder: "startDate",
+        type: "string",
+        description: "Starting date of period you're interested in"
+      },
+      %{
+        key: "to",
+        placeholder: "endDate",
+        type: "string",
+        description: "End date of period you're interested in"
+      }
+    ],
+    responses: [
+      %{
+        code: "200",
+        description: "successful operation",
+        example_value: Jason.encode!(@reward_getvalidatorsrewards_example_value),
+        model: %{
+          name: "Result",
+          fields: %{
+            status: @status_type,
+            message: @message_type,
+            result: %{
+              type: "model",
+              model: @generic_rewards_multiple_accounts
+            }
+          }
+        }
+      },
+      %{
+        code: "200",
+        description: "error",
+        example_value: Jason.encode!(@reward_getvalidatorsrewards_example_value_error)
+      }
+    ]
+  }
+
+  @reward_getvalidatorgroupsrewards_action %{
+    name: "getvalidatorgroupsrewards",
+    description: "Get multiple validator groups' rewards for a given time-span",
+    required_params: [
+      %{
+        key: "groupAddresses",
+        placeholder: "groupAddresses",
+        type: "string",
+        description: "List of comma separated validator group address hashes for which you wish to get the rewards. Example: ?module=reward&action=getvalidatorgrouprewards&groupAddresses=0x0000000000000000000000000000000000000001, 0x0000000000000000000000000000000000000002"
+      }
+    ],
+    optional_params: [
+      %{
+        key: "from",
+        placeholder: "startDate",
+        type: "string",
+        description: "Starting date of period you're interested in"
+      },
+      %{
+        key: "to",
+        placeholder: "endDate",
+        type: "string",
+        description: "End date of period you're interested in"
+      }
+    ],
+    responses: [
+      %{
+        code: "200",
+        description: "successful operation",
+        example_value: Jason.encode!(@reward_getvalidatorgroupsrewards_example_value),
+        model: %{
+          name: "Result",
+          fields: %{
+            status: @status_type,
+            message: @message_type,
+            result: %{
+              type: "model",
+              model: @group_rewards_multiple_accounts
+            }
+          }
+        }
+      },
+      %{
+        code: "200",
+        description: "error",
+        example_value: Jason.encode!(@reward_getvalidatorgroupsrewards_example_value_error)
+      }
+    ]
+  }
+
   @account_module %{
     name: "account",
     actions: [
@@ -3531,7 +3879,10 @@ defmodule BlockScoutWeb.Etherscan do
       @reward_getvoterrewardsforgroup_action,
       @reward_getvoterrewards_action,
       @reward_getvalidatorrewards_action,
-      @reward_getvalidatorgrouprewards_action
+      @reward_getvalidatorgrouprewards_action,
+      @reward_getvotersrewards_action,
+      @reward_getvalidatorsrewards_action,
+      @reward_getvalidatorgroupsrewards_action
     ]
   }
 
