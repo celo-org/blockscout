@@ -10,6 +10,7 @@ import Dropzone from 'dropzone'
 export const initialState = {
   channelDisconnected: false,
   addressHash: null,
+  validationErrors: null,
   newForm: null
 }
 
@@ -30,14 +31,75 @@ export function reducer (state = initialState, action) {
       if (action.msg.verificationResult === 'ok') {
         return window.location.replace(window.location.href.split('/contract_verifications')[0].split('/verify')[0] + '/contracts')
       } else {
-        return Object.assign({}, state, {
-          newForm: action.msg.verificationResult
-        })
+
+        try {
+          const result = JSON.parse(action.msg.verificationResult)
+
+          return Object.assign({}, state, {
+            validationErrors: result.errors
+          })
+        } catch {
+          // TODO: get rid of it when other paths are updated as well
+          return Object.assign({}, state, {
+            newForm: action.msg.verificationResult
+          })
+        }
       }
     }
     default:
       return state
   }
+}
+
+function resetForm() {
+  $(function () {
+    $('.js-btn-add-contract-libraries').on('click', function () {
+      $('.js-smart-contract-libraries-wrapper').show()
+      $(this).hide()
+    })
+
+    $('.js-smart-contract-form-reset').on('click', function () {
+      $('.js-contract-library-form-group').removeClass('active')
+      $('.js-contract-library-form-group').first().addClass('active')
+      $('.js-smart-contract-libraries-wrapper').hide()
+      $('.js-btn-add-contract-libraries').show()
+      $('.js-add-contract-library-wrapper').show()
+    })
+
+    $('.js-btn-add-contract-library').on('click', function () {
+      const nextContractLibrary = $('.js-contract-library-form-group.active').next('.js-contract-library-form-group')
+
+      if (nextContractLibrary) {
+        nextContractLibrary.addClass('active')
+      }
+
+      if ($('.js-contract-library-form-group.active').length === $('.js-contract-library-form-group').length) {
+        $('.js-add-contract-library-wrapper').hide()
+      }
+    })
+  })
+}
+
+function renderValidationErrors(errors) {
+  $('.form-error').remove()
+
+  errors.forEach((error) => {
+    const { field, message } = error
+    const fieldName = field.replaceAll('_', '-')
+
+    $(`<span class="text-danger form-error" data-test="${fieldName}-error" id="${fieldName}-help-block">${message}</span>`).insertAfter(`[name="smart_contract[${field}]"]`)
+  })
+}
+
+function updateFormState(locked) {
+  if (locked) {
+    document.getElementById('loading').classList.remove('d-none')
+  } else {
+    document.getElementById('loading').classList.add('d-none')
+  }
+
+  const controls = document.getElementsByClassName('form-control')
+  controls.forEach((control) => control.disabled = locked)
 }
 
 const elements = {
@@ -48,41 +110,14 @@ const elements = {
   },
   '[data-page="contract-verification"]': {
     render ($el, state) {
-      if (state.newForm) {
+      if (state.validationErrors) {
+        updateFormState(false)
+        renderValidationErrors(state.validationErrors)
+      } else if (state.newForm) {
         $el.replaceWith(state.newForm)
-        $('button[data-button-loading="animation"]').click(_event => {
-          $('#loading').removeClass('d-none')
-        })
-
-        $(function () {
-          $('.js-btn-add-contract-libraries').on('click', function () {
-            $('.js-smart-contract-libraries-wrapper').show()
-            $(this).hide()
-          })
-
-          $('.js-smart-contract-form-reset').on('click', function () {
-            $('.js-contract-library-form-group').removeClass('active')
-            $('.js-contract-library-form-group').first().addClass('active')
-            $('.js-smart-contract-libraries-wrapper').hide()
-            $('.js-btn-add-contract-libraries').show()
-            $('.js-add-contract-library-wrapper').show()
-          })
-
-          $('.js-btn-add-contract-library').on('click', function () {
-            const nextContractLibrary = $('.js-contract-library-form-group.active').next('.js-contract-library-form-group')
-
-            if (nextContractLibrary) {
-              nextContractLibrary.addClass('active')
-            }
-
-            if ($('.js-contract-library-form-group.active').length === $('.js-contract-library-form-group').length) {
-              $('.js-add-contract-library-wrapper').hide()
-            }
-          })
-        })
-
-        return $el
+        resetForm()
       }
+
       return $el
     }
   }
@@ -114,6 +149,23 @@ if ($contractVerificationPage.length) {
   const store = createStore(reducer)
   const addressHash = $('#smart_contract_address_hash').val()
   const { filter, blockNumber } = humps.camelizeKeys(URI(window.location).query(true))
+  const $form = $contractVerificationPage.find('form')
+
+  $form.on('submit', (e) => {
+    e.preventDefault() // avoid to execute the actual submit of the form.
+
+    if ($form.get(0).checkValidity() === false) {
+      return false
+    }
+
+    $.ajax({
+      type: 'POST',
+      url: $form.attr('action'),
+      data: $form.serialize()
+    })
+
+    updateFormState(true)
+  })
 
   store.dispatch({
     type: 'PAGE_LOAD',
@@ -132,10 +184,6 @@ if ($contractVerificationPage.length) {
     type: 'RECEIVED_VERIFICATION_RESULT',
     msg: humps.camelizeKeys(msg)
   }))
-
-  $('button[data-button-loading="animation"]').on('click', _event => {
-    $('#loading').removeClass('d-none')
-  })
 
   $(function () {
     if ($('#metadata-json-dropzone').length) {

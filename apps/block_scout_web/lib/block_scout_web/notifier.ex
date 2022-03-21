@@ -8,8 +8,8 @@ defmodule BlockScoutWeb.Notifier do
   alias BlockScoutWeb.{
     AddressContractVerificationViaFlattenedCodeView,
     AddressContractVerificationViaJsonView,
-    AddressContractVerificationVyperView,
-    Endpoint
+    Endpoint,
+    ChangesetView
   }
 
   alias Explorer.{Chain, ExchangeRates, Market, Repo}
@@ -49,6 +49,7 @@ defmodule BlockScoutWeb.Notifier do
       ) do
     verification_from_json_upload? = Map.has_key?(conn.params, "file")
     verification_from_flattened_source? = Map.has_key?(conn.params, "external_libraries")
+    verification_from_vyper_code? = not verification_from_json_upload? and not verification_from_flattened_source?
     compiler = if verification_from_flattened_source?, do: :solc, else: :vyper
 
     contract_verification_result =
@@ -70,18 +71,28 @@ defmodule BlockScoutWeb.Notifier do
             cond do
               verification_from_json_upload? -> AddressContractVerificationViaJsonView
               verification_from_flattened_source? -> AddressContractVerificationViaFlattenedCodeView
-              true -> AddressContractVerificationVyperView
+              true -> ChangesetView
             end
 
           result =
-            view
-            |> View.render_to_string("new.html",
-              changeset: changeset,
-              compiler_versions: compiler_versions,
-              evm_versions: CodeCompiler.allowed_evm_versions(),
-              address_hash: address_hash,
-              conn: conn
-            )
+            cond do
+              verification_from_vyper_code? ->
+                view
+                |> View.render_to_string("error.json",
+                  changeset: changeset,
+                  conn: conn
+                )
+
+              true ->
+                view
+                |> View.render_to_string("new.html",
+                  changeset: changeset,
+                  compiler_versions: compiler_versions,
+                  evm_versions: CodeCompiler.allowed_evm_versions(),
+                  address_hash: address_hash,
+                  conn: conn
+                )
+            end
 
           {:error, result}
       end
