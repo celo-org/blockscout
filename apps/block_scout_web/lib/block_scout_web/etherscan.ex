@@ -796,7 +796,6 @@ defmodule BlockScoutWeb.Etherscan do
     }
   }
 
-
   @reward_getvotersrewards_example_value %{
     "status" => "1",
     "message" => "OK",
@@ -3659,7 +3658,8 @@ defmodule BlockScoutWeb.Etherscan do
         key: "voterAddresses",
         placeholder: "voterAddresses",
         type: "string",
-        description: "List of coma separated voter address hashes for which you wish to get the rewards. Example: ?module=reward&action=getvotersrewards&voterAddresses=0x0000000000000000000000000000000000000001, 0x0000000000000000000000000000000000000002"
+        description:
+          "List of coma separated voter address hashes for which you wish to get the rewards. Example: ?module=reward&action=getvotersrewards&voterAddresses=0x0000000000000000000000000000000000000001, 0x0000000000000000000000000000000000000002"
       }
     ],
     optional_params: [
@@ -3709,7 +3709,8 @@ defmodule BlockScoutWeb.Etherscan do
         key: "validatorAddresses",
         placeholder: "validatorAddresses",
         type: "string",
-        description: "List of comma separated validator address hashes for which you wish to get the rewards. Example: ?module=reward&action=getvalidatorrewards&validatorAddresses=0x0000000000000000000000000000000000000001, 0x0000000000000000000000000000000000000002"
+        description:
+          "List of comma separated validator address hashes for which you wish to get the rewards. Example: ?module=reward&action=getvalidatorrewards&validatorAddresses=0x0000000000000000000000000000000000000001, 0x0000000000000000000000000000000000000002"
       }
     ],
     optional_params: [
@@ -3759,7 +3760,8 @@ defmodule BlockScoutWeb.Etherscan do
         key: "groupAddresses",
         placeholder: "groupAddresses",
         type: "string",
-        description: "List of comma separated validator group address hashes for which you wish to get the rewards. Example: ?module=reward&action=getvalidatorgrouprewards&groupAddresses=0x0000000000000000000000000000000000000001, 0x0000000000000000000000000000000000000002"
+        description:
+          "List of comma separated validator group address hashes for which you wish to get the rewards. Example: ?module=reward&action=getvalidatorgrouprewards&groupAddresses=0x0000000000000000000000000000000000000001, 0x0000000000000000000000000000000000000002"
       }
     ],
     optional_params: [

@@ -194,9 +194,9 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
     cast_hashes = Enum.map(uncast_hashes, &Chain.string_to_address_hash/1)
 
     if Enum.all?(cast_hashes, fn
-      {:ok, _} -> true
-      _ -> false
-    end) do
+         {:ok, _} -> true
+         _ -> false
+       end) do
       {:validator_format, {:ok, Enum.map(cast_hashes, fn {:ok, hash} -> hash end)}}
     else
       {:validator_format, :error}
@@ -209,9 +209,9 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
     cast_hashes = Enum.map(uncast_hashes, &Chain.string_to_address_hash/1)
 
     if Enum.all?(cast_hashes, fn
-      {:ok, _} -> true
-      _ -> false
-    end) do
+         {:ok, _} -> true
+         _ -> false
+       end) do
       {:group_format, {:ok, Enum.map(cast_hashes, fn {:ok, hash} -> hash end)}}
     else
       {:group_format, :error}

@@ -658,8 +658,7 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
 
     test "with valid validator address list", %{conn: conn} do
       {validator_address_1_hash, validator_address_2_hash, group_address_1_hash, group_address_2_hash, block_1_hash,
-        block_2_hash} =
-        SetupValidatorAndGroupRewardsTest.setup_for_multiple_accounts()
+       block_2_hash} = SetupValidatorAndGroupRewardsTest.setup_for_multiple_accounts()
 
       expected_result = %{
         "rewards" => [
@@ -693,7 +692,7 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
         ],
         "totalRewardCelo" => "450000",
         "from" => "2022-01-03 00:00:00.000000Z",
-        "to" => "2022-01-06 00:00:00.000000Z",
+        "to" => "2022-01-06 00:00:00.000000Z"
       }
 
       response =
@@ -750,8 +749,7 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
 
     test "with valid group address", %{conn: conn} do
       {validator_address_1_hash, validator_address_2_hash, group_address_1_hash, group_address_2_hash, block_1_hash,
-        block_2_hash} =
-        SetupValidatorAndGroupRewardsTest.setup_for_multiple_accounts()
+       block_2_hash} = SetupValidatorAndGroupRewardsTest.setup_for_multiple_accounts()
 
       expected_result = %{
         "rewards" => [
