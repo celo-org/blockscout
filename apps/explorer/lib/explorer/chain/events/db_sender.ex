@@ -4,10 +4,14 @@ defmodule Explorer.Chain.Events.DBSender do
   """
   alias Explorer.Repo
 
+  @max_payload 7500
+
   def send_data(event_type) do
     payload = encode_payload({:chain_event, event_type})
     send_notify(payload)
   end
+
+  def send_data(_event_type, :catchup, _event_data), do: :ok
 
   def send_data(event_type, broadcast_type, event_data) do
     payload = encode_payload({:chain_event, event_type, broadcast_type, event_data})
@@ -21,6 +25,8 @@ defmodule Explorer.Chain.Events.DBSender do
   end
 
   defp send_notify(payload) do
-    Repo.query!("select pg_notify('chain_event', $1::text);", [payload])
+    if byte_size(payload) < @max_payload do
+      Repo.query!("select pg_notify('chain_event', $1::text);", [payload])
+    end
   end
 end
