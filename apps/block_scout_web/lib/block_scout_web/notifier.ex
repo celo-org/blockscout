@@ -8,8 +8,8 @@ defmodule BlockScoutWeb.Notifier do
   alias BlockScoutWeb.{
     AddressContractVerificationViaFlattenedCodeView,
     AddressContractVerificationViaJsonView,
-    Endpoint,
-    ChangesetView
+    ChangesetView,
+    Endpoint
   }
 
   alias Explorer.{Chain, ExchangeRates, Market, Repo}
@@ -50,51 +50,12 @@ defmodule BlockScoutWeb.Notifier do
     verification_from_json_upload? = Map.has_key?(conn.params, "file")
     verification_from_flattened_source? = Map.has_key?(conn.params, "external_libraries")
     verification_from_vyper_code? = not verification_from_json_upload? and not verification_from_flattened_source?
-    compiler = if verification_from_flattened_source?, do: :solc, else: :vyper
 
     contract_verification_result =
-      case contract_verification_result do
-        {:ok, _} = result ->
-          result
-
-        {:error, changeset} ->
-          compiler_versions =
-            case CompilerVersion.fetch_versions(compiler) do
-              {:ok, compiler_versions} ->
-                compiler_versions
-
-              {:error, _} ->
-                []
-            end
-
-          view =
-            cond do
-              verification_from_json_upload? -> AddressContractVerificationViaJsonView
-              verification_from_flattened_source? -> AddressContractVerificationViaFlattenedCodeView
-              true -> ChangesetView
-            end
-
-          result =
-            cond do
-              verification_from_vyper_code? ->
-                view
-                |> View.render_to_string("error.json",
-                  changeset: changeset,
-                  conn: conn
-                )
-
-              true ->
-                view
-                |> View.render_to_string("new.html",
-                  changeset: changeset,
-                  compiler_versions: compiler_versions,
-                  evm_versions: CodeCompiler.allowed_evm_versions(),
-                  address_hash: address_hash,
-                  conn: conn
-                )
-            end
-
-          {:error, result}
+      if verification_from_vyper_code? do
+        handle_vyper_verification_results(contract_verification_result, conn)
+      else
+        handle_solidity_verification_results(address_hash, contract_verification_result, conn)
       end
 
     Endpoint.broadcast(
@@ -220,6 +181,61 @@ defmodule BlockScoutWeb.Notifier do
       ratio: Decimal.to_string(ratio),
       finished: finished?
     })
+  end
+
+  defp handle_vyper_verification_results(contract_verification_result, conn) do
+      case contract_verification_result do
+        {:ok, _} = result ->
+          result
+
+        {:error, changeset} ->
+          result =
+            ChangesetView
+            |> View.render_to_string("error.json",
+              changeset: changeset,
+              conn: conn
+            )
+
+          {:error, result}
+      end
+  end
+
+  defp handle_solidity_verification_results(address_hash, contract_verification_result, conn) do
+    verification_from_json_upload? = Map.has_key?(conn.params, "file")
+    verification_from_flattened_source? = Map.has_key?(conn.params, "external_libraries")
+
+    case contract_verification_result do
+      {:ok, _} = result ->
+        result
+
+      {:error, changeset} ->
+        compiler_versions =
+          case CompilerVersion.fetch_versions(:solc) do
+            {:ok, compiler_versions} ->
+              compiler_versions
+
+            {:error, _} ->
+              []
+          end
+
+        view =
+          cond do
+            verification_from_json_upload? -> AddressContractVerificationViaJsonView
+            verification_from_flattened_source? -> AddressContractVerificationViaFlattenedCodeView
+          end
+
+        result =
+          view
+          |> View.render_to_string("new.html",
+            changeset: changeset,
+            compiler_versions: compiler_versions,
+            evm_versions: CodeCompiler.allowed_evm_versions(),
+            address_hash: address_hash,
+            conn: conn
+          )
+
+        {:error, result}
+    end
   end
 
   defp broadcast_address_coin_balance(%{address_hash: address_hash, block_number: block_number}) do

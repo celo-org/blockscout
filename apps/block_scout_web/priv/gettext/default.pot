@@ -530,8 +530,7 @@ msgstr ""
 #: lib/block_scout_web/templates/address_contract_verification/new.html.eex:108
 #: lib/block_scout_web/templates/address_contract_verification_via_flattened_code/new.html.eex:305
 #: lib/block_scout_web/templates/address_contract_verification_via_json/new.html.eex:56
-#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:56
-#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:56 lib/block_scout_web/templates/api_docs/_action_tile.html.eex:47
+#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:57 lib/block_scout_web/templates/api_docs/_action_tile.html.eex:47
 #: lib/block_scout_web/templates/api_docs/_eth_rpc_item.html.eex:54
 msgid "Cancel"
 msgstr ""
@@ -654,8 +653,7 @@ msgstr ""
 #: lib/block_scout_web/templates/address_contract_verification/new.html.eex:4
 #: lib/block_scout_web/templates/address_contract_verification_via_flattened_code/new.html.eex:13
 #: lib/block_scout_web/templates/address_contract_verification_via_json/new.html.eex:4
-#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:7
-#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:7 lib/block_scout_web/templates/tokens/holder/index.html.eex:17
+#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:8 lib/block_scout_web/templates/tokens/holder/index.html.eex:17
 msgid "Connection Lost"
 msgstr ""
 
@@ -1102,8 +1100,7 @@ msgid "Enter the Solidity Contract Code"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:27
-#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:27
+#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:28
 msgid "Enter the Vyper Contract Code"
 msgstr ""
 
@@ -1506,8 +1503,7 @@ msgstr ""
 #: lib/block_scout_web/templates/address_contract_verification/new.html.eex:81
 #: lib/block_scout_web/templates/address_contract_verification_via_flattened_code/new.html.eex:299
 #: lib/block_scout_web/templates/address_contract_verification_via_json/new.html.eex:50
-#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:50
-#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:50
+#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:51
 msgid "Loading...."
 msgstr ""
 
@@ -1690,8 +1686,7 @@ msgid "New Solidity Smart Contract Verification"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:12
-#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:12
+#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:13
 msgid "New Vyper Smart Contract Verification"
 msgstr ""
 
@@ -1980,8 +1975,7 @@ msgstr ""
 #, elixir-format
 #: lib/block_scout_web/templates/address_contract_verification_via_flattened_code/new.html.eex:302
 #: lib/block_scout_web/templates/address_contract_verification_via_json/new.html.eex:53
-#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:53
-#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:53
+#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:54
 msgid "Reset"
 msgstr ""
 
@@ -2990,8 +2984,7 @@ msgstr ""
 #, elixir-format
 #: lib/block_scout_web/templates/address_contract_verification_via_flattened_code/new.html.eex:301
 #: lib/block_scout_web/templates/address_contract_verification_via_json/new.html.eex:52
-#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:52
-#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:52
+#: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:53
 msgid "Verify & publish"
 msgstr ""
 
