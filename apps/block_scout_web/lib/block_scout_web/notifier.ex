@@ -184,20 +184,20 @@ defmodule BlockScoutWeb.Notifier do
   end
 
   defp handle_vyper_verification_results(contract_verification_result, conn) do
-      case contract_verification_result do
-        {:ok, _} = result ->
-          result
+    case contract_verification_result do
+      {:ok, _} = result ->
+        result
 
-        {:error, changeset} ->
-          result =
-            ChangesetView
-            |> View.render_to_string("error.json",
-              changeset: changeset,
-              conn: conn
-            )
+      {:error, changeset} ->
+        result =
+          ChangesetView
+          |> View.render_to_string("error.json",
+            changeset: changeset,
+            conn: conn
+          )
 
-          {:error, result}
-      end
+        {:error, result}
+    end
   end
 
   defp handle_solidity_verification_results(address_hash, contract_verification_result, conn) do
