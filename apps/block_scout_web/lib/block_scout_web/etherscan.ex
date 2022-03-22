@@ -1502,21 +1502,6 @@ defmodule BlockScoutWeb.Etherscan do
     }
   }
 
-  @group_epoch_rewards %{
-    type: "array",
-    array_type: %{
-      name: "Reward",
-      fields: %{
-        amount: @wei_type,
-        blockHash: @block_hash_type,
-        blockNumber: @block_number_type,
-        date: %{type: "timestamp"},
-        epochNumber: "integer",
-        validator: @address_hash_type
-      }
-    }
-  }
-
   @generic_rewards %{
     name: "Rewards",
     fields: %{
