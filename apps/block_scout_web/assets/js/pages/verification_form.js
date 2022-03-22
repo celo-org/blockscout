@@ -31,7 +31,6 @@ export function reducer (state = initialState, action) {
       if (action.msg.verificationResult === 'ok') {
         return window.location.replace(window.location.href.split('/contract-verifications')[0].split('/verify')[0] + '/contracts')
       } else {
-
         try {
           const result = JSON.parse(action.msg.verificationResult)
 
@@ -51,7 +50,7 @@ export function reducer (state = initialState, action) {
   }
 }
 
-function resetForm() {
+function resetForm () {
   $(function () {
     $('.js-btn-add-contract-libraries').on('click', function () {
       $('.js-smart-contract-libraries-wrapper').show()
@@ -80,7 +79,7 @@ function resetForm() {
   })
 }
 
-function renderValidationErrors(errors) {
+function renderValidationErrors (errors) {
   $('.form-error').remove()
 
   errors.forEach((error) => {
@@ -91,7 +90,7 @@ function renderValidationErrors(errors) {
   })
 }
 
-function updateFormState(locked) {
+function updateFormState (locked) {
   if (locked) {
     document.getElementById('loading').classList.remove('d-none')
   } else {
@@ -99,7 +98,7 @@ function updateFormState(locked) {
   }
 
   const controls = document.getElementsByClassName('form-control')
-  controls.forEach((control) => control.disabled = locked)
+  controls.forEach((control) => { control.disabled = locked })
 }
 
 const elements = {
