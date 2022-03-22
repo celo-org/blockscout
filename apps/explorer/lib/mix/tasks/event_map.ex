@@ -4,6 +4,7 @@ defmodule Mix.Tasks.EventMap do
   use Mix.Task
 
   alias Explorer.Celo.ContractEvents.EventTransformer
+  require Logger
 
   @template """
   # This file is auto generated, changes will be lost upon regeneration
@@ -86,6 +87,8 @@ defmodule Mix.Tasks.EventMap do
     {options, _, _} = OptionParser.parse(args, strict: [verbose: :boolean])
 
     modules = get_events()
+
+    Logger.info("Found #{length(modules)} Celo contract events defined in the Explorer application")
     event_map = EEx.eval_string(@template, assigns: [modules: modules])
 
     if Keyword.get(options, :verbose) do
@@ -94,6 +97,8 @@ defmodule Mix.Tasks.EventMap do
 
     _ = File.rm(@path)
     File.write(@path, event_map)
+
+    Logger.info("Wrote event map to #{@path}")
   end
 
   @dialyzer {:nowarn_function, get_events: 0}

@@ -82,23 +82,6 @@ defmodule Explorer.Celo.ContractEvents.EventMap do
       Elixir.Explorer.Celo.ContractEvents.Validators.ValidatorEcdsaPublicKeyUpdatedEvent
   }
 
-  @name_to_event %{
-    "ValidatorGroupVoteActivated" => Elixir.Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent,
-    "ConstitutionSet" => Elixir.Explorer.Celo.ContractEvents.Governance.ConstitutionSetEvent,
-    "AssetAllocationSet" => Elixir.Explorer.Celo.ContractEvents.Reserve.AssetAllocationSetEvent,
-    "EpochRewardsDistributedToVoters" =>
-      Elixir.Explorer.Celo.ContractEvents.Election.EpochRewardsDistributedToVotersEvent,
-    "TransferComment" => Elixir.Explorer.Celo.ContractEvents.Goldtoken.TransferCommentEvent,
-    "TransferComment" => Elixir.Explorer.Celo.ContractEvents.Stabletoken.TransferCommentEvent,
-    "ValidatorGroupActiveVoteRevoked" =>
-      Elixir.Explorer.Celo.ContractEvents.Election.ValidatorGroupActiveVoteRevokedEvent,
-    "ValidatorGroupVoteCast" => Elixir.Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteCastEvent,
-    "ValidatorEpochPaymentDistributed" =>
-      Elixir.Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent,
-    "ValidatorEcdsaPublicKeyUpdated" =>
-      Elixir.Explorer.Celo.ContractEvents.Validators.ValidatorEcdsaPublicKeyUpdatedEvent
-  }
-
   def event_for_topic(topic), do: Map.get(@topic_to_event, topic)
-  def maps, do: {@name_to_event, @topic_to_event}
+  def map, do: @topic_to_event
 end
