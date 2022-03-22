@@ -2,8 +2,9 @@ defmodule Explorer.Repo.Migrations.AddCeloContracts do
   use Ecto.Migration
   alias Explorer.Celo.ContractEvents.Registry.RegistryUpdatedEvent
 
+  alias Explorer.Chain.Hash.Address
   def up do
-    create table(:celo_core_contracts) do
+    create table(:celo_core_contracts, primary_key: false) do
       add(:address_hash, :bytea, null: false, primary_key: true)
       add(:name, :string, null: false)
       add(:block_number, :integer)
@@ -14,14 +15,27 @@ defmodule Explorer.Repo.Migrations.AddCeloContracts do
 
     flush()
 
+    {:ok, registry_hash} = Address.cast("0x000000000000000000000000000000000000ce10")
+    {:ok, registry_bytea} = registry_hash |> Address.dump()
+
+    registry_contract = %{
+      name: "Registry",
+      address_hash: registry_bytea,
+      block_number: 1,
+      log_index: 0
+    }
+
     # get all core contracts (registry entries)
     core_contracts = RegistryUpdatedEvent.core_contracts()
     |> repo().all()
     |> Explorer.Celo.ContractEvents.EventMap.rpc_to_event_params()
     |> Enum.map(fn e ->
-      %{name: e.params.identifier, address_hash: e.params.addr, block_number: e.block_number, log_index: e.log_index}
+      {:ok, hsh} = Address.cast(e.params.addr)
+      {:ok, address_bytea} = hsh |> Address.dump()
+
+      %{name: e.params.identifier, address_hash: address_bytea, block_number: e.block_number, log_index: e.log_index}
     end)
-    |> then(&( [ %{name: "Registry", address_hash: "\\x000000000000000000000000000000000000ce10", block_number: 1, log_index: 0} | &1 ] ))
+    |> then(&( [ registry_contract | &1 ] ))
     |> Enum.map(fn e ->
       e
       |> Map.put(:inserted_at, Timex.now())
