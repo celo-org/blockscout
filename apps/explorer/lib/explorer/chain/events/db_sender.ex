@@ -3,6 +3,7 @@ defmodule Explorer.Chain.Events.DBSender do
   Sends events to Postgres.
   """
   alias Explorer.Repo
+  require Logger
 
   @max_payload 7500
 
@@ -25,8 +26,12 @@ defmodule Explorer.Chain.Events.DBSender do
   end
 
   defp send_notify(payload) do
-    if byte_size(payload) < @max_payload do
+    payload_size = byte_size(payload)
+
+    if payload_size < @max_payload do
       Repo.query!("select pg_notify('chain_event', $1::text);", [payload])
+    else
+      Logger.warn("Notification can't be sent, payload size #{payload_size} exceeds the limit of #{@max_payload}.")
     end
   end
 end
