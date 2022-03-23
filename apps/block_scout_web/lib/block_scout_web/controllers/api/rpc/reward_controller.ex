@@ -93,22 +93,6 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
     end
   end
 
-  def getvalidatorgroupsrewards(conn, params) do
-    with {:group_address_param, {:ok, group_addresses_param}} <- fetch_address(params, "groupAddresses"),
-         {:group_format, {:ok, group_address_hashes}} <- to_address_hash(group_addresses_param, :group_format),
-         {:date_param, {:ok, from, _}} <- fetch_date(params["from"]),
-         {:date_param, {:ok, to, _}} <- fetch_date(params["to"]),
-         rewards <- ValidatorGroupRewards.calculate_multiple_accounts(group_address_hashes, from, to) do
-      render(conn, :getvalidatorgroupsrewards, rewards: rewards)
-    else
-      {:group_address_param, :error} ->
-        render(conn, :error, error: "Query parameter 'groupAddresses' is required")
-
-      {:date_param, {:error, _}} ->
-        render(conn, :error, error: "Please only ISO 8601 formatted dates")
-    end
-  end
-
   defp fetch_address(params, key) when key == "voterAddress" do
     {:voter_address_param, Map.fetch(params, key)}
   end
@@ -135,9 +119,9 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
     cast_hashes = Enum.map(uncast_hashes, &Chain.string_to_address_hash/1)
 
     if Enum.all?(cast_hashes, fn
-      {:ok, _} -> true
-      _ -> false
-    end) do
+         {:ok, _} -> true
+         _ -> false
+       end) do
       {key, {:ok, Enum.map(cast_hashes, fn {:ok, hash} -> hash end)}}
     else
       {key, :error_list}

@@ -518,7 +518,7 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
 
     test "with valid validator address list", %{conn: conn} do
       {validator_address_1_hash, validator_address_2_hash, group_address_1_hash, group_address_2_hash, block_1_hash,
-        block_2_hash} = SetupValidatorAndGroupRewardsTest.setup_for_multiple_accounts()
+       block_2_hash} = SetupValidatorAndGroupRewardsTest.setup_for_multiple_accounts()
 
       expected_result = %{
         "rewards" => [
@@ -624,6 +624,7 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
       schema = group_rewards_multiple_accounts_schema()
       assert :ok = ExJsonSchema.Validator.validate(schema, response)
     end
+
     test "with an address that doesn't exist", %{conn: conn} do
       expected_result = %{
         "rewards" => [],
@@ -700,7 +701,7 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
 
     test "with valid group address list", %{conn: conn} do
       {validator_address_1_hash, validator_address_2_hash, group_address_1_hash, group_address_2_hash, block_1_hash,
-        block_2_hash} = SetupValidatorAndGroupRewardsTest.setup_for_multiple_accounts()
+       block_2_hash} = SetupValidatorAndGroupRewardsTest.setup_for_multiple_accounts()
 
       expected_result = %{
         "rewards" => [
