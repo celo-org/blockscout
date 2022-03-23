@@ -945,9 +945,9 @@ defmodule Indexer.Block.FetcherTest do
       assert {:ok, %{inserted: inserted}} = Fetcher.fetch_and_import_range(block_fetcher, block_number..block_number)
 
       assert 3 == length(inserted[:logs]) # should insert 3 logs
-      assert 1 == length(inserted[:celo_contract_events]) # should insert 1 celo contract event from those logs
+      assert 1 == length(inserted[:celo_contract_event]) # should insert 1 celo contract event from those logs
 
-      [event] = inserted[:celo_contract_events]
+      [event] = inserted[:celo_contract_event]
 
       #despite two matching contract event topics, only one log comes from an address marked as a celo core contract
       assert "ValidatorGroupActiveVoteRevoked" == event.name, "Only event inserted should be ValidatorGroupActiveVoteRevoked"
