@@ -192,6 +192,24 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
       assert :ok = ExJsonSchema.Validator.validate(schema, response)
     end
 
+    test "with an invalid voter address hash in the list", %{conn: conn} do
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "reward",
+          "action" => "getvoterrewards",
+          "voterAddress" => "0x0000000000000000000000000000000000000001, bad_hash"
+        })
+        |> json_response(200)
+
+      assert response["message"] == "One or more voter addresses are invalid"
+      assert response["status"] == "0"
+      assert Map.has_key?(response, "result")
+      refute response["result"]
+      schema = generic_rewards_for_multiple_accounts_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
+
     test "with an address that doesn't exist", %{conn: conn} do
       expected_result = %{
         "rewards" => [],
@@ -288,6 +306,89 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
       schema = generic_rewards_schema()
       assert :ok = ExJsonSchema.Validator.validate(schema, response)
     end
+
+    test "with valid voter address list", %{conn: conn} do
+      {voter_1_hash, voter_2_hash, group_1_hash, group_2_hash} = SetupVoterRewardsTest.setup_for_multiple_accounts()
+
+      expected_result = %{
+        "rewards" => [
+          %{
+            "account" => to_string(voter_1_hash),
+            "amount" => "75",
+            "date" => "2022-01-03T17:42:43.162804Z",
+            "blockNumber" => "10730880",
+            "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000003",
+            "epochNumber" => "621",
+            "group" => to_string(group_1_hash)
+          },
+          %{
+            "account" => to_string(voter_1_hash),
+            "amount" => "31",
+            "date" => "2022-01-04T17:42:43.162804Z",
+            "blockNumber" => "10748160",
+            "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000004",
+            "epochNumber" => "622",
+            "group" => to_string(group_1_hash)
+          },
+          %{
+            "account" => to_string(voter_1_hash),
+            "amount" => "39",
+            "date" => "2022-01-04T17:42:43.162804Z",
+            "blockNumber" => "10748160",
+            "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000004",
+            "epochNumber" => "622",
+            "group" => to_string(group_2_hash)
+          },
+          %{
+            "account" => to_string(voter_2_hash),
+            "amount" => "78",
+            "date" => "2022-01-05T17:42:43.162804Z",
+            "blockNumber" => "10765440",
+            "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000005",
+            "epochNumber" => "623",
+            "group" => to_string(group_1_hash)
+          },
+          %{
+            "account" => to_string(voter_1_hash),
+            "amount" => "77",
+            "date" => "2022-01-05T17:42:43.162804Z",
+            "blockNumber" => "10765440",
+            "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000005",
+            "epochNumber" => "623",
+            "group" => to_string(group_1_hash)
+          },
+          %{
+            "account" => to_string(voter_1_hash),
+            "amount" => "78",
+            "date" => "2022-01-05T17:42:43.162804Z",
+            "blockNumber" => "10765440",
+            "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000005",
+            "epochNumber" => "623",
+            "group" => to_string(group_2_hash)
+          }
+        ],
+        "totalRewardCelo" => "378",
+        "from" => "2022-01-03 00:00:00.000000Z",
+        "to" => "2022-01-06 00:00:00.000000Z"
+      }
+
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "reward",
+          "action" => "getvoterrewards",
+          "voterAddress" => to_string(voter_1_hash) <> ", " <> to_string(voter_2_hash),
+          "from" => "2022-01-03T00:00:00.000000Z",
+          "to" => "2022-01-06T00:00:00.000000Z"
+        })
+        |> json_response(200)
+
+      assert response["result"] == expected_result
+      assert response["status"] == "1"
+      assert response["message"] == "OK"
+      schema = generic_rewards_for_multiple_accounts_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
   end
 
   describe "getvalidatorrewards" do
@@ -320,6 +421,24 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
       assert Map.has_key?(response, "result")
       refute response["result"]
       schema = generic_rewards_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
+
+    test "with an invalid validator address hash in the list", %{conn: conn} do
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "reward",
+          "action" => "getvalidatorrewards",
+          "validatorAddress" => "0x0000000000000000000000000000000000000001, bad_hash"
+        })
+        |> json_response(200)
+
+      assert response["message"] == "One or more validator addresses are invalid"
+      assert response["status"] == "0"
+      assert Map.has_key?(response, "result")
+      refute response["result"]
+      schema = generic_rewards_for_multiple_accounts_schema()
       assert :ok = ExJsonSchema.Validator.validate(schema, response)
     end
 
@@ -396,6 +515,63 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
       schema = generic_rewards_schema()
       assert :ok = ExJsonSchema.Validator.validate(schema, response)
     end
+
+    test "with valid validator address list", %{conn: conn} do
+      {validator_address_1_hash, validator_address_2_hash, group_address_1_hash, group_address_2_hash, block_1_hash,
+        block_2_hash} = SetupValidatorAndGroupRewardsTest.setup_for_multiple_accounts()
+
+      expected_result = %{
+        "rewards" => [
+          %{
+            "account" => to_string(validator_address_1_hash),
+            "amount" => "100000",
+            "date" => "2022-01-03T17:42:43.162804Z",
+            "blockNumber" => "10730880",
+            "blockHash" => to_string(block_1_hash),
+            "epochNumber" => "621",
+            "group" => to_string(group_address_1_hash)
+          },
+          %{
+            "account" => to_string(validator_address_2_hash),
+            "amount" => "150000",
+            "date" => "2022-01-04T17:42:43.162804Z",
+            "blockNumber" => "10748160",
+            "blockHash" => to_string(block_2_hash),
+            "epochNumber" => "622",
+            "group" => to_string(group_address_2_hash)
+          },
+          %{
+            "account" => to_string(validator_address_1_hash),
+            "amount" => "200000",
+            "date" => "2022-01-04T17:42:43.162804Z",
+            "blockNumber" => "10748160",
+            "blockHash" => to_string(block_2_hash),
+            "epochNumber" => "622",
+            "group" => to_string(group_address_1_hash)
+          }
+        ],
+        "totalRewardCelo" => "450000",
+        "from" => "2022-01-03 00:00:00.000000Z",
+        "to" => "2022-01-06 00:00:00.000000Z"
+      }
+
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "reward",
+          "action" => "getvalidatorrewards",
+          "validatorAddress" => to_string(validator_address_1_hash) <> ", " <> to_string(validator_address_2_hash),
+          "from" => "2022-01-03T00:00:00.000000Z",
+          "to" => "2022-01-06T00:00:00.000000Z"
+        })
+        |> json_response(200)
+
+      assert response["result"] == expected_result
+      assert response["status"] == "1"
+      assert response["message"] == "OK"
+      schema = generic_rewards_for_multiple_accounts_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
   end
 
   describe "getvalidatorgrouprewards" do
@@ -431,6 +607,23 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
       assert :ok = ExJsonSchema.Validator.validate(schema, response)
     end
 
+    test "with an invalid group address hash in the list", %{conn: conn} do
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "reward",
+          "action" => "getvalidatorgrouprewards",
+          "groupAddress" => "0x0000000000000000000000000000000000000001, bad_hash"
+        })
+        |> json_response(200)
+
+      assert response["message"] == "One or more group addresses are invalid"
+      assert response["status"] == "0"
+      assert Map.has_key?(response, "result")
+      refute response["result"]
+      schema = group_rewards_multiple_accounts_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
     test "with an address that doesn't exist", %{conn: conn} do
       expected_result = %{
         "rewards" => [],
@@ -504,252 +697,10 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
       schema = group_rewards_schema()
       assert :ok = ExJsonSchema.Validator.validate(schema, response)
     end
-  end
 
-  describe "getvotersrewards" do
-    test "with missing voter address list", %{conn: conn} do
-      response =
-        conn
-        |> get("/api", %{"module" => "reward", "action" => "getvotersrewards"})
-        |> json_response(200)
-
-      assert response["message"] =~ "'voterAddresses' is required"
-      assert response["status"] == "0"
-      assert Map.has_key?(response, "result")
-      refute response["result"]
-      schema = generic_rewards_for_multiple_accounts_schema()
-      assert :ok = ExJsonSchema.Validator.validate(schema, response)
-    end
-
-    test "with an invalid voter address hash in the list", %{conn: conn} do
-      response =
-        conn
-        |> get("/api", %{
-          "module" => "reward",
-          "action" => "getvotersrewards",
-          "voterAddresses" => "0x0000000000000000000000000000000000000001, bad_hash"
-        })
-        |> json_response(200)
-
-      assert response["message"] == "One or more voter addresses are invalid"
-      assert response["status"] == "0"
-      assert Map.has_key?(response, "result")
-      refute response["result"]
-      schema = generic_rewards_for_multiple_accounts_schema()
-      assert :ok = ExJsonSchema.Validator.validate(schema, response)
-    end
-
-    test "with valid voter address list", %{conn: conn} do
-      {voter_1_hash, voter_2_hash, group_1_hash, group_2_hash} = SetupVoterRewardsTest.setup_for_multiple_accounts()
-
-      expected_result = %{
-        "rewards" => [
-          %{
-            "account" => to_string(voter_1_hash),
-            "amount" => "75",
-            "date" => "2022-01-03T17:42:43.162804Z",
-            "blockNumber" => "10730880",
-            "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000003",
-            "epochNumber" => "621",
-            "group" => to_string(group_1_hash)
-          },
-          %{
-            "account" => to_string(voter_1_hash),
-            "amount" => "31",
-            "date" => "2022-01-04T17:42:43.162804Z",
-            "blockNumber" => "10748160",
-            "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000004",
-            "epochNumber" => "622",
-            "group" => to_string(group_1_hash)
-          },
-          %{
-            "account" => to_string(voter_1_hash),
-            "amount" => "39",
-            "date" => "2022-01-04T17:42:43.162804Z",
-            "blockNumber" => "10748160",
-            "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000004",
-            "epochNumber" => "622",
-            "group" => to_string(group_2_hash)
-          },
-          %{
-            "account" => to_string(voter_2_hash),
-            "amount" => "78",
-            "date" => "2022-01-05T17:42:43.162804Z",
-            "blockNumber" => "10765440",
-            "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000005",
-            "epochNumber" => "623",
-            "group" => to_string(group_1_hash)
-          },
-          %{
-            "account" => to_string(voter_1_hash),
-            "amount" => "77",
-            "date" => "2022-01-05T17:42:43.162804Z",
-            "blockNumber" => "10765440",
-            "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000005",
-            "epochNumber" => "623",
-            "group" => to_string(group_1_hash)
-          },
-          %{
-            "account" => to_string(voter_1_hash),
-            "amount" => "78",
-            "date" => "2022-01-05T17:42:43.162804Z",
-            "blockNumber" => "10765440",
-            "blockHash" => "0x0000000000000000000000000000000000000000000000000000000000000005",
-            "epochNumber" => "623",
-            "group" => to_string(group_2_hash)
-          }
-        ],
-        "totalRewardCelo" => "378",
-        "from" => "2022-01-03 00:00:00.000000Z",
-        "to" => "2022-01-06 00:00:00.000000Z"
-      }
-
-      response =
-        conn
-        |> get("/api", %{
-          "module" => "reward",
-          "action" => "getvotersrewards",
-          "voterAddresses" => to_string(voter_1_hash) <> ", " <> to_string(voter_2_hash),
-          "from" => "2022-01-03T00:00:00.000000Z",
-          "to" => "2022-01-06T00:00:00.000000Z"
-        })
-        |> json_response(200)
-
-      assert response["result"] == expected_result
-      assert response["status"] == "1"
-      assert response["message"] == "OK"
-      schema = generic_rewards_for_multiple_accounts_schema()
-      assert :ok = ExJsonSchema.Validator.validate(schema, response)
-    end
-  end
-
-  describe "getvalidatorsrewards" do
-    test "with missing validator address list", %{conn: conn} do
-      response =
-        conn
-        |> get("/api", %{"module" => "reward", "action" => "getvalidatorsrewards"})
-        |> json_response(200)
-
-      assert response["message"] =~ "'validatorAddresses' is required"
-      assert response["status"] == "0"
-      assert Map.has_key?(response, "result")
-      refute response["result"]
-      schema = generic_rewards_for_multiple_accounts_schema()
-      assert :ok = ExJsonSchema.Validator.validate(schema, response)
-    end
-
-    test "with an invalid validator address hash in the list", %{conn: conn} do
-      response =
-        conn
-        |> get("/api", %{
-          "module" => "reward",
-          "action" => "getvalidatorsrewards",
-          "validatorAddresses" => "0x0000000000000000000000000000000000000001, bad_hash"
-        })
-        |> json_response(200)
-
-      assert response["message"] == "One or more validator addresses are invalid"
-      assert response["status"] == "0"
-      assert Map.has_key?(response, "result")
-      refute response["result"]
-      schema = generic_rewards_for_multiple_accounts_schema()
-      assert :ok = ExJsonSchema.Validator.validate(schema, response)
-    end
-
-    test "with valid validator address list", %{conn: conn} do
+    test "with valid group address list", %{conn: conn} do
       {validator_address_1_hash, validator_address_2_hash, group_address_1_hash, group_address_2_hash, block_1_hash,
-       block_2_hash} = SetupValidatorAndGroupRewardsTest.setup_for_multiple_accounts()
-
-      expected_result = %{
-        "rewards" => [
-          %{
-            "account" => to_string(validator_address_1_hash),
-            "amount" => "100000",
-            "date" => "2022-01-03T17:42:43.162804Z",
-            "blockNumber" => "10730880",
-            "blockHash" => to_string(block_1_hash),
-            "epochNumber" => "621",
-            "group" => to_string(group_address_1_hash)
-          },
-          %{
-            "account" => to_string(validator_address_2_hash),
-            "amount" => "150000",
-            "date" => "2022-01-04T17:42:43.162804Z",
-            "blockNumber" => "10748160",
-            "blockHash" => to_string(block_2_hash),
-            "epochNumber" => "622",
-            "group" => to_string(group_address_2_hash)
-          },
-          %{
-            "account" => to_string(validator_address_1_hash),
-            "amount" => "200000",
-            "date" => "2022-01-04T17:42:43.162804Z",
-            "blockNumber" => "10748160",
-            "blockHash" => to_string(block_2_hash),
-            "epochNumber" => "622",
-            "group" => to_string(group_address_1_hash)
-          }
-        ],
-        "totalRewardCelo" => "450000",
-        "from" => "2022-01-03 00:00:00.000000Z",
-        "to" => "2022-01-06 00:00:00.000000Z"
-      }
-
-      response =
-        conn
-        |> get("/api", %{
-          "module" => "reward",
-          "action" => "getvalidatorsrewards",
-          "validatorAddresses" => to_string(validator_address_1_hash) <> ", " <> to_string(validator_address_2_hash),
-          "from" => "2022-01-03T00:00:00.000000Z",
-          "to" => "2022-01-06T00:00:00.000000Z"
-        })
-        |> json_response(200)
-
-      assert response["result"] == expected_result
-      assert response["status"] == "1"
-      assert response["message"] == "OK"
-      schema = generic_rewards_for_multiple_accounts_schema()
-      assert :ok = ExJsonSchema.Validator.validate(schema, response)
-    end
-  end
-
-  describe "getvalidatorgroupsrewards" do
-    test "with missing group address list", %{conn: conn} do
-      response =
-        conn
-        |> get("/api", %{"module" => "reward", "action" => "getvalidatorgroupsrewards"})
-        |> json_response(200)
-
-      assert response["message"] =~ "'groupAddresses' is required"
-      assert response["status"] == "0"
-      assert Map.has_key?(response, "result")
-      refute response["result"]
-      schema = group_rewards_schema()
-      assert :ok = ExJsonSchema.Validator.validate(schema, response)
-    end
-
-    test "with an invalid validator address hash", %{conn: conn} do
-      response =
-        conn
-        |> get("/api", %{
-          "module" => "reward",
-          "action" => "getvalidatorgroupsrewards",
-          "groupAddresses" => "0x0000000000000000000000000000000000000001, bad_hash"
-        })
-        |> json_response(200)
-
-      assert response["message"] == "One or more group addresses are invalid"
-      assert response["status"] == "0"
-      assert Map.has_key?(response, "result")
-      refute response["result"]
-      schema = group_rewards_multiple_accounts_schema()
-      assert :ok = ExJsonSchema.Validator.validate(schema, response)
-    end
-
-    test "with valid group address", %{conn: conn} do
-      {validator_address_1_hash, validator_address_2_hash, group_address_1_hash, group_address_2_hash, block_1_hash,
-       block_2_hash} = SetupValidatorAndGroupRewardsTest.setup_for_multiple_accounts()
+        block_2_hash} = SetupValidatorAndGroupRewardsTest.setup_for_multiple_accounts()
 
       expected_result = %{
         "rewards" => [
@@ -790,8 +741,8 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
         conn
         |> get("/api", %{
           "module" => "reward",
-          "action" => "getvalidatorgroupsrewards",
-          "groupAddresses" => to_string(group_address_1_hash) <> ", " <> to_string(group_address_2_hash),
+          "action" => "getvalidatorgrouprewards",
+          "groupAddress" => to_string(group_address_1_hash) <> ", " <> to_string(group_address_2_hash),
           "from" => "2022-01-03T00:00:00.000000Z",
           "to" => "2022-01-06T00:00:00.000000Z"
         })

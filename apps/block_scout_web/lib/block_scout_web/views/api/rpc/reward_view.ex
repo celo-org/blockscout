@@ -10,25 +10,23 @@ defmodule BlockScoutWeb.API.RPC.RewardView do
   end
 
   def render(json, %{rewards: rewards}) when json in ~w(getvoterrewards.json getvalidatorrewards.json) do
-    prepared_rewards = prepare_generic_rewards(rewards)
+    prepared_rewards =
+      if Map.has_key?(rewards, :account) do
+        prepare_generic_rewards(rewards)
+      else
+        prepare_generic_rewards_multiple_accounts(rewards)
+      end
 
     RPCView.render("show.json", data: prepared_rewards)
   end
 
   def render("getvalidatorgrouprewards.json", %{rewards: rewards}) do
-    prepared_rewards = prepare_group_rewards(rewards)
-
-    RPCView.render("show.json", data: prepared_rewards)
-  end
-
-  def render(json, %{rewards: rewards}) when json in ~w(getvotersrewards.json getvalidatorsrewards.json) do
-    prepared_rewards = prepare_generic_rewards_multiple_accounts(rewards)
-
-    RPCView.render("show.json", data: prepared_rewards)
-  end
-
-  def render("getvalidatorgroupsrewards.json", %{rewards: rewards}) do
-    prepared_rewards = prepare_group_rewards_multiple_accounts(rewards)
+    prepared_rewards =
+      if Map.has_key?(rewards, :group) do
+        prepare_group_rewards(rewards)
+      else
+        prepare_group_rewards_multiple_accounts(rewards)
+      end
 
     RPCView.render("show.json", data: prepared_rewards)
   end
