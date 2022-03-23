@@ -6,7 +6,9 @@ defmodule Explorer.Celo.CoreContracts do
   use GenServer
   alias Explorer.Celo.{AbiHandler, AddressCache}
   alias Explorer.SmartContract.Reader
+  alias Explorer.Repo
   require Logger
+  import Ecto.Query
 
   @behaviour AddressCache
 
@@ -50,7 +52,24 @@ defmodule Explorer.Celo.CoreContracts do
       |> build_state()
       |> Map.put(:timer, timer)
 
-    {:ok, state}
+    {:ok, state, {:continue, :fetch_contracts_from_db}}
+  end
+
+  @impl true
+  def handle_continue(:fetch_contracts_from_db, %{cache: cache, timer: timer}) do
+    db_cache = Explorer.Chain.CeloCoreContract
+    |> order_by(:block_number)
+    |> Repo.all()
+    |> Enum.reduce(%{}, fn %{name: name, address_hash: address_hash}, map ->
+        Map.put(map, name, to_string(address_hash))
+    end)
+
+    new_state = cache
+    |> Map.merge(db_cache)
+    |> build_state()
+    |> Map.put(:timer, timer)
+
+    {:noreply, new_state}
   end
 
   @impl true

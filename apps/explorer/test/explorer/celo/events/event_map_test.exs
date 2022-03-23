@@ -77,7 +77,7 @@ defmodule Explorer.Celo.ContractEvents.EventMapTest do
 
       result = EventMap.filter_celo_contract_logs([test_event1, test_event2, test_event3])
 
-      assert result == [test_event1]# "Should only be core contract logs"
+      assert result == [test_event1] # "Should only be core contract logs"
     end
   end
 
