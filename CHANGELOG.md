@@ -10,6 +10,7 @@
 - [#5034](https://github.com/blockscout/blockscout/pull/5034) - Fix broken functions input at transation page
 - [#5025](https://github.com/blockscout/blockscout/pull/5025) - Add standard input JSON files validation
 - [#5051](https://github.com/blockscout/blockscout/pull/5051) - Fix 500 response when ABI method was parsed as nil
+- [#5319](https://github.com/blockscout/blockscout/pull/5319), [#5357](https://github.com/blockscout/blockscout/pull/5357) - Empty blocks sanitizer performance improvement
 
 ### Chore
 - [#5053](https://github.com/blockscout/blockscout/pull/5053) - Update ex_keccak lib
