@@ -790,6 +790,13 @@ defmodule Indexer.Block.FetcherTest do
       "0x" <> unprefixed_celo_token_address_hash = to_string(celo_token_address.hash)
       set_test_address(to_string(celo_token_address.hash))
 
+
+      core_contract = insert(:core_contract)
+
+      [core_contract.address_hash() |> to_string()]
+      |> MapSet.new()
+      |> set_cache_address_set()
+
       block_number = 7
       from_address_hash = "0xe8ddc5c7a2d2f0d7a9798459c0104fdf5e987aca"
       to_address_hash = "0x8bf38d4764929064f2d4d3a56520a76ab3df415b"
@@ -877,13 +884,45 @@ defmodule Indexer.Block.FetcherTest do
                        "data" => "0x0000000000000000000000000000000000000000000000000000000000000f00",
                        "logIndex" => "0x0",
                        "topics" => [
-                         "0x000000000000000000000000C257274276a4E539741Ca11b590B9447B26A8051"
+                         "0x000000000000000000000000c257274276a4e539741ca11b590b9447b26a8051"
                        ],
                        "transactionHash" => transaction_hash,
                        "transactionIndex" => "0x0",
                        "transactionLogIndex" => "0x0",
                        "type" => "mined"
-                     }
+                     },
+                     %{
+                       "address" => "0x0000000000000000000000000000000000000000",
+                       "blockHash" => "0x1b6fb99af0b51af6685a191b2f7bcba684f8565629bf084c70b2530479407455",
+                       "blockNumber" => "0x7",
+                       "data" => "0x0000000000000000000000000000000000000000000000000000000000000f00",
+                       "logIndex" => "0x1",
+                       "topics" => [
+                         "0x45aac85f38083b18efe2d441a65b9c1ae177c78307cb5a5d4aec8f7dbcaeabfe", #ValidatorGroupVoteActivated
+                         "0x00000000000000000000000088c1c759600ec3110af043c183a2472ab32d099c",
+                         "0x00000000000000000000000047b2db6af05a55d42ed0f3731735f9479abf0673"
+                       ],
+                       "transactionHash" => transaction_hash,
+                       "transactionIndex" => "0x0",
+                       "transactionLogIndex" => "0x1",
+                       "type" => "mined"
+                     },
+                     %{
+                       "address" => core_contract.address_hash() |> to_string(),
+                       "blockHash" => "0x1b6fb99af0b51af6685a191b2f7bcba684f8565629bf084c70b2530479407455",
+                       "blockNumber" => "0x7",
+                       "data" => "0x000000000000000000000000000000000000000000000003a188c31fefaa000000000000000000000000000000000012086cd1c417618770935790ad714d7730",
+                       "logIndex" => "0x2",
+                       "topics" => [
+                         "0xae7458f8697a680da6be36406ea0b8f40164915ac9cc40c0dad05a2ff6e8c6a8", #ValidatorGroupActiveVoteRevoked
+                         "0x00000000000000000000000088c1c759600ec3110af043c183a2472ab32d099c",
+                         "0x00000000000000000000000047b2db6af05a55d42ed0f3731735f9479abf0673"
+                       ],
+                       "transactionHash" => transaction_hash,
+                       "transactionIndex" => "0x0",
+                       "transactionLogIndex" => "0x2",
+                       "type" => "mined"
+                     },
                    ],
                    "logsBloom" =>
                      "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000200000000000000000000020000000000000000200000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
@@ -904,6 +943,14 @@ defmodule Indexer.Block.FetcherTest do
       end
 
       assert {:ok, %{inserted: inserted}} = Fetcher.fetch_and_import_range(block_fetcher, block_number..block_number)
+
+      assert 3 == length(inserted[:logs]) # should insert 3 logs
+      assert 1 == length(inserted[:celo_contract_events]) # should insert 1 celo contract event from those logs
+
+      [event] = inserted[:celo_contract_events]
+
+      #despite two matching contract event topics, only one log comes from an address marked as a celo core contract
+      assert "ValidatorGroupActiveVoteRevoked" == event.name, "Only event inserted should be ValidatorGroupActiveVoteRevoked"
 
       assert %{transactions: [inserted_transaction]} = inserted
       assert inserted_transaction.type == 2
