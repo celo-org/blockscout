@@ -43,8 +43,6 @@ defmodule Explorer.Fakes.VoterRewardsForGroup do
     bytes: <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 5>>
   }
 
-  def calculate(voter_address_hash, group_address_hash, _to_date \\ DateTime.utc_now())
-
   def calculate(voter_address_hash, group_address_hash, _to_date)
       when group_address_hash == @group_address_1_hash and
              voter_address_hash == @voter_address_1_hash do
