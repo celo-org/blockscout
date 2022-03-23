@@ -191,7 +191,7 @@ defmodule Indexer.Block.Fetcher do
          {:receipts, {:ok, receipt_params}} <- {:receipts, Receipts.fetch(state, transactions_params_without_receipts)},
          %{logs: tx_logs, receipts: receipts} = receipt_params,
          logs = tx_logs ++ process_extra_logs(extra_logs),
-         celo_contract_events = EventMap.rpc_to_event_params(logs),
+         celo_contract_events = EventMap.celo_rpc_to_event_params(logs),
          transactions_with_receipts = Receipts.put(transactions_params_without_receipts, receipts),
          %{token_transfers: normal_token_transfers, tokens: normal_tokens} = TokenTransfers.parse(logs),
          try_celo_token_enabled = config(:enable_gold_token),

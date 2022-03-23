@@ -30,6 +30,12 @@ defmodule Explorer.Celo.ContractEvents.EventMap do
    |> Enum.filter(fn %{address_hash: contract_address} -> AddressCache.is_core_contract_address?(contract_address) end)
   end
 
+  def celo_rpc_to_event_params(logs) do
+    logs
+    |> filter_celo_contract_logs()
+    |> rpc_to_event_params()
+  end
+
   @doc "Convert CeloContractEvent instance to their concrete types"
   def celo_contract_event_to_concrete_event(events) when is_list(events) do
     events
