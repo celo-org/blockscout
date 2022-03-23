@@ -86,7 +86,7 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
 
   def getvotersrewards(conn, params) do
     with {:voter_address_param, {:ok, voter_address_param}} <- fetch_address(params, "voterAddresses"),
-         {:voter_format, {:ok, voter_address_hashes}} <- to_address_hashes(voter_address_param, "voterAddresses"),
+         {:voter_format, {:ok, voter_address_hashes}} <- to_address_hashes(voter_address_param, :voter_format),
          {:date_param, {:ok, from, _}} <- fetch_date(params["from"]),
          {:date_param, {:ok, to, _}} <- fetch_date(params["to"]),
          {:ok, rewards} <- VoterRewards.calculate_multiple_accounts(voter_address_hashes, from, to) do
@@ -106,7 +106,7 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
   def getvalidatorsrewards(conn, params) do
     with {:validator_address_param, {:ok, validator_address_param}} <- fetch_address(params, "validatorAddresses"),
          {:validator_format, {:ok, validator_address_hashes}} <-
-           to_address_hashes(validator_address_param, "validatorAddresses"),
+           to_address_hashes(validator_address_param, :validator_format),
          {:date_param, {:ok, from, _}} <- fetch_date(params["from"]),
          {:date_param, {:ok, to, _}} <- fetch_date(params["to"]),
          {:ok, rewards} <- ValidatorRewards.calculate_multiple_accounts(validator_address_hashes, from, to) do
@@ -125,7 +125,7 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
 
   def getvalidatorgroupsrewards(conn, params) do
     with {:group_address_param, {:ok, group_addresses_param}} <- fetch_address(params, "groupAddresses"),
-         {:group_format, {:ok, group_address_hashes}} <- to_address_hashes(group_addresses_param, "groupAddresses"),
+         {:group_format, {:ok, group_address_hashes}} <- to_address_hashes(group_addresses_param, :group_format),
          {:date_param, {:ok, from, _}} <- fetch_date(params["from"]),
          {:date_param, {:ok, to, _}} <- fetch_date(params["to"]),
          {:ok, rewards} <- ValidatorGroupRewards.calculate_multiple_accounts(group_address_hashes, from, to) do
@@ -173,7 +173,7 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
     {:validator_format, Chain.string_to_address_hash(address_hash_string)}
   end
 
-  defp to_address_hashes(address_hashes_string, key) when key == "voterAddresses" do
+  defp to_address_hashes(address_hashes_string, key) do
     uncast_hashes = split_address_input_string(address_hashes_string)
 
     cast_hashes = Enum.map(uncast_hashes, &Chain.string_to_address_hash/1)
@@ -182,39 +182,9 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
          {:ok, _} -> true
          _ -> false
        end) do
-      {:voter_format, {:ok, Enum.map(cast_hashes, fn {:ok, hash} -> hash end)}}
+      {key, {:ok, Enum.map(cast_hashes, fn {:ok, hash} -> hash end)}}
     else
-      {:voter_format, :error}
-    end
-  end
-
-  defp to_address_hashes(address_hashes_string, key) when key == "validatorAddresses" do
-    uncast_hashes = split_address_input_string(address_hashes_string)
-
-    cast_hashes = Enum.map(uncast_hashes, &Chain.string_to_address_hash/1)
-
-    if Enum.all?(cast_hashes, fn
-         {:ok, _} -> true
-         _ -> false
-       end) do
-      {:validator_format, {:ok, Enum.map(cast_hashes, fn {:ok, hash} -> hash end)}}
-    else
-      {:validator_format, :error}
-    end
-  end
-
-  defp to_address_hashes(address_hashes_string, key) when key == "groupAddresses" do
-    uncast_hashes = split_address_input_string(address_hashes_string)
-
-    cast_hashes = Enum.map(uncast_hashes, &Chain.string_to_address_hash/1)
-
-    if Enum.all?(cast_hashes, fn
-         {:ok, _} -> true
-         _ -> false
-       end) do
-      {:group_format, {:ok, Enum.map(cast_hashes, fn {:ok, hash} -> hash end)}}
-    else
-      {:group_format, :error}
+      {key, :error}
     end
   end
 
