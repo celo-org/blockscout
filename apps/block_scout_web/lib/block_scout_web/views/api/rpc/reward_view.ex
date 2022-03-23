@@ -9,13 +9,7 @@ defmodule BlockScoutWeb.API.RPC.RewardView do
     RPCView.render("show.json", data: prepared_rewards)
   end
 
-  def render("getvoterrewards.json", %{rewards: rewards}) do
-    prepared_rewards = prepare_generic_rewards(rewards)
-
-    RPCView.render("show.json", data: prepared_rewards)
-  end
-
-  def render("getvalidatorrewards.json", %{rewards: rewards}) do
+  def render(json, %{rewards: rewards}) when json in ~w(getvoterrewards.json getvalidatorrewards.json) do
     prepared_rewards = prepare_generic_rewards(rewards)
 
     RPCView.render("show.json", data: prepared_rewards)
@@ -27,13 +21,7 @@ defmodule BlockScoutWeb.API.RPC.RewardView do
     RPCView.render("show.json", data: prepared_rewards)
   end
 
-  def render("getvotersrewards.json", %{rewards: rewards}) do
-    prepared_rewards = prepare_generic_rewards_multiple_accounts(rewards)
-
-    RPCView.render("show.json", data: prepared_rewards)
-  end
-
-  def render("getvalidatorsrewards.json", %{rewards: rewards}) do
+  def render(json, %{rewards: rewards}) when json in ~w(getvotersrewards.json getvalidatorsrewards.json) do
     prepared_rewards = prepare_generic_rewards_multiple_accounts(rewards)
 
     RPCView.render("show.json", data: prepared_rewards)
