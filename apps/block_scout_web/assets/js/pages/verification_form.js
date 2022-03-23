@@ -29,9 +29,8 @@ export function reducer (state = initialState, action) {
     }
     case 'RECEIVED_VERIFICATION_RESULT': {
       if (action.msg.verificationResult === 'ok') {
-        return window.location.replace(window.location.href.split('/contract_verifications')[0].split('/verify')[0] + '/contracts')
+        return window.location.replace(window.location.href.split('/contract-verifications')[0].split('/verify')[0] + '/contracts')
       } else {
-
         try {
           const result = JSON.parse(action.msg.verificationResult)
 
@@ -51,7 +50,7 @@ export function reducer (state = initialState, action) {
   }
 }
 
-function resetForm() {
+function resetForm () {
   $(function () {
     $('.js-btn-add-contract-libraries').on('click', function () {
       $('.js-smart-contract-libraries-wrapper').show()
@@ -80,8 +79,12 @@ function resetForm() {
   })
 }
 
-function renderValidationErrors(errors) {
+function clearValidationErrors () {
   $('.form-error').remove()
+}
+
+function renderValidationErrors (errors) {
+  clearValidationErrors()
 
   errors.forEach((error) => {
     const { field, message } = error
@@ -91,7 +94,7 @@ function renderValidationErrors(errors) {
   })
 }
 
-function updateFormState(locked) {
+function updateFormState (locked) {
   if (locked) {
     document.getElementById('loading').classList.remove('d-none')
   } else {
@@ -99,7 +102,7 @@ function updateFormState(locked) {
   }
 
   const controls = document.getElementsByClassName('form-control')
-  controls.forEach((control) => control.disabled = locked)
+  controls.forEach((control) => { control.disabled = locked })
 }
 
 const elements = {
@@ -193,26 +196,29 @@ if ($contractVerificationPage.length) {
         parallelUploads: 100,
         uploadMultiple: true,
         addRemoveLinks: true,
+        maxFilesize: 20,
         params: { address_hash: $('#smart_contract_address_hash').val() },
         init: function () {
           this.on('addedfile', function (_file) {
             changeVisibilityOfVerifyButton(this.files.length)
-            $('#file-help-block').text('')
+            clearValidationErrors()
           })
 
           this.on('removedfile', function (_file) {
             changeVisibilityOfVerifyButton(this.files.length)
           })
+        },
+        success: function (file, response) {
+          file.status = Dropzone.QUEUED
+        },
+        error: function (file, errorMessage, xhr) {
+          file.status = Dropzone.QUEUED
         }
       })
     }
 
     function changeVisibilityOfVerifyButton (filesLength) {
-      if (filesLength > 0) {
-        $('#verify-via-json-submit').prop('disabled', false)
-      } else {
-        $('#verify-via-json-submit').prop('disabled', true)
-      }
+      document.getElementById('verify-via-json-submit').disabled = (filesLength === 0)
     }
 
     setTimeout(function () {
@@ -268,15 +274,49 @@ if ($contractVerificationPage.length) {
       }
     })
 
-    $('#verify-via-json-submit').on('click', function () {
-      if (dropzone.files.length > 0) {
-        dropzone.processQueue()
-      } else {
-        $('#loading').addClass('d-none')
+    $('#verify-via-json-submit').on('click', function (e) {
+      e.preventDefault()
+
+      if (dropzone.files.length === 0) {
+        return
       }
+
+      updateFormState(true)
+      dropzone.processQueue()
     })
   })
 } else if ($contractVerificationChooseTypePage.length) {
+  $('#smart_contract_address_hash').on('change load input ready', function () {
+    const address = ($('#smart_contract_address_hash').val())
+
+    const onContractUnverified = () => {
+      document.getElementById('message-address-verified').hidden = true
+      document.getElementById('message-link').removeAttribute('href')
+      document.getElementById('data-button').disabled = false
+    }
+
+    const onContractVerified = (address) => {
+      document.getElementById('message-address-verified').hidden = false
+      document.getElementById('message-link').setAttribute('href', `/address/${address}/contracts`)
+      document.getElementById('data-button').disabled = true
+    }
+
+    const isContractVerified = (result) => {
+      return result &&
+        result[0].ABI !== undefined &&
+        result[0].ABI !== 'Contract source code not verified'
+    }
+
+    $.get(`/api/?module=contract&action=getsourcecode&address=${address}`).done(
+      response => {
+        if (isContractVerified(response.result)) {
+          onContractVerified(address)
+        } else {
+          onContractUnverified()
+        }
+      }).fail(onContractUnverified)
+  })
+
   $('.verify-via-flattened-code').on('click', function () {
     if ($(this).prop('checked')) {
       $('#verify_via_flattened_code_button').show()

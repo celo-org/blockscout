@@ -45,6 +45,37 @@ defmodule BlockScoutWeb.AddressContractVerificationController do
     end
   end
 
+  def new(conn, _params) do
+    changeset =
+      %SmartContract{}
+      |> SmartContract.changeset(%{})
+
+    render(conn, "new.html",
+      changeset: changeset,
+      address_hash: ""
+    )
+  end
+
+  def create(
+        conn,
+        %{"smart_contract" => smart_contract}
+      ) do
+    if smart_contract["verify_via"] == "true" do
+      if Chain.smart_contract_verified?(smart_contract["address_hash"]) do
+        address_path =
+          conn
+          |> address_path(:show, smart_contract["address_hash"])
+          |> Controller.full_path()
+
+        redirect(conn, to: address_path)
+      else
+        redirect(conn, to: "/address/#{smart_contract["address_hash"]}/verify-via-json/new")
+      end
+    else
+      redirect(conn, to: "/address/#{smart_contract["address_hash"]}/verify-vyper-contract/new")
+    end
+  end
+
   def create(
         conn,
         %{
@@ -87,7 +118,7 @@ defmodule BlockScoutWeb.AddressContractVerificationController do
       if Chain.smart_contract_fully_verified?(address_hash_string) do
         EventsPublisher.broadcast(
           prepare_verification_error(
-            "This contract already verified in Blockscout.",
+            "This contract is already verified.",
             address_hash_string,
             conn
           ),
@@ -123,19 +154,10 @@ defmodule BlockScoutWeb.AddressContractVerificationController do
   end
 
   defp verify_and_publish(address_hash_string, files_array, conn) do
-    case Sourcify.verify(address_hash_string, files_array) do
-      {:ok, _verified_status} ->
-        case Sourcify.check_by_address(address_hash_string) do
-          {:ok, _verified_status} ->
-            get_metadata_and_publish(address_hash_string, conn)
-
-          {:error, %{"error" => error}} ->
-            EventsPublisher.broadcast(
-              prepare_verification_error(error, address_hash_string, conn),
-              :on_demand
-            )
-        end
-
+    with {:ok, _verified_status} <- Sourcify.verify(address_hash_string, files_array),
+         {:ok, _verified_status} <- Sourcify.check_by_address(address_hash_string) do
+      get_metadata_and_publish(address_hash_string, conn)
+    else
       {:error, %{"error" => error}} ->
         EventsPublisher.broadcast(
           prepare_verification_error(error, address_hash_string, conn),
