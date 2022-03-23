@@ -1502,22 +1502,6 @@ defmodule BlockScoutWeb.Etherscan do
     }
   }
 
-  @generic_epoch_rewards_multiple_accounts %{
-    type: "array",
-    array_type: %{
-      name: "Reward multiple accounts",
-      fields: %{
-        account: @address_hash_type,
-        amount: @wei_type,
-        blockHash: @block_hash_type,
-        blockNumber: @block_number_type,
-        date: %{type: "timestamp"},
-        epochNumber: "integer",
-        group: @address_hash_type
-      }
-    }
-  }
-
   @group_epoch_rewards %{
     type: "array",
     array_type: %{
@@ -1528,22 +1512,6 @@ defmodule BlockScoutWeb.Etherscan do
         blockNumber: @block_number_type,
         date: %{type: "timestamp"},
         epochNumber: "integer",
-        validator: @address_hash_type
-      }
-    }
-  }
-
-  @group_epoch_rewards_multiple_accounts %{
-    type: "array",
-    array_type: %{
-      name: "Reward",
-      fields: %{
-        amount: @wei_type,
-        blockHash: @block_hash_type,
-        blockNumber: @block_number_type,
-        date: %{type: "timestamp"},
-        epochNumber: "integer",
-        group: @address_hash_type,
         validator: @address_hash_type
       }
     }
@@ -3566,10 +3534,7 @@ defmodule BlockScoutWeb.Etherscan do
       @reward_getvoterrewardsforgroup_action,
       @reward_getvoterrewards_action,
       @reward_getvalidatorrewards_action,
-      @reward_getvalidatorgrouprewards_action,
-      @reward_getvotersrewards_action,
-      @reward_getvalidatorsrewards_action,
-      @reward_getvalidatorgroupsrewards_action
+      @reward_getvalidatorgrouprewards_action
     ]
   }
 
