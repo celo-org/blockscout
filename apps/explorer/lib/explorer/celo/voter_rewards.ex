@@ -74,7 +74,7 @@ defmodule Explorer.Celo.VoterRewards do
         }
       end)
 
-    {:ok, structured_rewards_for_given_period}
+    structured_rewards_for_given_period
   end
 
   def calculate_multiple_accounts(voter_address_hash_list, from_date, to_date) do
@@ -85,6 +85,6 @@ defmodule Explorer.Celo.VoterRewards do
     {rewards, rewards_sum} =
       add_input_account_to_individual_rewards_and_calculate_sum(reward_lists_chunked_by_account, :account)
 
-    {:ok, %{from: from_date, to: to_date, rewards: rewards, total_reward_celo: rewards_sum}}
+    %{from: from_date, to: to_date, rewards: rewards, total_reward_celo: rewards_sum}
   end
 end

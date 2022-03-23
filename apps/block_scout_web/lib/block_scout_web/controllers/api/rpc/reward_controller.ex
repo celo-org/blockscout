@@ -9,7 +9,7 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
          {:group_address_param, {:ok, group_address_param}} <- fetch_address(params, "groupAddress"),
          {:voter_format, {:ok, voter_address_hash}} <- to_address_hash(voter_address_param, "voterAddress"),
          {:group_format, {:ok, group_address_hash}} <- to_address_hash(group_address_param, "groupAddress"),
-         {:ok, rewards} <- VoterRewardsForGroup.calculate(voter_address_hash, group_address_hash) do
+         rewards <- VoterRewardsForGroup.calculate(voter_address_hash, group_address_hash) do
       render(conn, :getvoterrewardsforgroup, rewards: rewards)
     else
       {:voter_address_param, :error} ->
@@ -31,7 +31,7 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
          {:voter_format, {:ok, voter_address_hash}} <- to_address_hash(voter_address_param, "voterAddress"),
          {:date_param, {:ok, from, _}} <- fetch_date(params["from"]),
          {:date_param, {:ok, to, _}} <- fetch_date(params["to"]),
-         {:ok, rewards} <- VoterRewards.calculate(voter_address_hash, from, to) do
+         rewards <- VoterRewards.calculate(voter_address_hash, from, to) do
       render(conn, :getvoterrewards, rewards: rewards)
     else
       {:voter_address_param, :error} ->
@@ -51,7 +51,7 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
            to_address_hash(validator_address_param, "validatorAddress"),
          {:date_param, {:ok, from, _}} <- fetch_date(params["from"]),
          {:date_param, {:ok, to, _}} <- fetch_date(params["to"]),
-         {:ok, rewards} <- ValidatorRewards.calculate(validator_address_hash, from, to) do
+         rewards <- ValidatorRewards.calculate(validator_address_hash, from, to) do
       render(conn, :getvalidatorrewards, rewards: rewards)
     else
       {:validator_address_param, :error} ->
@@ -70,7 +70,7 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
          {:group_format, {:ok, group_address_hash}} <- to_address_hash(group_address_param, "groupAddress"),
          {:date_param, {:ok, from, _}} <- fetch_date(params["from"]),
          {:date_param, {:ok, to, _}} <- fetch_date(params["to"]),
-         {:ok, rewards} <- ValidatorGroupRewards.calculate(group_address_hash, from, to) do
+         rewards <- ValidatorGroupRewards.calculate(group_address_hash, from, to) do
       render(conn, :getvalidatorgrouprewards, rewards: rewards)
     else
       {:group_address_param, :error} ->
@@ -89,7 +89,7 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
          {:voter_format, {:ok, voter_address_hashes}} <- to_address_hashes(voter_address_param, :voter_format),
          {:date_param, {:ok, from, _}} <- fetch_date(params["from"]),
          {:date_param, {:ok, to, _}} <- fetch_date(params["to"]),
-         {:ok, rewards} <- VoterRewards.calculate_multiple_accounts(voter_address_hashes, from, to) do
+         rewards <- VoterRewards.calculate_multiple_accounts(voter_address_hashes, from, to) do
       render(conn, :getvotersrewards, rewards: rewards)
     else
       {:voter_address_param, :error} ->
@@ -109,7 +109,7 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
            to_address_hashes(validator_address_param, :validator_format),
          {:date_param, {:ok, from, _}} <- fetch_date(params["from"]),
          {:date_param, {:ok, to, _}} <- fetch_date(params["to"]),
-         {:ok, rewards} <- ValidatorRewards.calculate_multiple_accounts(validator_address_hashes, from, to) do
+         rewards <- ValidatorRewards.calculate_multiple_accounts(validator_address_hashes, from, to) do
       render(conn, :getvalidatorsrewards, rewards: rewards)
     else
       {:validator_address_param, :error} ->
@@ -128,7 +128,7 @@ defmodule BlockScoutWeb.API.RPC.RewardController do
          {:group_format, {:ok, group_address_hashes}} <- to_address_hashes(group_addresses_param, :group_format),
          {:date_param, {:ok, from, _}} <- fetch_date(params["from"]),
          {:date_param, {:ok, to, _}} <- fetch_date(params["to"]),
-         {:ok, rewards} <- ValidatorGroupRewards.calculate_multiple_accounts(group_address_hashes, from, to) do
+         rewards <- ValidatorGroupRewards.calculate_multiple_accounts(group_address_hashes, from, to) do
       render(conn, :getvalidatorgroupsrewards, rewards: rewards)
     else
       {:group_address_param, :error} ->

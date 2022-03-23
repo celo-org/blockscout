@@ -95,7 +95,6 @@ defmodule Explorer.Celo.Util do
 
   def add_input_account_to_individual_rewards_and_calculate_sum(reward_lists_chunked_by_account, key) do
     reward_lists_chunked_by_account
-    |> Enum.map(fn {:ok, rewards} -> rewards end)
     |> Enum.map(fn x ->
       Map.put(
         x,

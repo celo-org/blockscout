@@ -8,7 +8,7 @@ defmodule Explorer.Celo.VoterRewardsTest do
     test "returns all rewards for a voter" do
       {voter_1_hash, group_1_hash, group_2_hash} = SetupVoterRewardsTest.setup_for_all_groups()
 
-      {:ok, rewards} =
+      rewards =
         VoterRewards.calculate(
           voter_1_hash,
           ~U[2022-01-03 00:00:00.000000Z],
@@ -96,7 +96,7 @@ defmodule Explorer.Celo.VoterRewardsTest do
     test "when all voters passed have rewards" do
       {voter_1_hash, voter_2_hash, group_1_hash, group_2_hash} = SetupVoterRewardsTest.setup_for_multiple_accounts()
 
-      {:ok, rewards} =
+      rewards =
         VoterRewards.calculate_multiple_accounts(
           [voter_1_hash, voter_2_hash],
           ~U[2022-01-03 00:00:00.000000Z],
@@ -200,7 +200,7 @@ defmodule Explorer.Celo.VoterRewardsTest do
     test "when not all voters passed have rewards" do
       {voter_1_hash, voter_2_hash, group_1_hash, group_2_hash} = SetupVoterRewardsTest.setup_for_multiple_accounts()
 
-      {:ok, rewards} =
+      rewards =
         VoterRewards.calculate_multiple_accounts(
           [voter_1_hash, voter_2_hash, group_1_hash],
           ~U[2022-01-03 00:00:00.000000Z],

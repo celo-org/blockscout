@@ -16,7 +16,7 @@ defmodule Explorer.Celo.VoterRewardsForGroupTest do
         block_7_hash
       } = SetupVoterRewardsTest.setup_for_group()
 
-      {:ok, rewards} = VoterRewardsForGroup.calculate(voter_hash, group_hash)
+      rewards = VoterRewardsForGroup.calculate(voter_hash, group_hash)
 
       assert rewards ==
                %{

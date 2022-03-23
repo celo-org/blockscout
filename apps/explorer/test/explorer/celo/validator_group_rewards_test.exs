@@ -9,7 +9,7 @@ defmodule Explorer.Celo.ValidatorGroupRewardsTest do
       {validator_address_1_hash, group_address_1_hash, block_2_hash, block_3_hash} =
         SetupValidatorAndGroupRewardsTest.setup()
 
-      {:ok, rewards} =
+      rewards =
         ValidatorGroupRewards.calculate(
           group_address_1_hash,
           ~U[2022-01-03 00:00:00.000000Z],
@@ -49,7 +49,7 @@ defmodule Explorer.Celo.ValidatorGroupRewardsTest do
       {validator_address_1_hash, validator_address_2_hash, group_address_1_hash, group_address_2_hash, block_1_hash,
        block_2_hash} = SetupValidatorAndGroupRewardsTest.setup_for_multiple_accounts()
 
-      {:ok, rewards} =
+      rewards =
         ValidatorGroupRewards.calculate_multiple_accounts(
           [group_address_1_hash, group_address_2_hash],
           ~U[2022-01-03 00:00:00.000000Z],
