@@ -47,10 +47,8 @@ defmodule BlockScoutWeb.AddressContractVerificationController do
 
   def new(conn, _params) do
     changeset =
-      SmartContract.changeset(
-        %SmartContract{address_hash: ""},
-        %{}
-      )
+      %SmartContract{}
+      |> SmartContract.changeset(%{})
 
     render(conn, "new.html",
       changeset: changeset,
