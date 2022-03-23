@@ -5,13 +5,11 @@ defmodule Explorer.Celo.ContractEvents.EventMap do
 
   alias Explorer.Celo.ContractEvents.EventTransformer
   alias Explorer.Repo
+  alias Explorer.Celo.AddressCache
 
   @doc "Convert ethrpc log parameters to CeloContractEvent insertion parameters"
   def rpc_to_event_params(logs) when is_list(logs) do
     logs
-    |> Enum.reject(fn %{address_hash: contract_address} ->
-
-    end)
     |> Enum.map(fn params = %{first_topic: event_topic} ->
       case event_for_topic(event_topic) do
         nil ->
@@ -25,6 +23,11 @@ defmodule Explorer.Celo.ContractEvents.EventMap do
       end
     end)
     |> Enum.reject(&is_nil/1)
+  end
+
+  def filter_celo_contract_logs(logs) do
+   logs
+   |> Enum.filter(fn %{address_hash: contract_address} -> AddressCache.is_core_contract_address?(contract_address) end)
   end
 
   @doc "Convert CeloContractEvent instance to their concrete types"

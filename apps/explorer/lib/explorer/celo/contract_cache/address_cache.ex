@@ -6,8 +6,15 @@ defmodule Explorer.Celo.AddressCache do
   """
   @callback contract_address(String.t()) :: String.t()
 
+  @doc """
+  Return whether this address represents a known core contract address
+  """
+  @callback is_core_contract_address?(String.t()) :: boolean()
+  @callback is_core_contract_address?(Explorer.Chain.Hash.Address.t()) :: boolean()
+
   # credo:disable-for-next-line
   @implementation Application.fetch_env!(:explorer, __MODULE__)
 
   defdelegate contract_address(contract_name), to: @implementation
+  defdelegate is_core_contract_address?(address), to: @implementation
 end

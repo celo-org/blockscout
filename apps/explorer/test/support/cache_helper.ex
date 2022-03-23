@@ -10,4 +10,10 @@ defmodule Explorer.Celo.CacheHelper do
   def empty_address_cache() do
     Explorer.Celo.AddressCache.Mock |> Mox.stub(:contract_address, fn _name -> :error end)
   end
+
+  def set_cache_address_set(set) do
+    Explorer.Celo.AddressCache.Mock |> Mox.stub(:is_core_contract_address?, fn address ->
+      MapSet.member?(set, address)
+    end)
+  end
 end

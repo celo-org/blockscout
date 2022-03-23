@@ -47,7 +47,7 @@ defmodule Explorer.Celo.CoreContracts do
     timer = Process.send_after(self(), :refresh, period)
 
     state = cache
-      |> build_state(cache)
+      |> build_state()
       |> Map.put(:timer, timer)
 
     {:ok, state}
@@ -65,7 +65,7 @@ defmodule Explorer.Celo.CoreContracts do
   end
 
   @impl true
-  def handle_info(:refresh, state = %{timer: timer, cache: cache}) do
+  def handle_info(:refresh, %{timer: timer, cache: cache}) do
     _ = Process.cancel_timer(timer, info: false)
 
     # fetch addresses for all contracts
@@ -98,7 +98,7 @@ defmodule Explorer.Celo.CoreContracts do
   def handle_info({:update, name, address}, %{cache: cache, timer: timer}) do
     state = cache
     |> Map.put(name, address)
-    |> build_state(cache)
+    |> build_state()
     |> Map.put(:timer, timer)
 
     {:noreply, state}
@@ -141,7 +141,15 @@ defmodule Explorer.Celo.CoreContracts do
   """
   def refresh, do: send(__MODULE__, :refresh)
 
-  def is_core_contract(address) do
+  @impl AddressCache
+  def is_core_contract_address?(address = %Explorer.Chain.Hash{}) do
+    address
+    |> to_string()
+    |> is_core_contract_address?()
+  end
+
+  @impl AddressCache
+  def is_core_contract_address?(address) do
     GenServer.call(__MODULE__, {:has_address, address})
   end
 
