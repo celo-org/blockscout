@@ -2,6 +2,7 @@
 defmodule Explorer.Celo.ContractEvents.EventMap do
   @moduledoc "Map event names and event topics to concrete contract event structs"
 
+  alias Explorer.Celo.AddressCache
   alias Explorer.Celo.ContractEvents.EventTransformer
   alias Explorer.Repo
 
