@@ -39,28 +39,39 @@ defmodule Explorer.Celo.CoreContracts do
           cache(:baklava)
 
         :error ->
-          Logger.warn("No SUBNETWORK env var set for Celo contract address cache, falling back to mainnet")
-          cache(:mainnet)
+          Logger.warn("No SUBNETWORK env var set for Celo contract address cache, building incrementally")
+          %{}
       end
 
     period = Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh]
     timer = Process.send_after(self(), :refresh, period)
 
-    {:ok, Map.put(cache, :timer, timer)}
+    state = cache
+      |> build_state(cache)
+      |> Map.put(:timer, timer)
+
+    {:ok, state}
   end
 
   @impl true
-  def handle_call({:get_address, contract_name}, _from, cache) do
-    {:reply, cache[contract_name], cache}
+  def handle_call({:get_address, contract_name}, _from, state) do
+    address = contract_address(contract_name)
+    {:reply, address, state}
   end
 
   @impl true
-  def handle_info(:refresh, %{timer: timer}) do
+  def handle_call({:has_address, address}, _from, state = %{address_set: set}) do
+    {:reply, MapSet.member?(set, address), state}
+  end
+
+  @impl true
+  def handle_info(:refresh, state = %{timer: timer, cache: cache}) do
     _ = Process.cancel_timer(timer, info: false)
 
     # fetch addresses for all contracts
     cache =
-      @core_contracts
+      cache
+      |> Map.keys()
       |> Enum.reduce(%{}, fn name, acc ->
         case get_address_raw(name) do
           :error ->
@@ -77,11 +88,20 @@ defmodule Explorer.Celo.CoreContracts do
 
     Logger.info("Updated Core Contract addresses")
 
-    {:noreply, Map.put(cache, :timer, timer)}
+    new_state = cache
+      |> build_state()
+      |> Map.put(:timer, timer)
+
+    {:noreply, new_state}
   end
 
-  def handle_info({:update, name, address}, state) do
-    {:noreply, Map.put(state, name, address)}
+  def handle_info({:update, name, address}, %{cache: cache, timer: timer}) do
+    state = cache
+    |> Map.put(name, address)
+    |> build_state(cache)
+    |> Map.put(:timer, timer)
+
+    {:noreply, state}
   end
 
   ## API Methods
@@ -121,6 +141,15 @@ defmodule Explorer.Celo.CoreContracts do
   """
   def refresh, do: send(__MODULE__, :refresh)
 
+  def is_core_contract(address) do
+    GenServer.call(__MODULE__, {:has_address, address})
+  end
+
+  defp build_state(cache) do
+    address_set = cache |> Map.values() |> MapSet.new()
+
+    %{cache: cache, address_set: address_set}
+  end
   # Directly query celo blockchain registry contract for core contract addresses
   defp get_address_raw(name) do
     contract_abi = AbiHandler.get_abi()

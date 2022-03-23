@@ -9,6 +9,9 @@ defmodule Explorer.Celo.ContractEvents.EventMap do
   @doc "Convert ethrpc log parameters to CeloContractEvent insertion parameters"
   def rpc_to_event_params(logs) when is_list(logs) do
     logs
+    |> Enum.reject(fn %{address_hash: contract_address} ->
+
+    end)
     |> Enum.map(fn params = %{first_topic: event_topic} ->
       case event_for_topic(event_topic) do
         nil ->
