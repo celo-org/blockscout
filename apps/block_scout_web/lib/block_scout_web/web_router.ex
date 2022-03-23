@@ -137,28 +137,12 @@ defmodule BlockScoutWeb.WebRouter do
         as: :logs
       )
 
-      # resources(
-      #   "/contract-verifications",
-      #   AddressContractVerificationController,
-      #   only: [:new],
-      #   as: :verify_contract
-      # )
-
-      if Application.get_env(:explorer, Explorer.ThirdPartyIntegrations.Sourcify)[:enabled] do
-        resources(
-          "/contract-verifications",
-          AddressContractVerificationViaJsonController,
-          only: [:new],
-          as: :verify_contract
-        )
-      else
-        resources(
-          "/contract-verifications",
-          AddressContractVerificationViaFlattenedCodeController,
-          only: [:new],
-          as: :verify_contract
-        )
-      end
+      resources(
+        "/contract-verifications",
+        AddressContractVerificationController,
+        only: [:new],
+        as: :verify_contract
+      )
 
       resources(
         "/verify-via-flattened-code",
@@ -357,7 +341,7 @@ defmodule BlockScoutWeb.WebRouter do
     )
 
     resources(
-      "/contract-verification",
+      "/contract-verifications",
       AddressContractVerificationController,
       only: [:new],
       as: :verify_contract
