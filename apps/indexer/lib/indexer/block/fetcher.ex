@@ -12,7 +12,7 @@ defmodule Indexer.Block.Fetcher do
   alias EthereumJSONRPC.{Blocks, FetchedBeneficiaries}
   alias Explorer.Celo.ContractEvents.{EventMap, EventTransformer}
   alias Explorer.Celo.ContractEvents.Registry.RegistryUpdatedEvent
-  alias Explorer.Celo.CoreContracts
+  alias Explorer.Celo.{AddressCache, CoreContracts}
   alias Explorer.{Chain, Market}
   alias Explorer.Chain.{Address, Block, Hash, Import, Transaction}
   alias Explorer.Chain.Block.Reward
@@ -139,7 +139,7 @@ defmodule Indexer.Block.Fetcher do
   defp process_celo_core_contracts(logs) do
     logs
     |> Enum.filter(fn log ->
-      log.first_topic == RegistryUpdatedEvent.topic() and log.address == CoreContracts.registry_address()
+      log.first_topic == RegistryUpdatedEvent.topic() and log.address_hash == CoreContracts.registry_address()
     end)
     |> Enum.map(fn registry_updated_log ->
       event = %RegistryUpdatedEvent{}
@@ -154,9 +154,11 @@ defmodule Indexer.Block.Fetcher do
         log_index: event.log_index
       }
     end)
-    |> Enum.each(fn %{name: name, address_hash: address} ->
-      Logger.info("New celo core contract discovered: #{name} at address #{to_string(address)}, cache will be updated")
-      CoreContracts.update_cache(name, to_string(address))
+    |> tap(fn new_contracts  ->
+        Enum.each(new_contracts, fn %{name: name, address_hash: address} ->
+          Logger.info("New celo core contract discovered: #{name} at address #{to_string(address)}, cache will be updated")
+          AddressCache.update_cache(name, to_string(address))
+      end)
     end)
   end
 
