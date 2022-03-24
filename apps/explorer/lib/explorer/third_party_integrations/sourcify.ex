@@ -60,6 +60,7 @@ defmodule Explorer.ThirdPartyIntegrations.Sourcify do
     end
   end
 
+  # sobelow_skip ["Traversal"]
   def get_missing_file_sources(files) do
     json_file =
       files
