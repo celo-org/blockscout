@@ -132,7 +132,7 @@ defmodule Explorer.SetupVoterRewardsTest do
   def setup_for_all_groups do
     %Address{hash: voter_1_hash} = insert(:address)
     %Address{hash: voter_2_hash} = insert(:address)
-    %Address{hash: contract_address_hash} = insert(:address)
+    %Explorer.Chain.CeloCoreContract{address_hash: contract_address_hash} = insert(:core_contract)
 
     %Address{hash: group_1_hash} =
       insert(:address,
