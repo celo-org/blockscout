@@ -131,19 +131,19 @@ defmodule Indexer.Block.Fetcher do
     e_logs
   end
 
-
   @doc """
-      If a RegistryUpdated event was sent from the registry contract it is treated as a new core contract, inserted into
-      the database and used to update the contract cache.
-      """
+  If a RegistryUpdated event was sent from the registry contract it is treated as a new core contract, inserted into
+  the database and used to update the contract cache.
+  """
   defp process_celo_core_contracts(logs) do
     logs
     |> Enum.filter(fn log ->
       log.first_topic == RegistryUpdatedEvent.topic() and log.address_hash == CoreContracts.registry_address()
     end)
     |> Enum.map(fn registry_updated_log ->
-      event = %RegistryUpdatedEvent{}
-      |> EventTransformer.from_params(registry_updated_log)
+      event =
+        %RegistryUpdatedEvent{}
+        |> EventTransformer.from_params(registry_updated_log)
 
       {:ok, new_contract_address} = event.addr |> Explorer.Chain.Hash.Address.cast()
 
@@ -154,10 +154,13 @@ defmodule Indexer.Block.Fetcher do
         log_index: event.log_index
       }
     end)
-    |> tap(fn new_contracts  ->
-        Enum.each(new_contracts, fn %{name: name, address_hash: address} ->
-          Logger.info("New celo core contract discovered: #{name} at address #{to_string(address)}, cache will be updated")
-          AddressCache.update_cache(name, to_string(address))
+    |> tap(fn new_contracts ->
+      Enum.each(new_contracts, fn %{name: name, address_hash: address} ->
+        Logger.info(
+          "New celo core contract discovered: #{name} at address #{to_string(address)}, cache will be updated"
+        )
+
+        AddressCache.update_cache(name, to_string(address))
       end)
     end)
   end

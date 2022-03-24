@@ -9,11 +9,11 @@ defmodule Explorer.Chain.CeloCoreContract do
   alias Explorer.Chain.Hash.Address
 
   @type t :: %__MODULE__{
-               name: String.t(),
-               log_index: non_neg_integer(),
-               block_number: non_neg_integer(),
-               address_hash: Hash.Address.t(),
-             }
+          name: String.t(),
+          log_index: non_neg_integer(),
+          block_number: non_neg_integer(),
+          address_hash: Hash.Address.t()
+        }
 
   @attrs ~w(name log_index block_number address_hash)a
   @required ~w(name log_index block_number address_hash)a

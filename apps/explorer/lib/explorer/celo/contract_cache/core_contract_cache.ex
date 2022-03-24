@@ -48,7 +48,8 @@ defmodule Explorer.Celo.CoreContracts do
     period = Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh]
     timer = Process.send_after(self(), :refresh, period)
 
-    state = cache
+    state =
+      cache
       |> build_state()
       |> Map.put(:timer, timer)
 
@@ -57,17 +58,19 @@ defmodule Explorer.Celo.CoreContracts do
 
   @impl true
   def handle_continue(:fetch_contracts_from_db, %{cache: cache, timer: timer}) do
-    db_cache = Explorer.Chain.CeloCoreContract
-    |> order_by(:block_number)
-    |> Repo.all()
-    |> Enum.reduce(%{}, fn %{name: name, address_hash: address_hash}, map ->
+    db_cache =
+      Explorer.Chain.CeloCoreContract
+      |> order_by(:block_number)
+      |> Repo.all()
+      |> Enum.reduce(%{}, fn %{name: name, address_hash: address_hash}, map ->
         Map.put(map, name, to_string(address_hash))
-    end)
+      end)
 
-    new_state = cache
-    |> Map.merge(db_cache)
-    |> build_state()
-    |> Map.put(:timer, timer)
+    new_state =
+      cache
+      |> Map.merge(db_cache)
+      |> build_state()
+      |> Map.put(:timer, timer)
 
     {:noreply, new_state}
   end
@@ -107,7 +110,8 @@ defmodule Explorer.Celo.CoreContracts do
 
     Logger.info("Updated Core Contract addresses")
 
-    new_state = cache
+    new_state =
+      cache
       |> build_state()
       |> Map.put(:timer, timer)
 
@@ -115,10 +119,11 @@ defmodule Explorer.Celo.CoreContracts do
   end
 
   def handle_info({:update, name, address}, %{cache: cache, timer: timer}) do
-    state = cache
-    |> Map.put(name, address)
-    |> build_state()
-    |> Map.put(:timer, timer)
+    state =
+      cache
+      |> Map.put(name, address)
+      |> build_state()
+      |> Map.put(:timer, timer)
 
     {:noreply, state}
   end
@@ -177,6 +182,7 @@ defmodule Explorer.Celo.CoreContracts do
 
     %{cache: cache, address_set: address_set}
   end
+
   # Directly query celo blockchain registry contract for core contract addresses
   defp get_address_raw(name) do
     contract_abi = AbiHandler.get_abi()

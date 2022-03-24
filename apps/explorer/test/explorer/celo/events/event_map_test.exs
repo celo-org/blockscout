@@ -52,7 +52,6 @@ defmodule Explorer.Celo.ContractEvents.EventMapTest do
       assert params.group == "\\x47b2db6af05a55d42ed0f3731735f9479abf0673"
     end
 
-
     test "filters celo contract events" do
       celo_contract = insert(:core_contract)
 
@@ -72,12 +71,13 @@ defmodule Explorer.Celo.ContractEvents.EventMapTest do
         transaction_hash: "0xb8960575a898afa8a124cd7414f1261109a119dba3bed4489393952a1556a5f0"
       }
 
-      test_event2 = %{ test_event1 | address_hash: "0x765de816845861e75a25fca122bb68invalidhsh"}
-      test_event3 = %{ test_event1 | address_hash: "0x00000000000861e75a25fca122bb68invalidhsh"}
+      test_event2 = %{test_event1 | address_hash: "0x765de816845861e75a25fca122bb68invalidhsh"}
+      test_event3 = %{test_event1 | address_hash: "0x00000000000861e75a25fca122bb68invalidhsh"}
 
       result = EventMap.filter_celo_contract_logs([test_event1, test_event2, test_event3])
 
-      assert result == [test_event1] # "Should only be core contract logs"
+      # "Should only be core contract logs"
+      assert result == [test_event1]
     end
   end
 

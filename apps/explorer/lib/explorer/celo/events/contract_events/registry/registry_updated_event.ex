@@ -12,11 +12,20 @@ defmodule Explorer.Celo.ContractEvents.Registry.RegistryUpdatedEvent do
   event_param(:addr, :address, :indexed)
 
   def core_contracts() do
-
     from(log in "logs",
-      select: [:first_topic, :second_topic, :third_topic, :data, :address_hash, :block_number, :block_hash, :transaction_hash, :index, :type],
+      select: [
+        :first_topic,
+        :second_topic,
+        :third_topic,
+        :data,
+        :address_hash,
+        :block_number,
+        :block_hash,
+        :transaction_hash,
+        :index,
+        :type
+      ],
       where: log.first_topic == ^@topic and fragment("l0.address_hash = '\\x000000000000000000000000000000000000ce10'")
     )
-
   end
 end
