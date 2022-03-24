@@ -69,7 +69,7 @@
             </div>
         </div>
         <div class="smart-contract-form-buttons">
-          <input type="submit" id="data-button" value="Next" class="btn-full-primary mr-2" data-button-loading="animation" disabled='<%= if Chain.smart_contract_verified?(@address_hash), do: "true", else: "false" %>'>
+          <input type="submit" id="data-button" value="Next" class="btn-full-primary mr-2" data-button-loading="animation" <%= if Chain.smart_contract_verified?(@address_hash) do "disabled" end %>>
         </div>
       <% end %>
     </div>

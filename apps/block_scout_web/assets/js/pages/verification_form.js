@@ -179,7 +179,7 @@ if ($contractVerificationPage.length) {
         addRemoveLinks: true,
         maxFilesize: 20,
         headers: {
-          "Accept": "*/*"
+          Accept: '*/*'
         },
         params: { address_hash: $('#smart_contract_address_hash').val() },
         init: function () {

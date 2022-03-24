@@ -6,8 +6,6 @@ defmodule BlockScoutWeb.Notifier do
   alias Absinthe.Subscription
 
   alias BlockScoutWeb.{
-    AddressContractVerificationViaFlattenedCodeView,
-    AddressContractVerificationViaJsonView,
     ChangesetView,
     Endpoint
   }

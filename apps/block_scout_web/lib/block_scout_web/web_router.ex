@@ -154,14 +154,14 @@ defmodule BlockScoutWeb.WebRouter do
       resources(
         "/verify-via-json",
         AddressContractVerificationViaJsonController,
-        only: [:new],
+        only: [:new, :create],
         as: :verify_contract_via_json
       )
 
       resources(
         "/verify-vyper-contract",
         AddressContractVerificationVyperController,
-        only: [:new],
+        only: [:new, :create],
         as: :verify_vyper_contract
       )
 
