@@ -53,7 +53,7 @@ defmodule Explorer.Chain.Import.Runner.CeloCoreContract do
       Import.insert_changes_list(
         repo,
         ordered_changes_list,
-        conflict_target: [:block_number, :log_index],
+        conflict_target: [:address_hash],
         on_conflict: on_conflict,
         for: CeloCoreContract,
         returning: true,

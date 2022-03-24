@@ -790,7 +790,6 @@ defmodule Indexer.Block.FetcherTest do
       "0x" <> unprefixed_celo_token_address_hash = to_string(celo_token_address.hash)
       set_test_address(to_string(celo_token_address.hash))
 
-
       core_contract = insert(:core_contract)
 
       [core_contract.address_hash() |> to_string()]
@@ -967,7 +966,9 @@ defmodule Indexer.Block.FetcherTest do
 
       assert {:ok, %{inserted: inserted}} = Fetcher.fetch_and_import_range(block_fetcher, block_number..block_number)
 
-      assert 3 == length(inserted[:logs]) # should insert 3 logs
+      require IEx; IEx.pry
+
+      assert 4 == length(inserted[:logs]) # should insert 3 logs
       assert 1 == length(inserted[:celo_contract_event]) # should insert 1 celo contract event from those logs
 
       [event] = inserted[:celo_contract_event]
