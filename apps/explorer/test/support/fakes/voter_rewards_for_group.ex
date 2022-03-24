@@ -110,43 +110,41 @@ defmodule Explorer.Fakes.VoterRewardsForGroup do
   def calculate(voter_address_hash, group_address_hash, _to_date)
       when group_address_hash == @group_address_1_hash and
              voter_address_hash == @voter_address_2_hash do
-    {:ok,
-     %{
-       group: group_address_hash,
-       total: 175,
-       rewards: [
-         %{
-           amount: 78,
-           block_hash: @block_5_hash,
-           block_number: @block_5_number,
-           date: ~U[2022-01-05 17:42:43.162804Z],
-           epoch_number: 623
-         }
-       ]
-     }}
+    %{
+      group: group_address_hash,
+      total: 175,
+      rewards: [
+        %{
+          amount: 78,
+          block_hash: @block_5_hash,
+          block_number: @block_5_number,
+          date: ~U[2022-01-05 17:42:43.162804Z],
+          epoch_number: 623
+        }
+      ]
+    }
   end
 
   def calculate(_voter_address_hash, group_address_hash, _to_date) when group_address_hash == @group_address_2_hash do
-    {:ok,
-     %{
-       group: group_address_hash,
-       total: 175,
-       rewards: [
-         %{
-           amount: 39,
-           block_hash: @block_4_hash,
-           block_number: @block_4_number,
-           date: ~U[2022-01-04 17:42:43.162804Z],
-           epoch_number: 622
-         },
-         %{
-           amount: 78,
-           block_hash: @block_5_hash,
-           block_number: @block_5_number,
-           date: ~U[2022-01-05 17:42:43.162804Z],
-           epoch_number: 623
-         }
-       ]
-     }}
+    %{
+      group: group_address_hash,
+      total: 175,
+      rewards: [
+        %{
+          amount: 39,
+          block_hash: @block_4_hash,
+          block_number: @block_4_number,
+          date: ~U[2022-01-04 17:42:43.162804Z],
+          epoch_number: 622
+        },
+        %{
+          amount: 78,
+          block_hash: @block_5_hash,
+          block_number: @block_5_number,
+          date: ~U[2022-01-05 17:42:43.162804Z],
+          epoch_number: 623
+        }
+      ]
+    }
   end
 end
