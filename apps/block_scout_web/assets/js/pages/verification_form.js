@@ -37,11 +37,9 @@ export function reducer (state = initialState, action) {
           return Object.assign({}, state, {
             validationErrors: result.errors
           })
-        } catch {
-          // TODO: get rid of it when other paths are updated as well
-          return Object.assign({}, state, {
-            newForm: action.msg.verificationResult
-          })
+        } catch (e) {
+          console.error('Unexpected verification response', e)
+          return state
         }
       }
     }
