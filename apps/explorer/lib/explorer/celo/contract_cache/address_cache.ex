@@ -15,7 +15,7 @@ defmodule Explorer.Celo.AddressCache do
   @doc """
     Add a name + address to the cache
   """
-  @callback update_cache(String.t(), String.t()) :: none()
+  @callback update_cache(String.t(), String.t()) :: any()
 
   # credo:disable-for-next-line
   @implementation Application.fetch_env!(:explorer, __MODULE__)

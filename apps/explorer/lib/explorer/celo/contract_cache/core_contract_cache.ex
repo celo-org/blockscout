@@ -156,6 +156,7 @@ defmodule Explorer.Celo.CoreContracts do
     end
   end
 
+  @impl AddressCache
   def update_cache(name, address) do
     send(__MODULE__, {:update, name, address})
   end

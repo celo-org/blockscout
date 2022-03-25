@@ -42,7 +42,7 @@ defmodule Explorer.Chain.Import.Runner.CeloCoreContract do
   end
 
   @spec insert(Repo.t(), [map()], Util.insert_options()) ::
-          {:ok, [CeloContractEvent.t()]} | {:error, [Changeset.t()]}
+          {:ok, [CeloCoreContract.t()]} | {:error, [Changeset.t()]}
   defp insert(repo, changes_list, %{timeout: timeout, timestamps: timestamps} = options) when is_list(changes_list) do
     on_conflict = Map.get(options, :on_conflict, :nothing)
 
