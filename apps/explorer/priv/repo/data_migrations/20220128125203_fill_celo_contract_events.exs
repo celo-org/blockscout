@@ -8,6 +8,8 @@ defmodule Explorer.Repo.Migrations.FillCeloContractEvents do
     EpochRewardsDistributedToVotersEvent
   }
 
+  alias Explorer.Chain.Hash.{Address, Full}
+
   alias Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent
 
   @disable_ddl_transaction true
@@ -38,16 +40,20 @@ defmodule Explorer.Repo.Migrations.FillCeloContractEvents do
         t = Timex.now()
 
         events
-        |> Enum.map(fn e ->
-          {:ok, contract_address_hash} = Explorer.Chain.Hash.Address.dump(e.contract_address_hash)
+        |> Enum.map(fn event ->
+          {:ok, contract_address_hash} = Address.dump(event.contract_address_hash)
 
-          e = if not is_nil(e.transaction_hash) do
-            IO.inspect(e)
-            {:ok, transaction_hash} = Explorer.Chain.Hash.Full.dump(e.transaction_hash)
-            e |> Map.put(:transaction_hash, transaction_hash)
-          end          
+          event =
+            case event.transaction_hash do
+              nil ->
+                event
 
-          e
+              hash ->
+                {:ok, transaction_hash} = Full.dump(hash)
+                event |> Map.put(:transaction_hash, transaction_hash)
+            end
+
+          event
           |> Map.put(:inserted_at, t)
           |> Map.put(:updated_at, t)
           |> Map.put(:contract_address_hash, contract_address_hash)
@@ -92,7 +98,8 @@ defmodule Explorer.Repo.Migrations.FillCeloContractEvents do
         block_number: l.block_number,
         index: l.index
       },
-      where: is_nil(e.topic) and l.first_topic in ^@topics and {l.block_number, l.index} > {^last_block_number, ^last_index},
+      where:
+        is_nil(e.topic) and l.first_topic in ^@topics and {l.block_number, l.index} > {^last_block_number, ^last_index},
       order_by: [asc: l.block_number, asc: l.index],
       limit: @batch_size
     )
