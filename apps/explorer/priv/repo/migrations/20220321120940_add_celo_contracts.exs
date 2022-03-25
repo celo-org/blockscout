@@ -28,7 +28,7 @@ defmodule Explorer.Repo.Migrations.AddCeloContracts do
 
     # get all core contracts (registry entries)
     core_contracts =
-      RegistryUpdatedEvent.core_contracts()
+      RegistryUpdatedEvent.raw_registry_updated_logs()
       |> repo().all()
       |> Explorer.Celo.ContractEvents.EventMap.rpc_to_event_params()
       |> Enum.map(fn e ->
