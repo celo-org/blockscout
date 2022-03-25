@@ -146,9 +146,7 @@ defmodule Explorer.SetupVoterRewardsTest do
         }
       )
 
-
     %Explorer.Chain.CeloCoreContract{address_hash: contract_address_hash} = insert(:core_contract)
-
 
     %Address{hash: group_1_hash} =
       insert(:address,
