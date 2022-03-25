@@ -5,8 +5,8 @@ defmodule Explorer.Celo.CoreContracts do
 
   use GenServer
   alias Explorer.Celo.{AbiHandler, AddressCache}
-  alias Explorer.SmartContract.Reader
   alias Explorer.Repo
+  alias Explorer.SmartContract.Reader
   require Logger
   import Ecto.Query
 
@@ -82,7 +82,7 @@ defmodule Explorer.Celo.CoreContracts do
   end
 
   @impl true
-  def handle_call({:has_address, address}, _from, state = %{address_set: set}) do
+  def handle_call({:has_address, address}, _from, %{address_set: set} = state) do
     {:reply, MapSet.member?(set, address), state}
   end
 
@@ -166,7 +166,7 @@ defmodule Explorer.Celo.CoreContracts do
   def refresh, do: send(__MODULE__, :refresh)
 
   @impl AddressCache
-  def is_core_contract_address?(address = %Explorer.Chain.Hash{}) do
+  def is_core_contract_address?(%Explorer.Chain.Hash{} = address) do
     address
     |> to_string()
     |> is_core_contract_address?()

@@ -11,7 +11,7 @@ defmodule Explorer.Celo.ContractEvents.Registry.RegistryUpdatedEvent do
   event_param(:identifier_hash, {:bytes, 32}, :indexed)
   event_param(:addr, :address, :indexed)
 
-  def core_contracts() do
+  def core_contracts do
     from(log in "logs",
       select: [
         :first_topic,
