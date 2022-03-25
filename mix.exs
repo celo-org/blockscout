@@ -6,8 +6,8 @@ defmodule BlockScout.Mixfile do
   def project do
     [
       app: :block_scout,
-      aliases: aliases(Mix.env()),
-      version: "2.0",
+      aliases: aliases(config_env()),
+      version: "4.1.2",
       apps_path: "apps",
       deps: deps(),
       dialyzer: dialyzer(),
@@ -16,7 +16,7 @@ defmodule BlockScout.Mixfile do
         credo: :test,
         dialyzer: :test
       ],
-      start_permanent: Mix.env() == :prod,
+      # start_permanent: config_env() == :prod,
       releases: [
         blockscout: [
           applications: [
@@ -51,9 +51,9 @@ defmodule BlockScout.Mixfile do
     ] ++ env_aliases(env)
   end
 
-  defp env_aliases(:dev) do
-    []
-  end
+  # defp env_aliases(:dev) do
+  #   []
+  # end
 
   defp env_aliases(_env) do
     [
