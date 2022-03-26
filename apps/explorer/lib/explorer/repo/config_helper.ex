@@ -29,16 +29,15 @@ defmodule Explorer.Repo.ConfigHelper do
     url = opts[:url] || System.get_env("DATABASE_URL")
     env_function = opts[:env_func] || (&System.get_env/1)
 
-    cond do
-      url == "" or is_nil(url) ->
-        [username: "", password: "", hostname: "", port: 5432, database: ""]
-        |> Keyword.merge(get_env_vars(@postgrex_env_vars, env_function))
-        |> Keyword.merge(get_env_vars(@app_env_vars, env_function))
-      true ->
-        url
-        |> extract_parameters()
-        |> Keyword.merge(get_env_vars(@postgrex_env_vars, env_function))
-        |> Keyword.merge(get_env_vars(@app_env_vars, env_function))
+    if url == "" or is_nil(url) do
+      [username: "", password: "", hostname: "", port: 5432, database: ""]
+      |> Keyword.merge(get_env_vars(@postgrex_env_vars, env_function))
+      |> Keyword.merge(get_env_vars(@app_env_vars, env_function))
+    else
+      url
+      |> extract_parameters()
+      |> Keyword.merge(get_env_vars(@postgrex_env_vars, env_function))
+      |> Keyword.merge(get_env_vars(@app_env_vars, env_function))
     end
   end
 
