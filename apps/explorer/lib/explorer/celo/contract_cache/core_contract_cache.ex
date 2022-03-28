@@ -76,23 +76,38 @@ defmodule Explorer.Celo.CoreContracts do
   end
 
   @impl true
-  def handle_call({:get_address, contract_name}, _from, state) do
-    case Map.get(state[:cache], contract_name) do
-      # not found in cache, fetch directly
-      nil ->
-        address = get_address_raw(contract_name)
-        update_cache(contract_name, address)
-        address
+  def handle_call({:get_address, contract_name}, _from, %{cache: cache, timer: timer} = state) do
+    {address, state} =
+      case Map.get(cache, contract_name) do
+        # not found in cache, fetch directly
+        nil ->
+          address = get_address_raw(contract_name)
 
-      # not in registry / not deployed yet, fetch each time until found
-      "0x0000000000000000000000000000000000000000" ->
-        address = get_address_raw(contract_name)
-        update_cache(contract_name, address)
-        address
+          state =
+            state
+            |> put_in(state, [:cache, contract_name])
+            |> build_state()
+            |> Map.put(:timer, timer)
 
-      address ->
-        address
-    end
+          {address, state}
+
+        # not in registry / not deployed yet, fetch each time until found
+        "0x0000000000000000000000000000000000000000" ->
+          address = get_address_raw(contract_name)
+
+          state =
+            state
+            |> put_in(state, [:cache, contract_name])
+            |> build_state()
+            |> Map.put(:timer, timer)
+
+          {address, state}
+
+        address ->
+          {address, state}
+      end
+
+    {:reply, address, state}
   end
 
   @impl true
