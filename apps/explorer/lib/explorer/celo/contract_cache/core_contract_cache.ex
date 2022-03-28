@@ -85,7 +85,7 @@ defmodule Explorer.Celo.CoreContracts do
 
           state =
             state
-            |> put_in(state, [:cache, contract_name])
+            |> put_in([:cache, contract_name], address)
             |> build_state()
             |> Map.put(:timer, timer)
 
@@ -97,7 +97,7 @@ defmodule Explorer.Celo.CoreContracts do
 
           state =
             state
-            |> put_in(state, [:cache, contract_name])
+            |> put_in([:cache, contract_name], address)
             |> build_state()
             |> Map.put(:timer, timer)
 
