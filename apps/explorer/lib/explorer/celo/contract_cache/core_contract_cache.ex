@@ -77,8 +77,22 @@ defmodule Explorer.Celo.CoreContracts do
 
   @impl true
   def handle_call({:get_address, contract_name}, _from, state) do
-    address = contract_address(contract_name)
-    {:reply, address, state}
+    case Map.get(state[:cache], contract_name) do
+      # not found in cache, fetch directly
+      nil ->
+        address = get_address_raw(contract_name)
+        update_cache(contract_name, address)
+        address
+
+      # not in registry / not deployed yet, fetch each time until found
+      "0x0000000000000000000000000000000000000000" ->
+        address = get_address_raw(contract_name)
+        update_cache(contract_name, address)
+        address
+
+      address ->
+        address
+    end
   end
 
   @impl true
@@ -137,24 +151,7 @@ defmodule Explorer.Celo.CoreContracts do
   def contract_address("Registry"), do: @registry_address
 
   @impl AddressCache
-  def contract_address(name) when name in @core_contracts do
-    case GenServer.call(__MODULE__, {:get_address, name}) do
-      # not found in cache, fetch directly
-      nil ->
-        address = get_address_raw(name)
-        update_cache(name, address)
-        address
-
-      # not in registry / not deployed yet, fetch each time until found
-      "0x0000000000000000000000000000000000000000" ->
-        address = get_address_raw(name)
-        update_cache(name, address)
-        address
-
-      address ->
-        address
-    end
-  end
+  def contract_address(name), do: GenServer.call(__MODULE__, {:get_address, name})
 
   @impl AddressCache
   def update_cache(name, address) do
