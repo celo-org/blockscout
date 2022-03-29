@@ -1,0 +1,34 @@
+<tr data-identifier-hash="hash<%# @contract.address %>">
+    <td class="stakes-td">
+        <!-- incremented number by order in the list -->
+        <span class="color-lighten">
+        <%= @index %>
+      </span>
+    </td>
+    <td class="stakes-td">
+    </td>
+    <td class="stakes-td">
+        <%# render BlockScoutWeb.AddressView,
+      "_link.html",
+      address: @token.contract_address,
+      contract: true,
+      use_custom_tooltip: false
+    %>
+        sup
+    </td>
+    <td class="stakes-td">
+        hello
+    </td>
+    <td class="stakes-td">
+        yes
+    </td>
+    <td class="stakes-td">
+        yes
+    </td>
+    <td class="stakes-td">
+        yes
+    </td>
+    <td class="stakes-td">
+        yes
+    </td>
+</tr>
