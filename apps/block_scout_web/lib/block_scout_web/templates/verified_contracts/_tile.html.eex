@@ -34,6 +34,6 @@
         <%= @contract.inserted_at |> Calendar.strftime("%m.%d.%y") %>
     </td>
     <td class="stakes-td">
-        license
+        <%= detect_license(@contract) %>
     </td>
 </tr>
