@@ -8,8 +8,8 @@
       <%= if stats_enabled do %>
         <!-- Stats Details -->
         <div class="card js-ad-dependant-mb-3">
-            <div class="google-data-studio">
-              <iframe width=100% height=2700 class="responsive-iframe" src="<%= stats_report_url %>" frameborder="0" style="border:0" allowfullscreen></iframe>
+            <div class="card-body google-data-studio">
+              <iframe width=100% height="2700" class="responsive-iframe" src="<%= stats_report_url %>" frameborder="0" style="border:0" allowfullscreen></iframe>
             </div>
         </div>
       <% end %>
