@@ -1,62 +1,65 @@
 <section
-	class="container"
-	data-page="verified_contracts"
-	data-chain-id="<%= System.get_env("CHAIN_ID") %>"
-	data-display-token-icons="<%= System.get_env("DISPLAY_TOKEN_ICONS") %>"
+		class="container"
+		data-page="verified_contracts"
+		data-chain-id="<%= System.get_env("CHAIN_ID") %>"
+		data-display-token-icons="<%= System.get_env("DISPLAY_TOKEN_ICONS") %>"
 >
-  <%= render BlockScoutWeb.Advertisement.TextAdView, "index.html", conn: @conn %>
-  <div class="card">
-    <div class="card-body" data-async-load data-async-listing="<#= @current_path %>">
-	  <h1 class="card-title list-title-description"><%= gettext "Verified Contracts" %></h1>
+	<%= render BlockScoutWeb.Advertisement.TextAdView, "index.html", conn: @conn %>
+	<div class="card">
+		<div class="card-body" data-async-load data-async-listing="<#= @current_path %>">
+			<h1 class="card-title list-title-description"><%= gettext "Verified Contracts" %></h1>
 
-	<div class="list-top-pagination-container-wrapper verified_contracts-list-search-input-outer-container d-flex" style="float: right;">
-		<label class="verified_contracts-list-search-input-container verified_contracts mr-3">
-			<input data-search-field="" class="form-control verified_contracts-list-search-input search-input" type="text" name="filter" placeholder="Contract name" id="search-text-input" />
-		</label>
-    	<%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "top", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+			<div class="list-top-pagination-container-wrapper verified_contracts-list-search-input-outer-container d-flex" style="float: right;">
+				<label class="verified_contracts-list-search-input-container verified_contracts mr-3">
+					<input data-search-field="" class="form-control verified_contracts-list-search-input search-input" type="text" name="filter" placeholder="Contract name" id="search-text-input" />
+				</label>
+				<%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "top", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+			</div>
+
+			<div class="addresses-table-container">
+				<div class="stakes-table-container">
+					<table>
+						<thead>
+						<tr>
+							<th class="stakes-table-th">
+								<div class="stakes-table-th-content">Address</div>
+							</th>
+							<th class="stakes-table-th">
+								<div class="stakes-table-th-content">Contract Name</div>
+							</th>
+							<th class="stakes-table-th">
+								<div class="stakes-table-th-content">Compiler</div>
+							</th>
+							<th class="stakes-table-th">
+								<div class="stakes-table-th-content">Balance</div>
+							</th>
+							<th class="stakes-table-th">
+								<div class="stakes-table-th-content">Txns (past 90 days)</div>
+							</th>
+							<th class="stakes-table-th">
+								<div class="stakes-table-th-content">Verification Status</div>
+							</th>
+							<th class="stakes-table-th">
+								<div class="stakes-table-th-content">Date Verified</div>
+							</th>
+							<th class="stakes-table-th">
+								<div class="stakes-table-th-content">License</div>
+							</th>
+						</tr>
+						</thead>
+						<tbody data-items data-selector="top-verified_contracts-list">
+						<%= for contract <- @contracts do %>
+						<%= render BlockScoutWeb.VerifiedContractsView, "_tile.html", contract: contract %>
+
+						<% end %>
+						</tbody>
+					</table>
+				</div>
+			</div>
+
+			<%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "bottom", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+		</div>
 	</div>
-
-    <div class="addresses-table-container">
-      <div class="stakes-table-container">
-	<table>
-	  <thead>
-	    <tr>
-	      <th class="stakes-table-th">
-			<div class="stakes-table-th-content">Address</div>
-	      </th>
-			<th class="stakes-table-th">
-				<div class="stakes-table-th-content">Contract Name</div>
-			</th>
-			<th class="stakes-table-th">
-				<div class="stakes-table-th-content">Compiler</div>
-			</th>
-			<th class="stakes-table-th">
-				<div class="stakes-table-th-content">Balance</div>
-			</th>
-			<th class="stakes-table-th">
-				<div class="stakes-table-th-content">Txns (past 90 days)</div>
-			</th>
-			<th class="stakes-table-th">
-				<div class="stakes-table-th-content">Verification Status</div>
-			</th>
-			<th class="stakes-table-th">
-				<div class="stakes-table-th-content">Date Verified</div>
-			</th>
-			<th class="stakes-table-th">
-				<div class="stakes-table-th-content">License</div>
-			</th>
-	    </tr>
-	  </thead>
-	  <tbody data-items data-selector="top-verified_contracts-list">
-	    <%= render BlockScoutWeb.CommonComponentsView, "_table-loader.html", columns_num: 8 %>
-	  </tbody>
-	</table>
-      </div>
-    </div>
-
-    <%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "bottom", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
-    </div>
-  </div>
-  <script defer data-cfasync="false" src="<%= static_path(@conn, "/js/verified_contracts.js") %>"></script>
-  <script defer data-cfasync="false" src="<%= static_path(@conn, "/js/token-transfers-toggle.js") %>"></script>
+	<script defer data-cfasync="false" src="<%= static_path(@conn, "/js/verified_contracts.js") %>"></script>
+	<script defer data-cfasync="false" src="<%= static_path(@conn, "/js/token-transfers-toggle.js") %>"></script>
 </section>
