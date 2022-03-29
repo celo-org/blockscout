@@ -98,7 +98,7 @@ defmodule Explorer.Repo.ConfigHelperTest do
         "DATABASE_PASSWORD" => env_db_password,
         "DATABASE_HOST" => env_db_host,
         "DATABASE_PORT" => env_db_port,
-        "DATABASE_NAME" => env_db_name
+        "DATABASE_DB" => env_db_name
       }
 
       func = fn v -> vars[v] end

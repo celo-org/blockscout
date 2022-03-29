@@ -13,7 +13,7 @@ defmodule Explorer.Repo.ConfigHelper do
     password: "DATABASE_PASSWORD",
     hostname: "DATABASE_HOST",
     port: "DATABASE_PORT",
-    database: "DATABASE_NAME"
+    database: "DATABASE_DB"
   ]
 
   # https://hexdocs.pm/postgrex/Postgrex.html#start_link/1-options
