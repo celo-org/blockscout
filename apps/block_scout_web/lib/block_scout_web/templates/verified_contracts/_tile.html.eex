@@ -6,28 +6,32 @@
       contract: true,
       use_custom_tooltip: false
     %>
-        <!-- incremented number by order in the list -->
-        <span class="color-lighten">
-        <%# @index %>
-      </span>
     </td>
     <td class="stakes-td">
-        contract name
+        <%= @contract.name %>
     </td>
     <td class="stakes-td">
-        compiler
+        <%= if @contract.is_vyper_contract do %>
+        Vyper
+        <% else %>
+        Solidity
+        <% end %>
     </td>
     <td class="stakes-td">
-        balance
+        0 CELO
     </td>
     <td class="stakes-td">
-        txns
+        8888 Txs
     </td>
     <td class="stakes-td">
-        verification
+        <%= if @contract.partially_verified do %>
+        Partial
+        <% else %>
+        Full
+        <% end %>
     </td>
     <td class="stakes-td">
-        verification date
+        <%= @contract.inserted_at |> Calendar.strftime("%m.%d.%y") %>
     </td>
     <td class="stakes-td">
         license
