@@ -18,7 +18,7 @@
         <% end %>
     </td>
     <td class="stakes-td">
-        0 CELO
+        <%= contract_balance(@contract) %> <%= gettext "CELO" %>
     </td>
     <td class="stakes-td">
         8888 Txs
