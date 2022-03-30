@@ -6,8 +6,8 @@ defmodule BlockScoutWeb.VerifiedContractsView do
       license = spdx_tag(contract.contract_source_code) ->
         license
 
-      Explorer.Celo.CoreContracts.is_core_contract_address?(contract.address) ->
-        "Celo"
+      Explorer.Celo.CoreContracts.is_core_contract_address?(contract.address.hash) ->
+        "LGPL-3.0"
 
       true ->
         "Unknown"
