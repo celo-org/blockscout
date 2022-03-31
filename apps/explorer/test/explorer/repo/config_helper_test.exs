@@ -93,7 +93,6 @@ defmodule Explorer.Repo.ConfigHelperTest do
       vars = %{
         "PGUSER" => "postgrex_user",
         "PGPASSWORD" => "postgrex_password",
-        "DATABASE_USER" => "app_db_user",
         "DATABASE_USER" => env_db_user,
         "DATABASE_PASSWORD" => env_db_password,
         "DATABASE_HOST" => env_db_host,
