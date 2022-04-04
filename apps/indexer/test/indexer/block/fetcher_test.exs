@@ -996,7 +996,9 @@ defmodule Indexer.Block.FetcherTest do
 
       core_contract = insert(:core_contract)
 
-      [core_contract.address_hash() |> to_string()]
+      contract_hash = core_contract.address_hash() |> to_string()
+
+      [contract_hash]
       |> MapSet.new()
       |> set_cache_address_set()
 
@@ -1021,13 +1023,13 @@ defmodule Indexer.Block.FetcherTest do
                    "extraData" => "0x5050594520737061726b706f6f6c2d6574682d7477",
                    "gasLimit" => "0x7a121d",
                    "gasUsed" => "0x79cbe9",
-                   "hash" => "0x1b6fb99af0b51af6685a191b2f7bcba684f8565629bf084c70b2530479407455",
+                   "hash" => "0xb8a9f217d2cd318c9068c5f09ba31b3cad3219ffa7e11b0bb8a76e43d4647d29",
                    "logsBloom" =>
                      "0x044d42d008801488400e1809190200a80d06105bc0c4100b047895c0d518327048496108388040140010b8208006288102e206160e21052322440924002090c1c808a0817405ab238086d028211014058e949401012403210314896702d06880c815c3060a0f0809987c81044488292cc11d57882c912a808ca10471c84460460040000c0001012804022000a42106591881d34407420ba401e1c08a8d00a000a34c11821a80222818a4102152c8a0c044032080c6462644223104d618e0e544072008120104408205c60510542264808488220403000106281a0290404220112c10b080145028c8000300b18a2c8280701c882e702210b00410834840108084",
                    "miner" => "0x5a0b54d5dc17e0aadc383d2db43b0a0d3e029c4c",
                    "mixHash" => "0xda53ae7c2b3c529783d6cdacdb90587fd70eb651c0f04253e8ff17de97844010",
                    "nonce" => "0x0946e5f01fce12bc",
-                   "number" => "0x7",
+                   "number" => "0xBA6A80",
                    "parentHash" => "0x62543e836e0ef7edfa9e38f26526092c4be97efdf5ba9e0f53a4b0b7d5bc930a",
                    "receiptsRoot" => "0xa7d2b82bd8526de11736c18bd5cc8cfe2692106c4364526f3310ad56d78669c4",
                    "sha3Uncles" => "0x483a8a21a5825ad270f358b3ea56e060bbb8b3082d9a92ec8fa17a5c7e6fc1b6",
@@ -1037,8 +1039,8 @@ defmodule Indexer.Block.FetcherTest do
                    "totalDifficulty" => "0x201a42c35142ae94458",
                    "transactions" => [
                      %{
-                       "blockHash" => "0x1b6fb99af0b51af6685a191b2f7bcba684f8565629bf084c70b2530479407455",
-                       "blockNumber" => "0x7",
+                       "blockHash" => "0xb8a9f217d2cd318c9068c5f09ba31b3cad3219ffa7e11b0bb8a76e43d4647d29",
+                       "blockNumber" => "0xBA6A80",
                        "chainId" => "0x4d",
                        "from" => from_address_hash,
                        "gas" => "0x47b760",
@@ -1074,8 +1076,8 @@ defmodule Indexer.Block.FetcherTest do
                  id: id,
                  jsonrpc: "2.0",
                  result: %{
-                   "blockHash" => "0x1b6fb99af0b51af6685a191b2f7bcba684f8565629bf084c70b2530479407455",
-                   "blockNumber" => "0x7",
+                   "blockHash" => "0xb8a9f217d2cd318c9068c5f09ba31b3cad3219ffa7e11b0bb8a76e43d4647d29",
+                   "blockNumber" => "0xBA6A80",
                    "contractAddress" => nil,
                    "cumulativeGasUsed" => "0xc512",
                    "gasUsed" => "0xc512",
@@ -1091,7 +1093,7 @@ defmodule Indexer.Block.FetcherTest do
                          "0x0000000000000000000000005e69cca114a77ab0a5804108faf0cd1e1c802a5e",
                          "0x000000000000000000000000614b7654ba0cc6000abe526779911b70c1f7125a"
                        ],
-                       "address" => "0xaeb865bca93ddc8f47b8e29f40c5399ce34d0c58",
+                       "address" => contract_hash,
                        "blockHash" => "0xb8a9f217d2cd318c9068c5f09ba31b3cad3219ffa7e11b0bb8a76e43d4647d29",
                        "transactionHash" => nil
                      },
@@ -1106,7 +1108,7 @@ defmodule Indexer.Block.FetcherTest do
                          "0x0000000000000000000000001819b44553fa39a983d1c92238e1f18aee30ef51",
                          "0x000000000000000000000000c7d5409fee80b3ac37dbc111664dc511a5982469"
                        ],
-                       "address" => "0xaeb865bca93ddc8f47b8e29f40c5399ce34d0c58",
+                       "address" => contract_hash,
                        "blockHash" => "0xb8a9f217d2cd318c9068c5f09ba31b3cad3219ffa7e11b0bb8a76e43d4647d29",
                        "transactionHash" => nil
                      },
@@ -1121,7 +1123,7 @@ defmodule Indexer.Block.FetcherTest do
                          "0x000000000000000000000000cdd88f80ed52afec9d670f5a6da8940eee716f45",
                          "0x0000000000000000000000003d451dd723797b3de938c5b22412032b6452591a"
                        ],
-                       "address" => "0xaeb865bca93ddc8f47b8e29f40c5399ce34d0c58",
+                       "address" => contract_hash,
                        "blockHash" => "0xb8a9f217d2cd318c9068c5f09ba31b3cad3219ffa7e11b0bb8a76e43d4647d29",
                        "transactionHash" => nil
                      }
@@ -1144,8 +1146,6 @@ defmodule Indexer.Block.FetcherTest do
       end
 
       assert {:ok, %{inserted: inserted}} = Fetcher.fetch_and_import_range(block_fetcher, block_number..block_number)
-
-      require IEx; IEx.pry
     end
 
     test "imports blocks with dynamic fee (type 0x2) transactions", %{

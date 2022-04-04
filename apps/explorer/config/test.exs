@@ -62,7 +62,9 @@ variant =
     |> String.downcase()
   end
 
+config :explorer, Explorer.Celo.CoreContracts, refresh: :timer.hours(1)
 config :explorer, Explorer.Celo.AddressCache, Explorer.Celo.AddressCache.Mock
+
 
 # Import variant specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

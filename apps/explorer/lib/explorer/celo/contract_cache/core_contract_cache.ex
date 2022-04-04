@@ -23,12 +23,12 @@ defmodule Explorer.Celo.CoreContracts do
   ## GenServer Callbacks
 
   @spec start_link(term()) :: GenServer.on_start()
-  def start_link(_) do
-    GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
+  def start_link(params \\ %{}) do
+    GenServer.start_link(__MODULE__, params, name: __MODULE__)
   end
 
   @impl true
-  def init(_) do
+  def init(params) do
     cache =
       case System.fetch_env("SUBNETWORK") do
         {:ok, "Celo"} ->
@@ -44,8 +44,9 @@ defmodule Explorer.Celo.CoreContracts do
           Logger.warn("No SUBNETWORK env var set for Celo contract address cache, building incrementally")
           %{}
       end
+      |> Map.merge(params[:cache] || %{})
 
-    period = Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh]
+    period = params[:refresh_period] || Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh]
     timer = Process.send_after(self(), :refresh, period)
 
     state =
