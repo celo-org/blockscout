@@ -10,6 +10,11 @@ $(window).on('load resize', function () {
   if (width < 768) {
     $('.js-ad-dependant-pt').removeClass('pt-5')
     $('.menu-wrap').removeClass('container')
+    if (localStorage.getItem('current-color-mode') === 'dark') {
+      $('.menu-wrap').addClass('dark')
+    } else {
+      $('.menu-wrap').removeClass('dark')
+    }
   } else {
     $('.js-ad-dependant-pt').addClass('pt-5')
     $('.menu-wrap').addClass('container')
