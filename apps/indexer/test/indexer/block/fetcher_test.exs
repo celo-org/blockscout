@@ -1014,7 +1014,7 @@ defmodule Indexer.Block.FetcherTest do
         |> expect(:json_rpc, 4, fn requests, _options ->
           {:ok,
            Enum.map(requests, fn
-             %{id: id, method: "eth_getBlockByNumber" } ->
+             %{id: id, method: "eth_getBlockByNumber"} ->
                %{
                  id: id,
                  result: %{
