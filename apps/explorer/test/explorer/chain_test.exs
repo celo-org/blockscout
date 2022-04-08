@@ -28,7 +28,8 @@ defmodule Explorer.ChainTest do
     Wei
   }
 
-  alias Explorer.Chain
+  alias Explorer.{Chain, Etherscan}
+  alias Explorer.Chain.Cache.Transaction, as: TransactionCache
   alias Explorer.Chain.InternalTransaction.Type
 
   alias Explorer.Celo.ContractEvents.Election.{
@@ -2706,7 +2707,7 @@ defmodule Explorer.ChainTest do
 
   describe "transaction_estimated_count/1" do
     test "returns integer" do
-      assert is_integer(Chain.transaction_estimated_count())
+      assert is_integer(TransactionCache.estimated_count())
     end
   end
 
