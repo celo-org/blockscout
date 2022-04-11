@@ -7,6 +7,7 @@ defmodule Explorer.Celo.CoreContracts do
   alias Explorer.Celo.{AbiHandler, AddressCache}
   alias Explorer.Repo
   alias Explorer.SmartContract.Reader
+  alias __MODULE__
   require Logger
   import Ecto.Query
 
@@ -119,30 +120,31 @@ defmodule Explorer.Celo.CoreContracts do
   def handle_info(:refresh, %{timer: timer, cache: cache}) do
     _ = Process.cancel_timer(timer, info: false)
 
-    # fetch addresses for all contracts
-    new_cache =
-      cache
-      |> Map.keys()
-      |> Enum.reduce(%{}, fn name, acc ->
-        case get_address_raw(name) do
-          {:error, e} ->
-            Logger.error("Failed to fetch Celo Contract address for #{name} - #{inspect(e)}")
-            acc
+    refresh_period = Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh]
+    refresh_concurrency = Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh_concurrency]
 
-          address when is_binary(address) ->
-            Map.put(acc, name, address)
-        end
-      end)
-      |> then(&Map.merge(cache, &1))
+    contracts_to_update = cache |> Map.keys()
+    Logger.info("Updating core contract addresses for #{Enum.join(contracts_to_update, ",")}")
 
-    period = Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh]
-    timer = Process.send_after(self(), :refresh, period)
+    #spawning async tasks for each contract to prevent this process (CoreContracts) being blocked
+    #whilst awaiting return from blockchain call
+    Explorer.TaskSupervisor
+    |> Task.Supervisor.async_stream(contracts_to_update, fn name ->
+      case get_address_raw(name) do
+        {:error, e} ->
+          Logger.error("Failed to fetch Celo Contract address for #{name} - #{inspect(e)}")
 
-    Logger.info("Refreshed Core Contract addresses")
+        address when is_binary(address) ->
+          CoreContracts.update_cache(name, address)
+      end
+    end, [on_timeout: :kill_task, max_concurrency: refresh_concurrency, ordered: false])
+    |> Stream.run()
 
-    new_state = %{cache: new_cache, timer: timer} |> rebuild_state()
+    timer = Process.send_after(self(), :refresh, refresh_period)
 
-    {:noreply, new_state}
+    state_with_new_timer = %{cache: cache, timer: timer} |> rebuild_state()
+
+    {:noreply, state_with_new_timer}
   end
 
   def handle_info({:update, name, address}, state) do

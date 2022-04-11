@@ -16,6 +16,10 @@ defmodule Explorer.Celo.CoreContractCacheTest do
          }}
       )
 
+      start_supervised(
+        {Task.Supervisor, name: Explorer.TaskSupervisor}, id: Explorer.TaskSupervisor
+      )
+
       assert CoreContracts.is_core_contract_address?(test_address)
 
       test_address = "0xnewaddresshey"
