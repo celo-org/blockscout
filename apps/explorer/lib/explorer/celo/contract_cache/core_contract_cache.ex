@@ -118,6 +118,7 @@ defmodule Explorer.Celo.CoreContracts do
 
   @impl true
   def handle_info(:refresh, %{timer: timer, cache: cache}) do
+    #cancel the timer as this method may have been invoked manually
     _ = Process.cancel_timer(timer, info: false)
 
     refresh_period = Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh]
@@ -140,8 +141,8 @@ defmodule Explorer.Celo.CoreContracts do
     end, [on_timeout: :kill_task, max_concurrency: refresh_concurrency, ordered: false])
     |> Stream.run()
 
+    #schedule next refresh
     timer = Process.send_after(self(), :refresh, refresh_period)
-
     state_with_new_timer = %{cache: cache, timer: timer} |> rebuild_state()
 
     {:noreply, state_with_new_timer}
