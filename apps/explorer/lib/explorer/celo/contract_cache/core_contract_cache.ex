@@ -16,6 +16,8 @@ defmodule Explorer.Celo.CoreContracts do
   @registry_address "0x000000000000000000000000000000000000ce10"
   def registry_address, do: @registry_address
 
+  @nil_address "0x0000000000000000000000000000000000000000"
+
   # full list of core contracts, see https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/lib/registry-utils.ts
   @core_contracts ~w(Accounts Attestations BlockchainParameters DoubleSigningSlasher DowntimeSlasher Election EpochRewards Escrow Exchange ExchangeEUR FeeCurrencyWhitelist Freezer GasPriceMinimum GoldToken Governance GovernanceSlasher GovernanceApproverMultiSig GrandaMento LockedGold Random Reserve ReserveSpenderMultiSig SortedOracles StableToken StableTokenEUR StableTokenREAL TransferWhitelist Validators)
   def contract_list, do: @core_contracts
@@ -50,15 +52,14 @@ defmodule Explorer.Celo.CoreContracts do
     timer = Process.send_after(self(), :refresh, period)
 
     state =
-      cache
-      |> build_state()
-      |> Map.put(:timer, timer)
+      %{cache: cache, timer: timer}
+      |> rebuild_state()
 
     {:ok, state, {:continue, :fetch_contracts_from_db}}
   end
 
   @impl true
-  def handle_continue(:fetch_contracts_from_db, %{cache: cache, timer: timer}) do
+  def handle_continue(:fetch_contracts_from_db, %{cache: cache} = state) do
     db_cache =
       Explorer.Chain.CeloCoreContract
       |> order_by(:block_number)
@@ -68,39 +69,37 @@ defmodule Explorer.Celo.CoreContracts do
       end)
 
     new_state =
-      cache
-      |> Map.merge(db_cache)
-      |> build_state()
-      |> Map.put(:timer, timer)
+      state
+      |> Map.put(:cache, Map.merge(cache, db_cache))
+      |> rebuild_state()
 
     {:noreply, new_state}
   end
 
   @impl true
-  def handle_call({:get_address, contract_name}, _from, %{cache: cache, timer: timer} = state) do
+  def handle_call({:get_address, contract_name}, _from, %{cache: cache} = state) do
     {address, state} =
       case Map.get(cache, contract_name) do
         # not found in cache, fetch directly
-        nil ->
-          address = get_address_raw(contract_name)
+        address when address in [nil, @nil_address] ->
+          address =
+            case get_address_raw(contract_name) do
+              {:error, e} ->
+                Logger.error("Failed to fetch Celo Contract address for #{contract_name} - #{inspect(e)}")
+                nil
+
+              address ->
+                address
+            end
 
           state =
-            state
-            |> put_in([:cache, contract_name], address)
-            |> build_state()
-            |> Map.put(:timer, timer)
-
-          {address, state}
-
-        # not in registry / not deployed yet, fetch each time until found
-        "0x0000000000000000000000000000000000000000" ->
-          address = get_address_raw(contract_name)
-
-          state =
-            state
-            |> put_in([:cache, contract_name], address)
-            |> build_state()
-            |> Map.put(:timer, timer)
+            unless is_nil(address) do
+              state
+              |> put_in([:cache, contract_name], address)
+              |> rebuild_state()
+            else
+              state
+            end
 
           {address, state}
 
@@ -121,41 +120,38 @@ defmodule Explorer.Celo.CoreContracts do
     _ = Process.cancel_timer(timer, info: false)
 
     # fetch addresses for all contracts
-    cache =
+    new_cache =
       cache
       |> Map.keys()
       |> Enum.reduce(%{}, fn name, acc ->
         case get_address_raw(name) do
-          :error ->
-            Logger.error("Failed to fetch Celo Contract address for #{name}")
+          {:error, e} ->
+            Logger.error("Failed to fetch Celo Contract address for #{name} - #{inspect(e)}")
             acc
 
-          address ->
+          address when is_binary(address) ->
             Map.put(acc, name, address)
         end
       end)
+      |> then(&Map.merge(cache, &1))
 
     period = Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh]
     timer = Process.send_after(self(), :refresh, period)
 
-    Logger.info("Updated Core Contract addresses")
+    Logger.info("Refreshed Core Contract addresses")
 
-    new_state =
-      cache
-      |> build_state()
-      |> Map.put(:timer, timer)
+    new_state = %{cache: new_cache, timer: timer} |> rebuild_state()
 
     {:noreply, new_state}
   end
 
-  def handle_info({:update, name, address}, %{cache: cache, timer: timer}) do
-    state =
-      cache
-      |> Map.put(name, address)
-      |> build_state()
-      |> Map.put(:timer, timer)
+  def handle_info({:update, name, address}, state) do
+    new_state =
+      state
+      |> put_in([:cache, name], address)
+      |> rebuild_state()
 
-    {:noreply, state}
+    {:noreply, new_state}
   end
 
   ## API Methods
@@ -191,10 +187,10 @@ defmodule Explorer.Celo.CoreContracts do
     GenServer.call(__MODULE__, {:has_address, address})
   end
 
-  defp build_state(cache) do
+  defp rebuild_state(%{cache: cache, timer: timer}) do
     address_set = cache |> Map.values() |> MapSet.new()
 
-    %{cache: cache, address_set: address_set}
+    %{cache: cache, address_set: address_set, timer: timer}
   end
 
   # Directly query celo blockchain registry contract for core contract addresses
@@ -219,7 +215,7 @@ defmodule Explorer.Celo.CoreContracts do
 
     case res["getAddressForString"] do
       {:ok, [address]} -> address
-      _ -> :error
+      e -> {:error, e}
     end
   end
 
