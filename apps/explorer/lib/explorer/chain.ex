@@ -3896,8 +3896,11 @@ defmodule Explorer.Chain do
         Wei.hex_format(value)
       )
 
-    data =
+    revert_reason =
       case EthereumJSONRPC.json_rpc(req, json_rpc_named_arguments) do
+        {:error, %{message: message}} ->
+          message
+
         {:error, %{message: message}} ->
           message
 
@@ -3905,7 +3908,8 @@ defmodule Explorer.Chain do
           ""
       end
 
-    formatted_revert_reason = format_revert_reason_message(data)
+    formatted_revert_reason =
+      revert_reason |> format_revert_reason_message() |> (&if(String.valid?(&1), do: &1, else: revert_reason)).()
 
     if byte_size(formatted_revert_reason) > 0 do
       transaction
@@ -3931,7 +3935,7 @@ defmodule Explorer.Chain do
         extract_revert_reason_message_wrapper(rest)
 
       @revert_msg_prefix_5 <> rest ->
-        rest
+        extract_revert_reason_message_wrapper(rest)
 
       revert_reason_full ->
         revert_reason_full
