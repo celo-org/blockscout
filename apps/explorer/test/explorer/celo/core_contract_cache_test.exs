@@ -65,10 +65,10 @@ defmodule Explorer.Celo.CoreContractCacheTest do
       # waiting for completion of async blockchain calls
       :timer.sleep(100)
 
-      #previous address should no longer be there due to refresh provding new address
+      # previous address should no longer be there due to refresh provding new address
       refute CoreContracts.is_core_contract_address?(test_address)
 
-      #new address is now considered a core contract
+      # new address is now considered a core contract
       assert CoreContracts.is_core_contract_address?("0x" <> result_address)
       assert CoreContracts.contract_address(test_contract_identifier) == "0x" <> result_address
     end
@@ -79,17 +79,16 @@ defmodule Explorer.Celo.CoreContractCacheTest do
 
       start_supervised(
         {CoreContracts,
-          %{
-            refresh_period: :timer.hours(1000),
-            cache: %{test_contract_identifier => test_address}
-          }}
+         %{
+           refresh_period: :timer.hours(1000),
+           cache: %{test_contract_identifier => test_address}
+         }}
       )
 
       start_supervised(
         {Task.Supervisor, name: Explorer.TaskSupervisor},
         id: Explorer.TaskSupervisor
       )
-
 
       EthereumJSONRPC.Mox
       |> expect(:json_rpc, 2, fn
@@ -102,7 +101,7 @@ defmodule Explorer.Celo.CoreContractCacheTest do
       # waiting for completion of async blockchain calls
       :timer.sleep(100)
 
-      #previous address should still be considered a core contract
+      # previous address should still be considered a core contract
       assert CoreContracts.is_core_contract_address?(test_address)
       assert CoreContracts.contract_address(test_contract_identifier) == test_address
     end

@@ -32,7 +32,7 @@ defmodule Explorer.Celo.CoreContracts do
 
   @impl true
   def init(params) do
-    cache =
+    initial_env_cache =
       case System.fetch_env("SUBNETWORK") do
         {:ok, "Celo"} ->
           cache(:mainnet)
@@ -47,7 +47,8 @@ defmodule Explorer.Celo.CoreContracts do
           Logger.warn("No SUBNETWORK env var set for Celo contract address cache, building incrementally")
           %{}
       end
-      |> Map.merge(params[:cache] || %{})
+
+    cache = initial_env_cache |> Map.merge(params[:cache] || %{})
 
     period = params[:refresh_period] || Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh]
     timer = Process.send_after(self(), :refresh, period)
@@ -83,6 +84,8 @@ defmodule Explorer.Celo.CoreContracts do
       case Map.get(cache, contract_name) do
         # not found in cache, fetch directly
         address when address in [nil, @nil_address] ->
+          Logger.info("Contract cache miss - #{contract_name}, fetching directly")
+
           address =
             case get_address_raw(contract_name) do
               {:error, e} ->
@@ -94,12 +97,12 @@ defmodule Explorer.Celo.CoreContracts do
             end
 
           state =
-            unless is_nil(address) do
+            if is_nil(address) do
+              state
+            else
               state
               |> put_in([:cache, contract_name], address)
               |> rebuild_state()
-            else
-              state
             end
 
           {address, state}
@@ -118,7 +121,7 @@ defmodule Explorer.Celo.CoreContracts do
 
   @impl true
   def handle_info(:refresh, %{timer: timer, cache: cache}) do
-    #cancel the timer as this method may have been invoked manually
+    # cancel the timer as this method may have been invoked manually
     _ = Process.cancel_timer(timer, info: false)
 
     refresh_period = Application.get_env(:explorer, Explorer.Celo.CoreContracts)[:refresh]
@@ -127,21 +130,27 @@ defmodule Explorer.Celo.CoreContracts do
     contracts_to_update = cache |> Map.keys()
     Logger.info("Updating core contract addresses for #{Enum.join(contracts_to_update, ",")}")
 
-    #spawning async tasks for each contract to prevent this process (CoreContracts) being blocked
-    #whilst awaiting return from blockchain call
+    # spawning async tasks for each contract to prevent this process (CoreContracts) being blocked
+    # whilst awaiting return from blockchain call
     Explorer.TaskSupervisor
-    |> Task.Supervisor.async_stream(contracts_to_update, fn name ->
-      case get_address_raw(name) do
-        {:error, e} ->
-          Logger.error("Failed to fetch Celo Contract address for #{name} - #{inspect(e)}")
+    |> Task.Supervisor.async_stream(
+      contracts_to_update,
+      fn name ->
+        case get_address_raw(name) do
+          {:error, e} ->
+            Logger.error("Failed to fetch Celo Contract address for #{name} - #{inspect(e)}")
 
-        address when is_binary(address) ->
-          CoreContracts.update_cache(name, address)
-      end
-    end, [on_timeout: :kill_task, max_concurrency: refresh_concurrency, ordered: false])
+          address when is_binary(address) ->
+            CoreContracts.update_cache(name, address)
+        end
+      end,
+      on_timeout: :kill_task,
+      max_concurrency: refresh_concurrency,
+      ordered: false
+    )
     |> Stream.run()
 
-    #schedule next refresh
+    # schedule next refresh
     timer = Process.send_after(self(), :refresh, refresh_period)
     state_with_new_timer = %{cache: cache, timer: timer} |> rebuild_state()
 
