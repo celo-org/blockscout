@@ -30,7 +30,8 @@ defmodule Indexer.MixProject do
         :logger_json,
         :cowboy,
         :plug,
-        :prometheus
+        :prometheus,
+        :explorer
       ],
       mod: {Indexer.Application, []}
     ]
