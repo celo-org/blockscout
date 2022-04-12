@@ -12,9 +12,6 @@ defmodule Indexer.MixProject do
       description: "Fetches block chain data from on-chain node for later reading with Explorer.",
       elixir: "~> 1.10",
       elixirc_paths: elixirc_paths(Mix.env()),
-      elixirc_options: [
-        warnings_as_errors: true
-      ],
       lockfile: "../../mix.lock",
       start_permanent: Mix.env() == :prod,
       version: "0.1.0"
@@ -30,8 +27,7 @@ defmodule Indexer.MixProject do
         :logger_json,
         :cowboy,
         :plug,
-        :prometheus,
-        :explorer
+        :prometheus
       ],
       mod: {Indexer.Application, []}
     ]
