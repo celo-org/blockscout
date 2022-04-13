@@ -11,6 +11,7 @@ config :explorer, Explorer.Repo,
   username: username,
   url: System.get_env("DATABASE_URL"),
   pool_size: String.to_integer(System.get_env("POOL_SIZE", "50")),
+  parameters: [application_name: System.get_env("USER", "anon") <> "_dev_explorer"],
   timeout: :timer.seconds(80)
 
 config :explorer, Explorer.Tracer, env: "dev", disabled?: true

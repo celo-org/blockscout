@@ -11,6 +11,7 @@ config :explorer, Explorer.Repo,
   pool_size: String.to_integer(System.get_env("POOL_SIZE") || "50"),
   ssl: String.equivalent?(System.get_env("ECTO_USE_SSL") || "true", "true"),
   prepare: :unnamed,
+  parameters: [application_name: System.get_env("HOSTNAME", "blockscout-production")],
   timeout: :timer.seconds(60)
 
 config :explorer, Explorer.Tracer, env: "production", disabled?: true
