@@ -129,7 +129,7 @@ defmodule Explorer.Repo do
     stream_in_transaction(query, &Enum.reduce(&1, initial, reducer))
   end
 
-  def get_application_name() do
+  def get_application_name do
     case Mix.env() do
       :dev ->
         System.get_env("USER", "anon") <> "_dev_blockscout"
