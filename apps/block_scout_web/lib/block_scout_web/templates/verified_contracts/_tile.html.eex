@@ -1,14 +1,20 @@
 <tr data-identifier-hash="<%= @contract.address_hash %>">
     <td class="stakes-td">
+        <span class="verification-mark">
+            <span class="material-icons">check</span>
+        </span>
         <%= render BlockScoutWeb.AddressView,
-      "_link.html",
-      address: @contract.address,
-      contract: true,
-      use_custom_tooltip: false
-    %>
+            "_link.html",
+            address: @contract.address,
+            contract: true,
+            use_custom_tooltip: false,
+            truncate: true
+        %>
     </td>
     <td class="stakes-td">
-        <%= @contract.name %>
+        <%= link to: address_path(BlockScoutWeb.Endpoint, :show, @contract.address), "data-test": "address_hash_link", class: assigns[:class] do %>
+            <%= @contract.name %>
+        <% end %>
     </td>
     <td class="stakes-td">
         <%= if @contract.is_vyper_contract do %>
@@ -21,13 +27,14 @@
         <%= contract_balance(@contract) %> <%= gettext "CELO" %>
     </td>
     <td class="stakes-td">
-        8888 Txs
+        0
     </td>
     <td class="stakes-td">
+        <span class="verification-label <%= if @contract.partially_verified do %>partial<% else %>full<% end %>">
         <%= if @contract.partially_verified do %>
-        Partial
+        <%= gettext "Partially Verified" %>
         <% else %>
-        Full
+        <%= gettext "Verified" %>
         <% end %>
     </td>
     <td class="stakes-td">

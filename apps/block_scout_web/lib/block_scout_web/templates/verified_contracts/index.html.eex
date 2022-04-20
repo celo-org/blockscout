@@ -13,7 +13,18 @@
 				<label class="verified_contracts-list-search-input-container verified_contracts mr-3">
 					<input data-search-field="" class="form-control verified_contracts-list-search-input search-input" type="text" name="filter" placeholder="Contract name" id="search-text-input" />
 				</label>
-				<%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "top", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+				<%= render BlockScoutWeb.CommonComponentsView,
+					"_pagination_container.html",
+					position: "top",
+					show_pagination_limit: true,
+					data_next_page_button: true,
+					data_prev_page_button: true,
+					cur_page_number: @pagination_current_page,
+					next_page_path: @pagination_next_page_path,
+					prev_page_path: @pagination_prev_page_path,
+					first_page_path: @pagination_first_page_path,
+					last_page_path: @pagination_last_page_path
+				%>
 			</div>
 
 			<div class="addresses-table-container">
@@ -37,7 +48,7 @@
 								<div class="stakes-table-th-content">Txns (past 90 days)</div>
 							</th>
 							<th class="stakes-table-th">
-								<div class="stakes-table-th-content">Verification Status</div>
+								<div class="stakes-table-th-content">Verified</div>
 							</th>
 							<th class="stakes-table-th">
 								<div class="stakes-table-th-content">Date Verified</div>
@@ -57,7 +68,18 @@
 				</div>
 			</div>
 
-			<%= render BlockScoutWeb.CommonComponentsView, "_pagination_container.html", position: "bottom", cur_page_number: "1", show_pagination_limit: true, data_next_page_button: true, data_prev_page_button: true %>
+			<%= render BlockScoutWeb.CommonComponentsView,
+				"_pagination_container.html",
+				position: "bottom",
+				show_pagination_limit: true,
+				data_next_page_button: true,
+				data_prev_page_button: true,
+				cur_page_number: @pagination_current_page,
+				next_page_path: @pagination_next_page_path,
+				prev_page_path: @pagination_prev_page_path,
+				first_page_path: @pagination_first_page_path,
+				last_page_path: @pagination_last_page_path
+			%>
 		</div>
 	</div>
 	<script defer data-cfasync="false" src="<%= static_path(@conn, "/js/verified_contracts.js") %>"></script>
