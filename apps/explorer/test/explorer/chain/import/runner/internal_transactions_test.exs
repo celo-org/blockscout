@@ -291,7 +291,15 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactionsTest do
 
     test "does not overwrite gas_used from transaction" do
       block = insert(:block)
-      transaction = insert(:transaction, gas_used: 30_000, cumulative_gas_used: 30_000, index: 0, block_hash: block.hash, block_number: block.number)
+
+      transaction =
+        insert(:transaction,
+          gas_used: 30_000,
+          cumulative_gas_used: 30_000,
+          index: 0,
+          block_hash: block.hash,
+          block_number: block.number
+        )
 
       insert(:pending_block_operation, block_hash: block.hash, fetch_internal_transactions: true)
 
