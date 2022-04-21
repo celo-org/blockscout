@@ -769,6 +769,11 @@ msgid "Contract source code"
 msgstr ""
 
 #, elixir-format
+#: lib/block_scout_web/templates/layout/_topnav.html.eex:89
+msgid "Contracts"
+msgstr ""
+
+#, elixir-format
 #: lib/block_scout_web/templates/address_contract/index.html.eex:154
 msgid "Contracts that self destruct in their constructors have no contract code published and cannot be verified."
 msgstr ""
@@ -2681,8 +2686,7 @@ msgstr ""
 #: lib/block_scout_web/templates/address/_tabs.html.eex:21
 #: lib/block_scout_web/templates/address/overview.html.eex:192 lib/block_scout_web/templates/address_token/overview.html.eex:58
 #: lib/block_scout_web/templates/address_token_transfer/index.html.eex:13 lib/block_scout_web/templates/layout/_topnav.html.eex:57
-#: lib/block_scout_web/templates/layout/_topnav.html.eex:89 lib/block_scout_web/templates/tokens/index.html.eex:10
-#: lib/block_scout_web/views/address_view.ex:404
+#: lib/block_scout_web/templates/tokens/index.html.eex:10 lib/block_scout_web/views/address_view.ex:404
 msgid "Tokens"
 msgstr ""
 

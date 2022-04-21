@@ -86,7 +86,7 @@
                 <span class="nav-link-icon">
                   <%= render BlockScoutWeb.IconsView, "_tokens_icon.html" %>
                 </span>
-                <%= gettext("Tokens") %>
+                <%= gettext("Contracts") %>
               </a>
               <div class="dropdown-menu" aria-labeledby="navbarTransactionsDropdown"> 
                 <%= link(
