@@ -23,6 +23,7 @@ defmodule Explorer.Celo.Telemetry do
       measurements,
       meta
     )
+    end_time
   end
 
   @doc false
