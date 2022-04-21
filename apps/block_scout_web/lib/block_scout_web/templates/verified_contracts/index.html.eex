@@ -18,9 +18,9 @@
 			<h1 class="card-title list-title-description"><%= gettext "Verified Contracts" %></h1>
 
 			<div class="list-top-pagination-container-wrapper verified_contracts-list-search-input-outer-container d-flex" style="float: right;">
-				<label class="verified_contracts-list-search-input-container verified_contracts mr-3">
+				<%# <label class="verified_contracts-list-search-input-container verified_contracts mr-3">
 					<input data-search-field="" class="form-control verified_contracts-list-search-input search-input" type="text" name="filter" placeholder="Contract name" id="search-text-input" />
-				</label>
+				</label> %>
 				<%= render BlockScoutWeb.CommonComponentsView,
 					"_pagination_container.html",
 					position: "top",
@@ -41,25 +41,43 @@
 						<thead>
 						<tr>
 							<th class="stakes-table-th">
-								<div class="stakes-table-th-content">Address</div>
+								<div class="stakes-table-th-content"><%= gettext("Address") %></div>
 							</th>
 							<th class="stakes-table-th">
-								<div class="stakes-table-th-content">Contract Name</div>
+								<div class="stakes-table-th-content">
+									<%= render BlockScoutWeb.CommonComponentsView,
+										"_pagination_sort_link.html",
+										link_order_field: "name",
+										link_path: sort_path(@conn, @params, @paging_options, "name", "asc", path_fun),
+										link_title: gettext("Contract Name"),
+										current_order_dir: @paging_options.order_dir,
+										current_order_field: @paging_options.order_field
+									%>
+								</div>
 							</th>
 							<th class="stakes-table-th">
-								<div class="stakes-table-th-content">Compiler</div>
+								<div class="stakes-table-th-content"><%= gettext("Compiler") %></div>
 							</th>
 							<th class="stakes-table-th">
-								<div class="stakes-table-th-content">Balance</div>
+								<div class="stakes-table-th-content"><%= gettext("Balance") %></div>
 							</th>
 							<th class="stakes-table-th">
-								<div class="stakes-table-th-content">Txns (past 90 days)</div>
+								<div class="stakes-table-th-content"><%= gettext("Txns (past 90 days)") %></div>
 							</th>
 							<th class="stakes-table-th">
-								<div class="stakes-table-th-content">Verified</div>
+								<div class="stakes-table-th-content"><%= gettext("Verified") %></div>
 							</th>
 							<th class="stakes-table-th">
-								<div class="stakes-table-th-content">Date Verified</div>
+								<div class="stakes-table-th-content">
+									<%= render BlockScoutWeb.CommonComponentsView,
+										"_pagination_sort_link.html",
+										link_order_field: "date",
+										link_path: sort_path(@conn, @params, @paging_options, "date", "asc", path_fun),
+										link_title: gettext("Date Verified"),
+										current_order_dir: @paging_options.order_dir,
+										current_order_field: @paging_options.order_field
+									%>
+								</div>
 							</th>
 							<th class="stakes-table-th">
 								<div class="stakes-table-th-content">License</div>

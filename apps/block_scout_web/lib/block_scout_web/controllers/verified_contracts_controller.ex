@@ -16,7 +16,7 @@ defmodule BlockScoutWeb.VerifiedContractsController do
       PagingOptions.extract_paging_options_from_params(
         params,
         contract_count,
-        ["name"],
+        ["name", "date"],
         @default_page_size
       )
 
@@ -49,11 +49,16 @@ defmodule BlockScoutWeb.VerifiedContractsController do
     offset = (paging_options.page_number - 1) * paging_options.page_size
 
     query
+    |> handle_order_clause(paging_options.order_dir, paging_options.order_field)
     |> limit(^paging_options.page_size)
     |> offset(^offset)
-    # TODO parametrize (use fragment)
-    |> order_by(asc: :name)
   end
+
+  defp handle_order_clause(query, _ = "desc", _ = "name"), do: query |> order_by(desc: :name)
+  defp handle_order_clause(query, _ = "asc", _ = "name"), do: query |> order_by(asc: :name)
+
+  defp handle_order_clause(query, _ = "desc", _ = "date"), do: query |> order_by(desc: :inserted_at)
+  defp handle_order_clause(query, _ = "asc", _ = "date"), do: query |> order_by(asc: :inserted_at)
 
   defp handle_filter(query, filter) do
     if not is_nil(filter) do
@@ -63,6 +68,4 @@ defmodule BlockScoutWeb.VerifiedContractsController do
       query
     end
   end
-
-  # defp path_for_paging_options
 end
