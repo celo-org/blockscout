@@ -5,6 +5,8 @@ defmodule BlockScoutWeb.VerifiedContractsView do
   alias Explorer.Chain.SmartContract
   alias Explorer.Chain.Address
 
+  import BlockScoutWeb.GenericPaginationHelpers
+
   def detect_license(contract) do
     cond do
       license = spdx_tag(contract.contract_source_code) ->
