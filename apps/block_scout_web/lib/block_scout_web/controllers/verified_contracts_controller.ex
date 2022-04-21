@@ -11,12 +11,14 @@ defmodule BlockScoutWeb.VerifiedContractsController do
   def index(conn, params) do
     filter = Map.get(params, "filter")
     contract_count = get_verified_contract_count(filter)
-    paging_options = PagingOptions.extract_paging_options_from_params(
-      params,
-      contract_count,
-      ["name"],
-      @default_page_size
-    )
+
+    paging_options =
+      PagingOptions.extract_paging_options_from_params(
+        params,
+        contract_count,
+        ["name"],
+        @default_page_size
+      )
 
     contracts = get_verified_contracts(paging_options, filter)
 
@@ -49,11 +51,12 @@ defmodule BlockScoutWeb.VerifiedContractsController do
     query
     |> limit(^paging_options.page_size)
     |> offset(^offset)
-    |> order_by(asc: :name) # TODO parametrize (use fragment)
+    # TODO parametrize (use fragment)
+    |> order_by(asc: :name)
   end
 
   defp handle_filter(query, filter) do
-    if not is_nil(filter)do
+    if not is_nil(filter) do
       # TODO implement WHERE clause
       query
     else

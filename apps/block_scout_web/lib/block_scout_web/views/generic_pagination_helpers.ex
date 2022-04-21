@@ -3,7 +3,13 @@ defmodule BlockScoutWeb.GenericPaginationHelpers do
   Helpers for handling pagination
   """
 
-  @spec next_page_path(conn :: any(), params :: map(), paging_options :: map(), total_item_count :: pos_integer(), path_fun :: any()) :: String.t()
+  @spec next_page_path(
+          conn :: any(),
+          params :: map(),
+          paging_options :: map(),
+          total_item_count :: pos_integer(),
+          path_fun :: any()
+        ) :: String.t()
   def next_page_path(conn, params, paging_options, total_item_count, path_fun) do
     if paging_options.page_number * paging_options.page_size >= total_item_count do
       nil
@@ -30,7 +36,13 @@ defmodule BlockScoutWeb.GenericPaginationHelpers do
     end
   end
 
-  @spec last_page_path(conn :: any(), params :: map(), paging_options :: map(), total_item_count :: pos_integer(), path_fun :: any()) :: String.t()
+  @spec last_page_path(
+          conn :: any(),
+          params :: map(),
+          paging_options :: map(),
+          total_item_count :: pos_integer(),
+          path_fun :: any()
+        ) :: String.t()
   def last_page_path(conn, params, paging_options, total_item_count, path_fun) do
     last_page_number = ceil(total_item_count / paging_options.page_size)
 
