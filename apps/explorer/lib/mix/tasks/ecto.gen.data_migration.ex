@@ -112,11 +112,11 @@ defmodule Mix.Tasks.Ecto.Gen.DataMigration do
 
   embed_template :migration, """
   defmodule <%= inspect @mod %> do
-    use <%= inspect migration_module() %>
-    import Ecto.Query
-
     <%= if @event do %># event topics to migrate from logs table
     @topics [] <% end %>
+
+    use <%= inspect migration_module() %>
+    import Ecto.Query
 
     @doc "Undo the data migration"
     def down, do: :ok

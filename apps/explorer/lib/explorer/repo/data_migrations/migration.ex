@@ -13,6 +13,7 @@ defmodule Explorer.Repo.Migrations.DataMigration do
       require Logger
       use Ecto.Migration
       alias Explorer.Celo.Telemetry
+      import Ecto.Query
 
       @disable_ddl_transaction true
       @disable_migration_lock true
@@ -130,7 +131,7 @@ defmodule Explorer.Repo.Migrations.DataMigration do
             |> MapSet.difference(MapSet.new(results))
             |> MapSet.to_list()
 
-          not_inserted |> Enum.each(&handle_non_update/1)
+          not_inserted |> Enum.each(&handle_failure/1)
         end
 
         last_key =
