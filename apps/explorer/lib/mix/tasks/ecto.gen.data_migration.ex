@@ -17,7 +17,8 @@ defmodule Mix.Tasks.Ecto.Gen.DataMigration do
     repo: [:string, :keep],
     no_compile: :boolean,
     no_deps_check: :boolean,
-    migrations_path: :string
+    migrations_path: :string,
+    events: :boolean
   ]
 
   @moduledoc """
@@ -78,7 +79,7 @@ defmodule Mix.Tasks.Ecto.Gen.DataMigration do
           end
 
           # The :change option may be used by other tasks but not the CLI
-          assigns = [mod: Module.concat([repo, Migrations, camelize(name)]), change: opts[:change]]
+          assigns = [mod: Module.concat([repo, Migrations, camelize(name)]), change: opts[:change], event: opts[:events]]
           create_file file, migration_template(assigns)
 
           if open?(file) and Mix.shell().yes?("Do you want to run this migration?") do
@@ -114,15 +115,20 @@ defmodule Mix.Tasks.Ecto.Gen.DataMigration do
     use <%= inspect migration_module() %>
     import Ecto.Query
 
+    <%= if @event do %># event topics to migrate from logs table
+    @topics [] <% end %>
+
     @doc "Undo the data migration"
     def down, do: :ok
 
     @doc "Returns an ecto query that gives list of ids representing the next batch / page of source rows to be processed"
     def page_query(start_of_page) do
+    <%= if @event do %> event_page_query(start_of_page) <% end %>
     end
 
     @doc "Perform the transformation with the list of ids to operate upon, returns a list of inserted / modified ids"
     def do_change(ids) do
+    <%= if @event do %> event_change(ids) <% end %>
     end
 
     @doc "Manage unsuccessful insertions"

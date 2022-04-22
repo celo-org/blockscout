@@ -55,28 +55,93 @@ defmodule Explorer.Repo.Migrations.DataMigration do
         initial_value_str = System.get_env("INITIAL_VALUE")
 
         unless initial_value_str do
-          raise "No initial value for data migration provided - please rerun with an environment var INITIAL_VALUE='elixir term'"
+          raise "No initial value for data migration provided - please rerun with an env var INITIAL_VALUE='elixir term'"
         end
 
         {result, _} = Code.eval_string(initial_value_str)
 
+        Logger.info("Using initial value #{inspect(result)}")
+
         result
       end
 
-      def before, do: Logger.info("Starting #{to_string(__MODULE__)}")
+      def before, do: Logger.info("Starting #{to_string(__MODULE__)} with batch size #{@batch_size} and throttle #{@throttle_ms} ms")
+
+      defp event_page_query({last_block_number, last_index}) do
+        from(
+          l in "logs",
+          left_join: e in "celo_contract_events",
+          on: e.topic == l.first_topic and e.block_number == l.block_number and e.log_index == l.index,
+          select: %{
+            first_topic: l.first_topic,
+            second_topic: l.second_topic,
+            third_topic: l.third_topic,
+            fourth_topic: l.fourth_topic,
+            data: l.data,
+            address_hash: l.address_hash,
+            transaction_hash: l.transaction_hash,
+            block_number: l.block_number,
+            index: l.index
+          },
+          where:
+            is_nil(e.topic) and l.first_topic in ^@topics and {l.block_number, l.index} > {^last_block_number, ^last_index},
+          order_by: [asc: l.block_number, asc: l.index],
+          limit: @batch_size
+        )
+      end
+
+      defp event_change(to_change) do
+        params =
+          to_change
+          |> Explorer.Celo.ContractEvents.EventMap.rpc_to_event_params()
+            # explicitly set timestamps as insert_all doesn't do this automatically
+          |> then(fn events ->
+            t = Timex.now()
+
+            events
+            |> Enum.map(fn event ->
+              {:ok, contract_address_hash} = Address.dump(event.contract_address_hash)
+
+              event =
+                case event.transaction_hash do
+                  nil ->
+                    event
+
+                  hash ->
+                    {:ok, transaction_hash} = Full.dump(hash)
+                    event |> Map.put(:transaction_hash, transaction_hash)
+                end
+
+              event
+              |> Map.put(:inserted_at, t)
+              |> Map.put(:updated_at, t)
+              |> Map.put(:contract_address_hash, contract_address_hash)
+            end)
+          end)
+
+        {inserted_count, results} =
+          Explorer.Repo.insert_all("celo_contract_events", params, returning: [:block_number, :log_index])
+
+        if inserted_count != length(to_change) do
+          not_inserted =
+            to_change
+            |> Enum.map(&Map.take(&1, [:block_number, :log_index]))
+            |> MapSet.new()
+            |> MapSet.difference(MapSet.new(results))
+            |> MapSet.to_list()
+
+          not_inserted |> Enum.each(&handle_non_update/1)
+        end
+
+        last_key =
+          results
+          |> Enum.map(fn %{block_number: block_number, log_index: index} -> {block_number, index} end)
+          |> Enum.max()
+
+        [last_key]
+      end
 
       defoverridable before: 0, up: 0
     end
   end
-
-  @doc """
-  A query returning a list of ids to be processed in a single batch, accepts an optional starting id to start the
-  next page from.
-  """
-  @callback page_query(any()) :: [any()]
-
-  @callback do_change([any()]) :: [any()]
-
-  @doc "Handle a failed insertion"
-  @callback handle_failure([any()]) :: nil
 end
