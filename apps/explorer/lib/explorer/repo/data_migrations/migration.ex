@@ -5,24 +5,27 @@ defmodule Explorer.Repo.Migrations.DataMigration do
 
   @doc false
   defmacro __using__(opts) do
-    alias Explorer.Celo.Telemetry
 
     batch_size = Keyword.get(opts, :batch_size, 1000)
     throttle = Keyword.get(opts, :throttle, 100)
 
     quote do
+      require Logger
       use Ecto.Migration
+      alias Explorer.Celo.Telemetry
 
       @disable_ddl_transaction true
       @disable_migration_lock true
       @batch_size unquote(batch_size)
       @throttle_ms unquote(throttle)
 
-      @behaviour Explorer.Repo.Migrations.DataMigration
-
       def up do
+        before()
+
+        initial_value = get_initial_value()
+
         start_time = Telemetry.start(__MODULE__)
-        throttle_change_in_batches(&page_query/1, &do_change/1)
+        throttle_change_in_batches(&page_query/1, &do_change/1, initial_value)
         Telemetry.stop(__MODULE__, start_time)
       end
 
@@ -47,18 +50,33 @@ defmodule Explorer.Repo.Migrations.DataMigration do
             throttle_change_in_batches(query_fun, change_fun, next_page)
         end
       end
+
+      defp get_initial_value() do
+        initial_value_str = System.get_env("INITIAL_VALUE")
+
+        unless initial_value_str do
+          raise "No initial value for data migration provided - please rerun with an environment var INITIAL_VALUE='elixir term'"
+        end
+
+        {result, _} = Code.eval_string(initial_value_str)
+
+        result
+      end
+
+      def before, do: Logger.info("Starting #{to_string(__MODULE__)}")
+
+      defoverridable before: 0, up: 0
     end
-
-    @doc """
-    A query returning a list of ids to be processed in a single batch, accepts an optional starting id to start the
-    next page from.
-    """
-    @callback page_query(start_from) :: [any()]
-
-    @doc "Perform the tranformation with the list of ids to operate upon, returns a list of inserted ids"
-    @callback do_change(batch_of_ids) :: [any()]
-
-    @doc "Handle a failed insertion"
-    @callback handle_failure(failed) :: nil
   end
+
+  @doc """
+  A query returning a list of ids to be processed in a single batch, accepts an optional starting id to start the
+  next page from.
+  """
+  @callback page_query(any()) :: [any()]
+
+  @callback do_change([any()]) :: [any()]
+
+  @doc "Handle a failed insertion"
+  @callback handle_failure([any()]) :: nil
 end
