@@ -14,12 +14,14 @@ defmodule BlockScoutWeb.GenericPagingOptions do
           params :: map(),
           total_item_count :: non_neg_integer(),
           allowed_order_fields :: list(String.t()),
+          default_order_dir :: String.t(),
           default_page_size :: pos_integer()
         ) :: generic_paging_options
   def extract_paging_options_from_params(
         params,
         total_item_count,
         allowed_order_fields,
+        default_order_dir,
         default_page_size
       ) do
     page_size =
@@ -64,7 +66,7 @@ defmodule BlockScoutWeb.GenericPagingOptions do
       if Map.has_key?(params, "order_dir") and Enum.member?(["desc", "asc"], Map.get(params, "order_dir")) do
         Map.get(params, "order_dir")
       else
-        "asc"
+        default_order_dir
       end
 
     %{

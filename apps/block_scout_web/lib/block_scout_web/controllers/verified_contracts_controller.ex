@@ -2,7 +2,7 @@ defmodule BlockScoutWeb.VerifiedContractsController do
   use BlockScoutWeb, :controller
 
   import Ecto.Query
-  alias Explorer.Chain.SmartContract, as: Contract
+  alias Explorer.Chain.{SmartContract, SmartContractTransactionCount}
   alias BlockScoutWeb.GenericPagingOptions, as: PagingOptions
   alias BlockScoutWeb.VerifiedContractsView
 
@@ -16,7 +16,8 @@ defmodule BlockScoutWeb.VerifiedContractsController do
       PagingOptions.extract_paging_options_from_params(
         params,
         contract_count,
-        ["name", "date"],
+        ["txns", "name", "date"],
+        "desc",
         @default_page_size
       )
 
@@ -32,15 +33,20 @@ defmodule BlockScoutWeb.VerifiedContractsController do
   end
 
   defp get_verified_contracts(paging_options, filter) do
-    Contract
+    SmartContract
     |> preload(:address)
+    |> join(:left, [c], tc in SmartContractTransactionCount,
+      on: c.address_hash == tc.address_hash,
+      as: :transaction_count
+    )
+    |> select([c, tc], [c, tc])
     |> handle_filter(filter)
     |> handle_paging_options(paging_options)
     |> Explorer.Repo.all()
   end
 
   defp get_verified_contract_count(filter) do
-    Contract
+    SmartContract
     |> handle_filter(filter)
     |> Explorer.Repo.aggregate(:count, :id)
   end
@@ -59,6 +65,12 @@ defmodule BlockScoutWeb.VerifiedContractsController do
 
   defp handle_order_clause(query, _ = "desc", _ = "date"), do: query |> order_by(desc: :inserted_at)
   defp handle_order_clause(query, _ = "asc", _ = "date"), do: query |> order_by(asc: :inserted_at)
+
+  defp handle_order_clause(query, _ = "desc", _ = "txns"),
+    do: query |> order_by([c, ct], desc_nulls_last: ct.transaction_count)
+
+  defp handle_order_clause(query, _ = "asc", _ = "txns"),
+    do: query |> order_by([c, ct], asc_nulls_first: ct.transaction_count)
 
   defp handle_filter(query, filter) do
     if not is_nil(filter) do

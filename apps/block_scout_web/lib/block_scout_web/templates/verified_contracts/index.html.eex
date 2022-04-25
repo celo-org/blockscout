@@ -62,7 +62,16 @@
 								<div class="stakes-table-th-content"><%= gettext("Balance") %></div>
 							</th>
 							<th class="stakes-table-th">
-								<div class="stakes-table-th-content"><%= gettext("Txns (past 90 days)") %></div>
+								<div class="stakes-table-th-content">
+									<%= render BlockScoutWeb.CommonComponentsView,
+										"_pagination_sort_link.html",
+										link_order_field: "txns",
+										link_path: sort_path(@conn, @params, @paging_options, "txns", "desc", path_fun),
+										link_title: gettext("Txns (past 90 days)"),
+										current_order_dir: @paging_options.order_dir,
+										current_order_field: @paging_options.order_field
+									%>
+								</div>
 							</th>
 							<th class="stakes-table-th">
 								<div class="stakes-table-th-content"><%= gettext("Verified") %></div>
