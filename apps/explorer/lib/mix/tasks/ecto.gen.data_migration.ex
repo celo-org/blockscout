@@ -121,17 +121,17 @@ defmodule Mix.Tasks.Ecto.Gen.DataMigration do
     @doc "Undo the data migration"
     def down, do: :ok
 
-    @doc "Returns an ecto query that gives list of ids representing the next batch / page of source rows to be processed"
+    @doc "Returns an ecto query that gives the next batch / page of source rows to be processed"
     def page_query(start_of_page) do
     <%= if @event do %> event_page_query(start_of_page) <% end %>
     end
 
-    @doc "Perform the transformation with the list of ids to operate upon, returns a list of inserted / modified ids"
+    @doc "Perform the transformation with the list of source rows to operate upon, returns a list of inserted / modified ids"
     def do_change(ids) do
     <%= if @event do %> event_change(ids) <% end %>
     end
 
-    @doc "Manage unsuccessful insertions"
+    @doc "Handle unsuccessful insertions"
     def handle_failure(ids), do: raise "Failed to insert - \#{inspect(ids)}"
   end
   """
