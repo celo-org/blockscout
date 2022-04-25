@@ -1,17 +1,19 @@
 defmodule Explorer.Repo.Migrations.DataMigration do
+  # credo:disable-for-this-file Credo.Check.Refactor.Nesting
+
   @moduledoc """
     Defines a data migration to be run outside of the standard schema migration flow.
   """
 
   @doc false
   defmacro __using__(opts) do
-
     batch_size = Keyword.get(opts, :batch_size, 1000)
     throttle = Keyword.get(opts, :throttle, 100)
 
     quote do
       require Logger
       use Ecto.Migration
+      alias Explorer.Celo.ContractEvents.EventMap
       alias Explorer.Celo.Telemetry
       import Ecto.Query
 
@@ -52,7 +54,7 @@ defmodule Explorer.Repo.Migrations.DataMigration do
         end
       end
 
-      defp get_initial_value() do
+      defp get_initial_value do
         initial_value_str = System.get_env("INITIAL_VALUE")
 
         unless initial_value_str do
@@ -66,7 +68,11 @@ defmodule Explorer.Repo.Migrations.DataMigration do
         result
       end
 
-      def before, do: Logger.info("Starting #{to_string(__MODULE__)} with batch size #{@batch_size} and throttle #{@throttle_ms} ms")
+      def before,
+        do:
+          Logger.info(
+            "Starting #{to_string(__MODULE__)} with batch size #{@batch_size} and throttle #{@throttle_ms} ms"
+          )
 
       defp event_page_query({last_block_number, last_index}) do
         from(
@@ -85,7 +91,8 @@ defmodule Explorer.Repo.Migrations.DataMigration do
             index: l.index
           },
           where:
-            is_nil(e.topic) and l.first_topic in ^@topics and {l.block_number, l.index} > {^last_block_number, ^last_index},
+            is_nil(e.topic) and l.first_topic in ^@topics and
+              {l.block_number, l.index} > {^last_block_number, ^last_index},
           order_by: [asc: l.block_number, asc: l.index],
           limit: @batch_size
         )
@@ -94,8 +101,8 @@ defmodule Explorer.Repo.Migrations.DataMigration do
       defp event_change(to_change) do
         params =
           to_change
-          |> Explorer.Celo.ContractEvents.EventMap.rpc_to_event_params()
-            # explicitly set timestamps as insert_all doesn't do this automatically
+          |> EventMap.rpc_to_event_params()
+          # explicitly set timestamps as insert_all doesn't do this automatically
           |> then(fn events ->
             t = Timex.now()
 
