@@ -95,7 +95,7 @@ defmodule Explorer.Repo.ConfigHelperTest do
         "PGPASSWORD" => "postgrex_password",
         "DATABASE_USER" => env_db_user,
         "DATABASE_PASSWORD" => env_db_password,
-        "DATABASE_HOST" => env_db_host,
+        "DATABASE_HOSTNAME" => env_db_host,
         "DATABASE_PORT" => env_db_port,
         "DATABASE_DB" => env_db_name
       }

@@ -11,7 +11,7 @@ defmodule Explorer.Repo.ConfigHelper do
   @app_env_vars [
     username: "DATABASE_USER",
     password: "DATABASE_PASSWORD",
-    hostname: "DATABASE_HOST",
+    hostname: "DATABASE_HOSTNAME",
     port: "DATABASE_PORT",
     database: "DATABASE_DB"
   ]
