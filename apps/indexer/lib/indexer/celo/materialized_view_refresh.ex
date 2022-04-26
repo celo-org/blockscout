@@ -33,12 +33,13 @@ defmodule Indexer.Fetcher.CeloMaterializedViewRefresh do
     Process.send_after(self(), :refresh_views, refresh_interval)
     Process.send_after(self(), :daily_refresh_views, daily_refresh_interval)
 
-    {:ok, %{
-      refresh_interval: refresh_interval,
-      timeout: timeout,
-      daily_refresh_interval: daily_refresh_interval,
-      daily_timeout: daily_timeout
-    }}
+    {:ok,
+     %{
+       refresh_interval: refresh_interval,
+       timeout: timeout,
+       daily_refresh_interval: daily_refresh_interval,
+       daily_timeout: daily_timeout
+     }}
   end
 
   def handle_info(:refresh_views, %{refresh_interval: refresh_interval, timeout: timeout} = state) do
