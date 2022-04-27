@@ -3,7 +3,7 @@ defmodule Mix.Tasks.Ecto.Gen.DataMigration do
 
   import Macro, only: [camelize: 1, underscore: 1]
   import Mix.Generator
-  import Mix.{Ecto, EctoSQL, Task}
+  import Mix.{Ecto, EctoSQL}
 
   @shortdoc "Generates a new data migration for the repo"
 
@@ -89,7 +89,8 @@ defmodule Mix.Tasks.Ecto.Gen.DataMigration do
 
           # credo:disable-for-next-line
           if open?(file) and Mix.shell().yes?("Do you want to run this migration?") do
-            Task.run("ecto.migrate", ["-r", inspect(repo), "--migrations-path", path])
+            # credo:disable-for-next-line
+            Mix.Task.run("ecto.migrate", ["-r", inspect(repo), "--migrations-path", path])
           end
 
           file

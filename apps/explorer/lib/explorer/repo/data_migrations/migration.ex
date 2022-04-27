@@ -54,12 +54,17 @@ defmodule Explorer.Repo.Migrations.DataMigration do
         end
       end
 
+      # sobelow_skip ["RCE.CodeModule"]
       defp get_initial_value do
         initial_value_str = System.get_env("INITIAL_VALUE")
 
         unless initial_value_str do
           raise "No initial value for data migration provided - please rerun with an env var INITIAL_VALUE='elixir term'"
         end
+
+        #we wish to pass in an initial value for data migrations - an index / composite index to start the migration from
+        #or to restart from in the case of an error. This necessitates the use of string eval which is usually a very bad
+        #idea and is only done here with great foreboding.
 
         {result, _} = Code.eval_string(initial_value_str)
 
