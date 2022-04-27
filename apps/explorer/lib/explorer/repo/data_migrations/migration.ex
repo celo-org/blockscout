@@ -62,9 +62,9 @@ defmodule Explorer.Repo.Migrations.DataMigration do
           raise "No initial value for data migration provided - please rerun with an env var INITIAL_VALUE='elixir term'"
         end
 
-        #we wish to pass in an initial value for data migrations - an index / composite index to start the migration from
-        #or to restart from in the case of an error. This necessitates the use of string eval which is usually a very bad
-        #idea and is only done here with great foreboding.
+        # we wish to pass in an initial value for data migrations - an index / composite index to start the migration from
+        # or to restart from in the case of an error. This necessitates the use of string eval which is usually a very bad
+        # idea.
 
         {result, _} = Code.eval_string(initial_value_str)
 
