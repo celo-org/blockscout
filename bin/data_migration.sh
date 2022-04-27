@@ -39,7 +39,7 @@ function prepare_secret () {
 }
 
 function start_job () {
-	execute_command 'kubectl create job -n rc1staging --from=cronjob/"$DEPLOY_ENVIRONMENT"-blockscout-data-migration "$DEPLOY_ENVIRONMENT"-blockscout-data-migration-instance'
+	execute_command 'kubectl create job -n rc1staging --from=cronjob/"$DEPLOY_ENVIRONMENT"-blockscout"$SUFFIX"-data-migration "$DEPLOY_ENVIRONMENT"-blockscout"$SUFFIX"-data-migration-instance'
 }
 
 
@@ -61,6 +61,10 @@ while [[ $# -gt 0 ]]; do
       ;;
     --dry-run)
       DRY_RUN=true
+      shift 
+      ;;
+    --suffix)
+      SUFFIX="$2"
       shift 
       ;;
     -v|--verbose)
