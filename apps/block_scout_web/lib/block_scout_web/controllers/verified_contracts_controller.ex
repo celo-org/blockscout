@@ -74,9 +74,5 @@ defmodule BlockScoutWeb.VerifiedContractsController do
     do: query |> order_by([c, ct], asc_nulls_first: ct.transaction_count)
 
   defp handle_filter(query, nil), do: query
-
-  defp handle_filter(query, _filter) do
-    # TODO implement WHERE clause
-    query
-  end
+  defp handle_filter(query, filter), do: query |> where([c], ilike(c.name, ^"%#{filter}%"))
 end
