@@ -1,8 +1,8 @@
 defmodule BlockScoutWeb.VerifiedContractsView do
   use BlockScoutWeb, :view
 
-  alias Explorer.Chain.{Address, SmartContract, Wei}
   alias Explorer.Celo.CoreContracts
+  alias Explorer.Chain.{Address, SmartContract, Wei}
 
   import BlockScoutWeb.GenericPaginationHelpers
 

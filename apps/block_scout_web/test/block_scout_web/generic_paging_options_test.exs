@@ -50,7 +50,8 @@ defmodule BlockScoutWeb.GenericPagingOptionsTest do
              } ==
                GenericPagingOptions.extract_paging_options_from_params(
                  %{
-                   "page_number" => 4
+                   "page_number" => "4",
+                   "page_size" => "20"
                  },
                  30,
                  ["count"],

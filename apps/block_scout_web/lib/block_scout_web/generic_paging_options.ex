@@ -24,56 +24,62 @@ defmodule BlockScoutWeb.GenericPagingOptions do
         default_order_dir,
         default_page_size
       ) do
-    page_size =
-      if Map.has_key?(params, "page_size") do
-        case Integer.parse(Map.get(params, "page_size", default_page_size)) do
-          {page_size, _} -> page_size
-          :error -> default_page_size
-        end
-      else
-        default_page_size
-      end
-
-    page_number =
-      if Map.has_key?(params, "page_number") do
-        page_number =
-          case Integer.parse(Map.get(params, "page_number", 1)) do
-            {page_number, _} -> page_number
-            :error -> 1
-          end
-
-        if page_number > ceil(total_item_count / page_size) do
-          1
-        else
-          page_number
-        end
-      else
-        1
-      end
-
-    order_field =
-      if Enum.count(allowed_order_fields) > 0 do
-        if Map.has_key?(params, "order_field") and Enum.member?(allowed_order_fields, Map.get(params, "order_field")) do
-          Map.get(params, "order_field")
-        else
-          Enum.at(allowed_order_fields, 0)
-        end
-      else
-        nil
-      end
-
-    order_dir =
-      if Map.has_key?(params, "order_dir") and Enum.member?(["desc", "asc"], Map.get(params, "order_dir")) do
-        Map.get(params, "order_dir")
-      else
-        default_order_dir
-      end
+    page_size = extract_page_size(params, default_page_size)
 
     %{
-      order_field: order_field,
-      order_dir: order_dir,
+      order_field: extract_order_field(params, allowed_order_fields),
+      order_dir: extract_order_dir(params, default_order_dir),
       page_size: page_size,
-      page_number: page_number
+      page_number: extract_page_number(params, total_item_count, page_size)
     }
+  end
+
+  defp extract_page_size(params, default_page_size) do
+    if Map.has_key?(params, "page_size") do
+      case Integer.parse(Map.get(params, "page_size", default_page_size)) do
+        {page_size, _} -> page_size
+        :error -> default_page_size
+      end
+    else
+      default_page_size
+    end
+  end
+
+  defp extract_page_number(params, total_item_count, page_size) do
+    if Map.has_key?(params, "page_number") do
+      page_number =
+        case Integer.parse(Map.get(params, "page_number", 1)) do
+          {page_number, _} -> page_number
+          :error -> 1
+        end
+
+      if page_number > ceil(total_item_count / page_size) do
+        1
+      else
+        page_number
+      end
+    else
+      1
+    end
+  end
+
+  defp extract_order_field(params, allowed_order_fields) do
+    if Enum.count(allowed_order_fields) > 0 do
+      if Map.has_key?(params, "order_field") and Enum.member?(allowed_order_fields, Map.get(params, "order_field")) do
+        Map.get(params, "order_field")
+      else
+        Enum.at(allowed_order_fields, 0)
+      end
+    else
+      nil
+    end
+  end
+
+  defp extract_order_dir(params, default_order_dir) do
+    if Map.has_key?(params, "order_dir") and Enum.member?(["desc", "asc"], Map.get(params, "order_dir")) do
+      Map.get(params, "order_dir")
+    else
+      default_order_dir
+    end
   end
 end
