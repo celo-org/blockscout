@@ -1,9 +1,8 @@
 defmodule BlockScoutWeb.VerifiedContractsView do
   use BlockScoutWeb, :view
 
-  alias Explorer.Chain.Wei
-  alias Explorer.Chain.SmartContract
-  alias Explorer.Chain.Address
+  alias Explorer.Chain.{Address, SmartContract, Wei}
+  alias Explorer.Celo.CoreContracts
 
   import BlockScoutWeb.GenericPaginationHelpers
 
@@ -12,7 +11,7 @@ defmodule BlockScoutWeb.VerifiedContractsView do
       license = spdx_tag(contract.contract_source_code) ->
         license
 
-      Explorer.Celo.CoreContracts.is_core_contract_address?(contract.address.hash) ->
+      CoreContracts.is_core_contract_address?(contract.address.hash) ->
         "LGPL-3.0"
 
       true ->

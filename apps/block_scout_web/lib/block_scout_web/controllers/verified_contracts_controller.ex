@@ -2,9 +2,10 @@ defmodule BlockScoutWeb.VerifiedContractsController do
   use BlockScoutWeb, :controller
 
   import Ecto.Query
-  alias Explorer.Chain.{SmartContract, SmartContractTransactionCount}
+
   alias BlockScoutWeb.GenericPagingOptions, as: PagingOptions
   alias BlockScoutWeb.VerifiedContractsView
+  alias Explorer.Chain.{SmartContract, SmartContractTransactionCount}
 
   @default_page_size 10
 
@@ -60,24 +61,22 @@ defmodule BlockScoutWeb.VerifiedContractsController do
     |> offset(^offset)
   end
 
-  defp handle_order_clause(query, _ = "desc", _ = "name"), do: query |> order_by(desc: :name)
-  defp handle_order_clause(query, _ = "asc", _ = "name"), do: query |> order_by(asc: :name)
+  defp handle_order_clause(query, "desc", "name"), do: query |> order_by(desc: :name)
+  defp handle_order_clause(query, "asc", "name"), do: query |> order_by(asc: :name)
 
-  defp handle_order_clause(query, _ = "desc", _ = "date"), do: query |> order_by(desc: :inserted_at)
-  defp handle_order_clause(query, _ = "asc", _ = "date"), do: query |> order_by(asc: :inserted_at)
+  defp handle_order_clause(query, "desc", "date"), do: query |> order_by(desc: :inserted_at)
+  defp handle_order_clause(query, "asc", "date"), do: query |> order_by(asc: :inserted_at)
 
-  defp handle_order_clause(query, _ = "desc", _ = "txns"),
+  defp handle_order_clause(query, "desc", "txns"),
     do: query |> order_by([c, ct], desc_nulls_last: ct.transaction_count)
 
-  defp handle_order_clause(query, _ = "asc", _ = "txns"),
+  defp handle_order_clause(query, "asc", "txns"),
     do: query |> order_by([c, ct], asc_nulls_first: ct.transaction_count)
 
-  defp handle_filter(query, filter) do
-    if not is_nil(filter) do
-      # TODO implement WHERE clause
-      query
-    else
-      query
-    end
+  defp handle_filter(query, nil), do: query
+
+  defp handle_filter(query, _filter) do
+    # TODO implement WHERE clause
+    query
   end
 end

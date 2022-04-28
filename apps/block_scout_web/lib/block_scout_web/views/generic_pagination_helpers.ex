@@ -71,12 +71,10 @@ defmodule BlockScoutWeb.GenericPaginationHelpers do
       params
       |> Map.merge(paging_options)
       |> Map.merge(
-        cond do
-          paging_options.order_field == field ->
-            if paging_options.order_dir == "desc", do: %{order_dir: "asc"}, else: %{order_dir: "desc"}
-
-          true ->
-            %{order_field: field, order_dir: default_order_dir}
+        if paging_options.order_field == field do
+          if paging_options.order_dir == "desc", do: %{order_dir: "asc"}, else: %{order_dir: "desc"}
+        else
+          %{order_field: field, order_dir: default_order_dir}
         end
       )
 
