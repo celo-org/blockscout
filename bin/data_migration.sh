@@ -51,13 +51,11 @@ while [[ $# -gt 0 ]]; do
       ;;
     -e|--env)
       DEPLOY_ENVIRONMENT="$2"
-      shift
-      shift
+      shift 2
       ;;
     -i|--initial-value)
       INITIAL_VALUE="$2"
-      shift 
-      shift 
+      shift 2
       ;;
     --dry-run)
       DRY_RUN=true
