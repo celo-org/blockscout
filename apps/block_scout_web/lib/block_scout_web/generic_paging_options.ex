@@ -45,12 +45,10 @@ defmodule BlockScoutWeb.GenericPagingOptions do
 
   defp extract_page_number(_, _), do: 1
 
-  defp extract_order_field(%{"order_field" => order_field}, allowed_order_fields) when is_list(allowed_order_fields) do
-    if Enum.member?(allowed_order_fields, order_field), do: order_field, else: Enum.at(allowed_order_fields, 0)
-  end
+  defp extract_order_field(%{"order_field" => order_field}, allowed_order_fields) when is_list(allowed_order_fields),
+    do: if(Enum.member?(allowed_order_fields, order_field), do: order_field, else: Enum.at(allowed_order_fields, 0))
 
-  defp extract_order_field(%{}, [default_order_field, _]), do: default_order_field
-  defp extract_order_field(%{}, [default_order_field]), do: default_order_field
+  defp extract_order_field(%{}, [default_order_field | _]), do: default_order_field
   defp extract_order_field(_, _), do: nil
 
   defp extract_order_dir(%{"order_dir" => order_dir}, _) when order_dir == "desc" or order_dir == "asc", do: order_dir

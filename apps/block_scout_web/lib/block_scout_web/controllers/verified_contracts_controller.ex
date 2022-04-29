@@ -26,10 +26,9 @@ defmodule BlockScoutWeb.VerifiedContractsController do
 
     render(conn, VerifiedContractsView, "index.html",
       conn: conn,
-      params: params,
+      params: Map.merge(params, paging_options),
       contracts: contracts,
-      contract_count: contract_count,
-      paging_options: paging_options
+      contract_count: contract_count
     )
   end
 

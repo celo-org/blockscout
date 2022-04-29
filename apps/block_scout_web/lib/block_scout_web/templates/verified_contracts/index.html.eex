@@ -1,10 +1,10 @@
 <%
 	path_fun = fn conn, params -> verified_contracts_path(conn, :index, params) end
-	pagination_current_page = current_page(@paging_options)
-	pagination_next_page_path = next_page_path(@conn, @params, @paging_options, @contract_count, path_fun)
-	pagination_prev_page_path = prev_page_path(@conn, @params, @paging_options, path_fun)
-	pagination_first_page_path = first_page_path(@conn, @params, @paging_options, path_fun)
-	pagination_last_page_path = last_page_path(@conn, @params, @paging_options, @contract_count, path_fun)
+	pagination_current_page = current_page(@params)
+	pagination_next_page_path = next_page_path(@conn, @params, @contract_count, path_fun)
+	pagination_prev_page_path = prev_page_path(@conn, @params, path_fun)
+	pagination_first_page_path = first_page_path(@conn, @params, path_fun)
+	pagination_last_page_path = last_page_path(@conn, @params, @contract_count, path_fun)
 %>
 <section
 		class="container"
@@ -48,10 +48,10 @@
 									<%= render BlockScoutWeb.CommonComponentsView,
 										"_pagination_sort_link.html",
 										link_order_field: "name",
-										link_path: sort_path(@conn, @params, @paging_options, "name", "asc", path_fun),
+										link_path: sort_path(@conn, @params, "name", "asc", path_fun),
 										link_title: gettext("Contract Name"),
-										current_order_dir: @paging_options.order_dir,
-										current_order_field: @paging_options.order_field
+										current_order_dir: @params.order_dir,
+										current_order_field: @params.order_field
 									%>
 								</div>
 							</th>
@@ -66,10 +66,10 @@
 									<%= render BlockScoutWeb.CommonComponentsView,
 										"_pagination_sort_link.html",
 										link_order_field: "txns",
-										link_path: sort_path(@conn, @params, @paging_options, "txns", "desc", path_fun),
+										link_path: sort_path(@conn, @params, "txns", "desc", path_fun),
 										link_title: gettext("Txns (past 90 days)"),
-										current_order_dir: @paging_options.order_dir,
-										current_order_field: @paging_options.order_field
+										current_order_dir: @params.order_dir,
+										current_order_field: @params.order_field
 									%>
 								</div>
 							</th>
@@ -81,10 +81,10 @@
 									<%= render BlockScoutWeb.CommonComponentsView,
 										"_pagination_sort_link.html",
 										link_order_field: "date",
-										link_path: sort_path(@conn, @params, @paging_options, "date", "asc", path_fun),
+										link_path: sort_path(@conn, @params, "date", "asc", path_fun),
 										link_title: gettext("Date Verified"),
-										current_order_dir: @paging_options.order_dir,
-										current_order_field: @paging_options.order_field
+										current_order_dir: @params.order_dir,
+										current_order_field: @params.order_field
 									%>
 								</div>
 							</th>
