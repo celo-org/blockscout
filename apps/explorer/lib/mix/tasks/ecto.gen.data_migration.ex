@@ -21,21 +21,21 @@ defmodule Mix.Tasks.Ecto.Gen.DataMigration do
   ]
 
   @moduledoc """
-  Generates a migration.
+  Generates a data migration.
 
   The repository must be set under `:ecto_repos` in the
   current app configuration or given via the `-r` option.
 
   ## Examples
 
-      $ mix ecto.gen.data_migration add_posts_table
-      $ mix ecto.gen.data_migration add_posts_table -r Custom.Repo
+      $ mix ecto.gen.data_migration migrate_things_to_other_things
+      $ mix ecto.gen.data_migration migrate_some_events --events
 
   The generated migration filename will be prefixed with the current
   timestamp in UTC which is used for versioning and ordering.
 
   By default, the migration will be generated to the
-  "priv/YOUR_REPO/migrations" directory of the current application
+  "priv/YOUR_REPO/data_migrations" directory of the current application
   but it can be configured to be any subdirectory of `priv` by
   specifying the `:priv` key under the repository configuration.
 
@@ -47,7 +47,8 @@ defmodule Mix.Tasks.Ecto.Gen.DataMigration do
     * `-r`, `--repo` - the repo to generate migration for
     * `--no-compile` - does not compile applications before running
     * `--no-deps-check` - does not check dependencies before running
-    * `--migrations-path` - the path to run the migrations from, defaults to `priv/repo/migrations`
+    * `--events` - generate a script with convenience methods for migrating data from `logs` to `celo_contract_events`
+    * `--migrations-path` - the path to run the migrations from, defaults to `priv/repo/data_migrations`
 
   ## Configuration
 
