@@ -41,11 +41,11 @@ defmodule BlockScoutWeb.GenericPagingOptionsTest do
                )
     end
 
-    test "provides default value for page number out of range" do
+    test "provides max value for page number out of range" do
       assert %{
                order_dir: "asc",
                order_field: "count",
-               page_number: 1,
+               page_number: 2,
                page_size: 20
              } ==
                GenericPagingOptions.extract_paging_options_from_params(
