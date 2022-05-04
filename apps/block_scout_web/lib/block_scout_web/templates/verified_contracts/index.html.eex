@@ -34,13 +34,13 @@
 
 			<div class="addresses-table-container">
 				<div class="stakes-table-container">
-					<table>
+					<table class="verified-contracts-table">
 						<thead>
 						<tr>
-							<th class="stakes-table-th">
+							<th class="stakes-table-th verified-contracts-table-th verified-contracts-table-cell-with-link">
 								<div class="stakes-table-th-content"><%= gettext("Address") %></div>
 							</th>
-							<th class="stakes-table-th">
+							<th class="stakes-table-th verified-contracts-table-th verified-contracts-table-cell-with-link">
 								<div class="stakes-table-th-content">
 									<%= render BlockScoutWeb.CommonComponentsView,
 										"_pagination_sort_link.html",
@@ -52,13 +52,13 @@
 									%>
 								</div>
 							</th>
-							<th class="stakes-table-th">
+							<th class="stakes-table-th verified-contracts-table-th">
 								<div class="stakes-table-th-content"><%= gettext("Compiler") %></div>
 							</th>
-							<th class="stakes-table-th">
+							<th class="stakes-table-th verified-contracts-table-th">
 								<div class="stakes-table-th-content"><%= gettext("Balance") %></div>
 							</th>
-							<th class="stakes-table-th">
+							<th class="stakes-table-th verified-contracts-table-th">
 								<div class="stakes-table-th-content">
 									<%= render BlockScoutWeb.CommonComponentsView,
 										"_pagination_sort_link.html",
@@ -70,10 +70,10 @@
 									%>
 								</div>
 							</th>
-							<th class="stakes-table-th">
+							<th class="stakes-table-th verified-contracts-table-th">
 								<div class="stakes-table-th-content"><%= gettext("Verified") %></div>
 							</th>
-							<th class="stakes-table-th">
+							<th class="stakes-table-th verified-contracts-table-th">
 								<div class="stakes-table-th-content">
 									<%= render BlockScoutWeb.CommonComponentsView,
 										"_pagination_sort_link.html",
@@ -85,7 +85,7 @@
 									%>
 								</div>
 							</th>
-							<th class="stakes-table-th">
+							<th class="stakes-table-th verified-contracts-table-th">
 								<div class="stakes-table-th-content">License</div>
 							</th>
 						</tr>

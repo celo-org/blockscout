@@ -7,7 +7,7 @@ defmodule BlockScoutWeb.VerifiedContractsController do
   alias BlockScoutWeb.VerifiedContractsView
   alias Explorer.Chain.{SmartContract, SmartContractTransactionCount}
 
-  @default_page_size 10
+  @default_page_size 50
 
   def index(conn, params) do
     filter = Map.get(params, "filter")
@@ -17,7 +17,7 @@ defmodule BlockScoutWeb.VerifiedContractsController do
       PagingOptions.extract_paging_options_from_params(
         params,
         contract_count,
-        ["txns", "name", "date"],
+        ["date", "txns", "name"],
         "desc",
         @default_page_size
       )

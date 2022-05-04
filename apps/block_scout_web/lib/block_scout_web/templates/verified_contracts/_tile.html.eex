@@ -1,7 +1,7 @@
 <% [contract, transaction_count] = @contract %>
 
 <tr data-identifier-hash="<%= contract.address_hash %>">
-    <td class="stakes-td">
+    <td class="stakes-td verified-contracts-table-cell-with-link">
         <span class="verification-mark">
             <span class="material-icons">check</span>
         </span>
@@ -13,7 +13,7 @@
             truncate: true
         %>
     </td>
-    <td class="stakes-td">
+    <td class="stakes-td verified-contracts-table-cell-with-link">
         <%= link to: address_path(BlockScoutWeb.Endpoint, :show, contract.address), "data-test": "address_hash_link", class: assigns[:class] do %>
             <%= contract.name %>
         <% end %>
