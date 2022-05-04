@@ -3,7 +3,7 @@ defmodule BlockScoutWeb.GenericPaginationHelpersTest do
 
   alias BlockScoutWeb.GenericPaginationHelpers
 
-  describe "next_page_path3" do
+  describe "next_page_path/3" do
     test "returns nil when there's no next page", %{conn: conn} do
       assert nil == GenericPaginationHelpers.next_page_path(conn, %{page_number: 2, page_size: 10}, 20, nil)
     end
