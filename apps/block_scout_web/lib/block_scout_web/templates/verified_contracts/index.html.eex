@@ -18,9 +18,6 @@
 			<h1 class="card-title list-title-description"><%= gettext "Verified Contracts" %></h1>
 
 			<div class="list-top-pagination-container-wrapper verified_contracts-list-search-input-outer-container d-flex" style="float: right;">
-				<%# <label class="verified_contracts-list-search-input-container verified_contracts mr-3">
-					<input data-search-field="" class="form-control verified_contracts-list-search-input search-input" type="text" name="filter" placeholder="Contract name" id="search-text-input" />
-				</label> %>
 				<%= render BlockScoutWeb.CommonComponentsView,
 					"_pagination_container.html",
 					position: "top",
@@ -117,6 +114,4 @@
 			%>
 		</div>
 	</div>
-	<script defer data-cfasync="false" src="<%= static_path(@conn, "/js/verified_contracts.js") %>"></script>
-	<script defer data-cfasync="false" src="<%= static_path(@conn, "/js/token-transfers-toggle.js") %>"></script>
 </section>

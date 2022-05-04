@@ -3,15 +3,26 @@ defmodule Explorer.Repo.Migrations.CreateSmartContractsTransactionCountsView do
 
   def up do
     execute("""
-    create materialized view if not exists smart_contract_transaction_counts as
-    with last_block_number as (select max(number) - 17280 * 90 as number from blocks)
-    select to_address_hash as address_hash, count(*) as transaction_count from transactions where to_address_hash in (select address_hash from smart_contracts) and block_number > (select number from last_block_number) group by to_address_hash;
+    CREATE MATERIALIZED VIEW IF NOT EXISTS smart_contract_transaction_counts AS
+    WITH last_block_number AS (
+      SELECT
+        MAX(number) - 17280 * 90 AS number
+      FROM blocks
+    )
+    SELECT
+      to_address_hash AS address_hash,
+      COUNT(*) as transaction_count
+    FROM transactions
+    WHERE
+      to_address_hash IN (SELECT address_hash FROM smart_contracts)
+      AND block_number > (SELECT number FROM last_block_number)
+    GROUP BY to_address_hash;
     """)
   end
 
   def down do
     execute("""
-    drop materialized view if exists smart_contract_transaction_counts
+    DROP MATERIALIZED VIEW IF EXISTS smart_contract_transaction_counts;
     """)
   end
 end
