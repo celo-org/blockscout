@@ -22,6 +22,7 @@ defmodule BlockScoutWeb.AddressValidationController do
           [
             necessity_by_association: %{
               :miner => :required,
+              [miner: :names] => :optional,
               [celo_delegator: :celo_account] => :optional,
               :nephews => :optional,
               :transactions => :optional,
