@@ -20,7 +20,7 @@ defmodule Explorer.Celo.CoreContracts do
   @nil_address "0x0000000000000000000000000000000000000000"
 
   # full list of core contracts, see https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/lib/registry-utils.ts
-  @core_contracts ~w(Accounts Attestations BlockchainParameters DoubleSigningSlasher DowntimeSlasher Election EpochRewards Escrow Exchange ExchangeEUR FeeCurrencyWhitelist Freezer GasPriceMinimum GoldToken Governance GovernanceSlasher GovernanceApproverMultiSig GrandaMento LockedGold Random Reserve ReserveSpenderMultiSig SortedOracles StableToken StableTokenEUR StableTokenREAL TransferWhitelist Validators)
+  @core_contracts ~w(Accounts Attestations BlockchainParameters DoubleSigningSlasher DowntimeSlasher Election EpochRewards Escrow Exchange ExchangeEUR FeeCurrencyWhitelist Freezer GasPriceMinimum GoldToken Governance GovernanceSlasher GovernanceApproverMultiSig GrandaMento LockedGold Random Reserve ReserveSpenderMultiSig SortedOracles StableToken StableTokenEUR StableTokenBRL TransferWhitelist Validators)
   def contract_list, do: @core_contracts
 
   ## GenServer Callbacks
@@ -259,6 +259,7 @@ defmodule Explorer.Celo.CoreContracts do
       "SortedOracles" => "0xefb84935239dacdecf7c5ba76d8de40b077b7b33",
       "StableToken" => "0x765de816845861e75a25fca122bb6898b8b1282a",
       "StableTokenEUR" => "0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73",
+      "StableTokenBRL" => "0xe8537a3d056da446677b9e9d6c5db704eaab4787",
       "TransferWhitelist" => "0xb49e4d6f0b7f8d0440f75697e6c8b37e09178bcf",
       "Validators" => "0xaeb865bca93ddc8f47b8e29f40c5399ce34d0c58"
     }
@@ -323,6 +324,7 @@ defmodule Explorer.Celo.CoreContracts do
       "SortedOracles" => "0xfdd8bd58115ffbf04e47411c1d228ecc45e93075",
       "StableToken" => "0x874069fa1eb16d44d622f2e0ca25eea172369bc1",
       "StableTokenEUR" => "0x10c892a6ec43a53e45d0b916b4b7d383b1b78c0f",
+      "StableTokenBRL" => "0xe4d517785d091d3c54818832db6094bcc2744545",
       "TransferWhitelist" => "0x52449a99e3455acb831c0d580dcdac8b290d5182",
       "Validators" => "0x9acf2a99914e083ad0d610672e93d14b0736bbcc"
     }
