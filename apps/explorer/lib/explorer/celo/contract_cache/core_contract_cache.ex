@@ -310,6 +310,7 @@ defmodule Explorer.Celo.CoreContracts do
       "Escrow" => "0xb07e10c5837c282209c6b9b3de0edbef16319a37",
       "Exchange" => "0x17bc3304f94c85618c46d0888aa937148007bd3c",
       "ExchangeEUR" => "0x997b494f17d3c49e66fafb50f37a972d8db9325b",
+      "ExchangeBRL" => "0xf391dcaf77360d39e566b93c8c0ceb7128fa1a08",
       "FeeCurrencyWhitelist" => "0xb8641365dbe943bc2fb6977e6fbc1630ef47db5a",
       "Freezer" => "0xfe0ada6e9a7b782f55750428cc1d8428cd83c3f1",
       "GasPriceMinimum" => "0xd0bf87a5936ee17014a057143a494dc5c5d51e5e",
