@@ -24,12 +24,17 @@ function updateAge (el, timestamp) {
   const elInTile = el.hasAttribute('in-tile')
   if ((window.location.pathname.includes('/tx/') || window.location.pathname.includes('/block/') || window.location.pathname.includes('/blocks/')) && !elInTile) {
     const browserLocale = window.navigator.userLanguage || window.navigator.language
+    const date = timestamp.toDate()
 
-    fromNow = `${fromNow} | ${timestamp.toDate().toLocaleString(
-      browserLocale, {
-        timeZone: 'UTC'
-      }
-    )} UTC`
+    if (browserLocale && typeof date.toLocaleString === 'function') {
+      fromNow = `${fromNow} | ${date.toLocaleString(
+        browserLocale, {
+          timeZone: 'UTC'
+        }
+      )} UTC`
+    } else {
+      fromNow = `${fromNow} | ${timestamp.toString()}`
+    }
   }
   if (fromNow !== el.innerHTML) el.innerHTML = fromNow
 }
