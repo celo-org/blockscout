@@ -13,7 +13,8 @@ defmodule Explorer.Celo.Events.ValidatorEcdsaPublicKeyUpdatedEvent do
       %Explorer.Chain.Block{number: block_number} = insert(:block)
       %Explorer.Chain.CeloCoreContract{address_hash: address_hash} = insert(:core_contract)
 
-      contract_event = %{
+      # values taken from production environment and causing an error due to "invalid byte 0x95" in ecdsa_public_key
+      contract_event = %CeloContractEvent{
         block_number: block_number,
         contract_address_hash:  address_hash,
         inserted_at: ~U[2022-05-16 13:11:06.729479Z],
@@ -31,7 +32,10 @@ defmodule Explorer.Celo.Events.ValidatorEcdsaPublicKeyUpdatedEvent do
         updated_at: ~U[2022-05-16 13:11:06.729479Z]
       }
 
-      {1, _} = Explorer.Repo.insert_all(CeloContractEvent, [contract_event])
+      changeset_params = EventMap.celo_contract_event_to_concrete_event(contract_event)
+      |> EventMap.event_to_contract_event_params()
+
+      {1, _} = Explorer.Repo.insert_all(CeloContractEvent, [changeset_params])
     end
   end
 end
