@@ -6,6 +6,8 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
   alias Explorer.Celo.ContractEvents.Reserve.AssetAllocationSetEvent
   alias Explorer.Chain.{Address, CeloContractEvent, Log}
 
+
+
   describe "overall generic tests" do
     @tag :skip
     test "exportisto event type parity" do
@@ -23,6 +25,50 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
 
       assert MapSet.equal?(MapSet.new(), missing_events),
              "Blockscout events should be a superset of exsportisto events, found #{Enum.count(missing_events)} missing events: #{Enum.join(missing_events, ", ")}"
+    end
+
+
+    test "handling new events with property name collisions" do
+      defmodule TestParamCollisionEvent do
+        @moduledoc "An event with properties the same names as event struct properties "
+
+        use Explorer.Celo.ContractEvents.Base, name: "TestName", topic: "0x08812eccd29961180ca7d99a726f3ec3d86acc2c0b7ad920180ca9d31f31c250"
+
+        event_param(:name, :string, :unindexed)
+        event_param(:topic, :string, :unindexed)
+        event_param(:transaction_hash, :address, :indexed)
+        event_param(:log_index, {:uint, 256}, :unindexed)
+        event_param(:block_number, {:uint, 256}, :unindexed)
+
+        def function_signature, do: "TestName(string,string,address,uint256,uint256)"
+      end
+
+
+      test_name = "event_parameter_test_name"
+      test_topic = "event_parameter_test_topic"
+      test_log_index = 555
+      test_block_number = 444
+      test_transaction_hash = "0x00000000000000000000000088c1c759600ec3110af043c183a2472ab32d099c"
+
+      data = ABI.TypeEncoder.encode(
+               [test_name, test_topic, test_log_index,test_block_number],
+               [:string,:string,{:uint, 256}, {:uint, 256}], :output)
+             |> Base.encode16(case: :lower)
+
+      test_params = %{
+        address_hash: "0x765de816845861e75a25fca122bb6898b8b1282a",
+        block_hash: "0x42b21f09e9956d1a01195b1ca461059b2705fe850fc1977bd7182957e1b390d3",
+        block_number: 10_913_664,
+        data: data,
+        first_topic: TestParamCollisionEvent.topic(),
+        fourth_topic: nil,
+        index: 8,
+        second_topic: test_transaction_hash,
+        third_topic: nil,
+        transaction_hash: "0xb8960575a898afa8a124cd7414f1261109a119dba3bed4489393952a1556a5f0"
+      }
+
+      require IEx; IEx.pry
     end
   end
 
