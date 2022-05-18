@@ -43,7 +43,6 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
         def function_signature, do: "TestName(string,string,address,uint256,uint256)"
       end
 
-
       test_name = "event_parameter_test_name"
       test_topic = "event_parameter_test_topic"
       test_log_index = 555
@@ -59,7 +58,7 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
         address_hash: "0x765de816845861e75a25fca122bb6898b8b1282a",
         block_hash: "0x42b21f09e9956d1a01195b1ca461059b2705fe850fc1977bd7182957e1b390d3",
         block_number: 10_913_664,
-        data: data,
+        data: "0x" <> data,
         first_topic: TestParamCollisionEvent.topic(),
         fourth_topic: nil,
         index: 8,
@@ -68,7 +67,9 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
         transaction_hash: "0xb8960575a898afa8a124cd7414f1261109a119dba3bed4489393952a1556a5f0"
       }
 
-      require IEx; IEx.pry
+      event = TestParamCollisionEvent |> struct!() |> EventTransformer.from_params(test_params)
+
+      assert(event.name == "TestName")
     end
   end
 
