@@ -118,7 +118,8 @@ defmodule Explorer.Celo.ContractEvents.EventMapTest do
         EventTransformer.__protocol__(:impls)
         |> then(fn {:consolidated, modules} -> Enum.map(modules, & &1.topic()) end)
         |> MapSet.new()
-        |> MapSet.delete(Explorer.Test.TestParamCollisionEvent.topic()) #only for test suite - not a real event
+        # only for test suite - not a real event
+        |> MapSet.delete(Explorer.Test.TestParamCollisionEvent.topic())
 
       assert MapSet.subset?(contract_events_topic_set, event_map_topic_set)
     end
