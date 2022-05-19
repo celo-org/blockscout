@@ -17,7 +17,15 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
       blockscout_events =
         EventMap.map()
         |> Map.values()
-        |> Enum.map(fn module -> module |> Atom.to_string() |> String.split(".") |> List.last() end)
+        |> Enum.map(fn module ->
+          event_name =
+            module
+            |> Atom.to_string()
+            |> String.split(".")
+            |> List.last()
+
+          event_name |> String.split("Event") |> hd()
+        end)
         |> MapSet.new()
 
       missing_events = MapSet.difference(exportisto_events, blockscout_events)
