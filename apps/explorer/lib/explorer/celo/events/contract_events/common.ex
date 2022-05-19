@@ -48,18 +48,21 @@ defmodule Explorer.Celo.ContractEvents.Common do
   end
 
   def extract_common_event_params(event) do
-    case Map.get(event, :__transaction_hash) do
-      nil ->
-        %{transaction_hash: nil}
+    # handle optional transaction hash
+    common_properties =
+      case Map.get(event, :__transaction_hash) do
+        nil ->
+          %{transaction_hash: nil}
 
-      v ->
-        {:ok, hsh} = Full.cast(v)
-        %{transaction_hash: hsh}
-    end
-    |> then(fn map ->
-      {:ok, hsh} = Address.cast(event.__contract_address_hash)
-      Map.put(map, :contract_address_hash, hsh)
-    end)
+        v ->
+          {:ok, hsh} = Full.cast(v)
+          %{transaction_hash: hsh}
+      end
+
+    {:ok, hsh} = Address.cast(event.__contract_address_hash)
+
+    common_properties
+    |> Map.put(:contract_address_hash, hsh)
     |> Map.put(:name, event.__name)
     |> Map.put(:topic, event.__topic)
     |> Map.put(:block_number, event.__block_number)

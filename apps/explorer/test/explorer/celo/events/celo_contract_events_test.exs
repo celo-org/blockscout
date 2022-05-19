@@ -6,8 +6,6 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
   alias Explorer.Celo.ContractEvents.Reserve.AssetAllocationSetEvent
   alias Explorer.Chain.{Address, CeloContractEvent, Log}
 
-
-
   describe "overall generic tests" do
     @tag :skip
     test "exportisto event type parity" do
@@ -28,12 +26,13 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
              "Blockscout events should be a superset of exsportisto events, found #{Enum.count(missing_events)} missing events: #{Enum.join(missing_events, ", ")}"
     end
 
-
     test "handling new events with property name collisions" do
       defmodule TestParamCollisionEvent do
         @moduledoc "An event with properties the same names as event struct properties "
 
-        use Explorer.Celo.ContractEvents.Base, name: "TestName", topic: "0x08812eccd29961180ca7d99a726f3ec3d86acc2c0b7ad920180ca9d31f31c250"
+        use Explorer.Celo.ContractEvents.Base,
+          name: "TestName",
+          topic: "0x08812eccd29961180ca7d99a726f3ec3d86acc2c0b7ad920180ca9d31f31c250"
 
         event_param(:name, :string, :unindexed)
         event_param(:topic, :string, :unindexed)
@@ -50,10 +49,13 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
       test_block_number = 444
       test_transaction_hash = "0x00000000000000000000000088c1c759600ec3110af043c183a2472ab32d099c"
 
-      data = ABI.TypeEncoder.encode(
-               [test_name, test_topic, test_log_index,test_block_number],
-               [:string,:string,{:uint, 256}, {:uint, 256}], :output)
-             |> Base.encode16(case: :lower)
+      data =
+        ABI.TypeEncoder.encode(
+          [test_name, test_topic, test_log_index, test_block_number],
+          [:string, :string, {:uint, 256}, {:uint, 256}],
+          :output
+        )
+        |> Base.encode16(case: :lower)
 
       test_params = %{
         address_hash: "0x765de816845861e75a25fca122bb6898b8b1282a",
@@ -70,7 +72,11 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
 
       event = TestParamCollisionEvent |> struct!() |> EventTransformer.from_params(test_params)
 
-      assert(event.__name == TestParamCollisionEvent.name(), "Event name should be available with underscored property name")
+      assert(
+        event.__name == TestParamCollisionEvent.name(),
+        "Event name should be available with underscored property name"
+      )
+
       assert(event.name == test_name, "Generated property value should be available under the name")
 
       celo_event = event |> EventTransformer.to_celo_contract_event_params()
