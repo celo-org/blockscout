@@ -69,7 +69,13 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
 
       event = TestParamCollisionEvent |> struct!() |> EventTransformer.from_params(test_params)
 
-      assert(event.name == "TestName")
+      assert(event.__name == TestParamCollisionEvent.name(), "Event name should be available with underscored property name")
+      assert(event.name == test_name, "Generated property value should be available under the name")
+
+      celo_event = event |> EventTransformer.to_celo_contract_event_params()
+
+      assert(celo_event.name == TestParamCollisionEvent.name(), "CeloContractEvent name should be name of the event")
+      assert(celo_event.params.name == test_name, "CeloContractEvent params should contain event property")
     end
   end
 
