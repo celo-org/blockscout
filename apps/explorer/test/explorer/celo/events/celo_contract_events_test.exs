@@ -17,8 +17,9 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
         |> MapSet.new()
 
       blockscout_events =
-        EventTransformer.__protocol__(:impls)
-        |> then(fn {:consolidated, modules} -> Enum.map(modules, & &1.name()) end)
+        EventMap.map()
+        |> Map.values()
+        |> Enum.map(fn module -> module |> Atom.to_string() |> String.split(".") |> List.last() end)
         |> MapSet.new()
 
       missing_events = MapSet.difference(exportisto_events, blockscout_events)

@@ -47,7 +47,7 @@ defmodule Explorer.Celo.Events.ValidatorGroupVoteActivatedEventTest do
       assert result.units == 6_136_281_451_163_456_507_329_304_650_157_103_347_504
       assert to_string(result.account) == "0x88c1c759600ec3110af043c183a2472ab32d099c"
       assert to_string(result.group) == "0x47b2db6af05a55d42ed0f3731735f9479abf0673"
-      assert result.log_index == 8
+      assert result.__log_index == 8
     end
 
     test "converts from ethjsonrpc log to event type and insert into db" do
