@@ -88,9 +88,9 @@ defmodule Explorer.Celo.ContractEvents.EventMapTest do
       contract = insert(:core_contract)
 
       event = %ValidatorGroupActiveVoteRevokedEvent{
-        block_number: 77,
-        log_index: log.index,
-        contract_address_hash: contract.address_hash,
+        __block_number: 77,
+        __log_index: log.index,
+        __contract_address_hash: contract.address_hash,
         account: address_hash(),
         group: address_hash(),
         units: 6_969_696_969,
