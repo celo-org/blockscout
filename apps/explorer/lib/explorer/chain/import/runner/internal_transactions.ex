@@ -14,6 +14,8 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
 
   import Ecto.Query, only: [from: 2, or_where: 3]
 
+  alias Indexer.Celo.InternalTransactionCache
+
   @behaviour Runner
 
   # milliseconds
@@ -651,5 +653,12 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
       postgrex_error in Postgrex.Error ->
         {:error, %{exception: postgrex_error, pending_hashes: valid_block_hashes}}
     end
+
+    # itx has been indexed and imported successfully, remove from itx cache
+    block_numbers_query =
+      from(b in Block, select: b.number, where: b.hash in ^valid_block_hashes)
+
+    valid_blocks = repo.all(block_numbers_query)
+    valid_blocks |> Enum.each(&(InternalTransactionCache.clear(&1)))
   end
 end
