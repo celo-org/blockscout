@@ -56,6 +56,11 @@ defmodule Indexer.Celo.InternalTransactionCache do
 
   def handle_call({:get, block_number}, _from, %{cache: cache} = state) do
     itx = cache[block_number]
+
+    if itx do
+      Telemetry.event(:itx_cache_hit, %{block_number: block_number})
+    end
+
     {:reply, itx, state}
   end
 
