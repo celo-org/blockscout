@@ -6,6 +6,7 @@ defmodule Explorer.Chain.Import.Runner.CeloContractEvent do
   alias Explorer.Chain.Import.Runner.Util
 
   alias Ecto.{Changeset, Multi, Repo}
+  import Ecto.Query
 
   @behaviour Import.Runner
 
