@@ -37,7 +37,7 @@ defmodule Indexer.Celo.InternalTransactionCache do
     GenServer.start_link(__MODULE__, init_opts, gen_server_opts)
   end
 
-  def init(opts) do
+  def init(_opts) do
     {:ok,
       %{
         cache: %{},
