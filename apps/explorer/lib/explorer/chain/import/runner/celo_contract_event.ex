@@ -41,10 +41,30 @@ defmodule Explorer.Chain.Import.Runner.CeloContractEvent do
     end)
   end
 
+  defp default_upsert do
+    from( cce in CeloContractEvent,
+      update: [
+        set: [
+          name: fragment("EXCLUDED.name"),
+          topic: fragment("EXCLUDED.topic"),
+          params: fragment("EXCLUDED.params"),
+          contract_address_hash: fragment("EXCLUDED.contract_address_hash"),
+          transaction_hash: fragment("EXCLUDED.transaction_hash")
+        ]
+      ],
+      where: fragment("(EXCLUDED.name, EXCLUDED.topic, EXCLUDED.params, EXCLUDED.contract_address_hash, EXCLUDED.transaction_hash) IS DISTINCT FROM (?, ?, ?, ?, ?)",
+        cce.name,
+        cce.topic,
+        cce.params,
+        cce.contract_address_hash,
+        cce.transaction_hash)
+    )
+  end
+
   @spec insert(Repo.t(), [map()], Util.insert_options()) ::
           {:ok, [CeloContractEvent.t()]} | {:error, [Changeset.t()]}
   defp insert(repo, changes_list, %{timeout: timeout, timestamps: timestamps} = options) when is_list(changes_list) do
-    on_conflict = Map.get(options, :on_conflict, :nothing)
+    on_conflict = Map.get(options, :on_conflict, &default_upsert/0)
 
     # Enforce Log ShareLocks order (see docs: sharelocks.md)
     ordered_changes_list = Enum.sort_by(changes_list, &{&1.block_number, &1.log_index})
