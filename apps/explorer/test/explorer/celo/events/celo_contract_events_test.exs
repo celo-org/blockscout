@@ -86,22 +86,23 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
 
       # event AccountWalletAddressSet with wallet_address as unindexed event parameter of type address
       # https://github.com/celo-org/data-services/issues/241
-      log_data =  %{
-        "address"=> contract_address_hash |> to_string(),
-        "topics"=> [
-          "0xf81d74398fd47e35c36b714019df15f200f623dde569b5b531d6a0b4da5c5f26",
-          "0x000000000000000000000000bcf444dc843a398c3436cc37729005378c3aae30"
-        ],
-        "data"=> "0x0000000000000000000000005c3909164426a6bff52907d05c83c509ae427119",
-        "blockNumber"=> 172_800,
-        "transactionHash"=> nil,
-        "transactionIndex"=> nil,
-        "blockHash"=> block_1.hash |> to_string(),
-        "logIndex"=> "0x8",
-        "removed"=> false
-      }
-      |> EthereumJSONRPC.Log.to_elixir()
-      |> EthereumJSONRPC.Log.elixir_to_params()
+      log_data =
+        %{
+          "address" => contract_address_hash |> to_string(),
+          "topics" => [
+            "0xf81d74398fd47e35c36b714019df15f200f623dde569b5b531d6a0b4da5c5f26",
+            "0x000000000000000000000000bcf444dc843a398c3436cc37729005378c3aae30"
+          ],
+          "data" => "0x0000000000000000000000005c3909164426a6bff52907d05c83c509ae427119",
+          "blockNumber" => 172_800,
+          "transactionHash" => nil,
+          "transactionIndex" => nil,
+          "blockHash" => block_1.hash |> to_string(),
+          "logIndex" => "0x8",
+          "removed" => false
+        }
+        |> EthereumJSONRPC.Log.to_elixir()
+        |> EthereumJSONRPC.Log.elixir_to_params()
 
       changeset_params =
         EventMap.rpc_to_event_params([log_data])
