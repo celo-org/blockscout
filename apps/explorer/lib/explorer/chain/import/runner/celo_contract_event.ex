@@ -58,14 +58,15 @@ defmodule Explorer.Chain.Import.Runner.CeloContractEvent do
         cce.topic,
         cce.params,
         cce.contract_address_hash,
-        cce.transaction_hash)
+        cce.transaction_hash
+      )
     )
   end
 
   @spec insert(Repo.t(), [map()], Util.insert_options()) ::
           {:ok, [CeloContractEvent.t()]} | {:error, [Changeset.t()]}
   defp insert(repo, changes_list, %{timeout: timeout, timestamps: timestamps} = options) when is_list(changes_list) do
-    on_conflict = Map.get(options, :on_conflict, &default_upsert/0)
+    on_conflict = Map.get_lazy(options, :on_conflict, &default_upsert/0)
 
     # Enforce Log ShareLocks order (see docs: sharelocks.md)
     ordered_changes_list = Enum.sort_by(changes_list, &{&1.block_number, &1.log_index})
