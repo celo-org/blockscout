@@ -109,14 +109,16 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
         |> Map.put(:updated_at, Timex.now())
         |> Map.put(:inserted_at, Timex.now())
 
-      # insert into db and assert that public key is inserted as valid json
+      # insert into db and assert that wallet_address is inserted as valid json
       {1, _} = Explorer.Repo.insert_all(CeloContractEvent, [changeset_params])
 
       # retrieve from db
       [event] = AccountWalletAddressSetEvent.query() |> EventMap.query_all()
 
-      #assert(event.ecdsa_public_key |> :erlang.list_to_binary() == expected_public_key)
+      # wallet_address should decode to following value from "data" in log above
+      assert(event.wallet_address |> to_string() == "0x5c3909164426a6bff52907d05c83c509ae427119")
     end
+
     test "converts arrays of bytes and ints" do
       block_1 = insert(:block, number: 172_800)
       %Explorer.Chain.CeloCoreContract{address_hash: contract_address_hash} = insert(:core_contract)

@@ -34,6 +34,7 @@ defmodule Explorer.Celo.ContractEvents.Common do
       # bytes to list of ints
       {d, {:bytes, _}} -> :binary.bin_to_list(d)
       {d, :bytes} -> :binary.bin_to_list(d)
+      {d, :address} -> convert_result(d, :address)
       {d, _} -> d
     end)
   end
