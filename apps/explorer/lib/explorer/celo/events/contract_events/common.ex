@@ -6,7 +6,7 @@ defmodule Explorer.Celo.ContractEvents.Common do
   alias Explorer.Chain.{Data, Hash, Hash.Full}
 
   @doc "Decode a single point of event data of a given type from a given topic"
-  def decode_event(topic, type) do
+  def decode_event_topic(topic, type) do
     topic
     |> extract_hash()
     |> TypeDecoder.decode_raw([type])
