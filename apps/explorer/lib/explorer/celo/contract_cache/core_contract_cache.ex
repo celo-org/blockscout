@@ -183,6 +183,7 @@ defmodule Explorer.Celo.CoreContracts do
 
       to_add
       |> Enum.map(fn {name, address} ->
+        address = Explorer.Chain.Hash.Address.cast(address)
         CeloCoreContract.changeset(%CeloCoreContract{}, name: name, address: address)
       end)
       |> Enum.each(fn changeset -> Repo.insert(changeset) end)
