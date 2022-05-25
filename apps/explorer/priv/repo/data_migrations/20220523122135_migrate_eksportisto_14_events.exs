@@ -1,6 +1,6 @@
 defmodule Explorer.Repo.Migrations.MigrateEksportisto14Events do
   @moduledoc """
-    Migrating eksportisto events from logs table to celo_contract_events
+    Migrating eksportisto events from logs table to celo_contract_events, will upsert existing events.
   """
 
   @topics ["0xbdf7e616a6943f81e07a7984c9d4c00197dc2f481486ce4ffa6af52a113974ad",
@@ -109,8 +109,27 @@ defmodule Explorer.Repo.Migrations.MigrateEksportisto14Events do
   def down, do: :ok
 
   @doc "Returns an ecto query that gives the next batch / page of source rows to be processed"
-  def page_query(start_of_page) do
-    event_page_query(start_of_page)
+  def page_query({last_block_number, last_index}) do
+    from(
+      l in "logs",
+      left_join: ccc in "celo_core_contracts",
+      on: ccc.address == l.address_hash,
+      select: %{
+        first_topic: l.first_topic,
+        second_topic: l.second_topic,
+        third_topic: l.third_topic,
+        fourth_topic: l.fourth_topic,
+        data: l.data,
+        address_hash: l.address_hash,
+        transaction_hash: l.transaction_hash,
+        block_number: l.block_number,
+        index: l.index
+      },
+      where:
+        l.first_topic in ^@topics and {l.block_number, l.index} > {^last_block_number, ^last_index},
+      order_by: [asc: l.block_number, asc: l.index],
+      limit: @batch_size
+    )
   end
 
   @doc "Perform the transformation with the list of source rows to operate upon, returns a list of inserted / modified ids"
