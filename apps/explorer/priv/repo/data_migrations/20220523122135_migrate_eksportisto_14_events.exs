@@ -3,7 +3,8 @@ defmodule Explorer.Repo.Migrations.MigrateEksportisto14Events do
     Migrating eksportisto events from logs table to celo_contract_events, will upsert existing events.
   """
 
-  @topics ["0xbdf7e616a6943f81e07a7984c9d4c00197dc2f481486ce4ffa6af52a113974ad",
+  @topics [
+    "0xbdf7e616a6943f81e07a7984c9d4c00197dc2f481486ce4ffa6af52a113974ad",
     "0xab64f92ab780ecbf4f3866f57cee465ff36c89450dcce20237ca7a8d81fb7d13",
     "0xbae2f33c70949fbc7325c98655f3039e5e1c7f774874c99fd4f31ec5f432b159",
     "0x213377eec2c15b21fa7abcbb0cb87a67e893cdb94a2564aa4bb4d380869473c8",
@@ -100,7 +101,8 @@ defmodule Explorer.Repo.Migrations.MigrateEksportisto14Events do
     "0x381545d9b1fffcb94ffbbd0bccfff9f1fb3acd474d34f7d59112a5c9973fee49",
     "0x229d63d990a0f1068a86ee5bdce0b23fe156ff5d5174cc634d5da8ed3618e0c9",
     "0x712ae1383f79ac853f8d882153778e0260ef8f03b504e2866e0593e04d2b291f",
-    "0x7dc46237a819c9171a9c037ec98928e563892905c4d23373ca0f3f500f4ed114"]
+    "0x7dc46237a819c9171a9c037ec98928e563892905c4d23373ca0f3f500f4ed114"
+  ]
 
   use Explorer.Repo.Migrations.DataMigration
   import Ecto.Query
@@ -113,7 +115,7 @@ defmodule Explorer.Repo.Migrations.MigrateEksportisto14Events do
     from(
       l in "logs",
       left_join: ccc in "celo_core_contracts",
-      on: ccc.address == l.address_hash,
+      on: ccc.address_hash == l.address_hash,
       select: %{
         first_topic: l.first_topic,
         second_topic: l.second_topic,
@@ -125,8 +127,7 @@ defmodule Explorer.Repo.Migrations.MigrateEksportisto14Events do
         block_number: l.block_number,
         index: l.index
       },
-      where:
-        l.first_topic in ^@topics and {l.block_number, l.index} > {^last_block_number, ^last_index},
+      where: l.first_topic in ^@topics and {l.block_number, l.index} > {^last_block_number, ^last_index},
       order_by: [asc: l.block_number, asc: l.index],
       limit: @batch_size
     )

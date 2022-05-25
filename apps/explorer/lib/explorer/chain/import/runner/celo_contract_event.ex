@@ -43,7 +43,7 @@ defmodule Explorer.Chain.Import.Runner.CeloContractEvent do
   end
 
   defp default_upsert do
-    from( cce in CeloContractEvent,
+    from(cce in CeloContractEvent,
       update: [
         set: [
           name: fragment("EXCLUDED.name"),
@@ -53,13 +53,15 @@ defmodule Explorer.Chain.Import.Runner.CeloContractEvent do
           transaction_hash: fragment("EXCLUDED.transaction_hash")
         ]
       ],
-      where: fragment("(EXCLUDED.name, EXCLUDED.topic, EXCLUDED.params, EXCLUDED.contract_address_hash, EXCLUDED.transaction_hash) IS DISTINCT FROM (?, ?, ?, ?, ?)",
-        cce.name,
-        cce.topic,
-        cce.params,
-        cce.contract_address_hash,
-        cce.transaction_hash
-      )
+      where:
+        fragment(
+          "(EXCLUDED.name, EXCLUDED.topic, EXCLUDED.params, EXCLUDED.contract_address_hash, EXCLUDED.transaction_hash) IS DISTINCT FROM (?, ?, ?, ?, ?)",
+          cce.name,
+          cce.topic,
+          cce.params,
+          cce.contract_address_hash,
+          cce.transaction_hash
+        )
     )
   end
 
