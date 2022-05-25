@@ -167,7 +167,7 @@ defmodule Explorer.Celo.CoreContracts do
     {:noreply, new_state}
   end
 
-  def handle_cast(:insert_entries_to_db, _from, %{cache: cache} = state) do
+  def handle_cast(:insert_entries_to_db, %{cache: cache} = state) do
     # moving out of task definition to satisfy credo nested function body warning
     already_in_db_cache = fn address, db_cache ->
       Enum.any?(db_cache, fn %CeloCoreContract{address_hash: ccc_address} ->
