@@ -15,6 +15,7 @@ defmodule Explorer.Repo.Migrations.DataMigration do
       use Ecto.Migration
       alias Explorer.Celo.ContractEvents.EventMap
       alias Explorer.Celo.Telemetry
+      alias Explorer.Chain.CeloContractEvent
       alias Explorer.Chain.Hash.{Address, Full}
       import Ecto.Query
 
@@ -133,8 +134,11 @@ defmodule Explorer.Repo.Migrations.DataMigration do
             end)
           end)
 
+
         {inserted_count, results} =
-          Explorer.Repo.insert_all("celo_contract_events", params, returning: [:block_number, :log_index])
+          Explorer.Repo.insert_all("celo_contract_events", params, returning: [:block_number, :log_index],
+            on_conflict: CeloContractEvent.default_upsert/0,
+          conflict_target: CeloContractEvent.conflict_target())
 
         if inserted_count != length(to_change) do
           not_inserted =
