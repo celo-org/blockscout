@@ -15,6 +15,7 @@ defmodule Explorer.Repo.Migrations.DataMigration do
       use Ecto.Migration
       alias Explorer.Celo.ContractEvents.EventMap
       alias Explorer.Celo.Telemetry
+      alias Explorer.Chain.Hash.{Address, Full}
       import Ecto.Query
 
       @disable_ddl_transaction true

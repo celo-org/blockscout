@@ -38,11 +38,13 @@ defmodule Explorer.Celo.ContractEvents.Common do
   # bytes to list of ints
   defp convert_type_to_elixir(decoded, {:bytes, _size}), do: :binary.bin_to_list(decoded)
   defp convert_type_to_elixir(decoded, :bytes), do: :binary.bin_to_list(decoded)
+
   defp convert_type_to_elixir(decoded, :address) do
     {:ok, address} = Address.cast(decoded)
     address
   end
-  #default - assume valid conversion
+
+  # default - assume valid conversion
   defp convert_type_to_elixir(decoded, _type), do: decoded
 
   def extract_common_event_params(event) do

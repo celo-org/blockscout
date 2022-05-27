@@ -117,11 +117,12 @@ defmodule Explorer.Celo.CoreContractCacheTest do
       )
 
       %Explorer.Chain.CeloCoreContract{address_hash: contract_address_hash} = insert(:core_contract)
+
       cache = %{
         "InDBAlready" => contract_address_hash |> to_string(),
         "New1" => "0x000000000000000000000000000000000000ce12",
         "New2" => "0x000000000000000000000000000000000000ce13"
-        }
+      }
 
       CoreContracts.handle_cast(:insert_entries_to_db, %{cache: cache})
 
@@ -132,6 +133,5 @@ defmodule Explorer.Celo.CoreContractCacheTest do
 
       assert(length(db_contracts) == 4)
     end
-
   end
 end
