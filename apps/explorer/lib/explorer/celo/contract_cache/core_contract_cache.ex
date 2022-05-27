@@ -167,6 +167,7 @@ defmodule Explorer.Celo.CoreContracts do
     {:noreply, new_state}
   end
 
+  @impl true
   def handle_cast(:insert_entries_to_db, %{cache: cache} = state) do
     # moving out of task definition to satisfy credo nested function body warning
     already_in_db_cache = fn address, db_cache ->
@@ -179,14 +180,14 @@ defmodule Explorer.Celo.CoreContracts do
     |> Task.Supervisor.start_child(fn ->
       db_cache = CeloCoreContract |> Repo.all()
 
-      to_add = cache |> Enum.reject(fn {_name, address} -> already_in_db_cache.(db_cache, address) end)
+      to_add = cache |> Enum.reject(fn {_name, address} -> already_in_db_cache.(address, db_cache) end)
 
       to_add
-      |> Enum.map(fn {name, address} ->
-        address = Explorer.Chain.Hash.Address.cast(address)
-        CeloCoreContract.changeset(%CeloCoreContract{}, name: name, address: address)
+      |> Enum.each(fn {name, address} ->
+        %CeloCoreContract{}
+        |> CeloCoreContract.changeset(%{name: name, address_hash: address})
+        |> Repo.insert()
       end)
-      |> Enum.each(fn changeset -> Repo.insert(changeset) end)
     end)
 
     {:noreply, state}
