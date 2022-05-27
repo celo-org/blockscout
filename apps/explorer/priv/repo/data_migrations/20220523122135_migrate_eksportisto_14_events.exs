@@ -106,6 +106,7 @@ defmodule Explorer.Repo.Migrations.MigrateEksportisto14Events do
 
   use Explorer.Repo.Migrations.DataMigration
   import Ecto.Query
+  require Logger
 
   @doc "Undo the data migration"
   def down, do: :ok
@@ -114,7 +115,7 @@ defmodule Explorer.Repo.Migrations.MigrateEksportisto14Events do
   def page_query({last_block_number, last_index}) do
     from(
       l in "logs",
-      left_join: ccc in "celo_core_contracts",
+      inner_join: ccc in "celo_core_contracts",
       on: ccc.address_hash == l.address_hash,
       select: %{
         first_topic: l.first_topic,
@@ -133,11 +134,67 @@ defmodule Explorer.Repo.Migrations.MigrateEksportisto14Events do
     )
   end
 
+  def event_changee(to_change) do
+    params =
+      to_change
+      |> EventMap.rpc_to_event_params()
+        # explicitly set timestamps as insert_all doesn't do this automatically
+      |> then(fn events ->
+        t = Timex.now()
+
+        events
+        |> Enum.map(fn event ->
+          {:ok, contract_address_hash} = Address.dump(event.contract_address_hash)
+
+          event =
+            case event.transaction_hash do
+              nil ->
+                event
+
+              hash ->
+                {:ok, transaction_hash} = Full.dump(hash)
+                event |> Map.put(:transaction_hash, transaction_hash)
+            end
+
+          event
+          |> Map.put(:inserted_at, t)
+          |> Map.put(:updated_at, t)
+          |> Map.put(:contract_address_hash, contract_address_hash)
+        end)
+      end)
+
+
+    {inserted_count, results} =
+      Explorer.Repo.insert_all("celo_contract_events", params, returning: [:block_number, :log_index],
+        on_conflict: CeloContractEvent.default_upsert(),
+        conflict_target: CeloContractEvent.conflict_target())
+
+    Logger.info("Inserted #{inserted_count} rows")
+    if inserted_count != length(to_change) do
+      not_inserted =
+        to_change
+        |> Enum.map(&Map.take(&1, [:block_number, :index]))
+        |> MapSet.new()
+        |> MapSet.difference(MapSet.new(results))
+        |> MapSet.to_list()
+
+      not_inserted |> handle_non_insert()
+    end
+
+    last_key =
+      to_change
+      |> Enum.map(fn %{block_number: block_number, index: index} -> {block_number, index} end)
+      |> Enum.max()
+
+    [last_key]
+  end
   @doc "Perform the transformation with the list of source rows to operate upon, returns a list of inserted / modified ids"
   def do_change(ids) do
-    event_change(ids)
+    event_changee(ids)
   end
 
+  # we simply log here, as postgres does not inform us of upserts we cannot consider non insertions as errors
+  # https://hexdocs.pm/ecto/Ecto.Repo.html#c:insert_all/3-return-values
   @doc "Handle unsuccessful insertions"
-  def handle_failure(ids), do: raise("Failed to insert - #{inspect(ids)}")
+  def handle_non_insert(ids), do: Logger.info("Failed to insert - #{inspect(ids)}")
 end
