@@ -1,13 +1,14 @@
 defmodule Explorer.Celo.Events.CeloContractEventsTest do
   use Explorer.DataCase, async: true
 
+  alias Explorer.Celo.ContractEvents.Accounts.AccountWalletAddressSetEvent
   alias Explorer.Celo.ContractEvents.EventTransformer
   alias Explorer.Celo.ContractEvents.EventMap
   alias Explorer.Celo.ContractEvents.Reserve.AssetAllocationSetEvent
   alias Explorer.Chain.{Address, CeloContractEvent, Log}
+  alias Explorer.Test.TestParamCollisionEvent
 
   describe "overall generic tests" do
-    @tag :skip
     test "exportisto event type parity" do
       # set of exportisto events taken from bigquery data set rc1_eksportisto_14
       exportisto_events =
@@ -15,8 +16,17 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
         |> MapSet.new()
 
       blockscout_events =
-        EventTransformer.__protocol__(:impls)
-        |> then(fn {:consolidated, modules} -> Enum.map(modules, & &1.name()) end)
+        EventMap.map()
+        |> Map.values()
+        |> Enum.map(fn module ->
+          event_name =
+            module
+            |> Atom.to_string()
+            |> String.split(".")
+            |> List.last()
+
+          event_name |> String.split("Event") |> hd()
+        end)
         |> MapSet.new()
 
       missing_events = MapSet.difference(exportisto_events, blockscout_events)
@@ -24,9 +34,92 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
       assert MapSet.equal?(MapSet.new(), missing_events),
              "Blockscout events should be a superset of exsportisto events, found #{Enum.count(missing_events)} missing events: #{Enum.join(missing_events, ", ")}"
     end
+
+    test "handling new events with property name collisions" do
+      test_name = "event_parameter_test_name"
+      test_topic = "event_parameter_test_topic"
+      test_log_index = 555
+      test_block_number = 444
+      test_transaction_hash = "0x00000000000000000000000088c1c759600ec3110af043c183a2472ab32d099c"
+
+      data =
+        ABI.TypeEncoder.encode(
+          [test_name, test_topic, test_log_index, test_block_number],
+          [:string, :string, {:uint, 256}, {:uint, 256}],
+          :output
+        )
+        |> Base.encode16(case: :lower)
+
+      test_params = %{
+        address_hash: "0x765de816845861e75a25fca122bb6898b8b1282a",
+        block_hash: "0x42b21f09e9956d1a01195b1ca461059b2705fe850fc1977bd7182957e1b390d3",
+        block_number: 10_913_664,
+        data: "0x" <> data,
+        first_topic: TestParamCollisionEvent.topic(),
+        fourth_topic: nil,
+        index: 8,
+        second_topic: test_transaction_hash,
+        third_topic: nil,
+        transaction_hash: "0xb8960575a898afa8a124cd7414f1261109a119dba3bed4489393952a1556a5f0"
+      }
+
+      event = TestParamCollisionEvent |> struct!() |> EventTransformer.from_params(test_params)
+
+      assert(
+        event.__name == TestParamCollisionEvent.name(),
+        "Event name should be available with underscored property name"
+      )
+
+      assert(event.name == test_name, "Generated property value should be available under the name")
+
+      celo_event = event |> EventTransformer.to_celo_contract_event_params()
+
+      assert(celo_event.name == TestParamCollisionEvent.name(), "CeloContractEvent name should be name of the event")
+      assert(celo_event.params.name == test_name, "CeloContractEvent params should contain event property")
+    end
   end
 
   describe "event parameter conversion tests" do
+    test "converts events with unindexed address types correctly" do
+      block_1 = insert(:block, number: 172_800)
+      %Explorer.Chain.CeloCoreContract{address_hash: contract_address_hash} = insert(:core_contract)
+
+      # event AccountWalletAddressSet with wallet_address as unindexed event parameter of type address
+      # https://github.com/celo-org/data-services/issues/241
+      log_data =
+        %{
+          "address" => contract_address_hash |> to_string(),
+          "topics" => [
+            "0xf81d74398fd47e35c36b714019df15f200f623dde569b5b531d6a0b4da5c5f26",
+            "0x000000000000000000000000bcf444dc843a398c3436cc37729005378c3aae30"
+          ],
+          "data" => "0x0000000000000000000000005c3909164426a6bff52907d05c83c509ae427119",
+          "blockNumber" => 172_800,
+          "transactionHash" => nil,
+          "transactionIndex" => nil,
+          "blockHash" => block_1.hash |> to_string(),
+          "logIndex" => "0x8",
+          "removed" => false
+        }
+        |> EthereumJSONRPC.Log.to_elixir()
+        |> EthereumJSONRPC.Log.elixir_to_params()
+
+      changeset_params =
+        EventMap.rpc_to_event_params([log_data])
+        |> List.first()
+        |> Map.put(:updated_at, Timex.now())
+        |> Map.put(:inserted_at, Timex.now())
+
+      # insert into db and assert that wallet_address is inserted as valid json
+      {1, _} = Explorer.Repo.insert_all(CeloContractEvent, [changeset_params])
+
+      # retrieve from db
+      [event] = AccountWalletAddressSetEvent.query() |> EventMap.query_all()
+
+      # wallet_address should decode to following value from "data" in log above
+      assert(event.wallet_address |> to_string() == "0x5c3909164426a6bff52907d05c83c509ae427119")
+    end
+
     test "converts arrays of bytes and ints" do
       block_1 = insert(:block, number: 172_800)
       %Explorer.Chain.CeloCoreContract{address_hash: contract_address_hash} = insert(:core_contract)
