@@ -81,7 +81,7 @@ defmodule Explorer.Chain.Block do
           round: non_neg_integer(),
           extra_data: Data.t(),
           online: %Ecto.Association.NotLoaded{} | boolean(),
-          base_fee_per_gas: Wei.t()
+          base_fee_per_gas: Wei.t(),
           is_empty: boolean()
         }
 
