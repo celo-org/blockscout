@@ -4,7 +4,7 @@ defmodule Explorer.Chain.Import.Runner.CeloContractEvent do
   """
   alias Explorer.Chain.{CeloContractEvent, Import}
   alias Explorer.Chain.Import.Runner.Util
-
+  alias Explorer.Repo
   alias Ecto.{Changeset, Multi}
 
   @behaviour Import.Runner
