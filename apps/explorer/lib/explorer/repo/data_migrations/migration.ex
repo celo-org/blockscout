@@ -135,9 +135,11 @@ defmodule Explorer.Repo.Migrations.DataMigration do
           end)
 
         {inserted_count, results} =
-          Explorer.Repo.insert_all("celo_contract_events", params, returning: [:block_number, :log_index],
+          Explorer.Repo.insert_all("celo_contract_events", params,
+            returning: [:block_number, :log_index],
             on_conflict: CeloContractEvent.default_upsert(),
-          conflict_target: CeloContractEvent.conflict_target())
+            conflict_target: CeloContractEvent.conflict_target()
+          )
 
         if inserted_count != length(to_change) do
           not_inserted =

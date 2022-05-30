@@ -138,7 +138,7 @@ defmodule Explorer.Repo.Migrations.MigrateEksportisto14Events do
     params =
       to_change
       |> EventMap.rpc_to_event_params()
-        # explicitly set timestamps as insert_all doesn't do this automatically
+      # explicitly set timestamps as insert_all doesn't do this automatically
       |> then(fn events ->
         t = Timex.now()
 
@@ -163,13 +163,15 @@ defmodule Explorer.Repo.Migrations.MigrateEksportisto14Events do
         end)
       end)
 
-
     {inserted_count, results} =
-      Explorer.Repo.insert_all("celo_contract_events", params, returning: [:block_number, :log_index],
+      Explorer.Repo.insert_all("celo_contract_events", params,
+        returning: [:block_number, :log_index],
         on_conflict: CeloContractEvent.default_upsert(),
-        conflict_target: CeloContractEvent.conflict_target())
+        conflict_target: CeloContractEvent.conflict_target()
+      )
 
     Logger.info("Inserted #{inserted_count} rows")
+
     if inserted_count != length(to_change) do
       not_inserted =
         to_change
@@ -188,6 +190,7 @@ defmodule Explorer.Repo.Migrations.MigrateEksportisto14Events do
 
     [last_key]
   end
+
   @doc "Perform the transformation with the list of source rows to operate upon, returns a list of inserted / modified ids"
   def do_change(ids) do
     event_changee(ids)
