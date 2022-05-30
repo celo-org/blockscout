@@ -5,8 +5,7 @@ defmodule Explorer.Chain.Import.Runner.CeloContractEvent do
   alias Explorer.Chain.{CeloContractEvent, Import}
   alias Explorer.Chain.Import.Runner.Util
 
-  alias Ecto.{Changeset, Multi, Repo}
-  import Ecto.Query
+  alias Ecto.{Changeset, Multi}
 
   @behaviour Import.Runner
 
@@ -44,7 +43,7 @@ defmodule Explorer.Chain.Import.Runner.CeloContractEvent do
 
   @spec insert(Repo.t(), [map()], Util.insert_options()) ::
           {:ok, [CeloContractEvent.t()]} | {:error, [Changeset.t()]}
-  defp insert(repo, changes_list, %{timeout: timeout, timestamps: timestamps} = options) when is_list(changes_list) do
+  defp insert(repo, changes_list, %{timeout: timeout, timestamps: timestamps}) when is_list(changes_list) do
     # Enforce Log ShareLocks order (see docs: sharelocks.md)
     ordered_changes_list = Enum.sort_by(changes_list, &{&1.block_number, &1.log_index})
 

@@ -7,10 +7,9 @@ defmodule Explorer.Chain.CeloContractEvent do
   use Explorer.Schema
   import Ecto.Query
 
-  alias Explorer.Celo.ContractEvents.{Common, EventMap}
-  alias Explorer.Chain.{CeloContractEvent, Hash, Log}
+  alias Explorer.Celo.ContractEvents.Common
+  alias Explorer.Chain.Hash
   alias Explorer.Chain.Hash.Address
-  alias Explorer.Repo
 
   @type t :: %__MODULE__{
           name: String.t(),
@@ -45,7 +44,7 @@ defmodule Explorer.Chain.CeloContractEvent do
   end
 
   def default_upsert do
-    from(cce in "celo_contract_events",
+    from(cce in __MODULE__,
       update: [
         set: [
           name: fragment("EXCLUDED.name"),
