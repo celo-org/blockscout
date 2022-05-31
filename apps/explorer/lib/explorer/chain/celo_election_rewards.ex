@@ -5,8 +5,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
 
   use Explorer.Schema
 
-  alias Explorer.Chain.{Block, Hash, Wei}
-  alias Explorer.Repo
+  alias Explorer.Chain.{Hash, Wei}
 
   @required_attrs ~w(account_hash amount associated_account_hash block_number block_timestamp reward_type)a
 
