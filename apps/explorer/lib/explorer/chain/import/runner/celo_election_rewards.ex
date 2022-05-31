@@ -90,9 +90,6 @@ defmodule Explorer.Chain.Import.Runner.CeloElectionRewards do
       update: [
         set: [
           amount: fragment("EXCLUDED.amount"),
-          block_number: fragment("EXCLUDED.block_number"),
-          block_timestamp: fragment("EXCLUDED.block_timestamp"),
-          reward_type: fragment("EXCLUDED.reward_type"),
           inserted_at: fragment("LEAST(?, EXCLUDED.inserted_at)", account.inserted_at),
           updated_at: fragment("GREATEST(?, EXCLUDED.updated_at)", account.updated_at)
         ]
