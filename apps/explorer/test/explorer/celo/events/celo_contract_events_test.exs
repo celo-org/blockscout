@@ -2,6 +2,7 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
   use Explorer.DataCase, async: true
 
   alias Explorer.Celo.ContractEvents.Accounts.AccountWalletAddressSetEvent
+  alias Explorer.Celo.ContractEvents.Common
   alias Explorer.Celo.ContractEvents.EventTransformer
   alias Explorer.Celo.ContractEvents.EventMap
   alias Explorer.Celo.ContractEvents.Reserve.AssetAllocationSetEvent
@@ -188,6 +189,16 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
 
       assert fetched_event.symbols == expected_symbols
       assert fetched_event.weights == expected_weights
+    end
+
+
+    test "converts indexed strings correctly" do
+      topic = "0x49399c1f1c39c8fa6ef22452af2bd0f965b694cb662347489bd8de38891eacd2"
+      type = :string
+
+      result = Common.decode_event_topic(topic, type)
+
+      assert(true, "should not crash when decoding")
     end
   end
 end
