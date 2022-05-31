@@ -75,6 +75,11 @@ defmodule Indexer.Fetcher.CeloElectionRewards do
 
     voter_rewards =
       Enum.map(account_group_pairs, fn account_group_pair ->
+        # The rewards are distributed on the last block of an epoch. Here we get the votes one block before they are
+        # distributed and at the exact block where they are distributed to subtract one from the other. We could have
+        # chosen to get the votes at the end of each epoch, but in that case we would need to consider all additional
+        # activations and revocations during the epoch (See VoterRewards.subtract_activated_add_revoked for more
+        # details).
         before_rewards_votes = fetch_from_blockchain(Map.put(account_group_pair, :block_number, block_number - 1))
         after_rewards_votes = fetch_from_blockchain(Map.put(account_group_pair, :block_number, block_number))
 
