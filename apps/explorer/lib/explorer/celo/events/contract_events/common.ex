@@ -6,69 +6,67 @@ defmodule Explorer.Celo.ContractEvents.Common do
   alias Explorer.Chain.{Data, Hash, Hash.Full}
 
   @doc "Decode a single point of event data of a given type from a given topic"
-  def decode_event(topic, type) do
+  def decode_event_topic(topic, type) do
     topic
     |> extract_hash()
     |> TypeDecoder.decode_raw([type])
     |> List.first()
-    |> convert_result(type)
+    |> convert_type_to_elixir(type)
   end
 
   @doc "Decode event data of given types from log data"
-  def decode_data(%Data{bytes: bytes}, types), do: decode_data(bytes, types)
+  def decode_event_data(%Data{bytes: bytes}, types), do: decode_event_data(bytes, types)
 
-  def decode_data("0x" <> data, types) do
+  def decode_event_data("0x" <> data, types) do
     data
     |> Base.decode16!(case: :lower)
-    |> decode_data(types)
+    |> decode_event_data(types)
   end
 
-  def decode_data(data, types) when is_binary(data) do
+  def decode_event_data(data, types) when is_binary(data) do
     data
     |> TypeDecoder.decode_raw(types)
     |> Enum.zip(types)
-    |> Enum.map(fn
-      # list of bytes to 2d list of ints
-      {d, {:array, {:bytes, _}}} -> d |> Enum.map(&:binary.bin_to_list(&1))
-      # bytes to list of ints
-      {d, {:bytes, _}} -> :binary.bin_to_list(d)
-      {d, _} -> d
-    end)
+    |> Enum.map(fn {decoded, type} -> convert_type_to_elixir(decoded, type) end)
   end
 
   defp extract_hash(event_data), do: event_data |> String.trim_leading("0x") |> Base.decode16!(case: :lower)
 
-  defp convert_result(result, :address) do
-    {:ok, address} = Address.cast(result)
+  # list of bytes to 2d list of ints
+  defp convert_type_to_elixir(decoded, {:array, {:bytes, _}}), do: decoded |> Enum.map(&:binary.bin_to_list(&1))
+  defp convert_type_to_elixir(decoded, {:array, :bytes}), do: decoded |> Enum.map(&:binary.bin_to_list(&1))
+  # bytes to list of ints
+  defp convert_type_to_elixir(decoded, {:bytes, _size}), do: :binary.bin_to_list(decoded)
+  defp convert_type_to_elixir(decoded, :bytes), do: :binary.bin_to_list(decoded)
+
+  defp convert_type_to_elixir(decoded, :address) do
+    {:ok, address} = Address.cast(decoded)
     address
   end
 
-  defp convert_result(result, {:bytes, _size}) do
-    :binary.bin_to_list(result)
-  end
+  # default - assume valid conversion
+  defp convert_type_to_elixir(decoded, _type), do: decoded
 
   def extract_common_event_params(event) do
-    # set full hashes
-    [:transaction_hash]
-    |> Enum.into(%{}, fn key ->
-      case Map.get(event, key) do
+    # handle optional transaction hash
+    common_properties =
+      case Map.get(event, :__transaction_hash) do
         nil ->
-          {key, nil}
+          %{transaction_hash: nil}
 
         v ->
           {:ok, hsh} = Full.cast(v)
-          {key, hsh}
+          %{transaction_hash: hsh}
       end
-    end)
-    # set contract address hash
-    |> then(fn map ->
-      {:ok, hsh} = Address.cast(event.contract_address_hash)
-      Map.put(map, :contract_address_hash, hsh)
-    end)
-    |> Map.put(:name, event.name)
-    |> Map.put(:topic, event.topic)
-    |> Map.put(:block_number, event.block_number)
-    |> Map.put(:log_index, event.log_index)
+
+    {:ok, hsh} = Address.cast(event.__contract_address_hash)
+
+    common_properties
+    |> Map.put(:contract_address_hash, hsh)
+    |> Map.put(:name, event.__name)
+    |> Map.put(:topic, event.__topic)
+    |> Map.put(:block_number, event.__block_number)
+    |> Map.put(:log_index, event.__log_index)
   end
 
   @doc "Store address in postgres json format to make joins work with indices"

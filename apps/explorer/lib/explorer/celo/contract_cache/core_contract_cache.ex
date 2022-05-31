@@ -5,6 +5,7 @@ defmodule Explorer.Celo.CoreContracts do
 
   use GenServer
   alias Explorer.Celo.{AbiHandler, AddressCache}
+  alias Explorer.Chain.CeloCoreContract
   alias Explorer.Repo
   alias Explorer.SmartContract.Reader
   alias __MODULE__
@@ -20,7 +21,7 @@ defmodule Explorer.Celo.CoreContracts do
   @nil_address "0x0000000000000000000000000000000000000000"
 
   # full list of core contracts, see https://github.com/celo-org/celo-monorepo/blob/master/packages/protocol/lib/registry-utils.ts
-  @core_contracts ~w(Accounts Attestations BlockchainParameters DoubleSigningSlasher DowntimeSlasher Election EpochRewards Escrow Exchange ExchangeEUR FeeCurrencyWhitelist Freezer GasPriceMinimum GoldToken Governance GovernanceSlasher GovernanceApproverMultiSig GrandaMento LockedGold Random Reserve ReserveSpenderMultiSig SortedOracles StableToken StableTokenEUR StableTokenREAL TransferWhitelist Validators)
+  @core_contracts ~w(Accounts Attestations BlockchainParameters DoubleSigningSlasher DowntimeSlasher Election EpochRewards Escrow Exchange ExchangeEUR ExchangeBRL FeeCurrencyWhitelist Freezer GasPriceMinimum GoldToken Governance GovernanceSlasher GovernanceApproverMultiSig GrandaMento LockedGold Random Reserve ReserveSpenderMultiSig SortedOracles StableToken StableTokenEUR StableTokenBRL TransferWhitelist Validators)
   def contract_list, do: @core_contracts
 
   ## GenServer Callbacks
@@ -63,7 +64,7 @@ defmodule Explorer.Celo.CoreContracts do
   @impl true
   def handle_continue(:fetch_contracts_from_db, %{cache: cache} = state) do
     db_cache =
-      Explorer.Chain.CeloCoreContract
+      CeloCoreContract
       |> order_by(:block_number)
       |> Repo.all()
       |> Enum.reduce(%{}, fn %{name: name, address_hash: address_hash}, map ->
@@ -166,6 +167,32 @@ defmodule Explorer.Celo.CoreContracts do
     {:noreply, new_state}
   end
 
+  @impl true
+  def handle_cast(:insert_entries_to_db, %{cache: cache} = state) do
+    # moving out of task definition to satisfy credo nested function body warning
+    already_in_db_cache = fn address, db_cache ->
+      Enum.any?(db_cache, fn %CeloCoreContract{address_hash: ccc_address} ->
+        ccc_address |> to_string() |> String.downcase() == address |> String.downcase()
+      end)
+    end
+
+    Explorer.TaskSupervisor
+    |> Task.Supervisor.start_child(fn ->
+      db_cache = CeloCoreContract |> Repo.all()
+
+      to_add = cache |> Enum.reject(fn {_name, address} -> already_in_db_cache.(address, db_cache) end)
+
+      to_add
+      |> Enum.each(fn {name, address} ->
+        %CeloCoreContract{}
+        |> CeloCoreContract.changeset(%{name: name, address_hash: address})
+        |> Repo.insert()
+      end)
+    end)
+
+    {:noreply, state}
+  end
+
   ## API Methods
 
   @doc """
@@ -197,6 +224,11 @@ defmodule Explorer.Celo.CoreContracts do
   @impl AddressCache
   def is_core_contract_address?(address) do
     GenServer.call(__MODULE__, {:has_address, address})
+  end
+
+  @doc "Ensure that db contains all known entries for contract cache"
+  def assert_db_entries do
+    GenServer.cast(__MODULE__, :insert_entries_to_db)
   end
 
   defp rebuild_state(%{cache: cache, timer: timer}) do
@@ -244,6 +276,7 @@ defmodule Explorer.Celo.CoreContracts do
       "Escrow" => "0xf4fa51472ca8d72af678975d9f8795a504e7ada5",
       "Exchange" => "0x67316300f17f063085ca8bca4bd3f7a5a3c66275",
       "ExchangeEUR" => "0xe383394b913d7302c49f794c7d3243c429d53d1d",
+      "ExchangeBRL" => "0x8f2cf9855C919AFAC8Bd2E7acEc0205ed568a4EA",
       "FeeCurrencyWhitelist" => "0xbb024e9cdcb2f9e34d893630d19611b8a5381b3c",
       "Freezer" => "0x47a472f45057a9d79d62c6427367016409f4ff5a",
       "GasPriceMinimum" => "0xdfca3a8d7699d8bafe656823ad60c17cb8270ecc",
@@ -259,6 +292,7 @@ defmodule Explorer.Celo.CoreContracts do
       "SortedOracles" => "0xefb84935239dacdecf7c5ba76d8de40b077b7b33",
       "StableToken" => "0x765de816845861e75a25fca122bb6898b8b1282a",
       "StableTokenEUR" => "0xd8763cba276a3738e6de85b4b3bf5fded6d6ca73",
+      "StableTokenBRL" => "0xe8537a3d056da446677b9e9d6c5db704eaab4787",
       "TransferWhitelist" => "0xb49e4d6f0b7f8d0440f75697e6c8b37e09178bcf",
       "Validators" => "0xaeb865bca93ddc8f47b8e29f40c5399ce34d0c58"
     }
@@ -308,6 +342,7 @@ defmodule Explorer.Celo.CoreContracts do
       "Escrow" => "0xb07e10c5837c282209c6b9b3de0edbef16319a37",
       "Exchange" => "0x17bc3304f94c85618c46d0888aa937148007bd3c",
       "ExchangeEUR" => "0x997b494f17d3c49e66fafb50f37a972d8db9325b",
+      "ExchangeBRL" => "0xf391dcaf77360d39e566b93c8c0ceb7128fa1a08",
       "FeeCurrencyWhitelist" => "0xb8641365dbe943bc2fb6977e6fbc1630ef47db5a",
       "Freezer" => "0xfe0ada6e9a7b782f55750428cc1d8428cd83c3f1",
       "GasPriceMinimum" => "0xd0bf87a5936ee17014a057143a494dc5c5d51e5e",
@@ -323,6 +358,7 @@ defmodule Explorer.Celo.CoreContracts do
       "SortedOracles" => "0xfdd8bd58115ffbf04e47411c1d228ecc45e93075",
       "StableToken" => "0x874069fa1eb16d44d622f2e0ca25eea172369bc1",
       "StableTokenEUR" => "0x10c892a6ec43a53e45d0b916b4b7d383b1b78c0f",
+      "StableTokenBRL" => "0xe4d517785d091d3c54818832db6094bcc2744545",
       "TransferWhitelist" => "0x52449a99e3455acb831c0d580dcdac8b290d5182",
       "Validators" => "0x9acf2a99914e083ad0d610672e93d14b0736bbcc"
     }
