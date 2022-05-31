@@ -197,8 +197,6 @@ defmodule Explorer.Celo.Events.CeloContractEventsTest do
 
       result = Common.decode_event_topic(topic, type)
 
-      require IEx
-      IEx.pry()
       assert(true, "should not crash when decoding")
     end
 
