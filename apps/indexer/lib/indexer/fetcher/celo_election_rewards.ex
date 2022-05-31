@@ -192,7 +192,7 @@ defmodule Indexer.Fetcher.CeloElectionRewards do
       end)
 
     if all_valid do
-      {:ok, Enum.map(changesets, &(&1.changes))}
+      {:ok, Enum.map(changesets, & &1.changes)}
     else
       Enum.each(changesets, fn cs ->
         Logger.error(
@@ -200,6 +200,7 @@ defmodule Indexer.Fetcher.CeloElectionRewards do
           errors: cs.errors
         )
       end)
+
       {:error}
     end
   end

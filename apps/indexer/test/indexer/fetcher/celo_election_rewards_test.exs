@@ -49,7 +49,7 @@ defmodule Indexer.Fetcher.CeloElectionRewardsTest do
       wait_for_results(fn ->
         reward = Repo.one!(from(rewards in CeloElectionRewards))
 
-        {:ok, amount_in_wei} = Wei.cast(4503599627369846)
+        {:ok, amount_in_wei} = Wei.cast(4_503_599_627_369_846)
         assert reward.reward_type == "voter"
         assert reward.block_number == context.last_block_in_epoch_number
         assert reward.amount == amount_in_wei
@@ -290,7 +290,6 @@ defmodule Indexer.Fetcher.CeloElectionRewardsTest do
       "Election" => "0x8d6677192144292870907e3fa8a5527fe55a7ff6"
     })
 
-    amount_in_hex
     expect(
       EthereumJSONRPC.Mox,
       :json_rpc,
