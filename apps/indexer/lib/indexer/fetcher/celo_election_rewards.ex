@@ -185,28 +185,24 @@ defmodule Indexer.Fetcher.CeloElectionRewards do
   end
 
   def changeset(election_rewards) do
-    {changes, all_valid} =
+    {changesets, all_valid} =
       Enum.map_reduce(election_rewards, true, fn reward, all_valid ->
         changeset = CeloElectionRewardsChain.changeset(%CeloElectionRewardsChain{}, reward)
-        log_changeset_error(changeset)
-        {changeset.changes, all_valid and changeset.valid?}
+        {changeset, all_valid and changeset.valid?}
       end)
 
     if all_valid do
-      {:ok, changes}
+      {:ok, Enum.map(changesets, &(&1.changes))}
     else
+      Enum.each(changesets, fn cs ->
+        Logger.error(
+          fn -> "Election rewards changeset errors. Block #{inspect(cs.changes.block_number)} requeued." end,
+          errors: cs.errors
+        )
+      end)
       {:error}
     end
   end
-
-  defp log_changeset_error(changeset) when not changeset.valid? do
-    Logger.error(
-      fn -> "Election rewards changeset errors. Block #{inspect(changeset.changes.block_number)} requeued." end,
-      errors: changeset.errors
-    )
-  end
-
-  defp log_changeset_error(changeset), do: changeset
 
   def chain_import(block_with_changes) when not is_map_key(block_with_changes, :voter_rewards), do: {:error, :changeset}
 
