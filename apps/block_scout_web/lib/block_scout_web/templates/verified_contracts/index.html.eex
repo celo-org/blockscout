@@ -7,7 +7,7 @@
 	pagination_last_page_path = last_page_path(@conn, @params, @contract_count, path_fun)
 %>
 <section
-		class="container"
+		class="container tooltip-with-link-container"
 		data-page="verified_contracts"
 		data-chain-id="<%= System.get_env("CHAIN_ID") %>"
 		data-display-token-icons="<%= System.get_env("DISPLAY_TOKEN_ICONS") %>"
@@ -115,4 +115,3 @@
 		</div>
 	</div>
 </section>
-<script defer data-cfasync="false" src="<%= static_path(@conn, "/js/verified-contracts.js") %>"></script>
