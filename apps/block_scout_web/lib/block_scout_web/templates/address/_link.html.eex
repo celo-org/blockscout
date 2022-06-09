@@ -3,7 +3,7 @@
     <%= if name = primary_name(@address) do %>
       <span><%= name %> |
     <% end %>
-    <%= link to: AccessHelpers.get_path(BlockScoutWeb.Endpoint, :address_transaction_path, :index, @address), "data-test": "address_hash_link", class: assigns[:class] do %>
+    <%= link to: address_transaction_path(BlockScoutWeb.Endpoint, :index, to_string(@address)), "data-test": "address_hash_link", class: assigns[:class] do %>
       <%= @address %>
     <% end %>
     </span>

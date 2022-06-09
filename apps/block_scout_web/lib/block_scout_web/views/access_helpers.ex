@@ -5,19 +5,14 @@ defmodule BlockScoutWeb.AccessHelpers do
 
   alias BlockScoutWeb.WebRouter.Helpers
   alias Plug.Conn
-  alias Plug.Conn.Unfetched
 
   defp get_restricted_key(%Phoenix.Socket{}) do
     nil
   end
 
-  defp get_restricted_key(%Conn{query_params: %Unfetched{}} = conn) do
+  defp get_restricted_key(conn) do
     conn_with_params = Conn.fetch_query_params(conn)
     conn_with_params.query_params["key"]
-  end
-
-  defp get_restricted_key(conn) do
-    Map.get(conn.query_params, "key")
   end
 
   def restricted_access?(address_hash, params) do
