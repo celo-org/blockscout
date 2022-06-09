@@ -2,7 +2,7 @@ defmodule BlockScoutWeb.Tokens.HolderControllerTest do
   use BlockScoutWeb.ConnCase, async: true
 
   alias Explorer.Chain.Hash
-  import Address, only: [:checksum]
+  alias Explorer.Chain.Address
 
   describe "GET index/3" do
     test "with invalid address hash", %{conn: conn} do
