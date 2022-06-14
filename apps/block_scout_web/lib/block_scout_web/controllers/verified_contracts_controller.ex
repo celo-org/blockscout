@@ -44,6 +44,7 @@ defmodule BlockScoutWeb.VerifiedContractsController do
     |> handle_paging_options(paging_options)
     |> Explorer.Repo.all()
   end
+
   defp get_verified_contracts(_, _, _), do: []
 
   defp get_verified_contract_count(filter) do

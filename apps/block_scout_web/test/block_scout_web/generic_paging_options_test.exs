@@ -134,7 +134,7 @@ defmodule BlockScoutWeb.GenericPagingOptionsTest do
              } ==
                GenericPagingOptions.extract_paging_options_from_params(
                  %{
-                   "page_number" => "1",
+                   "page_number" => "1"
                  },
                  0,
                  ["txns", "name", "date"],
