@@ -3,7 +3,6 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
 
   import Explorer.Factory
 
-  alias Explorer.SetupValidatorAndGroupRewardsTest
   alias Explorer.Chain.{Address, Block}
 
   describe "getvoterrewardsforgroup" do
@@ -219,7 +218,7 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
     test "with an address that doesn't exist", %{conn: conn} do
       expected_result = %{
         "rewards" => [],
-        "totalRewardCelo" => "",
+        "totalRewardCelo" => "0",
         "from" => "2022-01-03 00:00:00.000000Z",
         "to" => "2022-01-06 00:00:00.000000Z"
       }
@@ -282,7 +281,7 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
             "group" => to_string(group_hash)
           }
         ],
-        "totalRewardCelo" => "100",
+        "totalRewardCelo" => "80",
         "from" => "2022-01-03 00:00:00.000000Z",
         "to" => "2022-01-06 00:00:00.000000Z"
       }
@@ -360,7 +359,7 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
     test "with an address that doesn't exist", %{conn: conn} do
       expected_result = %{
         "rewards" => [],
-        "totalRewardCelo" => "",
+        "totalRewardCelo" => "0",
         "from" => "2022-01-03 00:00:00.000000Z",
         "to" => "2022-01-06 00:00:00.000000Z"
       }
@@ -509,7 +508,7 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
     test "with an address that doesn't exist", %{conn: conn} do
       expected_result = %{
         "rewards" => [],
-        "totalRewardCelo" => "",
+        "totalRewardCelo" => "0",
         "from" => "2022-01-03 00:00:00.000000Z",
         "to" => "2022-01-06 00:00:00.000000Z"
       }
