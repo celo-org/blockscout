@@ -106,7 +106,6 @@ defmodule Explorer.Chain.CeloElectionRewardsTest do
       )
 
       {:ok, one_wei} = Wei.cast(1)
-      {:ok, three_wei} = Wei.cast(3)
 
       expected_rewards = [
         %{
@@ -128,7 +127,7 @@ defmodule Explorer.Chain.CeloElectionRewardsTest do
                ["voter", "validator"],
                from,
                to
-             ) == %{from: from, to: to, rewards: expected_rewards, total_reward_celo: three_wei}
+             ) == %{from: from, to: to, rewards: expected_rewards, total_reward_celo: one_wei}
     end
   end
 end
