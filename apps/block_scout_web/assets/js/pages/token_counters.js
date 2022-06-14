@@ -2,6 +2,7 @@ import $ from 'jquery'
 import omit from 'lodash/omit'
 import humps from 'humps'
 import { createStore, connectElements } from '../lib/redux_helpers.js'
+import { createAsyncLoadStore } from '../lib/async_listing_load'
 import '../app'
 import {
   openQrModal
@@ -85,6 +86,10 @@ function updateCounters () {
   const store = createStore(reducer)
   connectElements({ store, elements })
   loadCounters(store)
+}
+
+if ($('[data-page="token-holders-list"]').length) {
+  createAsyncLoadStore(reducer, initialState, null)
 }
 
 $('.btn-qr-icon').click(_event => {
