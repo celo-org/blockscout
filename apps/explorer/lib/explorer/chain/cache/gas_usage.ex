@@ -11,6 +11,8 @@ defmodule Explorer.Chain.Cache.GasUsage do
     ]
 
   @default_cache_period :timer.hours(2)
+  config = Application.get_env(:explorer, __MODULE__)
+  @enabled Keyword.get(config, :enabled)
 
   use Explorer.Chain.MapCache,
     name: :gas_usage,
@@ -62,7 +64,10 @@ defmodule Explorer.Chain.Cache.GasUsage do
         set_async_task(nil)
       end)
 
-    {:update, task}
+      {:update, task}
+    else
+      {:update, nil}
+    end
   end
 
   # By setting this as a `callback` an async task will be started each time the

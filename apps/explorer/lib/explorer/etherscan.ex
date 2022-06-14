@@ -8,7 +8,8 @@ defmodule Explorer.Etherscan do
   alias Explorer.Etherscan.Logs
   alias Explorer.{Chain, Repo}
   alias Explorer.Chain.Address.{CurrentTokenBalance, TokenBalance}
-  alias Explorer.Chain.{Block, CeloParams, Hash, InternalTransaction, Log, TokenTransfer, Transaction}
+  alias Explorer.Chain.{Address, Block, Hash, InternalTransaction, TokenTransfer, Transaction}
+  alias Explorer.Chain.Transaction.History.TransactionStats
 
   @default_options %{
     order_by_direction: :desc,
@@ -19,6 +20,8 @@ defmodule Explorer.Etherscan do
     start_timestamp: nil,
     end_timestamp: nil
   }
+
+  @burn_address_hash_str "0x0000000000000000000000000000000000000000"
 
   @doc """
   Returns the maximum allowed page size number.
@@ -247,72 +250,6 @@ defmodule Explorer.Etherscan do
   end
 
   @doc """
-  Gets a list of token transfers within a given block range.
-
-  """
-  @spec list_token_transfers(map()) :: [map()]
-  def list_token_transfers(params) do
-    subquery =
-      from(
-        tt in TokenTransfer,
-        inner_join: t in Transaction,
-        on: t.hash == tt.transaction_hash,
-        left_join: l in Log,
-        on: l.transaction_hash == t.hash and l.address_hash == ^params.address_hash and l.index == tt.log_index,
-        left_join: b in Block,
-        on: b.number == t.block_number,
-        where:
-          tt.block_number >= ^params.from_block and tt.block_number <= ^params.to_block and
-            tt.token_contract_address_hash == ^params.address_hash,
-        order_by: tt.block_number,
-        limit: ^params.limit * 2,
-        select:
-          map(tt, [
-            :token_contract_address_hash,
-            :transaction_hash,
-            :from_address_hash,
-            :to_address_hash,
-            :amount,
-            :block_number
-          ]),
-        select_merge:
-          map(l, [
-            :data,
-            :first_topic,
-            :second_topic,
-            :third_topic,
-            :fourth_topic
-          ]),
-        select_merge: %{
-          block_timestamp: b.timestamp,
-          transaction_index: t.index,
-          log_index: l.index
-        },
-        select_merge:
-          map(t, [
-            :gas_price,
-            :gas_currency_hash,
-            :gas_fee_recipient_hash,
-            :gas_used,
-            :gateway_fee
-          ])
-      )
-
-    query =
-      from(
-        s in subquery(subquery),
-        order_by: [
-          {:asc, s.block_number},
-          {:asc, s.transaction_index},
-          {:asc, s.log_index}
-        ],
-        limit: ^params.limit
-      )
-
-    Repo.all(query)
-  end
-
-  @doc """
   Gets a list of blocks mined by `t:Explorer.Chain.Hash.Address.t/0`.
 
   For each block it returns the block's number, timestamp, and reward.
@@ -381,14 +318,14 @@ defmodule Explorer.Etherscan do
         inner_join: t in assoc(ctb, :token),
         where: ctb.address_hash == ^address_hash,
         where: ctb.value > 0,
-        distinct: :token_contract_address_hash,
         select: %{
           balance: ctb.value,
           contract_address_hash: ctb.token_contract_address_hash,
           name: t.name,
           decimals: t.decimals,
           symbol: t.symbol,
-          type: t.type
+          type: t.type,
+          id: ctb.token_id
         }
       )
 
@@ -403,10 +340,7 @@ defmodule Explorer.Etherscan do
     from_address_hash
     gas
     gas_price
-    gas_currency_hash
-    gas_fee_recipient_hash
     gas_used
-    gateway_fee
     hash
     index
     input
@@ -450,38 +384,15 @@ defmodule Explorer.Etherscan do
   end
 
   defp list_transactions(address_hash, max_block_number, options) do
-    [query_to_address_hash, query_from_address_hash, query_created_contract_address_hash] =
-      Enum.map(["to", "from", "created"], fn hash ->
-        transaction_with_address_query(hash, address_hash, max_block_number, options)
-      end)
-
-    addresses_subquery =
-      from(
-        s in subquery(query_to_address_hash),
-        union: ^query_from_address_hash,
-        union: ^query_created_contract_address_hash,
-        select: s
-      )
-
-    addresses_wrapped_subquery =
-      addresses_subquery
-      |> subquery()
-
     query =
       from(
         t in Transaction,
-        join: a in ^addresses_wrapped_subquery,
-        on: t.hash == a.hash,
-        left_join: p in CeloParams,
-        on: t.gas_currency_hash == p.address_value,
-        inner_join: b in Block,
-        on: b.number == t.block_number,
+        inner_join: b in assoc(t, :block),
         order_by: [{^options.order_by_direction, t.block_number}],
         limit: ^options.page_size,
         offset: ^offset(options),
         select:
           merge(map(t, ^@transaction_fields), %{
-            fee_currency: p.name,
             block_timestamp: b.timestamp,
             confirmations: fragment("? - ?", ^max_block_number, t.block_number)
           })
@@ -496,31 +407,12 @@ defmodule Explorer.Etherscan do
     |> Repo.all()
   end
 
-  defp transaction_with_address_query(filter, address_hash, _max_block_number, options) do
-    query =
-      from(
-        t in Transaction,
-        order_by: [{^options.order_by_direction, t.block_number}],
-        limit: ^options.page_size * 3,
-        select: %{
-          hash: t.hash
-        }
-      )
-
-    query
-    |> where_address_match(address_hash, %{filter_by: filter})
-  end
-
   defp where_address_match(query, address_hash, %{filter_by: "to"}) do
     where(query, [t], t.to_address_hash == ^address_hash)
   end
 
   defp where_address_match(query, address_hash, %{filter_by: "from"}) do
     where(query, [t], t.from_address_hash == ^address_hash)
-  end
-
-  defp where_address_match(query, address_hash, %{filter_by: "created"}) do
-    where(query, [t], t.created_contract_address_hash == ^address_hash)
   end
 
   defp where_address_match(query, address_hash, _) do
@@ -667,4 +559,53 @@ defmodule Explorer.Etherscan do
   """
   @spec list_logs(map()) :: [map()]
   def list_logs(filter), do: Logs.list_logs(filter)
+
+  @spec fetch_sum_coin_total_supply() :: non_neg_integer
+  def fetch_sum_coin_total_supply do
+    query =
+      from(
+        a0 in Address,
+        select: fragment("SUM(a0.fetched_coin_balance)"),
+        where: a0.fetched_coin_balance > ^0
+      )
+
+    Repo.one!(query, timeout: :infinity) || 0
+  end
+
+  @spec fetch_sum_coin_total_supply_minus_burnt() :: non_neg_integer
+  def fetch_sum_coin_total_supply_minus_burnt do
+    {:ok, burn_address_hash} = Chain.string_to_address_hash(@burn_address_hash_str)
+
+    query =
+      from(
+        a0 in Address,
+        select: fragment("SUM(a0.fetched_coin_balance)"),
+        where: a0.hash != ^burn_address_hash,
+        where: a0.fetched_coin_balance > ^0
+      )
+
+    Repo.one!(query, timeout: :infinity) || 0
+  end
+
+  @doc """
+  It is used by `totalfees` API endpoint of `stats` module for retrieving of total fee per day
+  """
+  @spec get_total_fees_per_day(String.t()) :: {:ok, non_neg_integer() | nil} | {:error, String.t()}
+  def get_total_fees_per_day(date_string) do
+    case Date.from_iso8601(date_string) do
+      {:ok, date} ->
+        query =
+          from(
+            tx_stats in TransactionStats,
+            where: tx_stats.date == ^date,
+            select: tx_stats.total_fee
+          )
+
+        total_fees = Repo.one(query)
+        {:ok, total_fees}
+
+      _ ->
+        {:error, "An incorrect input date provided. It should be in ISO 8601 format (yyyy-mm-dd)."}
+    end
+  end
 end

@@ -67,7 +67,7 @@ defmodule Explorer.Counters.TokenTransfersCounter do
 
   defp update_cache(address_hash) do
     address_hash_string = to_string(address_hash)
-    put_into_cache("hash_#{address_hash_string}_#{@last_update_key}", current_time())
+    put_into_cache("hash_#{address_hash_string}_#{@last_update_key}", Helper.current_time())
     new_data = Chain.count_token_transfers_from_token_hash(address_hash)
     put_into_cache("hash_#{address_hash_string}", new_data)
   end
