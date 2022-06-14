@@ -31,7 +31,7 @@
 					first_page_path: pagination_first_page_path,
 					last_page_path: pagination_last_page_path
 				%>
-				<%= end %>
+				<% end %>
 		</div>
 
 			<div class="addresses-table-container">
@@ -97,12 +97,12 @@
 							<tr>
 								<td class="stakes-td" colspan="8"><%= gettext("No verified contracts found") %></th>
 							</tr>
-							<%= else %>
+							<% else %>
 								<%= for contract <- @contracts do %>
 								<%= render BlockScoutWeb.VerifiedContractsView, "_tile.html", contract: contract %>
 
 								<% end %>
-							<%= end %>
+							<% end %>
 						</tbody>
 					</table>
 				</div>
