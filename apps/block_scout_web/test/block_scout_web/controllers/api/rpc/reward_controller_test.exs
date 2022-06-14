@@ -382,6 +382,69 @@ defmodule BlockScoutWeb.API.RPC.RewardControllerTest do
       assert :ok = ExJsonSchema.Validator.validate(schema, response)
     end
 
+    test "with valid validator address", %{conn: conn} do
+      %Address{hash: validator_1_hash} = insert(:address)
+      %Address{hash: validator_2_hash} = insert(:address)
+      %Address{hash: group_hash} = insert(:address)
+      insert(:celo_account, address: group_hash)
+
+      %Block{number: block_number, timestamp: block_timestamp} =
+        insert(:block, number: 17_280, timestamp: ~U[2022-01-05T17:42:43.162804Z])
+
+      insert(
+        :celo_election_rewards,
+        account_hash: validator_1_hash,
+        amount: 150_000,
+        associated_account_hash: group_hash,
+        block_number: block_number,
+        block_timestamp: block_timestamp,
+        reward_type: "validator"
+      )
+
+      insert(
+        :celo_election_rewards,
+        account_hash: validator_2_hash,
+        amount: 100_000,
+        associated_account_hash: group_hash,
+        block_number: block_number,
+        block_timestamp: block_timestamp,
+        reward_type: "validator"
+      )
+
+      expected_result = %{
+        "rewards" => [
+          %{
+            "account" => to_string(validator_1_hash),
+            "amount" => "150000",
+            "date" => "2022-01-05T17:42:43.162804Z",
+            "blockNumber" => "17280",
+            "epochNumber" => "1",
+            "group" => to_string(group_hash)
+          }
+        ],
+        "totalRewardCelo" => "150000",
+        "from" => "2022-01-03 00:00:00.000000Z",
+        "to" => "2022-01-06 00:00:00.000000Z"
+      }
+
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "reward",
+          "action" => "getvalidatorrewards",
+          "validatorAddress" => to_string(validator_1_hash),
+          "from" => "2022-01-03T00:00:00.000000Z",
+          "to" => "2022-01-06T00:00:00.000000Z"
+        })
+        |> json_response(200)
+
+      assert response["result"] == expected_result
+      assert response["status"] == "1"
+      assert response["message"] == "OK"
+      schema = generic_rewards_for_multiple_accounts_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
+
     test "with valid validator address list", %{conn: conn} do
       %Address{hash: validator_1_hash} = insert(:address)
       %Address{hash: validator_2_hash} = insert(:address)
