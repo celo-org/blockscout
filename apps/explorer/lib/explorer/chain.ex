@@ -3167,7 +3167,7 @@ defmodule Explorer.Chain do
 
   defp block_status(nil), do: {:error, :no_blocks}
 
-  def fetch_min_missing_block_cache do
+  def fetch_min_missing_block_cache(last_fetched_counter) do
     max_block_number = BlockNumber.get_max()
 
     if max_block_number > 0 do
@@ -3177,10 +3177,11 @@ defmodule Explorer.Chain do
             missing_range in fragment(
               """
                 (SELECT b1.number
-                FROM generate_series(0, (?)::integer) AS b1(number)
+                FROM generate_series((?)::integer, (?)::integer) AS b1(number)
                 WHERE NOT EXISTS
                   (SELECT 1 FROM blocks b2 WHERE b2.number=b1.number AND b2.consensus))
               """,
+              ^last_fetched_counter,
               ^max_block_number
             ),
           on: b.number == missing_range.number,

@@ -7,6 +7,8 @@ defmodule Explorer.Chain.Cache.MinMissingBlockNumber do
 
   alias Explorer.Chain
 
+  @counter_type "min_missing_block_number"
+
   @doc """
   Starts a process to periodically update the % of blocks indexed.
   """
@@ -25,11 +27,12 @@ defmodule Explorer.Chain.Cache.MinMissingBlockNumber do
   end
 
   def fetch_min_missing_block do
-    result = Chain.fetch_min_missing_block_cache()
+    last_fetched_counter = Chain.get_last_fetched_counter(@counter_type)
+    result = Chain.fetch_min_missing_block_cache(Decimal.to_integer(last_fetched_counter))
 
     if result > 0 do
       params = %{
-        counter_type: "min_missing_block_number",
+        counter_type: @counter_type,
         value: result
       }
 
