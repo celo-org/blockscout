@@ -27,8 +27,10 @@ defmodule Explorer.Chain.Cache.MinMissingBlockNumber do
   end
 
   def fetch_min_missing_block do
-    last_fetched_counter = Chain.get_last_fetched_counter(@counter_type)
-    result = Chain.fetch_min_missing_block_cache(Decimal.to_integer(last_fetched_counter))
+    result =
+      Chain.get_last_fetched_counter(@counter_type)
+      |> Decimal.to_integer()
+      |> Chain.fetch_min_missing_block_cache()
 
     if result > 0 do
       params = %{
