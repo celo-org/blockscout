@@ -4,7 +4,7 @@ defmodule Explorer.Repo.Migrations.SetCountersOnTransactionTable do
   def up do
     execute("CREATE TABLE celo_transaction_stats(stat_type varchar(255), value bigint);")
 
-    #coalesce gas_used values to prevent null propogation when gas used is null
+    # coalesce gas_used values to prevent null propogation when gas used is null
     execute("""
     CREATE FUNCTION celo_transaction_stats_trigger_func() RETURNS trigger
     LANGUAGE plpgsql AS
@@ -39,13 +39,16 @@ defmodule Explorer.Repo.Migrations.SetCountersOnTransactionTable do
     FOR EACH ROW EXECUTE PROCEDURE celo_transaction_stats_trigger_func();
     """)
 
-    #TRUNCATE triggers must be FOR EACH STATEMENT
+    # TRUNCATE triggers must be FOR EACH STATEMENT
     execute("""
     CREATE TRIGGER celo_transaction_stats_truncated AFTER TRUNCATE ON transactions
     FOR EACH STATEMENT EXECUTE PROCEDURE celo_transaction_stats_trigger_func();
     """)
 
-    execute("INSERT INTO celo_transaction_stats VALUES ('total_transaction_count', (SELECT count(*) FROM transactions));")
+    execute(
+      "INSERT INTO celo_transaction_stats VALUES ('total_transaction_count', (SELECT count(*) FROM transactions));"
+    )
+
     execute("INSERT INTO celo_transaction_stats VALUES ('total_gas_used', (SELECT sum(gas_used) FROM transactions));")
   end
 
