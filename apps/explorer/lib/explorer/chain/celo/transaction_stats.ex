@@ -10,9 +10,9 @@ defmodule Explorer.Chain.Celo.TransactionStats do
   import Ecto.Query
 
   @type t :: %__MODULE__{
-               name: String.t(),
-               value: non_neg_integer(),
-             }
+          name: String.t(),
+          value: non_neg_integer()
+        }
 
   @attrs ~w( stat_type value)a
   @required_attrs ~w( stat_type value)a
@@ -30,18 +30,20 @@ defmodule Explorer.Chain.Celo.TransactionStats do
 
   @tx_count_type "total_transaction_count"
   def transaction_count do
-    %TransactionStats{value: count} = TransactionStats
-    |> where([t], t.stat_type == @tx_count_type)
-    |> Repo.one()
+    %TransactionStats{value: count} =
+      TransactionStats
+      |> where([t], t.stat_type == @tx_count_type)
+      |> Repo.one()
 
     count
   end
 
   @total_gas_type "total_gas_used"
   def total_gas do
-    %TransactionStats{value: total_gas} = TransactionStats
-                                      |> where([t], t.stat_type == @total_gas_type)
-                                      |> Repo.one()
+    %TransactionStats{value: total_gas} =
+      TransactionStats
+      |> where([t], t.stat_type == @total_gas_type)
+      |> Repo.one()
 
     total_gas
   end

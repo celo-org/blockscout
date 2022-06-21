@@ -3674,7 +3674,9 @@ defmodule Explorer.Chain do
           SQL.query!(Repo, "SELECT reltuples::BIGINT AS estimate FROM pg_class WHERE relname='transactions'")
 
         rows
-      n -> n
+
+      n ->
+        n
     end
   end
 
