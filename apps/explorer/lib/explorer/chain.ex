@@ -87,6 +87,8 @@ defmodule Explorer.Chain do
     Uncles
   }
 
+  alias Explorer.Chain.Celo.TransactionStats
+
   alias Explorer.Chain.Import.Runner
   alias Explorer.Chain.InternalTransaction.{CallType, Type}
   alias Explorer.Chain.Transaction.History.TransactionStats
@@ -3663,20 +3665,24 @@ defmodule Explorer.Chain do
   """
   @spec transaction_estimated_count() :: non_neg_integer()
   def transaction_estimated_count do
+    count = TransactionStats.transaction_count()
 
-
-
-
+    case count do
+      nil ->
+        Logger.warn("Couldn't retrieve tx count from celo_transaction_stats - falling back to PG gc estimation")
+        0
+      n -> n
+    end
   end
 
   @spec total_gas_usage() :: non_neg_integer()
   def total_gas_usage do
-    cached_value = GasUsage.get_sum()
+    total_gas = TransactionStats.total_gas()
 
-    if is_nil(cached_value) do
+    if is_nil(total_gas) do
       0
     else
-      cached_value
+      total_gas
     end
   end
 
