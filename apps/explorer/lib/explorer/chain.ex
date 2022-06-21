@@ -86,7 +86,7 @@ defmodule Explorer.Chain do
     Uncles
   }
 
-  alias Explorer.Chain.Celo.TransactionStats
+  alias Explorer.Chain.Celo.TransactionStats, as: CeloTxStats
 
   alias Explorer.Chain.Import.Runner
   alias Explorer.Chain.InternalTransaction.{CallType, Type}
@@ -3664,7 +3664,7 @@ defmodule Explorer.Chain do
   """
   @spec transaction_estimated_count() :: non_neg_integer()
   def transaction_estimated_count do
-    count = TransactionStats.transaction_count()
+    count = CeloTxStats.transaction_count()
 
     case count do
       nil ->
@@ -3682,7 +3682,7 @@ defmodule Explorer.Chain do
 
   @spec total_gas_usage() :: non_neg_integer()
   def total_gas_usage do
-    total_gas = TransactionStats.total_gas()
+    total_gas = CeloTxStats.total_gas()
 
     if is_nil(total_gas) do
       0
