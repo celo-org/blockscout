@@ -81,7 +81,6 @@ defmodule Explorer.Chain do
     BlockCount,
     BlockNumber,
     Blocks,
-    GasUsage,
     TokenExchangeRate,
     Transactions,
     Uncles
@@ -3670,7 +3669,11 @@ defmodule Explorer.Chain do
     case count do
       nil ->
         Logger.warn("Couldn't retrieve tx count from celo_transaction_stats - falling back to PG gc estimation")
-        0
+
+        %Postgrex.Result{rows: [[rows]]} =
+          SQL.query!(Repo, "SELECT reltuples::BIGINT AS estimate FROM pg_class WHERE relname='transactions'")
+
+        rows
       n -> n
     end
   end

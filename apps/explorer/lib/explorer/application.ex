@@ -54,7 +54,6 @@ defmodule Explorer.Application do
       AddressSumMinusBurnt,
       BlockCount,
       Blocks,
-      GasUsage,
       NetVersion,
       BlockNumber,
       con_cache_child_spec(MarketHistoryCache.cache_name()),
