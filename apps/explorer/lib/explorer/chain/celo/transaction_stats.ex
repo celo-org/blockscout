@@ -10,7 +10,7 @@ defmodule Explorer.Chain.Celo.TransactionStats do
   import Ecto.Query
 
   @type t :: %__MODULE__{
-          name: String.t(),
+          stat_type: String.t(),
           value: non_neg_integer()
         }
 
