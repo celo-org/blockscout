@@ -50,7 +50,6 @@ defmodule Explorer.Application do
       Explorer.SmartContract.VyperDownloader,
       {Registry, keys: :duplicate, name: Registry.ChainEvents, id: Registry.ChainEvents},
       {Admin.Recovery, [[], [name: Admin.Recovery]]},
-      TransactionCount,
       AddressSum,
       AddressSumMinusBurnt,
       BlockCount,

@@ -83,7 +83,6 @@ defmodule Explorer.Chain do
     Blocks,
     GasUsage,
     TokenExchangeRate,
-    TransactionCount,
     Transactions,
     Uncles
   }
@@ -3658,28 +3657,16 @@ defmodule Explorer.Chain do
   Estimated count of `t:Explorer.Chain.Transaction.t/0`.
 
   Estimated count of both collated and pending transactions using the transactions table statistics.
+
+  Celo changes: Implemented via db trigger mechanism on `transactions` table directly and returns accurate tx count
+    with fallback to gc estimate.
   """
   @spec transaction_estimated_count() :: non_neg_integer()
   def transaction_estimated_count do
-    cached_value = TransactionCount.get_count()
 
-    if is_nil(cached_value) do
-      count = Chain.get_last_fetched_counter("total_transaction_count")
 
-      case count do
-        nil ->
-          %Postgrex.Result{rows: [[rows]]} =
-            SQL.query!(Repo, "SELECT reltuples::BIGINT AS estimate FROM pg_class WHERE relname='transactions'")
 
-          rows
 
-        _ ->
-          count
-          |> Decimal.to_integer()
-      end
-    else
-      cached_value
-    end
   end
 
   @spec total_gas_usage() :: non_neg_integer()
