@@ -17,8 +17,9 @@ defmodule Explorer.Chain.Celo.TransactionStats do
   @attrs ~w( stat_type value)a
   @required_attrs ~w( stat_type value)a
 
+  @primary_key false
   schema "celo_transaction_stats" do
-    field(:stat_type, :string, primary_key: true)
+    field(:stat_type, :string)
     field(:value, :integer)
   end
 
