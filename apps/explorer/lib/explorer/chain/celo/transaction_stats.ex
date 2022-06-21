@@ -18,7 +18,7 @@ defmodule Explorer.Chain.Celo.TransactionStats do
   @required_attrs ~w( stat_type value)a
 
   schema "celo_transaction_stats" do
-    field(:name, :string, primary_key: true)
+    field(:stat_type, :string, primary_key: true)
     field(:value, :integer)
   end
 
