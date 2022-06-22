@@ -36,12 +36,13 @@ defmodule Explorer.Chain.Celo.TransactionStats do
       |> where([t], t.stat_type == @tx_count_type)
       |> Repo.one()
 
-      case count do
-        %Decimal{} ->
-          count |> Decimal.to_integer()
+    case count do
+      %Decimal{} ->
+        count |> Decimal.to_integer()
 
-        nil -> 0
-      end
+      nil ->
+        0
+    end
   end
 
   @total_gas_type "total_gas_used"
@@ -55,7 +56,8 @@ defmodule Explorer.Chain.Celo.TransactionStats do
       %Decimal{} ->
         total_gas |> Decimal.to_integer()
 
-      nil -> 0
+      nil ->
+        0
     end
   end
 end
