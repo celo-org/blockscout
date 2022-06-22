@@ -20,7 +20,7 @@ defmodule Explorer.Chain.Celo.TransactionStats do
   @primary_key false
   schema "celo_transaction_stats" do
     field(:stat_type, :string)
-    field(:value, :integer)
+    field(:value, :decimal)
   end
 
   def changeset(%__MODULE__{} = item, attrs) do
@@ -36,7 +36,12 @@ defmodule Explorer.Chain.Celo.TransactionStats do
       |> where([t], t.stat_type == @tx_count_type)
       |> Repo.one()
 
-    count
+      case count do
+        %Decimal{} ->
+          count |> Decimal.to_integer()
+
+        nil -> 0
+      end
   end
 
   @total_gas_type "total_gas_used"
@@ -46,6 +51,11 @@ defmodule Explorer.Chain.Celo.TransactionStats do
       |> where([t], t.stat_type == @total_gas_type)
       |> Repo.one()
 
-    total_gas
+    case total_gas do
+      %Decimal{} ->
+        total_gas |> Decimal.to_integer()
+
+      nil -> 0
+    end
   end
 end
