@@ -14,8 +14,8 @@ defmodule Explorer.Chain.Celo.TransactionStats do
           value: non_neg_integer()
         }
 
-  @attrs ~w( stat_type value)a
-  @required_attrs ~w( stat_type value)a
+  @attrs ~w(stat_type value)a
+  @required_attrs ~w(stat_type value)a
 
   @primary_key false
   schema "celo_transaction_stats" do

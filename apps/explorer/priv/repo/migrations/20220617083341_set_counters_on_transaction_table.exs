@@ -2,11 +2,11 @@ defmodule Explorer.Repo.Migrations.SetCountersOnTransactionTable do
   use Ecto.Migration
 
   def up do
-    execute("CREATE TABLE celo_transaction_stats(stat_type varchar(255), value bigint);")
+    execute("CREATE TABLE celo_transaction_stats(stat_type varchar(255), value numeric(100,0));")
 
     # coalesce gas_used values to prevent null propogation when gas used is null
     execute("""
-    CREATE FUNCTION celo_transaction_stats_trigger_func() RETURNS trigger
+    CREATE OR REPLACE FUNCTION celo_transaction_stats_trigger_func() RETURNS trigger
     LANGUAGE plpgsql AS
     $$BEGIN
     IF TG_OP = 'INSERT' THEN
@@ -34,7 +34,7 @@ defmodule Explorer.Repo.Migrations.SetCountersOnTransactionTable do
 
     execute("""
     CREATE CONSTRAINT TRIGGER celo_transaction_stats_modified
-    AFTER INSERT OR DELETE ON transactions
+    AFTER INSERT OR DELETE OR UPDATE ON transactions
     DEFERRABLE INITIALLY DEFERRED
     FOR EACH ROW EXECUTE PROCEDURE celo_transaction_stats_trigger_func();
     """)
