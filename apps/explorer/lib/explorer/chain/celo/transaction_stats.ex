@@ -40,8 +40,8 @@ defmodule Explorer.Chain.Celo.TransactionStats do
       %Decimal{} ->
         count |> Decimal.to_integer()
 
-      nil ->
-        0
+      n ->
+        n
     end
   end
 
@@ -56,8 +56,8 @@ defmodule Explorer.Chain.Celo.TransactionStats do
       %Decimal{} ->
         total_gas |> Decimal.to_integer()
 
-      nil ->
-        0
+      n ->
+        n
     end
   end
 end
