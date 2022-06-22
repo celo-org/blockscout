@@ -33,7 +33,7 @@ defmodule Explorer.Repo.Migrations.SetCountersOnTransactionTable do
     """)
 
     execute("""
-    CREATE OR REPLACE CONSTRAINT TRIGGER celo_transaction_stats_modified
+    CREATE CONSTRAINT TRIGGER celo_transaction_stats_modified
     AFTER INSERT OR DELETE OR UPDATE ON transactions
     DEFERRABLE INITIALLY DEFERRED
     FOR EACH ROW EXECUTE PROCEDURE celo_transaction_stats_trigger_func();
@@ -41,7 +41,7 @@ defmodule Explorer.Repo.Migrations.SetCountersOnTransactionTable do
 
     # TRUNCATE triggers must be FOR EACH STATEMENT
     execute("""
-    CREATE OR REPLACE TRIGGER celo_transaction_stats_truncated AFTER TRUNCATE ON transactions
+    CREATE TRIGGER celo_transaction_stats_truncated AFTER TRUNCATE ON transactions
     FOR EACH STATEMENT EXECUTE PROCEDURE celo_transaction_stats_trigger_func();
     """)
 
