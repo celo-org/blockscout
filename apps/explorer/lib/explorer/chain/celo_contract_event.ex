@@ -26,7 +26,6 @@ defmodule Explorer.Chain.CeloContractEvent do
 
   @primary_key false
   schema "celo_contract_events" do
-    field(:id, :bigserial, primary_key: true)
     field(:block_number, :integer)
     field(:log_index, :integer)
     field(:name, :string)
