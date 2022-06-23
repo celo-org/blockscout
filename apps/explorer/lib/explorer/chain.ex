@@ -4414,12 +4414,9 @@ defmodule Explorer.Chain do
 
             verified_contract_twin_query =
               from(
-                address in Address,
-                inner_join: smart_contract in SmartContract,
-                on: address.hash == smart_contract.address_hash,
-                where: fragment("md5(contract_code::text)") == ^contract_code_md5,
-                where: address.hash != ^target_address_hash,
-                select: smart_contract,
+                sc in SmartContract,
+                where: sc.contract_byte_code_md5 == ^contract_code_md5,
+                where: sc.address_hash != ^target_address_hash,
                 limit: 1
               )
 
