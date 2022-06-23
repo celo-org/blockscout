@@ -4,7 +4,7 @@
   <% circles_addresses_list = CustomContractsHelpers.get_custom_addresses_list(:circles_addresses) %>
   <% current_address = "0x" <> Base.encode16(@address.hash.bytes, case: :lower) %>
   <% created_from_address_hash = if from_address_hash(@address), do: "0x" <> Base.encode16(from_address_hash(@address).bytes, case: :lower), else: nil %>
-  <div class="row mb-2 mb-5-reverse">
+  <div class="row mb-2 mb-5">
     <!-- Address details -->
     <div class="col-md-12 mb-2">
       <div class="card mb-2">
