@@ -951,6 +951,11 @@ msgid "Date & time of transaction inclusion, including length of time for confir
 msgstr ""
 
 #, elixir-format
+#: lib/block_scout_web/templates/verified_contracts/index.html.eex:84
+msgid "Date Verified"
+msgstr ""
+
+#, elixir-format
 #: lib/block_scout_web/templates/tokens/instance/overview/_details.html.eex:52
 #: lib/block_scout_web/templates/tokens/overview/_details.html.eex:85
 msgid "Decimals"
@@ -1443,6 +1448,12 @@ msgid "Learn"
 msgstr ""
 
 #, elixir-format
+#: lib/block_scout_web/templates/verified_contracts/_tile.html.eex:43
+#: lib/block_scout_web/templates/verified_contracts/_tile.html.eex:48
+msgid "Learn more"
+msgstr ""
+
+#, elixir-format
 #: lib/block_scout_web/templates/layout/_topnav.html.eex:185
 msgid "Learn, Borrow, Earn"
 msgstr ""
@@ -1594,6 +1605,11 @@ msgid "Maximum total amount per unit of gas a user is willing to pay for a trans
 msgstr ""
 
 #, elixir-format
+#: lib/block_scout_web/templates/stats/index.html.eex:28
+msgid "Mento Reserve"
+msgstr ""
+
+#, elixir-format
 #: lib/block_scout_web/templates/tokens/instance/metadata/index.html.eex:18
 #: lib/block_scout_web/templates/tokens/instance/overview/_tabs.html.eex:10 lib/block_scout_web/views/tokens/instance/overview_view.ex:178
 msgid "Metadata"
@@ -1651,7 +1667,7 @@ msgstr ""
 
 #, elixir-format
 #: lib/block_scout_web/templates/address_transaction/index.html.eex:50
-#: lib/block_scout_web/templates/chain/show.html.eex:238 lib/block_scout_web/templates/pending_transaction/index.html.eex:13
+#: lib/block_scout_web/templates/chain/show.html.eex:236 lib/block_scout_web/templates/pending_transaction/index.html.eex:13
 #: lib/block_scout_web/templates/transaction/index.html.eex:19
 msgid "More transactions have come in"
 msgstr ""
@@ -1722,6 +1738,11 @@ msgstr ""
 #, elixir-format
 #: lib/block_scout_web/templates/stakes/_stakes_empty_content.html.eex:11
 msgid "No Information"
+msgstr ""
+
+#, elixir-format
+#: lib/block_scout_web/templates/verified_contracts/index.html.eex:98
+msgid "No verified contracts found"
 msgstr ""
 
 #, elixir-format
@@ -1813,6 +1834,11 @@ msgstr ""
 #, elixir-format
 #: lib/block_scout_web/templates/block/overview.html.eex:133
 msgid "Parent Hash"
+msgstr ""
+
+#, elixir-format
+#: lib/block_scout_web/templates/verified_contracts/_tile.html.eex:44
+msgid "Partially Verified"
 msgstr ""
 
 #, elixir-format
@@ -2176,7 +2202,7 @@ msgid "Something went wrong, click to reload."
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/chain/show.html.eex:244
+#: lib/block_scout_web/templates/chain/show.html.eex:242
 msgid "Something went wrong, click to retry."
 msgstr ""
 
@@ -2188,6 +2214,16 @@ msgstr ""
 #, elixir-format
 #: lib/block_scout_web/templates/stakes/_stakes_modal_move.html.eex:7
 msgid "Source Pool"
+msgstr ""
+
+#, elixir-format
+#: lib/block_scout_web/templates/verified_contracts/_tile.html.eex:48
+msgid "Source code matches deployed contract 100%"
+msgstr ""
+
+#, elixir-format
+#: lib/block_scout_web/templates/verified_contracts/_tile.html.eex:43
+msgid "Source code matches deployed contracts except the metadata hash"
 msgstr ""
 
 #, elixir-format
@@ -2819,7 +2855,7 @@ msgstr ""
 #: lib/block_scout_web/templates/address/_tabs.html.eex:7
 #: lib/block_scout_web/templates/address/overview.html.eex:203 lib/block_scout_web/templates/address_transaction/index.html.eex:17
 #: lib/block_scout_web/templates/block/overview.html.eex:74 lib/block_scout_web/templates/block_signers/index.html.eex:10
-#: lib/block_scout_web/templates/block_transaction/index.html.eex:10 lib/block_scout_web/templates/chain/show.html.eex:235
+#: lib/block_scout_web/templates/block_transaction/index.html.eex:10 lib/block_scout_web/templates/chain/show.html.eex:233
 #: lib/block_scout_web/templates/stats/index.html.eex:33 lib/block_scout_web/views/address_view.ex:406
 msgid "Transactions"
 msgstr ""
@@ -2860,6 +2896,11 @@ msgstr ""
 #: lib/block_scout_web/templates/chain/show.html.eex:91
 #: lib/block_scout_web/templates/layout/app.html.eex:47
 msgid "Tx/day"
+msgstr ""
+
+#, elixir-format
+#: lib/block_scout_web/templates/verified_contracts/index.html.eex:69
+msgid "Txns (past 90 days)"
 msgstr ""
 
 #, elixir-format
@@ -3003,6 +3044,12 @@ msgid "Value sent in CELO (and USD) if applicable."
 msgstr ""
 
 #, elixir-format
+#: lib/block_scout_web/templates/verified_contracts/_tile.html.eex:49
+#: lib/block_scout_web/templates/verified_contracts/index.html.eex:76
+msgid "Verified"
+msgstr ""
+
+#, elixir-format
 #: lib/block_scout_web/templates/layout/_topnav.html.eex:98
 #: lib/block_scout_web/templates/verified_contracts/index.html.eex:18
 msgid "Verified Contracts"
@@ -3055,7 +3102,7 @@ msgid "View All Blocks"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/chain/show.html.eex:234
+#: lib/block_scout_web/templates/chain/show.html.eex:232
 msgid "View All Transactions"
 msgstr ""
 
@@ -3366,50 +3413,3 @@ msgstr "CELO"
 # From templates/tokens/overview/details.html.eex#
 msgid "Celo Gold"
 msgstr "CELO"
-
-#, elixir-format
-#: lib/block_scout_web/templates/verified_contracts/index.html.eex:84
-msgid "Date Verified"
-msgstr ""
-
-#, elixir-format
-#: lib/block_scout_web/templates/verified_contracts/_tile.html.eex:44
-msgid "Partially Verified"
-msgstr ""
-
-#, elixir-format
-#: lib/block_scout_web/templates/verified_contracts/index.html.eex:69
-msgid "Txns (past 90 days)"
-msgstr ""
-
-#, elixir-format
-#: lib/block_scout_web/templates/verified_contracts/_tile.html.eex:49
-#: lib/block_scout_web/templates/verified_contracts/index.html.eex:76
-msgid "Verified"
-msgstr ""
-
-#, elixir-format
-#: lib/block_scout_web/templates/verified_contracts/_tile.html.eex:43
-#: lib/block_scout_web/templates/verified_contracts/_tile.html.eex:48
-msgid "Learn more"
-msgstr ""
-
-#, elixir-format
-#: lib/block_scout_web/templates/verified_contracts/_tile.html.eex:48
-msgid "Source code matches deployed contract 100%"
-msgstr ""
-
-#, elixir-format
-#: lib/block_scout_web/templates/verified_contracts/_tile.html.eex:43
-msgid "Source code matches deployed contracts except the metadata hash"
-msgstr ""
-
-#, elixir-format
-#: lib/block_scout_web/templates/stats/index.html.eex:28
-msgid "Mento Reserve"
-msgstr ""
-
-#, elixir-format
-#: lib/block_scout_web/templates/verified_contracts/index.html.eex:98
-msgid "No verified contracts found"
-msgstr ""
