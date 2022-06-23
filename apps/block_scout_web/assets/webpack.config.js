@@ -95,7 +95,6 @@ const appJs =
       'tokens': './js/pages/token/search.js',
       'ad': './js/lib/ad.js',
       'text_ad': './js/lib/text_ad.js',
-      'banner': './js/lib/banner.js',
       'autocomplete': './js/lib/autocomplete.js',
       'search-results': './js/pages/search-results/search.js',
       'token-overview': './js/pages/token/overview.js',

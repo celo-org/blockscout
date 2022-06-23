@@ -227,8 +227,6 @@
     </div>
   </div>
 
-  <%= render BlockScoutWeb.Advertisement.BannersAdView, "_banner_728.html", conn: @conn %>
-
   <div class="card card-chain-transactions">
     <div class="card-body">
       <%= link(gettext("View All Transactions"), to: transaction_path(BlockScoutWeb.Endpoint, :index), class: "btn-line float-right") %>
