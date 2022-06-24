@@ -25,7 +25,7 @@ defmodule BlockScoutWeb.BlockViewTest do
       assert BlockView.block_type(block) == "Block"
     end
 
-    test "returns Reorg" do
+    test "returns Fetching" do
       reorg = insert(:block, consensus: false, nephews: [])
 
       assert BlockView.block_type(reorg) == "Fetching"
