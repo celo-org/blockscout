@@ -162,7 +162,8 @@ defmodule Indexer.Fetcher.InternalTransaction do
       block_number, {:ok, acc_list} ->
         {:ok, block} = Chain.number_to_any_block(block_number)
 
-        cached = Indexer.Celo.InternalTransactionCache.get(block_number)
+        cached = InternalTransactionCache.get(block_number)
+
         if cached do
           {:ok, cached}
         else

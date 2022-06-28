@@ -13,20 +13,25 @@ defmodule Indexer.Celo.InternalTransactionCache do
   def store(block_number, itx) do
     pid = Process.whereis(__MODULE__)
 
-    if pid do GenServer.cast(pid, {:store, block_number, itx} ) end
+    if pid do
+      GenServer.cast(pid, {:store, block_number, itx})
+    end
   end
-
 
   def get(block_number) do
     pid = Process.whereis(__MODULE__)
 
-    if pid do GenServer.call(pid, {:get, block_number} ) end
+    if pid do
+      GenServer.call(pid, {:get, block_number})
+    end
   end
 
   def clear(block_number) do
     pid = Process.whereis(__MODULE__)
 
-    if pid do GenServer.cast(pid, {:clear, block_number} ) end
+    if pid do
+      GenServer.cast(pid, {:clear, block_number})
+    end
   end
 
   def start_link([init_opts, gen_server_opts]) do
@@ -39,17 +44,17 @@ defmodule Indexer.Celo.InternalTransactionCache do
 
   def init(_opts) do
     {:ok,
-      %{
-        cache: %{},
-        timers: %{},
-      }
-    }
+     %{
+       cache: %{},
+       timers: %{}
+     }}
   end
 
   def handle_cast({:store, block_number, itx}, _from, state) do
-    state = state
-            |> put_in([:cache, block_number], itx)
-            |> put_in([:timers, block_number], Process.send_after(self(), {:clear, block_number}, @cache_time))
+    state =
+      state
+      |> put_in([:cache, block_number], itx)
+      |> put_in([:timers, block_number], Process.send_after(self(), {:clear, block_number}, @cache_time))
 
     {:noreply, state}
   end
@@ -64,8 +69,8 @@ defmodule Indexer.Celo.InternalTransactionCache do
     {:reply, itx, state}
   end
 
-  defp remove_item(block_number, state = %{cache: cache, timers: timers}) do
-    cache = Map.delete(cache,block_number)
+  defp remove_item(block_number, %{cache: cache, timers: timers} = state) do
+    cache = Map.delete(cache, block_number)
 
     timer = timers[block_number]
     Process.cancel_timer(timer)
