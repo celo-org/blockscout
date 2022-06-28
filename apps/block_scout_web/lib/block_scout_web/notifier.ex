@@ -80,7 +80,7 @@ defmodule BlockScoutWeb.Notifier do
   end
 
   def handle_event({:chain_event, :exchange_rate}) do
-    exchange_rate =  ExchangeRates.lookup("CELO") || ExchangeRates.lookup("cGLD") || Token.null()
+    exchange_rate = ExchangeRates.lookup("CELO") || ExchangeRates.lookup("cGLD") || Token.null()
 
     market_history_data =
       case Market.fetch_recent_history() do
