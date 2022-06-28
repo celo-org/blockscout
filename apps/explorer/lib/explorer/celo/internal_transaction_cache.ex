@@ -70,12 +70,13 @@ defmodule Explorer.Celo.InternalTransactionCache do
   defp remove_item(block_number, %{cache: cache, timers: timers} = state) do
     cache = Map.delete(cache, block_number)
 
-    timers = if timers[block_number] do
-      Process.cancel_timer(timers[block_number])
-      Map.delete(timers, block_number)
-    else
-      timers
-    end
+    timers =
+      if timers[block_number] do
+        Process.cancel_timer(timers[block_number])
+        Map.delete(timers, block_number)
+      else
+        timers
+      end
 
     %{cache: cache, timers: timers}
   end
