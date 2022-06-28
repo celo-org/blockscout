@@ -4,8 +4,6 @@ defmodule Explorer.Celo.InternalTransactionCache do
   """
   use GenServer
 
-  require Logger
-
   require Explorer.Celo.Telemetry, as: Telemetry
 
   @cache_time :timer.minutes(10)
@@ -72,9 +70,12 @@ defmodule Explorer.Celo.InternalTransactionCache do
   defp remove_item(block_number, %{cache: cache, timers: timers} = state) do
     cache = Map.delete(cache, block_number)
 
-    timer = timers[block_number]
-    Process.cancel_timer(timer)
-    timers = Map.delete(timers, block_number)
+    timers = if timers[block_number] do
+      Process.cancel_timer(timers[block_number])
+      Map.delete(timers, block_number)
+    else
+      timers
+    end
 
     %{cache: cache, timers: timers}
   end
