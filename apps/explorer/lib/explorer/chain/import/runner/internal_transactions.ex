@@ -15,7 +15,6 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
 
   import Ecto.Query, only: [from: 2, or_where: 3]
 
-
   @behaviour Runner
 
   # milliseconds
