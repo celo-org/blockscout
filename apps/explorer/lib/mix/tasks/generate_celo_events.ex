@@ -22,7 +22,11 @@ defmodule Mix.Tasks.GenerateCeloEvents do
     contract_filter =
       if options[:contract] do
         fn contract_path ->
-          Path.basename(contract_path, ".json") |> String.downcase() == options[:contract] |> String.downcase()
+          contract_name = contract_path
+            |> Path.basename(contract_path, ".json")
+            |> String.downcase()
+
+          contract_name == options[:contract] |> String.downcase()
         end
       else
         fn _ -> true end
