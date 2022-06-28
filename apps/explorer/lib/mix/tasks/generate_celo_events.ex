@@ -11,19 +11,22 @@ defmodule Mix.Tasks.GenerateCeloEvents do
 
   def run(args) do
     {options, args, _} =
-      OptionParser.parse(args, strict: [path: :string, destination: :string, contract: :string, only: :boolean, overwrite: :boolean])
+      OptionParser.parse(args,
+        strict: [path: :string, destination: :string, contract: :string, only: :boolean, overwrite: :boolean]
+      )
 
     path = options[:path] || @abi_path
     destination = options[:destination] || @destination_path
 
     # use only a specific contract
-    contract_filter = if options[:contract] do
-      fn contract_path ->
-        Path.basename(contract_path, ".json") |> String.downcase() == options[:contract] |> String.downcase()
+    contract_filter =
+      if options[:contract] do
+        fn contract_path ->
+          Path.basename(contract_path, ".json") |> String.downcase() == options[:contract] |> String.downcase()
+        end
+      else
+        fn _ -> true end
       end
-    else
-      fn _ -> true end
-    end
 
     # glob all json files in path (assumed to be contract abis) and create a map of filename -> event defs
     contract_name_to_event_defs =
