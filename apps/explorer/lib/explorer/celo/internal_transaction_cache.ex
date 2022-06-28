@@ -1,4 +1,4 @@
-defmodule Indexer.Celo.InternalTransactionCache do
+defmodule Explorer.Celo.InternalTransactionCache do
   @moduledoc """
   Store internal transaction fetch results when blocks are not correctly indexed
   """

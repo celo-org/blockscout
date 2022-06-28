@@ -8,13 +8,13 @@ defmodule Explorer.Chain.Import.Runner.InternalTransactions do
 
   alias Ecto.Adapters.SQL
   alias Ecto.{Changeset, Multi, Repo}
+  alias Explorer.Celo.InternalTransactionCache
   alias Explorer.Chain.{Block, Hash, Import, InternalTransaction, PendingBlockOperation, Transaction}
   alias Explorer.Chain.Import.Runner
   alias Explorer.Repo, as: ExplorerRepo
 
   import Ecto.Query, only: [from: 2, or_where: 3]
 
-  alias Indexer.Celo.InternalTransactionCache
 
   @behaviour Runner
 

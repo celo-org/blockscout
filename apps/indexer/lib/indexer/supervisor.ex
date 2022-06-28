@@ -5,6 +5,8 @@ defmodule Indexer.Supervisor do
 
   use Supervisor
 
+  alias Explorer.Celo.InternalTransactionCache
+
   alias Explorer.Chain
 
   alias Indexer.{
@@ -17,8 +19,6 @@ defmodule Indexer.Supervisor do
   }
 
   alias Indexer.Block.{Catchup, Realtime}
-
-  alias Indexer.Celo.InternalTransactionCache
 
   alias Indexer.Fetcher.{
     BlockReward,

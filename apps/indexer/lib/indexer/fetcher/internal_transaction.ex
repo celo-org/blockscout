@@ -12,12 +12,11 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
   import Indexer.Block.Fetcher, only: [async_import_coin_balances: 2]
 
-  alias Explorer.Celo.Util
+  alias Explorer.Celo.{InternalTransactionCache, Util}
   alias Explorer.Chain
   alias Explorer.Chain.{Block, Transaction}
   alias Explorer.Chain.Cache.{Accounts, Blocks}
   alias Indexer.{BufferedTask, Tracer}
-  alias Indexer.Celo.InternalTransactionCache
   alias Indexer.Fetcher.TokenBalance
   alias Indexer.Transform.{Addresses, TokenTransfers}
 
