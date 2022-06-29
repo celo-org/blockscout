@@ -97,8 +97,7 @@ defmodule Explorer.Repo.Migrations.DataMigration do
             block_number: l.block_number,
             index: l.index
           },
-          where:
-            l.first_topic in ^@topics and {l.block_number, l.index} > {^last_block_number, ^last_index},
+          where: l.first_topic in ^@topics and {l.block_number, l.index} > {^last_block_number, ^last_index},
           order_by: [asc: l.block_number, asc: l.index],
           limit: @batch_size
         )
