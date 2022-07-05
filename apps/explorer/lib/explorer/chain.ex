@@ -3901,9 +3901,6 @@ defmodule Explorer.Chain do
         {:error, %{message: message}} ->
           message
 
-        {:error, %{message: message}} ->
-          message
-
         _ ->
           ""
       end
