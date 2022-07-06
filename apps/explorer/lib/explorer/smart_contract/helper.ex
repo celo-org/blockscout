@@ -37,11 +37,20 @@ defmodule Explorer.SmartContract.Helper do
     end
   end
 
-  def event_abi_to_topic_str(%{"type" => "event", "name" => name, "inputs" => parameters}) do
-    parameters_str = parameters |> Enum.map(&(&1["type"])) |> Enum.join(",")
-    event_str = "#{name}(#{parameters_str})"
-    topic_hash = event_str |> ExKeccak.hash_256() |> Base.encode16(case: :lower)
+  def event_abi_to_topic_str(%{"type" => "event", "name" => name} = event) do
+    types =
+      event
+      |> Map.get("inputs", [])
+      |> Enum.map(& &1["type"])
+      |> Enum.join(",")
 
-    "0x" <> topic_hash
+    function_signature = "#{name}(#{types})"
+
+    topic =
+      function_signature
+      |> ExKeccak.hash_256()
+      |> Base.encode16(case: :lower)
+
+    "0x" <> topic
   end
 end
