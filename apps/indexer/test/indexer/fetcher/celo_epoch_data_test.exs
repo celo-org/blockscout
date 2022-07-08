@@ -41,6 +41,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
     test "with consensus block without reward", context do
       CeloEpochDataFetcher.async_fetch([
         %{
+          block_hash: context.last_block_in_epoch_hash,
           block_number: context.last_block_in_epoch_number,
           block_timestamp: DateTime.utc_now()
         }
@@ -63,7 +64,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
   describe "async_fetch for epoch rewards" do
     setup [:save_voter_contract_events_and_start_fetcher, :setup_votes_mox, :setup_epoch_mox]
 
-    test "saves epoch reward to db", context do
+    test "saves epoch reward to db and deletes pending operation", context do
       CeloEpochDataFetcher.async_fetch([
         %{
           block_hash: context.last_block_in_epoch_hash,
@@ -74,6 +75,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
 
       wait_for_results(fn ->
         assert Repo.one!(from(rewards in CeloEpochRewards))
+        assert count(CeloPendingEpochOperation)
       end)
 
       # Terminates the process so it finishes all Ecto processes.
@@ -92,7 +94,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
                [],
                fn block_number, acc -> [block_number | acc] end,
                json_rpc_named_arguments
-             ) == [%{block_number: block.number, block_timestamp: block.timestamp}]
+             ) == [%{block_hash: block.hash, block_number: block.number, block_timestamp: block.timestamp}]
     end
 
     test "does not buffer blocks with fetched rewards", %{
@@ -254,13 +256,39 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
       %Address{hash: validator_hash} = insert(:address)
       %Address{hash: group_hash} = insert(:address)
 
-      %Block{number: block_number} = insert(:block, number: 10_679_040)
+      %Block{hash: block_hash, number: block_number} = insert(:block, number: 10_679_040)
       insert(:celo_pending_epoch_operations, block_number: block_number)
       insert(:celo_account, address: group_hash)
       insert(:celo_account, address: validator_hash)
 
       input = %{
         block_number: block_number,
+        epoch_rewards: %{
+          block_hash: block_hash,
+          block_number: block_number,
+          carbon_offsetting_target_epoch_rewards: 62225632760255012269,
+          community_target_epoch_rewards: 15556408190063753067479,
+          electable_validators_max: 110,
+          epoch_number: 10,
+          gold_total_supply: 600363049982598326620386513,
+          reserve_gold_balance: 115255226249038379930471272,
+          rewards_multiplier: 1000741854737500000000000,
+          rewards_multiplier_max: 2000000000000000000000000,
+          rewards_multiplier_over: 5000000000000000000000000,
+          rewards_multiplier_under: 500000000000000000000000,
+          stable_usd_total_supply: 5182985086049091467996121,
+          target_total_supply: 601017204041941484863859293,
+          target_voting_fraction: 500000000000000000000000,
+          target_voting_yield: 160000000000000000000,
+          target_voting_yield_adjustment_factor: 0,
+          target_voting_yield_max: 500000000000000000000,
+          total_locked_gold: 316279462377767975674883803,
+          total_non_voting: 22643903944557354402445358,
+          total_votes: 293635558433210621272438445,
+          validator_target_epoch_rewards: 205631887959760273971,
+          voter_target_epoch_rewards: 26043810141454976793003,
+          voting_fraction: 410303431329291024629586
+        },
         voter_rewards: [
           %{
             account_hash: voter_hash,
