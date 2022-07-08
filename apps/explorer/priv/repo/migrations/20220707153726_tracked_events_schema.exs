@@ -11,6 +11,7 @@ defmodule Explorer.Repo.Migrations.TrackedEventsSchema do
       add(:name, :string, null: false)
 
       add(:backfilled, :boolean, null: false, default: false)
+      add(:enabled, :boolean, null: false, default: false)
 
       timestamps()
     end
@@ -36,5 +37,8 @@ defmodule Explorer.Repo.Migrations.TrackedEventsSchema do
 
     create(index(:clabs_tracked_contract_events, :block_number))
     create(index(:clabs_tracked_contract_events, :updated_at))
+    # Intentionally not adding a GIN index to params as in celo_contract_events as generic contracts aren't
+    # integral to the celo protocol. When necessary partial indices over contract addresses can be added for the same
+    # result.
   end
 end
