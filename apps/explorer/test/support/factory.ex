@@ -24,7 +24,6 @@ defmodule Explorer.Factory do
     CeloCoreContract,
     CeloElectionRewards,
     CeloPendingEpochOperation,
-    CeloValidatorGroupVotes,
     CeloVoterVotes,
     ContractMethod,
     Data,
@@ -325,12 +324,6 @@ defmodule Explorer.Factory do
       # caller MUST supply block
       # all operations will default to true
       fetch_epoch_data: true
-    }
-  end
-
-  def celo_validator_group_votes_factory do
-    %CeloValidatorGroupVotes{
-      previous_block_active_votes: 3_309_559_737_470_045_295_626_384
     }
   end
 
