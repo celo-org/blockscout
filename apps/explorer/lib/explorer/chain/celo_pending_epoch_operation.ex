@@ -52,26 +52,10 @@ defmodule Explorer.Chain.CeloPendingEpochOperation do
     )
   end
 
-  @spec falsify_celo_pending_epoch_operation(
-          non_neg_integer(),
-          :fetch_epoch_rewards | :election_rewards | :fetch_validator_group_data | :fetch_voter_votes
-        ) :: __MODULE__.t()
-  def falsify_celo_pending_epoch_operation(block_number, operation_type) do
-    celo_pending_operation = Repo.one(from(op in __MODULE__, where: op.block_number == ^block_number))
+  @spec delete_celo_pending_epoch_operation(non_neg_integer()) :: __MODULE__.t()
+  def delete_celo_pending_epoch_operation(block_number) do
+    query = from(cpeo in __MODULE__, where: cpeo.block_number == ^block_number)
 
-    new_celo_pending_operation = Map.put(celo_pending_operation, operation_type, false)
-
-    %{
-      fetch_epoch_rewards: new_fetch_epoch_rewards,
-      election_rewards: new_election_rewards
-    } = new_celo_pending_operation
-
-    celo_pending_operation
-    |> changeset(%{
-      block_number: block_number,
-      fetch_epoch_rewards: new_fetch_epoch_rewards,
-      election_rewards: new_election_rewards
-    })
-    |> Repo.update()
+    Repo.delete_all(query)
   end
 end

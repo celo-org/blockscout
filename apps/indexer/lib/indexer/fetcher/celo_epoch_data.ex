@@ -11,7 +11,7 @@ defmodule Indexer.Fetcher.CeloEpochData do
   alias Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
   alias Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent
   alias Explorer.Chain
-  alias Explorer.Chain.Block
+  alias Explorer.Chain.{Block, CeloPendingEpochOperation}
   alias Explorer.Chain.CeloElectionRewards, as: CeloElectionRewardsChain
   alias Explorer.Chain.CeloEpochRewards, as: CeloEpochRewardsChain
 
@@ -267,6 +267,7 @@ defmodule Indexer.Fetcher.CeloEpochData do
 
     case Chain.import(import_params) do
       {:ok, _} ->
+        CeloPendingEpochOperation.delete_celo_pending_epoch_operation(block_with_changes.block_number)
         :ok
 
       {:error, reason} ->
