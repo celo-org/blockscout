@@ -12,23 +12,20 @@ defmodule Explorer.Chain.CeloPendingEpochOperation do
       from: 2
     ]
 
-  @required_attrs ~w(block_number fetch_epoch_rewards election_rewards)a
+  @required_attrs ~w(block_number fetch_epoch_data)a
 
   @typedoc """
    * `block_number` - the number of the epoch block that has pending operations.
-   * `fetch_epoch_rewards` - if the epoch rewards should be fetched (or not)
-   * `election_rewards` - if the voter votes should be fetched (or not)
+   * `fetch_epoch_data` - if rewards should be fetched (or not)
   """
   @type t :: %__MODULE__{
           block_number: non_neg_integer(),
-          fetch_epoch_rewards: boolean(),
-          election_rewards: boolean()
+          fetch_epoch_data: boolean()
         }
 
   @primary_key {:block_number, :integer, autogenerate: false}
   schema "celo_pending_epoch_operations" do
-    field(:fetch_epoch_rewards, :boolean)
-    field(:election_rewards, :boolean)
+    field(:fetch_epoch_data, :boolean)
 
     timestamps()
   end
@@ -45,14 +42,13 @@ defmodule Explorer.Chain.CeloPendingEpochOperation do
       celo_epoch_pending_ops in __MODULE__,
       update: [
         set: [
-          fetch_epoch_rewards: celo_epoch_pending_ops.fetch_epoch_rewards or fragment("EXCLUDED.fetch_epoch_rewards"),
-          election_rewards: celo_epoch_pending_ops.election_rewards or fragment("EXCLUDED.election_rewards"),
+          fetch_epoch_data: celo_epoch_pending_ops.fetch_epoch_data or fragment("EXCLUDED.fetch_epoch_data"),
           # Don't update `block_number` as it is used for the conflict target
           inserted_at: celo_epoch_pending_ops.inserted_at,
           updated_at: fragment("EXCLUDED.updated_at")
         ]
       ],
-      where: fragment("EXCLUDED.fetch_epoch_rewards <> ?", celo_epoch_pending_ops.fetch_epoch_rewards)
+      where: fragment("EXCLUDED.fetch_epoch_data <> ?", celo_epoch_pending_ops.fetch_epoch_data)
     )
   end
 

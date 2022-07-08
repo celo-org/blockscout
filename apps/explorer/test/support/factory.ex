@@ -324,8 +324,7 @@ defmodule Explorer.Factory do
     %CeloPendingEpochOperation{
       # caller MUST supply block
       # all operations will default to true
-      fetch_epoch_rewards: true,
-      election_rewards: true
+      fetch_epoch_data: true
     }
   end
 
