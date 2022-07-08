@@ -55,13 +55,16 @@ defmodule Indexer.Fetcher.CeloEpochData do
   def run(entries, _json_rpc_named_arguments) do
     response =
       entries
-      |> Task.async_stream(fn entry ->
-        entry
-        |> get_voter_rewards()
-        |> get_validator_and_group_rewards()
-        |> get_epoch_rewards()
-        |> import_items()
-      end, timeout: 30_000)
+      |> Task.async_stream(
+        fn entry ->
+          entry
+          |> get_voter_rewards()
+          |> get_validator_and_group_rewards()
+          |> get_epoch_rewards()
+          |> import_items()
+        end,
+        timeout: 30_000
+      )
 
     failed = Enum.filter(response, &(&1 != :ok))
 

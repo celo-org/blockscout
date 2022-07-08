@@ -411,9 +411,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
 
   defp save_voter_contract_events_and_start_fetcher(context) do
     pid =
-      CeloEpochDataFetcher.Supervisor.Case.start_supervised!(
-        json_rpc_named_arguments: context.json_rpc_named_arguments
-      )
+      CeloEpochDataFetcher.Supervisor.Case.start_supervised!(json_rpc_named_arguments: context.json_rpc_named_arguments)
 
     %Address{hash: voter_hash} = insert(:address)
     %Address{hash: group_hash} = insert(:address)
