@@ -40,20 +40,37 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
     timestamps(null: false, type: :utc_datetime_usec)
   end
 
-  def from_event_topic(smart_contract = %SmartContract{abi: contract_abi}, topic) do
-    # create a new contract event tracking from the event that matches the topic
-    event_abi =
-      contract_abi
-      |> Enum.find(fn
+  def from_event_topic(smart_contract, topic) do
+    find_function = fn
         event = %{"type" => "event"} -> SmartContractHelper.event_abi_to_topic_str(event) == topic
         _ -> false
-      end)
+      end
+
+    build_tracking(smart_contract, find_function)
+  end
+
+
+  def from_event_name(smart_contract, name) do
+    find_function = fn
+     %{"type" => "event", "name" => ^name} -> true
+      _ -> false
+    end
+
+    build_tracking(smart_contract, find_function)
+  end
+
+  defp build_tracking(%SmartContract{abi: contract_abi} = smart_contract, find_function) do
+    event_abi =
+      contract_abi
+      |> Enum.find(find_function)
 
     case event_abi do
       nil ->
         nil
 
       valid = %{"name" => name} ->
+        topic = SmartContractHelper.event_abi_to_topic_str(event_abi)
+
         %ContractEventTracking{}
         |> changeset( %{name: name, abi: event_abi, topic: topic, smart_contract: smart_contract})
     end
@@ -67,7 +84,7 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
 
   def changeset(%__MODULE__{} = event_tracking, %{smart_contract: sc} = attrs) do
     attrs
-    |> Map.put(attrs, :smart_contract_id, sc.id)
+    |> Map.put(:smart_contract_id, sc.id)
     |> then(&(changeset(event_tracking, &1)))
   end
 end

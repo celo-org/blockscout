@@ -61,12 +61,12 @@ defmodule Explorer.Chain.Celo.ContractEventTrackingTest do
       assert tracking_changeset.valid?
     end
 
-    test "should insert a new event tracking operation from a given smart contract by topic" do
+    test "should insert a new event tracking operation from a given smart contract by name" do
       smart_contract = create_smart_contract()
 
       tracking_changeset =
         smart_contract
-        |> ContractEventTracking.from_event_topic(@gold_unlocked_topic)
+        |> ContractEventTracking.from_event_name("GoldUnlocked")
 
       assert tracking_changeset.valid?
     end
