@@ -17,6 +17,7 @@ defmodule Explorer.Repo.Migrations.TrackedEventsSchema do
 
     create(index(:clabs_contract_event_trackings, :topic))
     create(index(:clabs_contract_event_trackings, :backfilled))
+    create(index(:clabs_contract_event_trackings, :smart_contract_id))
 
     create table(:clabs_tracked_contract_events, primary_key: false) do
       add(:block_number, :integer, primary_key: true, null: false)
@@ -36,5 +37,7 @@ defmodule Explorer.Repo.Migrations.TrackedEventsSchema do
 
     create(index(:clabs_tracked_contract_events, :block_number))
     create(index(:clabs_tracked_contract_events, :updated_at))
+    create(index(:clabs_tracked_contract_events, :contract_address_hash))
+    create(index(:clabs_tracked_contract_events, :contract_event_tracking_id))
   end
 end
