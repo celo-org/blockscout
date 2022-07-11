@@ -3,11 +3,13 @@ defmodule Explorer.Chain.Celo.ContractEventTrackingTest do
   import Explorer.Factory
 
   alias Explorer.Chain.Celo.ContractEventTracking
+  alias Explorer.Chain.SmartContract
 
   describe "ContractEventTracking" do
 
     def create_smart_contract do
-      contract_abi = File.read!("./lockedgoldabi.json")
+      contract_abi = File.read!("./test/explorer/chain/celo/lockedgoldabi.json")
+      |> Jason.decode!()
 
       contract_code_info = %{
         bytecode:
