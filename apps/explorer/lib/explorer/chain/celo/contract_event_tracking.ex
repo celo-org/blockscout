@@ -5,22 +5,26 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
   require Logger
 
   alias __MODULE__
-  alias Explorer.Chain.Hash
+  alias Explorer.Chain.{Hash, SmartContract}
   alias Explorer.Chain.Hash.Address
   alias Explorer.Repo
+  alias Explorer.SmartContract.Helper, as: SmartContractHelper
 
   use Explorer.Schema
   import Ecto.Query
 
   @type t :: %__MODULE__{
-               abi: map(),
-               name: String.t(),
-               topic: String.t(),
-               backfilled: boolean(),
-               enabled: boolean(),
-               transaction_hash: Hash.Full.t(),
-               smart_contract_id: non_neg_integer()
-             }
+          abi: map(),
+          name: String.t(),
+          topic: String.t(),
+          backfilled: boolean(),
+          enabled: boolean(),
+          smart_contract_id: non_neg_integer()
+        }
+
+  @attrs ~w(
+          abi name topic smart_contract_id
+        )a
 
   schema "clabs_contract_event_trackings" do
     field(:abi, :map)
@@ -30,10 +34,34 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
     field(:enabled, :boolean)
 
     belongs_to(:smart_contract, SmartContract)
-    belongs_to(:transaction, Transactions, foreign_key: :transaction_hash, references: :hash, type: Hash.Address)
 
-    has_one :address, through: [:smart_contract, :address_hash]
+    has_one(:address, through: [:smart_contract, :address_hash])
 
     timestamps(null: false, type: :utc_datetime_usec)
+  end
+
+  def from_event_topic(smart_contract = %SmartContract{abi: contract_abi}, topic) do
+    # create a new contract event tracking from the event that matches the topic
+    event_abi =
+      contract_abi
+      |> Enum.find(fn
+        event = %{"type" => "event"} -> SmartContractHelper.event_abi_to_topic_str(event) == topic
+        _ -> false
+      end)
+
+    case event_abi do
+      nil ->
+        nil
+
+      valid = %{"name" => name} ->
+        ContractEventTracking.create(%{name: name, abi: event_abi, topic: topic, smart_contract: smart_contract})
+    end
+  end
+
+  def changeset(%__MODULE__{} = event_tracking, attrs) do
+    event_tracking
+    |> cast(attrs, @attrs)
+    |> validate_required(@attrs)
+    |> unique_constraint(:celo_wallet_key, name: :celo_wallets_wallet_address_hash_account_address_hash_index)
   end
 end

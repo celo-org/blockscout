@@ -4,7 +4,6 @@ defmodule Explorer.Repo.Migrations.TrackedEventsSchema do
   def change do
     create table(:clabs_contract_event_trackings) do
       add(:smart_contract_id, references(:smart_contracts), null: false)
-      add(:transaction_hash, references(:transactions, column: :hash, type: :bytea), null: false)
 
       add(:abi, :jsonb, null: false)
       add(:topic, :string, null: false)

@@ -6,10 +6,10 @@ defmodule Explorer.Chain.Celo.ContractEventTrackingTest do
   alias Explorer.Chain.SmartContract
 
   describe "ContractEventTracking" do
-
     def create_smart_contract do
-      contract_abi = File.read!("./test/explorer/chain/celo/lockedgoldabi.json")
-      |> Jason.decode!()
+      contract_abi =
+        File.read!("./test/explorer/chain/celo/lockedgoldabi.json")
+        |> Jason.decode!()
 
       contract_code_info = %{
         bytecode:
@@ -38,7 +38,6 @@ defmodule Explorer.Chain.Celo.ContractEventTrackingTest do
         optimized: false
       }
 
-
       %SmartContract{
         address_hash: insert(:address, contract_code: contract_code_info.bytecode, verified: true).hash,
         compiler_version: contract_code_info.version,
@@ -46,14 +45,20 @@ defmodule Explorer.Chain.Celo.ContractEventTrackingTest do
         contract_source_code: contract_code_info.source_code,
         optimization: contract_code_info.optimized,
         abi: contract_code_info.abi
-      } |> insert()
+      }
+      |> insert()
     end
 
-    test "should insert a new event tracking operation" do
+    @gold_unlocked_topic "0xb1a3aef2a332070da206ad1868a5e327f5aa5144e00e9a7b40717c153158a588"
+    test "should insert a new event tracking operation from a given smart contract by topic" do
       smart_contract = create_smart_contract()
 
-      require IEx; IEx.pry
+      tracking =
+        smart_contract
+        |> ContractEventTracking.from_event_topic(@gold_unlocked_topic)
 
+      require IEx
+      IEx.pry()
     end
   end
 end
