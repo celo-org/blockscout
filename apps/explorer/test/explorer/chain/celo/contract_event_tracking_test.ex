@@ -50,15 +50,25 @@ defmodule Explorer.Chain.Celo.ContractEventTrackingTest do
     end
 
     @gold_unlocked_topic "0xb1a3aef2a332070da206ad1868a5e327f5aa5144e00e9a7b40717c153158a588"
+
     test "should insert a new event tracking operation from a given smart contract by topic" do
       smart_contract = create_smart_contract()
 
-      tracking =
+      tracking_changeset =
         smart_contract
         |> ContractEventTracking.from_event_topic(@gold_unlocked_topic)
 
-      require IEx
-      IEx.pry()
+      assert tracking_changeset.valid?
+    end
+
+    test "should insert a new event tracking operation from a given smart contract by topic" do
+      smart_contract = create_smart_contract()
+
+      tracking_changeset =
+        smart_contract
+        |> ContractEventTracking.from_event_topic(@gold_unlocked_topic)
+
+      assert tracking_changeset.valid?
     end
   end
 end

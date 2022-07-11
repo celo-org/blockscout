@@ -14,13 +14,13 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
   import Ecto.Query
 
   @type t :: %__MODULE__{
-          abi: map(),
-          name: String.t(),
-          topic: String.t(),
-          backfilled: boolean(),
-          enabled: boolean(),
-          smart_contract_id: non_neg_integer()
-        }
+               abi: map(),
+               name: String.t(),
+               topic: String.t(),
+               backfilled: boolean(),
+               enabled: boolean(),
+               smart_contract_id: non_neg_integer()
+             }
 
   @attrs ~w(
           abi name topic smart_contract_id
@@ -54,14 +54,20 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
         nil
 
       valid = %{"name" => name} ->
-        ContractEventTracking.create(%{name: name, abi: event_abi, topic: topic, smart_contract: smart_contract})
+        %ContractEventTracking{}
+        |> changeset( %{name: name, abi: event_abi, topic: topic, smart_contract: smart_contract})
     end
   end
 
-  def changeset(%__MODULE__{} = event_tracking, attrs) do
+  def changeset(%__MODULE__{} = event_tracking, %{smart_contract_id: _scid} = attrs) do
     event_tracking
     |> cast(attrs, @attrs)
     |> validate_required(@attrs)
-    |> unique_constraint(:celo_wallet_key, name: :celo_wallets_wallet_address_hash_account_address_hash_index)
+  end
+
+  def changeset(%__MODULE__{} = event_tracking, %{smart_contract: sc} = attrs) do
+    attrs
+    |> Map.put(attrs, :smart_contract_id, sc.id)
+    |> then(&(changeset(event_tracking, &1)))
   end
 end
