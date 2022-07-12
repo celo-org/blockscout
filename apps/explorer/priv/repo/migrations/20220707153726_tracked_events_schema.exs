@@ -26,6 +26,9 @@ defmodule Explorer.Repo.Migrations.TrackedEventsSchema do
       add(:contract_event_tracking_id, references(:clabs_contract_event_trackings), null: false)
       add(:contract_address_hash, references(:smart_contracts, column: :address_hash, type: :bytea), null: false)
 
+      # epoch events may have null transaction hash
+      add(:transaction_hash, references(:transactions, column: :hash, type: :bytea), null: true)
+
       add(:topic, :string, null: false)
       add(:name, :string, null: false)
       add(:params, :jsonb)
@@ -36,6 +39,7 @@ defmodule Explorer.Repo.Migrations.TrackedEventsSchema do
     end
 
     create(index(:clabs_tracked_contract_events, :block_number))
+    create(index(:clabs_tracked_contract_events, :transaction_hash))
     create(index(:clabs_tracked_contract_events, :updated_at))
     create(index(:clabs_tracked_contract_events, :contract_address_hash))
     create(index(:clabs_tracked_contract_events, :contract_event_tracking_id))

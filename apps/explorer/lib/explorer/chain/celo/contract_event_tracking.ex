@@ -5,6 +5,7 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
   require Logger
 
   alias __MODULE__
+  alias Explorer.Chain.Celo.TrackedContractEvent
   alias Explorer.Chain.{Hash, SmartContract}
   alias Explorer.Chain.Hash.Address
   alias Explorer.Repo
@@ -19,6 +20,7 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
                topic: String.t(),
                backfilled: boolean(),
                enabled: boolean(),
+               address_hash: Address.Full.t(),
                smart_contract_id: non_neg_integer()
              }
 
@@ -36,6 +38,7 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
     belongs_to(:smart_contract, SmartContract)
 
     has_one(:address, through: [:smart_contract, :address_hash])
+    has_many(:tracked_contract_events, TrackedContractEvent)
 
     timestamps(null: false, type: :utc_datetime_usec)
   end
