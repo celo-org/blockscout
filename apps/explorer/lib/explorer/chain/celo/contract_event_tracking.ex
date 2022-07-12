@@ -20,7 +20,6 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
                topic: String.t(),
                backfilled: boolean(),
                enabled: boolean(),
-               address_hash: Address.Full.t(),
                smart_contract_id: non_neg_integer()
              }
 
@@ -36,7 +35,6 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
     field(:enabled, :boolean)
 
     belongs_to(:smart_contract, SmartContract)
-
     has_one(:address, through: [:smart_contract, :address_hash])
     has_many(:tracked_contract_events, TrackedContractEvent)
 
@@ -71,7 +69,7 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
       nil ->
         nil
 
-      valid = %{"name" => name} ->
+      %{"name" => name} ->
         topic = SmartContractHelper.event_abi_to_topic_str(event_abi)
 
         %ContractEventTracking{}

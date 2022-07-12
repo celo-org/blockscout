@@ -46,6 +46,8 @@ defmodule Explorer.Chain.Celo.ContractEventTrackingTest do
         |> ContractEventTracking.from_event_topic(@gold_unlocked_topic)
 
       assert tracking_changeset.valid?
+
+      {:ok, _inserted} = Repo.insert(tracking_changeset)
     end
 
     test "should create a new event tracking operation from a given smart contract by name" do
@@ -56,6 +58,8 @@ defmodule Explorer.Chain.Celo.ContractEventTrackingTest do
         |> ContractEventTracking.from_event_name("GoldUnlocked")
 
       assert tracking_changeset.valid?
+
+      {:ok, _inserted} = Repo.insert(tracking_changeset)
     end
   end
 end
