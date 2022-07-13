@@ -20,7 +20,9 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
                topic: String.t(),
                backfilled: boolean(),
                enabled: boolean(),
-               smart_contract_id: non_neg_integer()
+
+               address: %Ecto.Association.NotLoaded{} | Address.t(),
+               smart_contract: %Ecto.Association.NotLoaded{} | SmartContract.t()
              }
 
   @attrs ~w(
@@ -35,7 +37,7 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
     field(:enabled, :boolean)
 
     belongs_to(:smart_contract, SmartContract)
-    has_one(:address, through: [:smart_contract, :address_hash])
+    has_one(:address, through: [:smart_contract, :address])
     has_many(:tracked_contract_events, TrackedContractEvent)
 
     timestamps(null: false, type: :utc_datetime_usec)
