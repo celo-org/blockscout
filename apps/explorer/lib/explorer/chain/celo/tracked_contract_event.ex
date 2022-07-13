@@ -15,14 +15,14 @@ defmodule Explorer.Chain.Celo.TrackedContractEvent do
   import Ecto.Query
 
   @type t :: %__MODULE__{
-               block_number: integer(),
-               log_index: integer(),
-               name: String.t(),
-               topic: String.t(),
-               params: map(),
-                transaction_hash: Hash.Full.t(),
-               contract_address_hash: Hash.Address.t(),
-             }
+          block_number: integer(),
+          log_index: integer(),
+          name: String.t(),
+          topic: String.t(),
+          params: map(),
+          transaction_hash: Hash.Full.t(),
+          contract_address_hash: Hash.Address.t()
+        }
 
   @attrs ~w(
           block_number log_index name topic params transaction_hash contract_address_hash contract_event_tracking_id
@@ -42,23 +42,30 @@ defmodule Explorer.Chain.Celo.TrackedContractEvent do
     field(:params, :map)
 
     belongs_to(:contract_event_tracking, ContractEventTracking)
-    belongs_to(:smart_contract, SmartContract, foreign_key: :contract_address_hash, references: :address_hash, type: Hash.Address)
+
+    belongs_to(:smart_contract, SmartContract,
+      foreign_key: :contract_address_hash,
+      references: :address_hash,
+      type: Hash.Address
+    )
+
     belongs_to(:transaction, Transaction, foreign_key: :transaction_hash, references: :hash, type: Hash.Full)
 
     timestamps(null: false, type: :utc_datetime_usec)
   end
 
-  def from(attrs,
+  def from(
+        attrs,
         log = %Log{address_hash: contract_hash, first_topic: topic},
-        %ContractEventTracking{id: id, topic: topic, name: name, address: %{hash: contract_hash}}) do
-
+        %ContractEventTracking{id: id, topic: topic, name: name, address: %{hash: contract_hash}}
+      ) do
     log_properties = %{log_index: log.index, block_number: log.block_number, transaction_hash: log.transaction_hash}
-    other_properties = %{topic: topic, name: name, contract_address_hash: contract_hash, contract_event_tracking_id: id }
+    other_properties = %{topic: topic, name: name, contract_address_hash: contract_hash, contract_event_tracking_id: id}
 
     attrs
     |> Map.merge(log_properties)
     |> Map.merge(other_properties)
-    |> then(&( changeset(%__MODULE__{}, &1)))
+    |> then(&changeset(%__MODULE__{}, &1))
   end
 
   def changeset(%__MODULE__{} = item, attrs) do

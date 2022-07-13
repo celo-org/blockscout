@@ -15,15 +15,14 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
   import Ecto.Query
 
   @type t :: %__MODULE__{
-               abi: map(),
-               name: String.t(),
-               topic: String.t(),
-               backfilled: boolean(),
-               enabled: boolean(),
-
-               address: %Ecto.Association.NotLoaded{} | Address.t(),
-               smart_contract: %Ecto.Association.NotLoaded{} | SmartContract.t()
-             }
+          abi: map(),
+          name: String.t(),
+          topic: String.t(),
+          backfilled: boolean(),
+          enabled: boolean(),
+          address: %Ecto.Association.NotLoaded{} | Address.t(),
+          smart_contract: %Ecto.Association.NotLoaded{} | SmartContract.t()
+        }
 
   @attrs ~w(
           abi name topic smart_contract_id
@@ -45,17 +44,16 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
 
   def from_event_topic(smart_contract, topic) do
     find_function = fn
-        event = %{"type" => "event"} -> SmartContractHelper.event_abi_to_topic_str(event) == topic
-        _ -> false
-      end
+      event = %{"type" => "event"} -> SmartContractHelper.event_abi_to_topic_str(event) == topic
+      _ -> false
+    end
 
     build_tracking(smart_contract, find_function)
   end
 
-
   def from_event_name(smart_contract, name) do
     find_function = fn
-     %{"type" => "event", "name" => ^name} -> true
+      %{"type" => "event", "name" => ^name} -> true
       _ -> false
     end
 
@@ -75,7 +73,7 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
         topic = SmartContractHelper.event_abi_to_topic_str(event_abi)
 
         %ContractEventTracking{}
-        |> changeset( %{name: name, abi: event_abi, topic: topic, smart_contract: smart_contract})
+        |> changeset(%{name: name, abi: event_abi, topic: topic, smart_contract: smart_contract})
     end
   end
 
@@ -88,6 +86,6 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
   def changeset(%__MODULE__{} = event_tracking, %{smart_contract: sc} = attrs) do
     attrs
     |> Map.put(:smart_contract_id, sc.id)
-    |> then(&(changeset(event_tracking, &1)))
+    |> then(&changeset(event_tracking, &1))
   end
 end

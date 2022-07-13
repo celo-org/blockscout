@@ -5,7 +5,6 @@ defmodule Explorer.Chain.Celo.TrackedContractEventTest do
   alias Explorer.Chain.Celo.{ContractEventTracking, TrackedContractEvent}
   alias Explorer.Chain.{Log, SmartContract}
 
-
   describe "TrackedContractEvent" do
     def create_smart_contract do
       contract_abi =
@@ -51,17 +50,21 @@ defmodule Explorer.Chain.Celo.TrackedContractEventTest do
     end
 
     test "should insert valid event" do
-      event_tracking = create_event_tracking()
-                       |> Repo.preload(:address)
+      event_tracking =
+        create_event_tracking()
+        |> Repo.preload(:address)
 
-      source_log = build(:log,
-                     %{
-                       first_topic: @gold_unlocked_topic,
-                       address: event_tracking.address,
-                       block_number: 7777,
-                       index: 55})
-                   |> insert()
-
+      source_log =
+        build(
+          :log,
+          %{
+            first_topic: @gold_unlocked_topic,
+            address: event_tracking.address,
+            block_number: 7777,
+            index: 55
+          }
+        )
+        |> insert()
 
       event_params = %{"account" => "0xtestacacount", "value" => 44444, "available" => 55555}
 
@@ -70,8 +73,6 @@ defmodule Explorer.Chain.Celo.TrackedContractEventTest do
       assert event_changeset.valid?
 
       {:ok, _event} = Repo.insert(event_changeset)
-
-
     end
   end
 end
