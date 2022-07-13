@@ -208,6 +208,8 @@ defmodule Indexer.Transform.TokenTransfersTest do
       {407, 26},
       {39, 34},
       {39, 199}, # max tx_i found from sampling 10000000 values in live data
+      {39, 1000}, # 1000 transactions in block
+      {39, 9000} # 9000 transactions in block
     ]
 
     test_itx_maps =
