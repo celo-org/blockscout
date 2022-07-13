@@ -9,8 +9,9 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
 
   alias Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
   alias Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent
-  alias Explorer.Chain.{Address, Block, CeloElectionRewards, CeloEpochRewards, CeloPendingEpochOperation, Wei}
+  alias Explorer.Chain.{Address, Block, CeloElectionRewards, CeloEpochRewards, CeloPendingEpochOperation, Hash, Wei}
   alias Indexer.Fetcher.CeloEpochData, as: CeloEpochDataFetcher
+  alias Explorer.Celo.ContractEvents.Lockedgold.GoldLockedEvent
 
   @moduletag :capture_log
 
@@ -318,7 +319,8 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
             block_timestamp: ~U[2022-05-10 14:18:54.093055Z],
             reward_type: "group"
           }
-        ]
+        ],
+
       }
 
       assert CeloEpochDataFetcher.import_items(input) == :ok
@@ -332,6 +334,185 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
                voter_rewards: [%{block_number: block_number}]
              }) == %{block_number: block_number}
     end
+  end
+
+  describe "get_accounts_epochs/1 when there are no accounts at all" do
+    test "it fetches empty list" do
+      assert CeloEpochDataFetcher.get_accounts_epochs(%{
+               block_number: 123_456
+             }) == %{
+               block_number: 123_456,
+               accounts_epochs: []
+             }
+    end
+
+    test "it skips fetching when there is :accounts_epochs key" do
+      assert CeloEpochDataFetcher.get_accounts_epochs(%{
+               block_number: 123_456,
+               accounts_epochs: [
+                 %{
+                   account: "account-hash-1",
+                   locked_gold: 123_456_789
+                 },
+                 %{
+                   account: "account-hash-2",
+                   locked_gold: 987_654_321
+                 }
+               ]
+             }) == %{
+               block_number: 123_456,
+               accounts_epochs: [
+                 %{
+                   account: "account-hash-1",
+                   locked_gold: 123_456_789
+                 },
+                 %{
+                   account: "account-hash-2",
+                   locked_gold: 987_654_321
+                 }
+               ]
+             }
+    end
+  end
+
+  describe "get_accounts_epochs/1 when there are multiple accounts" do
+    setup [:setup_accounts_epochs_mox]
+
+    test "it fetches a list of accounts", %{
+      block: %{
+        number: block_number,
+        hash: block_hash,
+      },
+      address_1_hash: address_1_hash,
+      address_2_hash: address_2_hash,
+    } do
+      assert CeloEpochDataFetcher.get_accounts_epochs(%{
+               block_number: block_number,
+               block_hash: block_hash
+             }) == %{
+               block_number: block_number,
+               block_hash: block_hash,
+               accounts_epochs: [
+                 %{
+                   account_hash: address_1_hash,
+                   block_hash: block_hash,
+                   locked_gold: 123,
+                   activated_gold: 0
+                 },
+                 %{
+                   account_hash: address_2_hash,
+                   block_hash: block_hash,
+                   locked_gold: 124,
+                   activated_gold: 0
+                 }
+               ]
+             }
+    end
+  end
+
+  # describe "get_accounts_epochs/1 when there is an error" do
+  #   setup [:setup_accounts_epochs_mox_with_error]
+
+  #   test "it fetches a list of accounts", context do
+  #     assert CeloEpochDataFetcher.get_accounts_epochs(%{
+  #              block_number: 123_456
+  #            }) == %{
+  #              block_number: 123_456,
+  #              accounts_epochs: [
+
+  #              ]
+  #            }
+  #   end
+  # end
+
+  defp setup_accounts_epochs_mox(context) do
+    %Address{hash: address_1_hash} = insert(:address)
+    %Address{hash: address_2_hash} = insert(:address)
+
+    set_test_addresses(%{
+      # TODO change address or not?
+      "LockedGold" => "0x8d6677192144292870907e3fa8a5527fe55a7ff6"
+    })
+
+    expect(
+      EthereumJSONRPC.Mox,
+      :json_rpc,
+      fn [
+           %{
+             id: getAccountTotalLockedGold,
+             jsonrpc: "2.0",
+             method: "eth_call",
+             params: [%{data: "0x30ec70f5000000000000000000000000" <> address_1_hash, to: _}, "0x2A300"]
+           }
+         ],
+         _ ->
+        {
+          :ok,
+          [
+            %{
+              id: getAccountTotalLockedGold,
+              jsonrpc: "2.0",
+              result: "0x000000000000000000000000000000000000000000000000000000000000007b"
+            }
+          ]
+        }
+      end
+    )
+
+    expect(
+      EthereumJSONRPC.Mox,
+      :json_rpc,
+      fn [
+           %{
+             id: getAccountTotalLockedGold,
+             jsonrpc: "2.0",
+             method: "eth_call",
+             params: [%{data: "0x30ec70f5000000000000000000000000" <> address_2_hash, to: _}, "0x2A300"]
+           }
+         ],
+         _ ->
+        {
+          :ok,
+          [
+            %{
+              id: getAccountTotalLockedGold,
+              jsonrpc: "2.0",
+              result: "0x000000000000000000000000000000000000000000000000000000000000007c"
+            }
+          ]
+        }
+      end
+    )
+
+    block_1 = insert(:block, number: 172_800)
+    log_1_1 = insert(:log, block: block_1, index: 1)
+    log_1_2 = insert(:log, block: block_1, index: 2)
+    log_1_3 = insert(:log, block: block_1, index: 3)
+    block_2 = insert(:block, number: 190_080)
+    log_2 = insert(:log, block: block_2, index: 1)
+    %Explorer.Chain.CeloCoreContract{address_hash: contract_address_hash} = insert(:core_contract)
+
+    insert(:contract_event, %{
+      event: %GoldLockedEvent{
+        __block_number: 172_800,
+        __log_index: log_1_1.index,
+        __contract_address_hash: contract_address_hash,
+        account: address_1_hash,
+        value: 2
+      }
+    })
+
+    insert(:contract_event, %{
+      event: %GoldLockedEvent{
+        __block_number: 172_800,
+        __log_index: log_1_2.index,
+        __contract_address_hash: contract_address_hash,
+        account: address_2_hash,
+        value: 3
+      }
+    })
+
+    Map.merge(context, %{block: block_1, address_1_hash: address_1_hash, address_2_hash: address_2_hash})
   end
 
   defp setup_votes_mox(context) do

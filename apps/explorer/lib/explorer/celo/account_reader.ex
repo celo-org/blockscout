@@ -394,6 +394,26 @@ defmodule Explorer.Celo.AccountReader do
     ])
   end
 
+  @spec fetch_celo_account_epoch_data(account_hash :: String.t(), block_number :: pos_integer()) :: map()
+  def fetch_celo_account_epoch_data(account_hash, block_number) do
+    data =
+      call_methods([
+        {:lockedgold, "getAccountTotalLockedGold", [account_hash], block_number}
+        # TODO add activated gold
+      ])
+
+    with {:ok, [locked_gold]} <- data["getAccountTotalLockedGold"] do
+      {:ok,
+       %{
+         locked_gold: locked_gold,
+         activated_gold: 0
+       }}
+    else
+      _ ->
+        :error
+    end
+  end
+
   def fetch_account_usd(address) do
     call_methods([{:usd, "balanceOf", [address]}])
   end

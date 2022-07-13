@@ -9,4 +9,9 @@ defmodule Explorer.Celo.ContractEvents.Lockedgold.GoldLockedEvent do
 
   event_param(:account, :address, :indexed)
   event_param(:value, {:uint, 256}, :unindexed)
+
+  def events_distinct_accounts do
+    from(c in CeloContractEvent, where: c.topic == ^@topic)
+    |> distinct([gl], fragment("(?).params->'account'", gl))
+  end
 end

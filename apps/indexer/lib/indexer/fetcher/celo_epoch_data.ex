@@ -11,9 +11,12 @@ defmodule Indexer.Fetcher.CeloEpochData do
   alias Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
   alias Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent
   alias Explorer.Chain
-  alias Explorer.Chain.{Block, CeloPendingEpochOperation}
+  alias Explorer.Chain.{Block, CeloContractEvent, CeloPendingEpochOperation, Hash}
   alias Explorer.Chain.CeloElectionRewards, as: CeloElectionRewardsChain
   alias Explorer.Chain.CeloEpochRewards, as: CeloEpochRewardsChain
+
+  alias Explorer.Celo.ContractEvents.Lockedgold.GoldLockedEvent
+  alias Explorer.Celo.ContractEvents.EventMap
 
   alias Indexer.BufferedTask
   alias Indexer.Fetcher.Util
@@ -61,6 +64,7 @@ defmodule Indexer.Fetcher.CeloEpochData do
           |> get_voter_rewards()
           |> get_validator_and_group_rewards()
           |> get_epoch_rewards()
+          |> get_accounts_epochs()
           |> import_items()
         end,
         timeout: 30_000
@@ -72,6 +76,34 @@ defmodule Indexer.Fetcher.CeloEpochData do
       :ok
     else
       {:retry, failed}
+    end
+  end
+
+  def get_accounts_epochs(%{accounts_epochs: _accounts_epochs} = block_with_accounts_epochs),
+    do: block_with_accounts_epochs
+
+  # TODO is should it be number + hash?
+  def get_accounts_epochs(%{block_number: block_number, block_hash: block_hash} = block) do
+    accounts_with_locked_gold =
+      GoldLockedEvent.events_distinct_accounts()
+      |> EventMap.query_all()
+      |> Enum.map(fn event -> event.account end)
+
+    # TODO add error handling
+    accounts_epochs =
+      accounts_with_locked_gold
+      |> Enum.map(fn account_hash -> get_account_epoch_data(account_hash, block_number, block_hash) end)
+
+    Map.merge(block, %{accounts_epochs: accounts_epochs})
+  end
+
+  defp get_account_epoch_data(account_hash, block_number, block_hash) do
+    case AccountReader.fetch_celo_account_epoch_data(Hash.to_string(account_hash), block_number) do
+      {:ok, data} ->
+        data |> Map.merge(%{account_hash: account_hash, block_hash: block_hash})
+
+      error ->
+        error
     end
   end
 
@@ -188,7 +220,13 @@ defmodule Indexer.Fetcher.CeloEpochData do
     reward_types_present_for_block =
       MapSet.intersection(
         MapSet.new(Map.keys(block_with_rewards)),
-        MapSet.new([:voter_rewards, :validator_rewards, :group_rewards, :epoch_rewards])
+        MapSet.new([
+          :voter_rewards,
+          :validator_rewards,
+          :group_rewards,
+          :epoch_rewards,
+          :accounts_epochs,
+        ])
       )
 
     block_with_changes =
