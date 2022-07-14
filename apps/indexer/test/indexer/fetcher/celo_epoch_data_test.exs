@@ -9,7 +9,18 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
 
   alias Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
   alias Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent
-  alias Explorer.Chain.{Address, Block, CeloElectionRewards, CeloEpochRewards, CeloPendingEpochOperation, Hash, Wei}
+
+  alias Explorer.Chain.{
+    Address,
+    Block,
+    CeloAccountEpoch,
+    CeloElectionRewards,
+    CeloEpochRewards,
+    CeloPendingEpochOperation,
+    Hash,
+    Wei
+  }
+
   alias Indexer.Fetcher.CeloEpochData, as: CeloEpochDataFetcher
   alias Explorer.Celo.ContractEvents.Lockedgold.GoldLockedEvent
 
@@ -76,7 +87,35 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
 
       wait_for_results(fn ->
         assert Repo.one!(from(rewards in CeloEpochRewards))
-        assert count(CeloPendingEpochOperation)
+        assert count(CeloPendingEpochOperation) == 0
+      end)
+
+      # Terminates the process so it finishes all Ecto processes.
+      GenServer.stop(context.pid)
+    end
+  end
+
+  describe "async_fetch for locked gold" do
+    setup [
+      :save_voter_contract_events_and_start_fetcher,
+      :setup_votes_mox,
+      :setup_epoch_mox,
+      :setup_accounts_epochs_mox,
+      :save_locked_gold_events
+    ]
+
+    test "saves epoch reward to db and deletes pending operation", context do
+      CeloEpochDataFetcher.async_fetch([
+        %{
+          block_hash: context.last_block_in_epoch_hash,
+          block_number: context.last_block_in_epoch_number,
+          block_timestamp: DateTime.utc_now()
+        }
+      ])
+
+      wait_for_results(fn ->
+        assert Repo.one!(from(account_epoch in CeloAccountEpoch))
+        assert count(CeloPendingEpochOperation) == 0
       end)
 
       # Terminates the process so it finishes all Ecto processes.
@@ -319,8 +358,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
             block_timestamp: ~U[2022-05-10 14:18:54.093055Z],
             reward_type: "group"
           }
-        ],
-
+        ]
       }
 
       assert CeloEpochDataFetcher.import_items(input) == :ok
@@ -376,15 +414,15 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
   end
 
   describe "get_accounts_epochs/1 when there are multiple accounts" do
-    setup [:setup_accounts_epochs_mox]
+    setup [:setup_accounts_epochs_mox, :save_locked_gold_events]
 
     test "it fetches a list of accounts", %{
       block: %{
         number: block_number,
-        hash: block_hash,
+        hash: block_hash
       },
       address_1_hash: address_1_hash,
-      address_2_hash: address_2_hash,
+      address_2_hash: address_2_hash
     } do
       assert CeloEpochDataFetcher.get_accounts_epochs(%{
                block_number: block_number,
@@ -411,7 +449,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
   end
 
   # describe "get_accounts_epochs/1 when there is an error" do
-  #   setup [:setup_accounts_epochs_mox_with_error]
+  #   setup [:setup_accounts_epochs_mox_with_error, :save_locked_gold_events]
 
   #   test "it fetches a list of accounts", context do
   #     assert CeloEpochDataFetcher.get_accounts_epochs(%{
@@ -484,35 +522,36 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
       end
     )
 
-    block_1 = insert(:block, number: 172_800)
-    log_1_1 = insert(:log, block: block_1, index: 1)
-    log_1_2 = insert(:log, block: block_1, index: 2)
-    log_1_3 = insert(:log, block: block_1, index: 3)
-    block_2 = insert(:block, number: 190_080)
-    log_2 = insert(:log, block: block_2, index: 1)
+    Map.merge(context, %{address_1_hash: address_1_hash, address_2_hash: address_2_hash})
+  end
+
+  defp save_locked_gold_events(context) do
+    block = insert(:block, number: 172_800)
+    log_1 = insert(:log, block: block, index: 1)
+    log_2 = insert(:log, block: block, index: 2)
     %Explorer.Chain.CeloCoreContract{address_hash: contract_address_hash} = insert(:core_contract)
 
     insert(:contract_event, %{
       event: %GoldLockedEvent{
-        __block_number: 172_800,
-        __log_index: log_1_1.index,
+        __block_number: block.number,
+        __log_index: log_1.index,
         __contract_address_hash: contract_address_hash,
-        account: address_1_hash,
+        account: context.address_1_hash,
         value: 2
       }
     })
 
     insert(:contract_event, %{
       event: %GoldLockedEvent{
-        __block_number: 172_800,
-        __log_index: log_1_2.index,
+        __block_number: block.number,
+        __log_index: log_2.index,
         __contract_address_hash: contract_address_hash,
-        account: address_2_hash,
+        account: context.address_2_hash,
         value: 3
       }
     })
 
-    Map.merge(context, %{block: block_1, address_1_hash: address_1_hash, address_2_hash: address_2_hash})
+    Map.merge(context, %{block: block})
   end
 
   defp setup_votes_mox(context) do

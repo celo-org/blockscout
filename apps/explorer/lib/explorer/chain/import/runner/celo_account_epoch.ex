@@ -6,7 +6,7 @@ defmodule Explorer.Chain.Import.Runner.CeloAccountEpochs do
   require Ecto.Query
 
   alias Ecto.{Changeset, Multi, Repo}
-  alias Explorer.Chain.{CeloEpochRewards, CeloPendingEpochOperation, Import}
+  alias Explorer.Chain.{CeloAccountEpoch, Import}
   alias Explorer.Chain.Import.Runner.Util
 
   import Ecto.Query, only: [from: 2]
@@ -16,10 +16,10 @@ defmodule Explorer.Chain.Import.Runner.CeloAccountEpochs do
   # milliseconds
   @timeout 60_000
 
-  @type imported :: [CeloEpochRewards.t()]
+  @type imported :: [CeloAccountEpoch.t()]
 
   @impl Import.Runner
-  def ecto_schema_module, do: CeloAccountsEpochs
+  def ecto_schema_module, do: CeloAccountEpoch
 
   @impl Import.Runner
   def option_key, do: :celo_accounts_epochs
@@ -37,22 +37,8 @@ defmodule Explorer.Chain.Import.Runner.CeloAccountEpochs do
     insert_options = Util.make_insert_options(option_key(), @timeout, options)
 
     # Enforce ShareLocks tables order (see docs: sharelocks.md)
-    multi_chain =
-      Multi.run(multi, :insert_voter_reward_items, fn repo, _ ->
-        insert(repo, changes_list, insert_options)
-      end)
-
-    multi_chain
-    |> Multi.run(:falsify_fetch_epoch_rewards, fn _, _ ->
-      changes_list
-      |> Enum.each(fn reward ->
-        CeloPendingEpochOperation.falsify_celo_pending_epoch_operation(
-          reward.block_number,
-          :fetch_epoch_rewards
-        )
-      end)
-
-      {:ok, changes_list}
+    Multi.run(multi, :insert_account_epoch_items, fn repo, _ ->
+      insert(repo, changes_list, insert_options)
     end)
   end
 
@@ -60,7 +46,7 @@ defmodule Explorer.Chain.Import.Runner.CeloAccountEpochs do
   def timeout, do: @timeout
 
   @spec insert(Repo.t(), [map()], Util.insert_options()) ::
-          {:ok, [CeloEpochRewards.t()]} | {:error, [Changeset.t()]}
+          {:ok, [CeloAccountEpoch.t()]} | {:error, [Changeset.t()]}
   defp insert(repo, changes_list, %{timeout: timeout, timestamps: timestamps} = options) when is_list(changes_list) do
     on_conflict = Map.get_lazy(options, :on_conflict, &default_on_conflict/0)
 

@@ -11,9 +11,7 @@ defmodule Indexer.Fetcher.CeloEpochData do
   alias Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
   alias Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent
   alias Explorer.Chain
-  alias Explorer.Chain.{Block, CeloContractEvent, CeloPendingEpochOperation, Hash}
-  alias Explorer.Chain.CeloElectionRewards, as: CeloElectionRewardsChain
-  alias Explorer.Chain.CeloEpochRewards, as: CeloEpochRewardsChain
+  alias Explorer.Chain.{Block, CeloAccountEpoch, CeloElectionRewards, CeloEpochRewards, CeloPendingEpochOperation, Hash}
 
   alias Explorer.Celo.ContractEvents.Lockedgold.GoldLockedEvent
   alias Explorer.Celo.ContractEvents.EventMap
@@ -225,7 +223,7 @@ defmodule Indexer.Fetcher.CeloEpochData do
           :validator_rewards,
           :group_rewards,
           :epoch_rewards,
-          :accounts_epochs,
+          :accounts_epochs
         ])
       )
 
@@ -246,7 +244,7 @@ defmodule Indexer.Fetcher.CeloEpochData do
   end
 
   def changeset(epoch_rewards) when is_map(epoch_rewards) do
-    changeset = CeloEpochRewardsChain.changeset(%CeloEpochRewardsChain{}, epoch_rewards)
+    changeset = CeloEpochRewards.changeset(%CeloEpochRewards{}, epoch_rewards)
 
     if changeset.valid? do
       {:ok, changeset.changes}
@@ -260,19 +258,25 @@ defmodule Indexer.Fetcher.CeloEpochData do
     end
   end
 
-  def changeset(election_rewards) do
+  def changeset(changes) do
+    IO.inspect(changes, label: "changes")
     {changesets, all_valid} =
-      Enum.map_reduce(election_rewards, true, fn reward, all_valid ->
-        changeset = CeloElectionRewardsChain.changeset(%CeloElectionRewardsChain{}, reward)
+      Enum.map_reduce(changes, true, fn change, all_valid ->
+        changeset = if Map.has_key?(change, :locked_gold) do
+            CeloAccountEpoch.changeset(%CeloAccountEpoch{}, change)
+          else
+            CeloElectionRewards.changeset(%CeloElectionRewards{}, change)
+          end
         {changeset, all_valid and changeset.valid?}
       end)
+      IO.inspect(changesets, label: "changeset")
 
     if all_valid do
       {:ok, Enum.map(changesets, & &1.changes)}
     else
       Enum.each(changesets, fn cs ->
         Logger.error(
-          fn -> "Election rewards changeset errors. Block #{inspect(cs.changes.block_number)} requeued." end,
+          fn -> "Epoch data changeset errors. Block #{inspect(cs.changes.block_number)} requeued." end,
           errors: cs.errors
         )
       end)
@@ -290,8 +294,14 @@ defmodule Indexer.Fetcher.CeloEpochData do
 
   def chain_import(block_with_changes) when not is_map_key(block_with_changes, :epoch_rewards), do: {:error, :changeset}
 
+  def chain_import(block_with_changes) when not is_map_key(block_with_changes, :accounts_epochs),
+      do: {:error, :changeset}
+
   def chain_import(block_with_changes) do
     import_params = %{
+      celo_accounts_epochs: %{
+        params: block_with_changes.accounts_epochs
+      },
       celo_epoch_rewards: %{
         params: [block_with_changes.epoch_rewards]
       },

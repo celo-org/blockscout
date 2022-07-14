@@ -20,7 +20,7 @@ defmodule Explorer.Chain.CeloAccountEpoch do
   """
 
   @type t :: %__MODULE__{
-          account_hash: Hash.Full.t(),
+          account_hash: Hash.Address.t(),
           block_hash: Hash.Full.t(),
           locked_gold: Wei.t()
         }
@@ -29,7 +29,8 @@ defmodule Explorer.Chain.CeloAccountEpoch do
 
   @required_attrs ~w( account_hash block_hash )a
 
-  schema "celo_account_epoch" do
+  @primary_key false
+  schema "celo_accounts_epochs" do
     field(:locked_gold, Wei)
     field(:activated_gold, Wei)
 
@@ -44,7 +45,7 @@ defmodule Explorer.Chain.CeloAccountEpoch do
       foreign_key: :account_hash,
       primary_key: true,
       references: :hash,
-      type: Hash.Full
+      type: Hash.Address
     )
 
     timestamps(null: false, type: :utc_datetime_usec)
