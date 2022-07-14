@@ -404,11 +404,13 @@ defmodule Explorer.Celo.AccountReader do
       ])
 
     case data["getAccountTotalLockedGold"] do
-      {:ok, [locked_gold]} -> {:ok,
-       %{
-         locked_gold: locked_gold,
-         activated_gold: 0
-       }}
+      {:ok, [locked_gold]} ->
+        {:ok,
+         %{
+           locked_gold: locked_gold,
+           activated_gold: 0
+         }}
+
       error ->
         {:error, error}
     end
