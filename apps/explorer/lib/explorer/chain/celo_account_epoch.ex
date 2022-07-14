@@ -59,12 +59,5 @@ defmodule Explorer.Chain.CeloAccountEpoch do
     item
     |> cast(attrs, @attrs)
     |> validate_required(@required_attrs)
-
-    # TODO what is this for?
-    # |> unique_constraint(:celo_epoch_rewards_key, name: :celo_epoch_rewards_block_hash_index)
   end
-
-  # def get_celo_epoch_rewards_for_block(block_number) do
-  #   Repo.one(from(rewards in __MODULE__, where: rewards.block_number == ^block_number))
-  # end
 end

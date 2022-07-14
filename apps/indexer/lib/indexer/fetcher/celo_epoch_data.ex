@@ -80,7 +80,6 @@ defmodule Indexer.Fetcher.CeloEpochData do
   def get_accounts_epochs(%{accounts_epochs: _accounts_epochs} = block_with_accounts_epochs),
     do: block_with_accounts_epochs
 
-  # TODO is should it be number + hash?
   def get_accounts_epochs(%{block_number: block_number, block_hash: block_hash} = block) do
     accounts_with_locked_gold =
       GoldLockedEvent.events_distinct_accounts()
