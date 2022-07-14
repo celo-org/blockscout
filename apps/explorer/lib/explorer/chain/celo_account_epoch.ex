@@ -23,7 +23,7 @@ defmodule Explorer.Chain.CeloAccountEpoch do
           account_hash: Hash.Address.t(),
           block_hash: Hash.Full.t(),
           locked_gold: Wei.t(),
-          activated_gold: Wei.t(),
+          activated_gold: Wei.t()
         }
 
   @attrs ~w( account_hash block_hash locked_gold activated_gold )a

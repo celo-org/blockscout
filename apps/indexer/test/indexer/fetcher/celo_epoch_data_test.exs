@@ -401,7 +401,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
     test "it fetches empty list" do
       assert CeloEpochDataFetcher.get_accounts_epochs(%{
                block_number: 123_456,
-               block_hash: "block-hash",
+               block_hash: "block-hash"
              }) == %{
                block_number: 123_456,
                block_hash: "block-hash",

@@ -261,11 +261,13 @@ defmodule Indexer.Fetcher.CeloEpochData do
   def changeset(changes) do
     {changesets, all_valid} =
       Enum.map_reduce(changes, true, fn change, all_valid ->
-        changeset = if Map.has_key?(change, :locked_gold) do
+        changeset =
+          if Map.has_key?(change, :locked_gold) do
             CeloAccountEpoch.changeset(%CeloAccountEpoch{}, change)
           else
             CeloElectionRewards.changeset(%CeloElectionRewards{}, change)
           end
+
         {changeset, all_valid and changeset.valid?}
       end)
 
@@ -293,7 +295,7 @@ defmodule Indexer.Fetcher.CeloEpochData do
   def chain_import(block_with_changes) when not is_map_key(block_with_changes, :epoch_rewards), do: {:error, :changeset}
 
   def chain_import(block_with_changes) when not is_map_key(block_with_changes, :accounts_epochs),
-      do: {:error, :changeset}
+    do: {:error, :changeset}
 
   def chain_import(block_with_changes) do
     import_params = %{
