@@ -304,6 +304,20 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
       insert(:celo_account, address: validator_hash)
 
       input = %{
+        accounts_epochs: [
+          %{
+            account_hash: voter_hash,
+            activated_gold: 0,
+            block_hash: block_hash,
+            locked_gold: 123
+          },
+          %{
+            account_hash: validator_hash,
+            activated_gold: 0,
+            block_hash: block_hash,
+            locked_gold: 124
+          }
+        ],
         block_number: block_number,
         epoch_rewards: %{
           block_hash: block_hash,
