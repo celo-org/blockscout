@@ -400,7 +400,6 @@ defmodule Explorer.Celo.AccountReader do
     data =
       call_methods([
         {:lockedgold, "getAccountTotalLockedGold", [account_hash], block_number}
-        # TODO add activated gold
       ])
 
     with {:ok, [locked_gold]} <- data["getAccountTotalLockedGold"] do
