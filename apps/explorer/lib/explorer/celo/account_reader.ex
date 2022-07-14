@@ -394,7 +394,8 @@ defmodule Explorer.Celo.AccountReader do
     ])
   end
 
-  @spec fetch_celo_account_epoch_data(account_hash :: String.t(), block_number :: pos_integer()) :: :error | {:ok, %{:activated_gold => non_neg_integer(), :locked_gold => non_neg_integer()}}
+  @spec fetch_celo_account_epoch_data(account_hash :: String.t(), block_number :: pos_integer()) ::
+          :error | {:ok, %{:activated_gold => non_neg_integer(), :locked_gold => non_neg_integer()}}
   def fetch_celo_account_epoch_data(account_hash, block_number) do
     data =
       call_methods([
