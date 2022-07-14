@@ -208,7 +208,7 @@ defmodule Indexer.Fetcher.CeloEpochData do
       {:ok, data} ->
         data
 
-      error ->
+      {:error, error} ->
         Logger.debug(inspect(error))
         Map.put(entry, :error, error)
     end
