@@ -74,9 +74,8 @@ defmodule Explorer.Chain.Import.Runner.CeloAccountEpochs do
       account_epoch in CeloAccountEpoch,
       update: [
         set: [
-          block_number: fragment("EXCLUDED.block_number"),
-          account_hash: fragment("EXCLUDED.account_hash"),
           locked_gold: fragment("EXCLUDED.locked_gold"),
+          activated_gold: fragment("EXCLUDED.activated_gold"),
           inserted_at: fragment("LEAST(?, EXCLUDED.inserted_at)", account_epoch.inserted_at),
           updated_at: fragment("GREATEST(?, EXCLUDED.updated_at)", account_epoch.updated_at)
         ]

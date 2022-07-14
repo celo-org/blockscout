@@ -97,11 +97,11 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
 
   describe "async_fetch for locked gold" do
     setup [
-      :save_voter_contract_events_and_start_fetcher,
       :setup_votes_mox,
       :setup_epoch_mox,
       :setup_accounts_epochs_mox,
-      :save_locked_gold_events
+      :save_locked_gold_events,
+      :save_voter_contract_events_and_start_fetcher,
     ]
 
     test "saves epoch reward to db and deletes pending operation", context do
@@ -114,7 +114,9 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
       ])
 
       wait_for_results(fn ->
-        assert Repo.one!(from(account_epoch in CeloAccountEpoch))
+        assert Repo.one!(from(account_epoch in CeloAccountEpoch) |> where([ae], ae.account_hash == ^context.address_1_hash))
+        assert Repo.one!(from(account_epoch in CeloAccountEpoch) |> where([ae], ae.account_hash == ^context.address_2_hash))
+
         assert count(CeloPendingEpochOperation) == 0
       end)
 

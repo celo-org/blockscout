@@ -22,12 +22,13 @@ defmodule Explorer.Chain.CeloAccountEpoch do
   @type t :: %__MODULE__{
           account_hash: Hash.Address.t(),
           block_hash: Hash.Full.t(),
-          locked_gold: Wei.t()
+          locked_gold: Wei.t(),
+          activated_gold: Wei.t(),
         }
 
-  @attrs ~w( account_hash block_hash locked_gold )a
+  @attrs ~w( account_hash block_hash locked_gold activated_gold )a
 
-  @required_attrs ~w( account_hash block_hash )a
+  @required_attrs ~w( account_hash block_hash locked_gold activated_gold )a
 
   @primary_key false
   schema "celo_accounts_epochs" do

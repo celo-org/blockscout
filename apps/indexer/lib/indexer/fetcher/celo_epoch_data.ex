@@ -259,7 +259,6 @@ defmodule Indexer.Fetcher.CeloEpochData do
   end
 
   def changeset(changes) do
-    IO.inspect(changes, label: "changes")
     {changesets, all_valid} =
       Enum.map_reduce(changes, true, fn change, all_valid ->
         changeset = if Map.has_key?(change, :locked_gold) do
@@ -269,7 +268,6 @@ defmodule Indexer.Fetcher.CeloEpochData do
           end
         {changeset, all_valid and changeset.valid?}
       end)
-      IO.inspect(changesets, label: "changeset")
 
     if all_valid do
       {:ok, Enum.map(changesets, & &1.changes)}
