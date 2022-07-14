@@ -101,7 +101,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
       :setup_epoch_mox,
       :setup_accounts_epochs_mox,
       :save_locked_gold_events,
-      :save_voter_contract_events_and_start_fetcher,
+      :save_voter_contract_events_and_start_fetcher
     ]
 
     test "saves epoch reward to db and deletes pending operation", context do
@@ -114,8 +114,15 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
       ])
 
       wait_for_results(fn ->
-        assert Repo.one!(from(account_epoch in CeloAccountEpoch) |> where([ae], ae.account_hash == ^context.address_1_hash))
-        assert Repo.one!(from(account_epoch in CeloAccountEpoch) |> where([ae], ae.account_hash == ^context.address_2_hash))
+        assert Repo.one!(
+                 from(account_epoch in CeloAccountEpoch)
+                 |> where([ae], ae.account_hash == ^context.address_1_hash)
+               )
+
+        assert Repo.one!(
+                 from(account_epoch in CeloAccountEpoch)
+                 |> where([ae], ae.account_hash == ^context.address_2_hash)
+               )
 
         assert count(CeloPendingEpochOperation) == 0
       end)
@@ -393,9 +400,11 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
   describe "get_accounts_epochs/1 when there are no accounts at all" do
     test "it fetches empty list" do
       assert CeloEpochDataFetcher.get_accounts_epochs(%{
-               block_number: 123_456
+               block_number: 123_456,
+               block_hash: "block-hash",
              }) == %{
                block_number: 123_456,
+               block_hash: "block-hash",
                accounts_epochs: []
              }
     end
