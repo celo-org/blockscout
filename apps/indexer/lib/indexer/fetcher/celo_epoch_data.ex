@@ -13,8 +13,8 @@ defmodule Indexer.Fetcher.CeloEpochData do
   alias Explorer.Chain
   alias Explorer.Chain.{Block, CeloAccountEpoch, CeloElectionRewards, CeloEpochRewards, CeloPendingEpochOperation, Hash}
 
-  alias Explorer.Celo.ContractEvents.Lockedgold.GoldLockedEvent
   alias Explorer.Celo.ContractEvents.EventMap
+  alias Explorer.Celo.ContractEvents.Lockedgold.GoldLockedEvent
 
   alias Indexer.BufferedTask
   alias Indexer.Fetcher.Util

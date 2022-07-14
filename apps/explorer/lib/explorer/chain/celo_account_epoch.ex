@@ -12,7 +12,7 @@ defmodule Explorer.Chain.CeloAccountEpoch do
       from: 2
     ]
 
-  alias Explorer.Chain.{Block, Hash, Wei, Address}
+  alias Explorer.Chain.{Address, Block, Hash, Wei}
   alias Explorer.Repo
 
   @typedoc """
