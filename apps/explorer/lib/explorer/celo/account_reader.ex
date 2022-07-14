@@ -403,13 +403,12 @@ defmodule Explorer.Celo.AccountReader do
         # TODO add activated gold
       ])
 
-    with {:ok, [locked_gold]} <- data["getAccountTotalLockedGold"] do
-      {:ok,
+    case data["getAccountTotalLockedGold"] do
+      {:ok, [locked_gold]} -> {:ok,
        %{
          locked_gold: locked_gold,
          activated_gold: 0
        }}
-    else
       error ->
         {:error, error}
     end
