@@ -16,7 +16,10 @@ defmodule Explorer.Chain.CeloAccountEpoch do
   alias Explorer.Repo
 
   @typedoc """
-  * `block_hash` - block where this reward was paid.
+  * `account_hash` - account for which we're tracking the data
+  * `block_hash` - epoch block for which we're tracking the data
+  * `locked_gold` - amount of locked gold
+  * `activated_gold` - amount of activated gold
   """
 
   @type t :: %__MODULE__{
