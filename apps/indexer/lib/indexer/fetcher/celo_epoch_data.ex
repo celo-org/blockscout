@@ -65,7 +65,7 @@ defmodule Indexer.Fetcher.CeloEpochData do
           |> get_accounts_epochs()
           |> import_items()
         end,
-        timeout: 30_000
+        timeout: 120_000
       )
 
     failed = Enum.filter(response, &(&1 != :ok))
