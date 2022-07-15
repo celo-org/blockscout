@@ -42,8 +42,6 @@ RUN npm install -g npm@7.24.1
 ADD apps/block_scout_web/assets/ ./apps/block_scout_web/assets/
 ADD apps/explorer/package*.json ./apps/explorer/
 
-RUN npm install npm@latest
-
 # Add blockscout npm deps
 RUN cd apps/block_scout_web/assets/ && \
     npm install && \
