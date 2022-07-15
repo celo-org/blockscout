@@ -56,7 +56,7 @@ defmodule Explorer.Chain.Celo.TrackedContractEvent do
 
   def from(
         attrs,
-        log = %Log{address_hash: contract_hash, first_topic: topic},
+        %Log{address_hash: contract_hash, first_topic: topic} = log,
         %ContractEventTracking{id: id, topic: topic, name: name, address: %{hash: contract_hash}}
       ) do
     log_properties = %{log_index: log.index, block_number: log.block_number, transaction_hash: log.transaction_hash}
