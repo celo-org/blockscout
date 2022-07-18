@@ -29,7 +29,6 @@ defmodule Indexer.Prometheus.MetricsCron do
 
   @impl true
   def handle_info(:import_and_reschedule, state) do
-
     pending_transactions()
 
     block_age_and_gas_metrics()
@@ -43,7 +42,6 @@ defmodule Indexer.Prometheus.MetricsCron do
     number_of_deadlocks()
 
     longest_query_duration()
-
 
     rpc_response_times()
 
@@ -135,9 +133,7 @@ defmodule Indexer.Prometheus.MetricsCron do
     :telemetry.execute([:indexer, :blocks, :last_block_number], %{value: last_block_number})
   end
 
-
-
-    defp calculate_and_add_rpc_response_metrics(id, [start, finish]) do
+  defp calculate_and_add_rpc_response_metrics(id, [start, finish]) do
     RPCInstrumenter.instrument(%{
       time: Map.get(finish, :finish) - Map.get(start, :start),
       method: Map.get(start, :method),
