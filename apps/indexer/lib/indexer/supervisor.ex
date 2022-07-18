@@ -188,7 +188,10 @@ defmodule Indexer.Supervisor do
 
     fetchers_with_metrics =
       if metrics_enabled do
-        [{MetricsCron, [[]]} | fetchers_with_amb_bridge_mediators]
+        [
+          {MetricsCron, [[]]},
+          {Task.Supervisor, name: Indexer.Prometheus.MetricsCron.TaskSupervisor} | fetchers_with_amb_bridge_mediators
+        ]
       else
         fetchers_with_amb_bridge_mediators
       end

@@ -27,33 +27,44 @@ defmodule Indexer.Prometheus.MetricsCron do
     Application.get_env(:indexer, __MODULE__, [])[key]
   end
 
+  @metric_operations [
+    :pending_transactions,
+    :block_age_and_gas_metrics,
+    :average_block_time,
+    :pending_block_count,
+    :number_of_locks,
+    :number_of_deadlocks,
+    :longest_query_duration,
+    :rpc_response_times,
+    :transaction_count,
+    :address_count,
+    :total_token_supply
+  ]
+
   @impl true
-  def handle_info(:import_and_reschedule, state) do
-    pending_transactions()
+  def handle_info(:import_and_reschedule, state = %{running_operations: running}) do
+    unless running == [] do
+      Logger.info("MetricsCron scheduled, tasks still running: #{Enum.join(running, ",")}")
+    end
 
-    block_age_and_gas_metrics()
-
-    average_block_time()
-
-    pending_block_count()
-
-    number_of_locks()
-
-    number_of_deadlocks()
-
-    longest_query_duration()
-
-    rpc_response_times()
-
-    transaction_count()
-
-    address_count()
-
-    total_token_supply()
+    running_operations =
+      @metric_operations
+      |> Enum.filter(&(!Enum.member?(running, &1)))
+      |> Enum.map(fn operation ->
+        Task.Supervisor.async_nolink(Indexer.MetricsCron.TaskSupervisor, fn ->
+          apply(__MODULE__, operation, [])
+          {:completed, operation}
+        end)
+      end)
 
     repeat()
 
-    {:noreply, state}
+    {:noreply, %{state | running_operations: running_operations}}
+  end
+
+  @impl true
+  def handle_info({_task_ref, {:completed, operation}}, state = %{running_operations: ops}) do
+    {:noreply, %{state | running_operations: List.delete(ops, operation)}}
   end
 
   def pending_transactions do
