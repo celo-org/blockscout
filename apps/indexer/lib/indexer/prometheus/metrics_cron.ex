@@ -18,9 +18,9 @@ defmodule Indexer.Prometheus.MetricsCron do
   end
 
   @impl true
-  def init(args) do
-    send(self(), :import_and_reschedule)
-    {:ok, args}
+  def init(_) do
+    repeat()
+    {:ok, %{running_operations: []}}
   end
 
   defp config(key) do
@@ -51,10 +51,12 @@ defmodule Indexer.Prometheus.MetricsCron do
       @metric_operations
       |> Enum.filter(&(!Enum.member?(running, &1)))
       |> Enum.map(fn operation ->
-        Task.Supervisor.async_nolink(Indexer.MetricsCron.TaskSupervisor, fn ->
+        Task.Supervisor.async_nolink(Indexer.Prometheus.MetricsCron.TaskSupervisor, fn ->
           apply(__MODULE__, operation, [])
           {:completed, operation}
         end)
+
+        operation
       end)
 
     repeat()
@@ -66,6 +68,9 @@ defmodule Indexer.Prometheus.MetricsCron do
   def handle_info({_task_ref, {:completed, operation}}, state = %{running_operations: ops}) do
     {:noreply, %{state | running_operations: List.delete(ops, operation)}}
   end
+
+  @impl true
+  def handle_info({:DOWN, _, _, _, :normal}, state), do: {:noreply, state}
 
   def pending_transactions do
     pending_transactions_list_from_db = Chain.pending_transactions_list()
