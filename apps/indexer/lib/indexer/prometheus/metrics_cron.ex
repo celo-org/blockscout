@@ -112,12 +112,8 @@ defmodule Indexer.Prometheus.MetricsCron do
   end
 
   def transaction_count do
-    response_times = RpcResponseEts.get_all()
-
-    response_times
-    |> Enum.filter(&Map.has_key?(elem(&1, 1), :finish))
-    |> Enum.map(&elem(&1, 0))
-    |> Enum.each(&calculate_and_add_rpc_response_metrics(&1, :proplists.get_all_values(&1, response_times)))
+    total_transaction_count = Chain.transaction_estimated_count()
+    :telemetry.execute([:indexer, :transactions, :total], %{value: total_transaction_count})
   end
 
   def address_count do
