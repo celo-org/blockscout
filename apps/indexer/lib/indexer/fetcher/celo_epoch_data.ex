@@ -77,27 +77,39 @@ defmodule Indexer.Fetcher.CeloEpochData do
   def get_accounts_epochs(%{accounts_epochs: _accounts_epochs} = block_with_accounts_epochs),
     do: block_with_accounts_epochs
 
-  def get_accounts_epochs(%{block_number: block_number, block_hash: block_hash} = block) do
-    accounts_with_locked_gold =
-      GoldLockedEvent.events_distinct_accounts()
-      |> EventMap.query_all()
-      |> Enum.map(fn event -> event.account end)
-
-    # TODO add error handling
-    accounts_epochs =
-      accounts_with_locked_gold
-      |> Enum.map(fn account_hash -> get_account_epoch_data(account_hash, block_number, block_hash) end)
-
-    Map.merge(block, %{accounts_epochs: accounts_epochs})
+  def get_accounts_epochs(block) do
+    GoldLockedEvent.events_distinct_accounts()
+    |> EventMap.query_all()
+    |> Enum.map(fn event -> event.account end)
+    |> fetch_accounts_epochs(block)
   end
+
+  def fetch_accounts_epochs([], block, acc), do: Map.put(block, :accounts_epochs, acc)
+
+  def fetch_accounts_epochs(
+        [account_hash | hashes],
+        %{block_hash: block_hash, block_number: block_number} = block,
+        acc
+      ) do
+    case get_account_epoch_data(account_hash, block_number, block_hash) do
+      {:ok, data} ->
+        fetch_accounts_epochs(hashes, block, [data | acc])
+
+      {:error, error} ->
+        Logger.error(inspect(error))
+        Map.put(block, :error, error)
+    end
+  end
+
+  def fetch_accounts_epochs(hashes, block), do: fetch_accounts_epochs(hashes, block, [])
 
   defp get_account_epoch_data(account_hash, block_number, block_hash) do
     case AccountReader.fetch_celo_account_epoch_data(Hash.to_string(account_hash), block_number) do
       {:ok, data} ->
-        data |> Map.merge(%{account_hash: account_hash, block_hash: block_hash})
+        {:ok, data |> Map.merge(%{account_hash: account_hash, block_hash: block_hash})}
 
-      error ->
-        error
+      {:error, error} ->
+        {:error, error}
     end
   end
 

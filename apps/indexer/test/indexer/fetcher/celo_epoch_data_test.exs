@@ -313,16 +313,16 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
       input = %{
         accounts_epochs: [
           %{
-            account_hash: voter_hash,
-            activated_gold: 0,
-            block_hash: block_hash,
-            locked_gold: 123
-          },
-          %{
             account_hash: validator_hash,
             activated_gold: 0,
             block_hash: block_hash,
             locked_gold: 124
+          },
+          %{
+            account_hash: voter_hash,
+            activated_gold: 0,
+            block_hash: block_hash,
+            locked_gold: 123
           }
         ],
         block_number: block_number,
@@ -457,15 +457,15 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
                block_hash: block_hash,
                accounts_epochs: [
                  %{
-                   account_hash: address_1_hash,
-                   block_hash: block_hash,
-                   locked_gold: 123,
-                   activated_gold: 0
-                 },
-                 %{
                    account_hash: address_2_hash,
                    block_hash: block_hash,
                    locked_gold: 124,
+                   activated_gold: 0
+                 },
+                 %{
+                   account_hash: address_1_hash,
+                   block_hash: block_hash,
+                   locked_gold: 123,
                    activated_gold: 0
                  }
                ]
@@ -473,27 +473,33 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
     end
   end
 
-  # describe "get_accounts_epochs/1 when there is an error" do
-  #   setup [:setup_accounts_epochs_mox_with_error, :save_locked_gold_events]
+  describe "get_accounts_epochs/1 when there is an error" do
+    setup [:setup_accounts_epochs_mox_with_error, :save_locked_gold_events]
 
-  #   test "it fetches a list of accounts", context do
-  #     assert CeloEpochDataFetcher.get_accounts_epochs(%{
-  #              block_number: 123_456
-  #            }) == %{
-  #              block_number: 123_456,
-  #              accounts_epochs: [
-
-  #              ]
-  #            }
-  #   end
-  # end
+    test "it handles error", %{
+      block: %{
+        number: block_number,
+        hash: block_hash
+      },
+      address_1_hash: address_1_hash,
+      address_2_hash: address_2_hash
+    } do
+      assert CeloEpochDataFetcher.get_accounts_epochs(%{
+               block_number: block_number,
+               block_hash: block_hash
+             }) == %{
+               block_number: block_number,
+               block_hash: block_hash,
+               error: "mock_reason"
+             }
+    end
+  end
 
   defp setup_accounts_epochs_mox(context) do
     %Address{hash: address_1_hash} = insert(:address)
     %Address{hash: address_2_hash} = insert(:address)
 
     set_test_addresses(%{
-      # TODO change address or not?
       "LockedGold" => "0x8d6677192144292870907e3fa8a5527fe55a7ff6"
     })
 
@@ -543,6 +549,61 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
               result: "0x000000000000000000000000000000000000000000000000000000000000007c"
             }
           ]
+        }
+      end
+    )
+
+    Map.merge(context, %{address_1_hash: address_1_hash, address_2_hash: address_2_hash})
+  end
+
+  defp setup_accounts_epochs_mox_with_error(context) do
+    %Address{hash: address_1_hash} = insert(:address)
+    %Address{hash: address_2_hash} = insert(:address)
+
+    set_test_addresses(%{
+      "LockedGold" => "0x8d6677192144292870907e3fa8a5527fe55a7ff6"
+    })
+
+    expect(
+      EthereumJSONRPC.Mox,
+      :json_rpc,
+      fn [
+           %{
+             id: getAccountTotalLockedGold,
+             jsonrpc: "2.0",
+             method: "eth_call",
+             params: [%{data: "0x30ec70f5000000000000000000000000" <> address_1_hash, to: _}, "0x2A300"]
+           }
+         ],
+         _ ->
+        {
+          :ok,
+          [
+            %{
+              id: getAccountTotalLockedGold,
+              jsonrpc: "2.0",
+              result: "0x000000000000000000000000000000000000000000000000000000000000007b"
+            }
+          ]
+        }
+      end
+    )
+
+    expect(
+      EthereumJSONRPC.Mox,
+      :json_rpc,
+      fn [
+           %{
+             id: getAccountTotalLockedGold,
+             jsonrpc: "2.0",
+             method: "eth_call",
+             params: [%{data: "0x30ec70f5000000000000000000000000" <> address_2_hash, to: _}, "0x2A300"]
+           }
+         ],
+         _ ->
+        {
+          :error,
+          :mock_reason
         }
       end
     )

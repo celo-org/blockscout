@@ -410,8 +410,9 @@ defmodule Explorer.Celo.AccountReader do
            activated_gold: 0
          }}
 
+      # error is already in format of {:error, reason}
       error ->
-        {:error, error}
+        error
     end
   end
 
