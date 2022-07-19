@@ -42,7 +42,7 @@ defmodule Indexer.Prometheus.MetricsCron do
   ]
 
   @impl true
-  def handle_info(:import_and_reschedule, state = %{running_operations: running}) do
+  def handle_info(:import_and_reschedule, %{running_operations: running} = state) do
     unless running == [] do
       Logger.info("MetricsCron scheduled, tasks still running: #{Enum.join(running, ",")}")
     end
@@ -65,7 +65,7 @@ defmodule Indexer.Prometheus.MetricsCron do
   end
 
   @impl true
-  def handle_info({_task_ref, {:completed, operation}}, state = %{running_operations: ops}) do
+  def handle_info({_task_ref, {:completed, operation}}, %{running_operations: ops} = state) do
     {:noreply, %{state | running_operations: List.delete(ops, operation)}}
   end
 
