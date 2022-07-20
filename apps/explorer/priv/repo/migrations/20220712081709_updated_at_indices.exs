@@ -5,14 +5,15 @@ defmodule Explorer.Repo.Migrations.UpdatedAtIndices do
   @disable_ddl_transaction true
 
   @tables ~w(
-    token_transfers
     blocks
     celo_wallets
     address_current_token_balances
     address_token_balances
+    addresses
+    token_transfers
   )a
 
   def change do
-    for table <- @tables, do: create(index(table, [:updated_at], concurrently: true))
+    for table <- @tables, do: create_if_not_exists(index(table, [:updated_at], concurrently: true))
   end
 end
