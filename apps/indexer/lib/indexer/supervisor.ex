@@ -23,8 +23,7 @@ defmodule Indexer.Supervisor do
   alias Indexer.Fetcher.{
     BlockReward,
     CeloAccount,
-    CeloElectionRewards,
-    CeloEpochRewards,
+    CeloEpochData,
     CeloMaterializedViewRefresh,
     CeloUnlocked,
     CeloValidator,
@@ -160,9 +159,7 @@ defmodule Indexer.Supervisor do
        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {CeloValidatorHistory.Supervisor,
        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
-      {CeloElectionRewards.Supervisor,
-       [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
-      {CeloEpochRewards.Supervisor,
+      {CeloEpochData.Supervisor,
        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {CeloUnlocked.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {CeloVoters.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
@@ -191,7 +188,12 @@ defmodule Indexer.Supervisor do
 
     fetchers_with_metrics =
       if metrics_enabled do
-        [{MetricsCron, [[]]} | fetchers_with_amb_bridge_mediators]
+        metrics_processes = [
+          {MetricsCron, [[]]},
+          {Task.Supervisor, name: Indexer.Prometheus.MetricsCron.TaskSupervisor}
+        ]
+
+        metrics_processes ++ fetchers_with_amb_bridge_mediators
       else
         fetchers_with_amb_bridge_mediators
       end
