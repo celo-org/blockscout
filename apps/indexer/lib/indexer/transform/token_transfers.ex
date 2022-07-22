@@ -115,7 +115,7 @@ defmodule Indexer.Transform.TokenTransfers do
       from_address_hash: itx.from_address_hash,
       to_address_hash: to_hash,
       token_contract_address_hash: gold_token,
-      transaction_hash: tx.transaction_hash,
+      transaction_hash: itx.transaction_hash,
       token_id: nil,
       token_type: "ERC-20"
     }
