@@ -47,7 +47,7 @@ defmodule Indexer.Supervisor do
 
   alias Indexer.Temporary.{
     BlocksTransactionsMismatch,
-    UncatalogedTokenTransfers,
+    # UncatalogedTokenTransfers,
     UnclesWithoutIndex
   }
 
@@ -144,7 +144,7 @@ defmodule Indexer.Supervisor do
       {PendingTransactionsSanitizer, [[json_rpc_named_arguments: json_rpc_named_arguments]]},
 
       # Temporary workers
-      {UncatalogedTokenTransfers.Supervisor, [[]]},
+      # {UncatalogedTokenTransfers.Supervisor, [[]]},
       {UnclesWithoutIndex.Supervisor,
        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {BlocksTransactionsMismatch.Supervisor,
