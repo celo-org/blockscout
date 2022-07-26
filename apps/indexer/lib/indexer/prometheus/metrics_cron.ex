@@ -28,7 +28,7 @@ defmodule Indexer.Prometheus.MetricsCron do
   end
 
   @metric_operations [
-    :pending_transactions,
+    # :pending_transactions,
     :block_age_and_gas_metrics,
     :average_block_time,
     :pending_block_count,
