@@ -82,7 +82,7 @@ defmodule Indexer.Transform.TokenTransfers do
 
   @doc "Discerns CELO token transfers from internal transactions"
   def parse_itx(txs, gold_token) do
-    initial_acc = %{token_transfers: [], gold_token: gold_token, transfer_count: 0}
+    initial_acc = %{token_transfers: [], gold_token: gold_token, transfer_count: 1}
 
     txs
     |> Enum.filter(fn a -> a.value > 0 end)
