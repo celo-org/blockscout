@@ -235,9 +235,6 @@ defmodule Indexer.Transform.TokenTransfersTest do
         }
       ])
 
-    # asset MapSet.new(Enum.map(result_itx, fn itx -> itx.log_index end)));
-    # IO.inspect(MapSet.new(Enum.map(result_tx, fn tx -> tx.log_index end)));
-
     # create a map of log_index -> count of log_index in result
     log_indexes =
       Enum.concat(result_itx, result_tx)
