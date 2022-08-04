@@ -39,30 +39,42 @@ defmodule Explorer.Celo.Events.TransformerTest do
 
     test "transforms event parameters" do
       test_abi = """
+      {
+        "anonymous": false,
+        "inputs": [
         {
-            "anonymous": false,
-            "inputs": [
-              {
-                "indexed": true,
-                "internalType": "address",
-                "name": "validator",
-                "type": "address"
-              },
-              {
-                "indexed": false,
-                "internalType": "bytes",
-                "name": "ecdsaPublicKey",
-                "type": "bytes"
-              }
-            ],
-            "name": "ValidatorEcdsaPublicKeyUpdated",
-            "type": "event"
+          "indexed": true,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "group",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "value",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "units",
+          "type": "uint256"
         }
+        ],
+        "name": "ValidatorGroupVoteActivated",
+        "type": "event"
+      }
       """
 
       result = Transformer.decode(test_abi, @test_log)
 
-      assert Enum.all?([:validator, :ecdsaPublicKey], &(Map.has_key?(result, &1)))
+      assert Enum.all?([:account, :group, :value, :units], &(Map.has_key?(result, &1)))
     end
   end
 end
