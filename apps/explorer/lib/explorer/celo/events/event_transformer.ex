@@ -6,23 +6,13 @@ defmodule Explorer.Celo.Events.Transformer do
   alias ABI.FunctionSelector
   require Logger
 
-  # decode json string
-  def decode(event_abi, log) when is_binary(event_abi) do
-    event_abi
-    |> Jason.decode!()
-    |> decode(log)
-  end
-
-  def decode(event_abi, %{second_topic: second_topic,
+  def decode(%FunctionSelector{input_names: inputs, inputs_indexed: indexed, types: types}, %{second_topic: second_topic,
     third_topic: third_topic,
     fourth_topic: fourth_topic,
     data: data
-  }) when is_map(event_abi) do
-    # extract necessary data from abi selector
-    %{input_names: inputs, inputs_indexed: indexed, types: types} = FunctionSelector.parse_specification_item(event_abi)
-
+  })  do
     event_params = [inputs, indexed, types]
-             |> Enum.zip()
+                   |> Enum.zip()
 
     # decode indexed parameters directly from topics
     indexed_params =
@@ -50,9 +40,23 @@ defmodule Explorer.Celo.Events.Transformer do
     unindexed_params |> Map.merge(indexed_params)
   end
 
-  def decode16!(nil), do: nil
+  # decode json string
+  def decode(event_abi, log) when is_binary(event_abi) do
+    event_abi
+    |> Jason.decode!()
+    |> decode(log)
+  end
 
-  def decode16!(value) do
+  # convert abi map into ABI.FunctionSelector
+  def decode(event_abi, log) when is_map(event_abi) do
+    event_abi
+    |> FunctionSelector.parse_specification_item()
+    |> decode(log)
+  end
+
+  defp decode16!(nil), do: nil
+
+  defp decode16!(value) do
     value
     |> String.trim_leading("0x")
     |> Base.decode16!(case: :lower)
