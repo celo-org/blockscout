@@ -6,20 +6,24 @@ defmodule Explorer.Celo.Events.Transformer do
   alias ABI.FunctionSelector
   require Logger
 
-  def decode(%FunctionSelector{input_names: inputs, inputs_indexed: indexed, types: types}, %{second_topic: second_topic,
-    third_topic: third_topic,
-    fourth_topic: fourth_topic,
-    data: data
-  })  do
-    event_params = [inputs, indexed, types]
-                   |> Enum.zip()
+  def decode(%FunctionSelector{input_names: inputs, inputs_indexed: indexed, types: types}, %{
+        second_topic: second_topic,
+        third_topic: third_topic,
+        fourth_topic: fourth_topic,
+        data: data
+      }) do
+    event_params =
+      [inputs, indexed, types]
+      |> Enum.zip()
 
     # decode indexed parameters directly from topics
     indexed_params =
       event_params
       |> Enum.filter(fn {_name, indexed, _type} -> indexed == true end)
       |> Enum.zip([second_topic, third_topic, fourth_topic])
-      |> Enum.into(%{}, fn {{name, _indexed, type}, topic} -> {String.to_atom(name), Common.decode_event_topic(topic, type) } end)
+      |> Enum.into(%{}, fn {{name, _indexed, type}, topic} ->
+        {String.to_atom(name), Common.decode_event_topic(topic, type)}
+      end)
 
     # decode unindexed parameters from the log data body via their declaration order within the event abi
     unindexed_param_specs =
@@ -28,8 +32,8 @@ defmodule Explorer.Celo.Events.Transformer do
 
     unindexed_param_values =
       unindexed_param_specs
-      |> Enum.map(fn {_name,_indexed, type} -> type end)
-      |> then(&(Common.decode_event_data(data, &1)))
+      |> Enum.map(fn {_name, _indexed, type} -> type end)
+      |> then(&Common.decode_event_data(data, &1))
 
     unindexed_params =
       [unindexed_param_specs, unindexed_param_values]
