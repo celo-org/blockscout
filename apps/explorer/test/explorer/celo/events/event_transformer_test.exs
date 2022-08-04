@@ -15,21 +15,21 @@ defmodule Explorer.Celo.Events.TransformerTest do
         byte_count: 32,
         bytes:
           <<51, 29, 185, 3, 161, 229, 18, 118, 203, 232, 19, 53, 6, 69, 194, 216, 184, 147, 82, 253, 153, 80, 89, 61,
-          16, 26, 146, 28, 159, 122, 17, 82>>
+            16, 26, 146, 28, 159, 122, 17, 82>>
       },
       type: nil,
       block_number: 10_913_664,
       data: %Explorer.Chain.Data{
         bytes:
           <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3, 161, 136, 195, 31, 239, 170, 0, 0,
-          0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 8, 108, 209, 196, 23, 97, 135, 112, 147, 87, 144, 173,
-          113, 77, 119, 48>>
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 18, 8, 108, 209, 196, 23, 97, 135, 112, 147, 87, 144, 173, 113,
+            77, 119, 48>>
       },
       block_hash: %Explorer.Chain.Hash{
         byte_count: 32,
         bytes:
           <<39, 45, 177, 52, 77, 35, 177, 94, 225, 112, 13, 8, 78, 175, 197, 158, 167, 36, 208, 58, 41, 172, 144, 114,
-          90, 101, 80, 42, 78, 59, 143, 220>>
+            90, 101, 80, 42, 78, 59, 143, 220>>
       },
       address_hash: %Explorer.Chain.Hash{
         byte_count: 20,
@@ -74,7 +74,7 @@ defmodule Explorer.Celo.Events.TransformerTest do
 
       result = Transformer.decode(test_abi, @test_log)
 
-      assert Enum.all?([:account, :group, :value, :units], &(Map.has_key?(result, &1)))
+      assert Enum.all?([:account, :group, :value, :units], &Map.has_key?(result, &1))
     end
   end
 end
