@@ -6,12 +6,15 @@ defmodule Explorer.Celo.Events.Transformer do
   require Logger
 
   @doc "Takes an event abi and a Explorer.Chain.Log instance (or map with matching parameters) and decodes the log according to the abi specifications"
-  def decode_event(%FunctionSelector{input_names: inputs, inputs_indexed: indexed, types: types, function: event_name}, %{
-        second_topic: second_topic,
-        third_topic: third_topic,
-        fourth_topic: fourth_topic,
-        data: data
-      }) do
+  def decode_event(
+        %FunctionSelector{input_names: inputs, inputs_indexed: indexed, types: types, function: event_name},
+        %{
+          second_topic: second_topic,
+          third_topic: third_topic,
+          fourth_topic: fourth_topic,
+          data: data
+        }
+      ) do
     event_params =
       [inputs, indexed, types]
       |> Enum.zip()
@@ -22,7 +25,7 @@ defmodule Explorer.Celo.Events.Transformer do
       |> Map.merge(decode_unindexed(event_params, data))
       |> EventUtils.normalise_map()
     rescue
-       error ->
+      error ->
         Logger.error("Error decoding #{event_name} - #{inspect(error)}")
         reraise error, __STACKTRACE__
     end
@@ -44,12 +47,12 @@ defmodule Explorer.Celo.Events.Transformer do
 
   # relevant_topics are the second to fourth topics - the first topic is always the event identifier
   defp decode_indexed(event_params, relevant_topics) do
-      event_params
-      |> Enum.filter(fn {_name, indexed, _type} -> indexed == true end)
-      |> Enum.zip(relevant_topics)
-      |> Enum.into(%{}, fn {{name, _indexed, type}, topic} ->
-        {name, EventUtils.decode_event_topic(topic, type)}
-      end)
+    event_params
+    |> Enum.filter(fn {_name, indexed, _type} -> indexed == true end)
+    |> Enum.zip(relevant_topics)
+    |> Enum.into(%{}, fn {{name, _indexed, type}, topic} ->
+      {name, EventUtils.decode_event_topic(topic, type)}
+    end)
   end
 
   defp decode_unindexed(event_params, data) do
