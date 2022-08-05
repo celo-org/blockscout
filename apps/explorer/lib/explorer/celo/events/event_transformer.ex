@@ -6,7 +6,7 @@ defmodule Explorer.Celo.Events.Transformer do
   require Logger
 
   @doc "Takes an event abi and a Explorer.Chain.Log instance (or map with matching parameters) and decodes the log according to the abi specifications"
-  def decode_event(%FunctionSelector{input_names: inputs, inputs_indexed: indexed, types: types}, %{
+  def decode_event(%FunctionSelector{input_names: inputs, inputs_indexed: indexed, types: types, function: event_name}, %{
         second_topic: second_topic,
         third_topic: third_topic,
         fourth_topic: fourth_topic,
@@ -16,10 +16,16 @@ defmodule Explorer.Celo.Events.Transformer do
       [inputs, indexed, types]
       |> Enum.zip()
 
-    event_params
-    |> decode_indexed([second_topic, third_topic, fourth_topic])
-    |> Map.merge(decode_unindexed(event_params, data))
-    |> EventUtils.normalise_map()
+    try do
+      event_params
+      |> decode_indexed([second_topic, third_topic, fourth_topic])
+      |> Map.merge(decode_unindexed(event_params, data))
+      |> EventUtils.normalise_map()
+    rescue
+       error ->
+        Logger.error("Error decoding #{event_name} - #{inspect(error)}")
+        reraise error, __STACKTRACE__
+    end
   end
 
   # decode json string
