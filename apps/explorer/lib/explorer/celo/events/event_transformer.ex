@@ -1,12 +1,12 @@
 defmodule Explorer.Celo.Events.Transformer do
   @moduledoc "Transform Explorer.Chain.Log + Event ABI to a human readable map of parameters"
 
-  alias Explorer.Chain.Log
-  alias Explorer.Celo.ContractEvents.Common
+  alias Explorer.Celo.ContractEvents.Common, as: EventUtils
   alias ABI.FunctionSelector
   require Logger
 
-  def decode(%FunctionSelector{input_names: inputs, inputs_indexed: indexed, types: types}, %{
+  @doc "Takes an event abi and a Explorer.Chain.Log instance (or map with matching parameters) and decodes the log according to the abi specifications"
+  def decode_event(%FunctionSelector{input_names: inputs, inputs_indexed: indexed, types: types}, %{
         second_topic: second_topic,
         third_topic: third_topic,
         fourth_topic: fourth_topic,
@@ -19,20 +19,21 @@ defmodule Explorer.Celo.Events.Transformer do
     event_params
     |> decode_indexed([second_topic, third_topic, fourth_topic])
     |> Map.merge(decode_unindexed(event_params, data))
+    |> EventUtils.normalise_map()
   end
 
   # decode json string
-  def decode(event_abi, log) when is_binary(event_abi) do
+  def decode_event(event_abi, log) when is_binary(event_abi) do
     event_abi
     |> Jason.decode!()
-    |> decode(log)
+    |> decode_event(log)
   end
 
   # convert abi map into ABI.FunctionSelector
-  def decode(event_abi, log) when is_map(event_abi) do
+  def decode_event(event_abi, log) when is_map(event_abi) do
     event_abi
     |> FunctionSelector.parse_specification_item()
-    |> decode(log)
+    |> decode_event(log)
   end
 
   # relevant_topics are the second to fourth topics - the first topic is always the event identifier
@@ -41,7 +42,7 @@ defmodule Explorer.Celo.Events.Transformer do
       |> Enum.filter(fn {_name, indexed, _type} -> indexed == true end)
       |> Enum.zip(relevant_topics)
       |> Enum.into(%{}, fn {{name, _indexed, type}, topic} ->
-        {String.to_atom(name), Common.decode_event_topic(topic, type)}
+        {name, EventUtils.decode_event_topic(topic, type)}
       end)
   end
 
@@ -54,19 +55,11 @@ defmodule Explorer.Celo.Events.Transformer do
     unindexed_param_values =
       unindexed_param_specs
       |> Enum.map(fn {_name, _indexed, type} -> type end)
-      |> then(&Common.decode_event_data(data, &1))
+      |> then(&EventUtils.decode_event_data(data, &1))
 
     # reconcile values with parameter name
     [unindexed_param_specs, unindexed_param_values]
     |> Enum.zip()
-    |> Enum.into(%{}, fn {{name, _i, _type}, value} -> {String.to_atom(name), value} end)
-  end
-
-  defp decode16!(nil), do: nil
-
-  defp decode16!(value) do
-    value
-    |> String.trim_leading("0x")
-    |> Base.decode16!(case: :lower)
+    |> Enum.into(%{}, fn {{name, _i, _type}, value} -> {name, value} end)
   end
 end

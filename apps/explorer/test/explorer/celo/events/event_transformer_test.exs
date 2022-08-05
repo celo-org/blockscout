@@ -72,9 +72,13 @@ defmodule Explorer.Celo.Events.TransformerTest do
       }
       """
 
-      result = Transformer.decode(test_abi, @test_log)
+      result = Transformer.decode_event(test_abi, @test_log)
 
       assert Enum.all?([:account, :group, :value, :units], &Map.has_key?(result, &1))
+      assert result.value == 66_980_000_000_000_000_000
+      assert result.units == 6_136_281_451_163_456_507_329_304_650_157_103_347_504
+      assert to_string(result.account) == "0x88c1c759600ec3110af043c183a2472ab32d099c"
+      assert to_string(result.group) == "0x47b2db6af05a55d42ed0f3731735f9479abf0673"
     end
   end
 end
