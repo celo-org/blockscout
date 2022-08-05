@@ -82,7 +82,7 @@ defmodule Explorer.Celo.Events.TransformerTest do
     end
 
     test "errors on Log instance that doesn't correspond to event abi" do
-      #EpochRewardsDistributedToVotersEvent
+      # EpochRewardsDistributedToVotersEvent
       test_log = %Explorer.Chain.Log{
         address_hash: %Explorer.Chain.Hash{
           byte_count: 20,
@@ -92,13 +92,13 @@ defmodule Explorer.Celo.Events.TransformerTest do
           byte_count: 32,
           bytes:
             <<254, 191, 217, 63, 241, 142, 215, 218, 49, 254, 129, 108, 56, 249, 72, 220, 12, 207, 160, 12, 108, 157,
-            106, 108, 17, 51, 158, 153, 118, 182, 255, 64>>
+              106, 108, 17, 51, 158, 153, 118, 182, 255, 64>>
         },
         block_number: 11_111_040,
         data: %Explorer.Chain.Data{
           bytes:
             <<0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 22, 80, 90, 116, 216, 163, 248, 180,
-            104>>
+              104>>
         },
         first_topic: "0x91ba34d62474c14d6c623cd322f4256666c7a45b7fdaa3378e009d39dfcec2a7",
         fourth_topic: nil,
