@@ -1,8 +1,8 @@
 defmodule Explorer.Celo.Events.Transformer do
   @moduledoc "Transform Explorer.Chain.Log + Event ABI to a human readable map of parameters"
 
-  alias Explorer.Celo.ContractEvents.Common, as: EventUtils
   alias ABI.FunctionSelector
+  alias Explorer.Celo.ContractEvents.Common, as: EventUtils
   require Logger
 
   @doc "Takes an event abi and a Explorer.Chain.Log instance (or map with matching parameters) and decodes the log according to the abi specifications"
