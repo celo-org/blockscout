@@ -12,7 +12,7 @@ defmodule Explorer.Celo.EpochUtil do
     rem(bn, 17_280) == 0
   end
 
-  def calculate_epoch_transaction_count_for_block(bn, _epoch_rewards = nil), do: 0
+  def calculate_epoch_transaction_count_for_block(bn, nil = _epoch_rewards), do: 0
 
   def calculate_epoch_transaction_count_for_block(bn, _epoch_rewards) do
     if is_epoch_block?(bn) do
