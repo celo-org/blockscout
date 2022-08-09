@@ -4,7 +4,10 @@ defmodule Indexer.Fetcher.EventProcessor do
   use Indexer.Fetcher
   use Spandex.Decorators
   require Logger
-  alias Indexer.BufferedTask
+  require Indexer.Tracer
+
+  alias Indexer.{BufferedTask, Tracer}
+  alias Indexer.Fetcher.Util
 
   @behaviour BufferedTask
 
@@ -15,6 +18,17 @@ defmodule Indexer.Fetcher.EventProcessor do
     task_supervisor: Indexer.Fetcher.EventProcessor.TaskSupervisor,
     metadata: [fetcher: :event_processor]
   ]
+
+  @impl BufferedTask
+  def init(initial, _reducer, _) do
+
+    initial
+  end
+
+  @doc false
+  def child_spec([init_options, gen_server_options]) do
+    Util.default_child_spec(init_options, gen_server_options, __MODULE__)
+  end
 
   @impl BufferedTask
   @decorate trace(name: "fetch", resource: "Indexer.Fetcher.EventProcessor.run/2", service: :indexer, tracer: Tracer)
