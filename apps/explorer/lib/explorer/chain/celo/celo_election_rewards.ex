@@ -199,8 +199,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
   def get_epoch_transaction_count_for_block(block_number) do
     query = from(reward in __MODULE__, select: count(fragment("*")), where: reward.block_number == ^block_number)
 
-    # we add 2 transactions manually
-    Repo.one!(query) + 2
+    Repo.one!(query)
   end
 
   defp extract_pagination_params(pagination_params) do

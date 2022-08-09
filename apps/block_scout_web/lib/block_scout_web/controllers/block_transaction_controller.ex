@@ -10,7 +10,7 @@ defmodule BlockScoutWeb.BlockTransactionController do
 
   alias Explorer.Celo.{AccountReader, EpochUtil}
   alias Explorer.Chain
-  alias Explorer.Chain.CeloElectionRewards
+  alias Explorer.Chain.{CeloElectionRewards, CeloEpochRewards}
 
   alias Phoenix.View
 
@@ -115,12 +115,7 @@ defmodule BlockScoutWeb.BlockTransactionController do
       {:ok, block} ->
         block_transaction_count = Chain.block_to_transaction_count(block.hash)
 
-        epoch_transaction_count =
-          if EpochUtil.is_epoch_block?(block.number) do
-            CeloElectionRewards.get_epoch_transaction_count_for_block(block.number)
-          else
-            0
-          end
+        epoch_rewards = CeloEpochRewards.get_celo_epoch_rewards_for_block(block.number)
 
         render(
           conn,
@@ -128,7 +123,7 @@ defmodule BlockScoutWeb.BlockTransactionController do
           block: block,
           block_transaction_count: block_transaction_count,
           current_path: Controller.current_full_path(conn),
-          epoch_transaction_count: epoch_transaction_count
+          epoch_transaction_count: EpochUtil.calculate_epoch_transaction_count_for_block(block.number, epoch_rewards)
         )
 
       {:error, {:invalid, :hash}} ->
