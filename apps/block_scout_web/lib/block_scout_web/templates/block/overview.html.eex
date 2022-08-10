@@ -91,7 +91,7 @@
               <%= gettext("Epoch Transactions") %>
             </dt>
             <dd class="col-sm-9 col-lg-10">
-              <a href="#a.card-tab" class="page-link bs-label large btn-no-border-link-to-tems">
+              <a href="<%= AccessHelpers.get_path(@conn, :block_epoch_transaction_path, :index, @block.number) %>" class="page-link bs-label large btn-no-border-link-to-tems">
                 <%= gettext "%{count} Epoch Transactions", count: @epoch_transaction_count %>
               </a>
             </dd>
@@ -202,7 +202,7 @@
                 text: gettext("The total gas amount used in the block and its percentage of gas filled in the block.") %>
                 <%= gettext("Gas Used") %>
               </dt>
-              <dd class="col-sm-9 col-lg-10"><%= @block.gas_used |> BlockScoutWeb.Cldr.Number.to_string! %> | <%= (Decimal.to_integer(@block.gas_used) / Decimal.to_integer(@block.gas_limit)) |> BlockScoutWeb.Cldr.Number.to_string!(format: "#.#%") %></dd>
+              <dd class="col-sm-9 col-lg-10"><%= @block.gas_used |> BlockScoutWeb.Cldr.Number.to_string! %> | <%= if Decimal.cmp(@block.gas_limit, 0) == :eq, do: "0%", else: ((Decimal.to_integer(@block.gas_used) / Decimal.to_integer(@block.gas_limit)) |> BlockScoutWeb.Cldr.Number.to_string!(format: "#.#%")) %></dd>
             </dl>
             <!-- Gas Limit -->
             <dl class="row">
@@ -283,7 +283,7 @@
                 </dt>
                 <dd class="col-sm-9 col-lg-10"><%= format_wei_value(%Wei{value: priority_fee}, :ether) %></dd>
             </dl>
-          <% end %>  
+          <% end %>
           <%= if show_reward?(@block.rewards) do %>
             <hr>
             <%= for block_reward <- @block.rewards do %>
