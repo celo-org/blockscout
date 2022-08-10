@@ -32,10 +32,16 @@ defmodule Indexer.Fetcher.EventProcessor do
 
   @impl BufferedTask
   @decorate trace(name: "fetch", resource: "Indexer.Fetcher.EventProcessor.run/2", service: :indexer, tracer: Tracer)
-  def run(entries, _json_rpc_named_arguments) do
+  def run(entries, state) do
     # take a batch
     # transform
     # send to import
     # emit metrics
+  end
+
+
+  @doc "Accepts a list of maps representing events and filters out entries that have no corresponding `ContractEventTracking` row"
+  def filter_tracked_events(events) do
+
   end
 end
