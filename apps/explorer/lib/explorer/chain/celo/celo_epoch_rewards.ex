@@ -43,10 +43,11 @@ defmodule Explorer.Chain.CeloEpochRewards do
           electable_validators_max: non_neg_integer(),
           reserve_gold_balance: Wei.t(),
           gold_total_supply: Wei.t(),
-          stable_usd_total_supply: Wei.t()
+          stable_usd_total_supply: Wei.t(),
+          reserve_bolster: Wei.t()
         }
 
-  @attrs ~w( block_hash block_number epoch_number validator_target_epoch_rewards voter_target_epoch_rewards community_target_epoch_rewards carbon_offsetting_target_epoch_rewards target_total_supply rewards_multiplier rewards_multiplier_max rewards_multiplier_under rewards_multiplier_over target_voting_yield target_voting_yield_max target_voting_yield_adjustment_factor target_voting_fraction voting_fraction total_locked_gold total_non_voting total_votes electable_validators_max reserve_gold_balance gold_total_supply stable_usd_total_supply )a
+  @attrs ~w( block_hash block_number epoch_number validator_target_epoch_rewards voter_target_epoch_rewards community_target_epoch_rewards carbon_offsetting_target_epoch_rewards target_total_supply rewards_multiplier rewards_multiplier_max rewards_multiplier_under rewards_multiplier_over target_voting_yield target_voting_yield_max target_voting_yield_adjustment_factor target_voting_fraction voting_fraction total_locked_gold total_non_voting total_votes electable_validators_max reserve_gold_balance gold_total_supply stable_usd_total_supply reserve_bolster)a
 
   @required_attrs ~w( block_hash )a
 
@@ -74,6 +75,7 @@ defmodule Explorer.Chain.CeloEpochRewards do
     field(:reserve_gold_balance, Wei)
     field(:gold_total_supply, Wei)
     field(:stable_usd_total_supply, Wei)
+    field(:reserve_bolster, Wei)
 
     belongs_to(:block, Block,
       foreign_key: :block_hash,

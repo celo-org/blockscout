@@ -10,6 +10,7 @@ defmodule Indexer.Fetcher.CeloEpochData do
   alias Explorer.Celo.{AccountReader, EpochUtil, VoterRewards}
   alias Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
   alias Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent
+  alias Explorer.Celo.ContractEvents.Common.TransferEvent
   alias Explorer.Chain
   alias Explorer.Chain.{Block, CeloPendingEpochOperation}
   alias Explorer.Chain.CeloElectionRewards, as: CeloElectionRewardsChain
@@ -170,6 +171,20 @@ defmodule Indexer.Fetcher.CeloEpochData do
 
   def get_epoch_rewards(block) do
     epoch_rewards = fetch_epoch_rewards_from_blockchain(block)
+
+    reserve_bolster_event = TransferEvent.reserve_bolster(block.block_number)
+
+    epoch_rewards =
+      Map.put(
+        epoch_rewards,
+        :reserve_bolster,
+        if is_nil(reserve_bolster_event) do
+          0
+        else
+          reserve_bolster_event.value
+        end
+      )
+
     Map.merge(block, %{epoch_rewards: epoch_rewards})
   end
 
