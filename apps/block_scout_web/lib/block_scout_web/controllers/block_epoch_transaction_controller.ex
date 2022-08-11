@@ -81,6 +81,7 @@ defmodule BlockScoutWeb.BlockEpochTransactionController do
           {:ok, carbon_fund_address_hash} = string_to_address_hash(address_string)
           {:ok, carbon_fund_address} = hash_to_address(carbon_fund_address_hash)
           carbon_fund_address
+      end
 
     {:ok, reserve_address_hash} = string_to_address_hash(CoreContracts.contract_address("Reserve"))
     {:ok, reserve_address} = hash_to_address(reserve_address_hash)
