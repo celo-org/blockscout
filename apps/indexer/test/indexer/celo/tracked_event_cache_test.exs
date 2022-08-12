@@ -96,6 +96,24 @@ defmodule Indexer.Celo.TrackedEventCacheTest do
 
   describe "filters events" do
     test "filters out untracked events" do
+      event_topics = [@gold_unlocked_topic, @gold_relocked_topic, @slasher_whitelist_added_topic]
+      smart_contract = add_trackings(event_topics)
+      cache_pid = start_supervised!( {TrackedEventCache, [%{}, []]})
+
+      logs = 1..20
+      |> Enum.map(fn _ -> insert(:log) end)
+
+      relevant_logs =
+      event_topics
+      |> Enum.map(fn topic ->
+        insert(:log, %{first_topic: topic, address: smart_contract.address})
+      end)
+
+      filtered_list = TrackedEventCache.filter_tracked(logs ++ relevant_logs)
+
+      assert length(filtered_list) == 3
+
+      require IEx; IEx.pry
     end
   end
 end

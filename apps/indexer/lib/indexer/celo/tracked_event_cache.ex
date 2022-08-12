@@ -74,6 +74,7 @@ defmodule Indexer.Celo.TrackedEventCache do
   end
 
   defp tracked_event?(event) do
+    require IEx; IEx.pry
     :ets.lookup(__MODULE__, event_id(event)) != []
   end
 
