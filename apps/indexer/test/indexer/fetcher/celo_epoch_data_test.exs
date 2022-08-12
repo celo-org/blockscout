@@ -290,7 +290,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
   end
 
   describe "get_epoch_rewards without reserve bolster event" do
-    setup [:setup_epoch_mox]
+    setup [:save_epoch_block, :setup_epoch_mox]
 
     test "it fetches data without reserve bolster", %{block: %{number: block_number, hash: block_hash}} do
       assert CeloEpochDataFetcher.get_epoch_rewards(%{block_number: block_number, block_hash: block_hash}) == %{
@@ -546,6 +546,15 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
         to: reserve_address
       }
     })
+
+    Map.merge(context, %{
+      block: block
+    })
+  end
+
+  def save_epoch_block(context) do
+    block = insert(:block, number: 172_800)
+    insert(:celo_pending_epoch_operations, block_number: block.number)
 
     Map.merge(context, %{
       block: block
