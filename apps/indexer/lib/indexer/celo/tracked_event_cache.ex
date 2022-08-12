@@ -10,15 +10,18 @@ defmodule Indexer.Celo.TrackedEventCache do
   alias Explorer.Repo
   require Explorer.Celo.Telemetry, as: Telemetry
 
-  def start_link([init_opts, gen_server_opts]) do
-    start_link(init_opts, gen_server_opts)
+  def start_link([init_arg, gen_server_opts]) do
+    start_link(init_arg, gen_server_opts)
   end
 
-  def start_link(init_opts, gen_server_opts) do
-    GenServer.start_link(__MODULE__, init_opts, gen_server_opts)
+  def start_link(init_arg, gen_server_opts) do
+    gen_server_opts = Keyword.merge(gen_server_opts, name: __MODULE__)
+
+    GenServer.start_link(__MODULE__, init_arg, gen_server_opts)
   end
 
-  def init(opts) do
+  @impl true
+  def init(_) do
     state = %{
       table_ref: nil
     }
@@ -26,13 +29,24 @@ defmodule Indexer.Celo.TrackedEventCache do
     {:ok, state, {:continue, :populate_cache}}
   end
 
+  @impl true
   def handle_continue(:populate_cache, state) do
     #create ets table
-    cache_table = :ets.new(__MODULE__, [:set, :protected, :named_table])
+    cache_table = :ets.new(__MODULE__, [:set, :protected, :named_table, read_concurrency: true])
 
     cache_table |> build_cache()
 
     {:noreply, %{state | table_ref: cache_table}}
+  end
+
+  def rebuild_cache() do
+    GenServer.call(__MODULE__, :rebuild_cache)
+  end
+
+  @impl true
+  def handle_call(:rebuild_cache, _from, %{table_ref: table} = state) do
+    build_cache(table)
+    {:reply, nil, state}
   end
 
   defp build_cache(table_ref) do
@@ -47,10 +61,10 @@ defmodule Indexer.Celo.TrackedEventCache do
                    |> Enum.map(fn cet = %ContractEventTracking{} -> cet |> event_id() end)
 
     table_ref |> :ets.delete_all_objects()
-
     cache_values
-    |> Enum.each(fn event_topic_and_contract_address ->
-      :ets.insert(table_ref, {event_topic_and_contract_address, true})
+    |> Enum.each(fn value ->
+      table_ref
+      |> :ets.insert({value, true})
     end)
   end
 

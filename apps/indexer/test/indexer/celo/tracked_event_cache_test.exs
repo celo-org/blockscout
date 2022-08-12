@@ -36,9 +36,13 @@ defmodule Indexer.Celo.TrackedEventCacheTest do
     |> insert()
   end
 
-  def add_trackings(event_topics) do
-    smart_contract = create_smart_contract()
+  def add_trackings(event_topics, smart_contract \\ nil)
+  def add_trackings(event_topics, nil) do
+   smart_contract = create_smart_contract()
+   add_trackings(event_topics, smart_contract)
+  end
 
+  def add_trackings(event_topics, smart_contract) do
     event_topics
     |> Enum.each( fn topic ->
       {:ok, tracking} =
@@ -49,7 +53,12 @@ defmodule Indexer.Celo.TrackedEventCacheTest do
 
     smart_contract
   end
+
+  # example abi above is locked gold contract, valid topics need to be used for ContractEventTracking to extract
+  # the event abi from the full contract abi
   @gold_unlocked_topic "0xb1a3aef2a332070da206ad1868a5e327f5aa5144e00e9a7b40717c153158a588"
+  @gold_relocked_topic "0xa823fc38a01c2f76d7057a79bb5c317710f26f7dbdea78634598d5519d0f7cb0"
+  @slasher_whitelist_added_topic "0x92a16cb9e1846d175c3007fc61953d186452c9ea1aa34183eb4b7f88cd3f07bb"
 
   describe "populates cache" do
 
@@ -67,6 +76,21 @@ defmodule Indexer.Celo.TrackedEventCacheTest do
     end
 
     test "rebuilds cache on command" do
+      smart_contract = add_trackings([@gold_unlocked_topic])
+      cache_pid = start_supervised!( {TrackedEventCache, [%{}, []]})
+
+      #force handle_continue to complete before continuing with test
+      _ = :sys.get_state(cache_pid)
+
+      _ = add_trackings([@gold_relocked_topic, @slasher_whitelist_added_topic], smart_contract)
+
+      TrackedEventCache.rebuild_cache()
+
+      [@gold_relocked_topic, @gold_unlocked_topic, @slasher_whitelist_added_topic]
+      |> Enum.each(fn topic ->
+        search_tuple = {topic, smart_contract.address_hash |> to_string()}
+        refute :ets.lookup(TrackedEventCache, search_tuple) == []
+      end)
     end
   end
 
