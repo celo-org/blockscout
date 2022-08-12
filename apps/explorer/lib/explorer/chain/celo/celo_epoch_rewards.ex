@@ -116,12 +116,12 @@ defmodule Explorer.Chain.CeloEpochRewards do
 
     event = Repo.one(query)
 
-    unless is_nil(event) do
+    if is_nil(event) do
+      0
+    else
       transfer_event = EventMap.celo_contract_event_to_concrete_event(event)
 
       transfer_event.value
-    else
-      0
     end
   end
 end

@@ -13,8 +13,8 @@ defmodule BlockScoutWeb.BlockEpochTransactionController do
   alias Explorer.Chain.{CeloElectionRewards, CeloEpochRewards, Wei}
   alias Phoenix.View
 
-  alias Explorer.Celo.CoreContracts
   alias Explorer.Celo.ContractEvents.Common.TransferEvent
+  alias Explorer.Celo.CoreContracts
 
   # The community fund address never changes, so it's ok to hard-code it.
   @community_fund_address "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"
