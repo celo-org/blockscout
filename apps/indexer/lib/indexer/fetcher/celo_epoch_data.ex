@@ -172,18 +172,9 @@ defmodule Indexer.Fetcher.CeloEpochData do
   def get_epoch_rewards(block) do
     epoch_rewards = fetch_epoch_rewards_from_blockchain(block)
 
-    reserve_bolster_event = TransferEvent.reserve_bolster(block.block_number)
-
     epoch_rewards_with_rewards_bolster =
-      Map.put(
-        epoch_rewards,
-        :reserve_bolster,
-        if is_nil(reserve_bolster_event) do
-          0
-        else
-          reserve_bolster_event.value
-        end
-      )
+      epoch_rewards
+      |> Map.put(:reserve_bolster, CeloEpochRewardsChain.reserve_bolster_value(block.block_number))
 
     Map.merge(block, %{epoch_rewards: epoch_rewards_with_rewards_bolster})
   end

@@ -12,7 +12,8 @@ defmodule Explorer.Chain.CeloEpochRewards do
       from: 2
     ]
 
-  alias Explorer.Chain.{Block, Hash, Wei}
+  alias Explorer.Celo.ContractEvents.EventMap
+  alias Explorer.Chain.{Block, CeloContractEvent, CeloCoreContract, Hash, Wei}
   alias Explorer.Repo
 
   @typedoc """
@@ -96,5 +97,31 @@ defmodule Explorer.Chain.CeloEpochRewards do
 
   def get_celo_epoch_rewards_for_block(block_number) do
     Repo.one(from(rewards in __MODULE__, where: rewards.block_number == ^block_number))
+  end
+
+  def reserve_bolster_value(epoch_block_number) do
+    query =
+      from(
+        cce in CeloContractEvent,
+        join: ccc_to in CeloCoreContract,
+        on: fragment("?::bytea = cast(?->>'to' AS bytea)", ccc_to.address_hash, cce.params),
+        join: celo_token in CeloCoreContract,
+        on: celo_token.address_hash == cce.contract_address_hash,
+        where: cce.name == "Transfer",
+        where: ccc_to.name == "Reserve",
+        where: celo_token.name == "GoldToken",
+        where: fragment("?->>'from' = '\\x0000000000000000000000000000000000000000'", cce.params),
+        where: cce.block_number == ^epoch_block_number
+      )
+
+    event = Repo.one(query)
+
+    unless is_nil(event) do
+      transfer_event = EventMap.celo_contract_event_to_concrete_event(event)
+
+      transfer_event.value
+    else
+      0
+    end
   end
 end
