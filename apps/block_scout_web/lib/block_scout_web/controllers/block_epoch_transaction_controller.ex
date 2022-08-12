@@ -12,8 +12,9 @@ defmodule BlockScoutWeb.BlockEpochTransactionController do
   alias Explorer.Chain
   alias Explorer.Chain.{CeloElectionRewards, CeloEpochRewards, Wei}
   alias Phoenix.View
-  alias Explorer.Celo.ContractEvents.Common.TransferEvent
+
   alias Explorer.Celo.CoreContracts
+  alias Explorer.Celo.ContractEvents.Common.TransferEvent
 
   # The community fund address never changes, so it's ok to hard-code it.
   @community_fund_address "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"
@@ -121,7 +122,7 @@ defmodule BlockScoutWeb.BlockEpochTransactionController do
 
     items = [community_transaction_json, carbon_transaction_json]
 
-    items =
+    items_with_rewards_bolster =
       if Decimal.cmp(epoch_rewards.reserve_bolster.value, 0) == :gt do
         reserve_bolster_epoch_transaction = %{
           address: reserve_address,
@@ -152,7 +153,7 @@ defmodule BlockScoutWeb.BlockEpochTransactionController do
         )
       end)
 
-    items ++ epoch_transactions_json
+    items_with_rewards_bolster ++ epoch_transactions_json
   end
 
   def index(conn, %{"block_hash_or_number" => formatted_block_hash_or_number}) do
