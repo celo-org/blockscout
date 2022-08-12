@@ -106,14 +106,13 @@ defmodule Indexer.Celo.TrackedEventCacheTest do
       relevant_logs =
       event_topics
       |> Enum.map(fn topic ->
-        insert(:log, %{first_topic: topic, address: smart_contract.address})
+        log = insert(:log, %{first_topic: topic})
+        %{ log | address_hash: smart_contract.address_hash}
       end)
 
       filtered_list = TrackedEventCache.filter_tracked(logs ++ relevant_logs)
 
       assert length(filtered_list) == 3
-
-      require IEx; IEx.pry
     end
   end
 end

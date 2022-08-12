@@ -74,16 +74,17 @@ defmodule Indexer.Celo.TrackedEventCache do
   end
 
   defp tracked_event?(event) do
-    require IEx; IEx.pry
     :ets.lookup(__MODULE__, event_id(event)) != []
   end
 
   # calculating event id as a tuple of {event_topic, contract_address}
-  defp event_id(%{topic: topic, smart_contract: sc}) do
+  @doc false
+  def event_id(%{topic: topic, smart_contract: sc}) do
     {topic, sc.address_hash |> to_string()}
   end
 
-  defp event_id(%{first_topic: topic, address_hash: address_hash}) do
+  @doc false
+  def event_id(%{first_topic: topic, address_hash: address_hash}) do
     {topic, address_hash |> to_string()}
   end
 end
