@@ -6,8 +6,10 @@ defmodule Indexer.Celo.TrackedEventCache do
   require Logger
   import Ecto.Query
 
+  alias ABI.FunctionSelector
   alias Explorer.Chain.Celo.ContractEventTracking
   alias Explorer.Repo
+
   require Explorer.Celo.Telemetry, as: Telemetry
 
   def start_link([init_arg, gen_server_opts]) do
@@ -58,19 +60,37 @@ defmodule Indexer.Celo.TrackedEventCache do
 
     cache_values = query
                    |> Repo.all()
-                   |> Enum.map(fn cet = %ContractEventTracking{} -> cet |> event_id() end)
+                   |> Enum.map(fn cet = %ContractEventTracking{} -> {cet |> event_id(), cet.abi} end)
 
     table_ref |> :ets.delete_all_objects()
     cache_values
-    |> Enum.each(fn value ->
+    |> Enum.each(fn {cache_id, abi} ->
+      function_selector = FunctionSelector.parse_specification_item(abi)
+
       table_ref
-      |> :ets.insert({value, true})
+      |> :ets.insert({cache_id, function_selector})
     end)
   end
 
   def filter_tracked(events) when is_list(events) do
     events
     |> Enum.filter(&tracked_event?/1)
+  end
+
+  @doc "Accepts a list of logs / events for processing and batches them into tuples of {[tracked_logs], event_function_selector} for batch processing"
+  def batch_events(events) when is_list(events) do
+    events
+    |> filter_tracked()
+    |> Enum.group_by(%{}, &event_id/1)
+    |> Map.values()
+    |> Enum.map(fn logs ->
+      {_id, function_selector} =
+        logs
+        |> List.first()
+        |> event_id()
+        |> then(&:ets.lookup(__MODULE__, &1))
+      {logs, function_selector}
+    end)
   end
 
   defp tracked_event?(event) do

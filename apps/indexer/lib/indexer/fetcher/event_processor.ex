@@ -6,7 +6,9 @@ defmodule Indexer.Fetcher.EventProcessor do
   require Logger
   require Indexer.Tracer
 
+  alias Explorer.Celo.Events.Transformer
   alias Indexer.{BufferedTask, Tracer}
+  alias Indexer.Celo.TrackedEventCache
   alias Indexer.Fetcher.Util
 
   @behaviour BufferedTask
@@ -32,16 +34,26 @@ defmodule Indexer.Fetcher.EventProcessor do
 
   @impl BufferedTask
   @decorate trace(name: "fetch", resource: "Indexer.Fetcher.EventProcessor.run/2", service: :indexer, tracer: Tracer)
-  def run(entries, state) do
+  def run({logs, function_selector}, state) do
+    decoded = logs
+    |> Enum.map(fn log ->
+      Transformer.decode_event(function_selector, log)
+    end)
+#    entries
+#    |> Enum.map(fn event ->
+#      Explorer.Celo.Events.Transformer.e
+#
+#    end)
     # take a batch
     # transform
     # send to import
     # emit metrics
   end
 
-
   @doc "Accepts a list of maps representing events and filters out entries that have no corresponding `ContractEventTracking` row"
-  def filter_tracked_events(events) do
-
+  def enqueue_logs(events) do
+    events
+    |> TrackedEventCache.batch_events()
+    |> Enum.each(&BufferedTask.buffer(__MODULE__, &1))
   end
 end
