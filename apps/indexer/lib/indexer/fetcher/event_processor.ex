@@ -34,20 +34,23 @@ defmodule Indexer.Fetcher.EventProcessor do
 
   @impl BufferedTask
   @decorate trace(name: "fetch", resource: "Indexer.Fetcher.EventProcessor.run/2", service: :indexer, tracer: Tracer)
-  def run({logs, function_selector}, state) do
+  def run({logs, function_selector} = batch, state) do
     decoded = logs
     |> Enum.map(fn log ->
       Transformer.decode_event(function_selector, log)
     end)
-#    entries
-#    |> Enum.map(fn event ->
-#      Explorer.Celo.Events.Transformer.e
-#
-#    end)
-    # take a batch
-    # transform
-    # send to import
-    # emit metrics
+
+    imported = Chain.import(
+      %{tracked_events: decoded, timeout: :infinity}
+    )
+
+    case imported do
+      {:ok, events} ->
+        :ok
+      {:error, step, reason, _changes} ->
+        Logger.error("Failed to import tracked events  #{step} - #{inspect(reason)}")
+        {:retry, batch}
+    end
   end
 
   @doc "Accepts a list of maps representing events and filters out entries that have no corresponding `ContractEventTracking` row"
