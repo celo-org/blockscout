@@ -3542,6 +3542,16 @@ defmodule Explorer.Chain do
     |> Repo.all(timeout: :infinity)
   end
 
+  def pending_transactions_count do
+    query =
+      from(transaction in Transaction,
+        where: is_nil(transaction.block_hash) and (is_nil(transaction.error) or transaction.error != "dropped/replaced")
+      )
+
+    query
+    |> Repo.aggregate(:count, :hash)
+  end
+
   @doc """
   Returns the list of empty blocks from the DB which have not marked with `t:Explorer.Chain.Block.is_empty/0`.
   This query used for initializtion of Indexer.EmptyBlocksSanitizer
