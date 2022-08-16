@@ -467,14 +467,14 @@ defmodule Explorer.Chain.Transaction do
   def decoded_revert_reason(transaction, revert_reason) do
     case revert_reason do
       "0x" <> hex_part ->
-        proccess_hex_revert_reason(hex_part, transaction)
+        process_hex_revert_reason(hex_part, transaction)
 
       hex_part ->
-        proccess_hex_revert_reason(hex_part, transaction)
+        process_hex_revert_reason(hex_part, transaction)
     end
   end
 
-  defp proccess_hex_revert_reason(hex_revert_reason, %__MODULE__{to_address: smart_contract, hash: hash}) do
+  defp process_hex_revert_reason(hex_revert_reason, %__MODULE__{to_address: smart_contract, hash: hash}) do
     case Integer.parse(hex_revert_reason, 16) do
       {number, ""} ->
         binary_revert_reason = :binary.encode_unsigned(number)

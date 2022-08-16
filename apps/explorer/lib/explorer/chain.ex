@@ -3906,7 +3906,8 @@ defmodule Explorer.Chain do
       end
 
     formatted_revert_reason =
-      revert_reason |> format_revert_reason_message() |> (&if(String.valid?(&1), do: &1, else: revert_reason)).()
+      revert_reason
+      |> format_revert_reason_message()
 
     if byte_size(formatted_revert_reason) > 0 do
       transaction
@@ -3918,25 +3919,28 @@ defmodule Explorer.Chain do
   end
 
   defp format_revert_reason_message(revert_reason) do
-    case revert_reason do
-      @revert_msg_prefix_1 <> rest ->
-        rest
+    message =
+      case revert_reason do
+        @revert_msg_prefix_1 <> rest ->
+          rest
 
-      @revert_msg_prefix_2 <> rest ->
-        rest
+        @revert_msg_prefix_2 <> rest ->
+          rest
 
-      @revert_msg_prefix_3 <> rest ->
-        extract_revert_reason_message_wrapper(rest)
+        @revert_msg_prefix_3 <> rest ->
+          extract_revert_reason_message_wrapper(rest)
 
-      @revert_msg_prefix_4 <> rest ->
-        extract_revert_reason_message_wrapper(rest)
+        @revert_msg_prefix_4 <> rest ->
+          extract_revert_reason_message_wrapper(rest)
 
-      @revert_msg_prefix_5 <> rest ->
-        extract_revert_reason_message_wrapper(rest)
+        @revert_msg_prefix_5 <> rest ->
+          extract_revert_reason_message_wrapper(rest)
 
-      revert_reason_full ->
-        revert_reason_full
-    end
+        revert_reason_full ->
+          revert_reason_full
+      end
+
+    if String.valid?(message), do: message, else: revert_reason
   end
 
   defp extract_revert_reason_message_wrapper(revert_reason_message) do
