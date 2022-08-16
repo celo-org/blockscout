@@ -1,25 +1,27 @@
 defmodule Indexer.Fetcher.EventProcessorTest do
-  use EthereumJSONRPC.Case
-  use Explorer.DataCase, async: true
+  use Explorer.DataCase, async: false
 
-  import Mox
+  import Indexer.Celo.TrackedEventSupport
+
+  alias Indexer.Fetcher.EventProcessor
+  alias Indexer.Celo.TrackedEventCache
 
   describe "enqueue/3" do
-    setup do
-      # start the process
-      #
+    ## end to end test - enqueue to import
+    test "buffers tracked events and imports" do
+      smart_contract = add_trackings([gold_relocked_topic()])
+      cache_pid = start_supervised!( {TrackedEventCache, [%{}, []]})
+      _ = :sys.get_state(cache_pid)
 
-      Indexer.Fetcher.EventProcessor.Supervisor.Case.start_supervised!()
-      :ok
-    end
+      pid = Indexer.Fetcher.EventProcessor.Supervisor.Case.start_supervised!()
+      logs = gold_relocked_logs(smart_contract.address_hash)
 
-    test "enqueues tracked events" do
-
+      EventProcessor.enqueue_logs(logs)
+       require IEx; IEx.pry
+      # generate some logs
+      # enqueue the logs to the event processor
+      # assert that they are in the database
       assert true, "hello"
-    end
-
-    test "doesn't include untracked events" do
-      assert true, "goodbye"
     end
   end
 end

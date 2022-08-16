@@ -81,10 +81,10 @@ defmodule Indexer.Celo.TrackedEventCache do
   def batch_events(events) when is_list(events) do
     events
     |> filter_tracked()
-    |> Enum.group_by(%{}, &event_id/1)
+    |> Enum.group_by(&event_id/1)
     |> Map.values()
     |> Enum.map(fn logs ->
-      {_id, function_selector} =
+      [{_id, function_selector}] =
         logs
         |> List.first()
         |> event_id()

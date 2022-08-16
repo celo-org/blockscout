@@ -7,6 +7,7 @@ defmodule Indexer.Fetcher.EventProcessor do
   require Indexer.Tracer
 
   alias Explorer.Celo.Events.Transformer
+  alias Explorer.Chain
   alias Indexer.{BufferedTask, Tracer}
   alias Indexer.Celo.TrackedEventCache
   alias Indexer.Fetcher.Util
@@ -15,7 +16,7 @@ defmodule Indexer.Fetcher.EventProcessor do
 
   @defaults [
     flush_interval: :timer.seconds(3),
-    max_batch_size: 500,
+    max_batch_size: 1,
     max_concurrency: 20,
     task_supervisor: Indexer.Fetcher.EventProcessor.TaskSupervisor,
     metadata: [fetcher: :event_processor]
@@ -34,10 +35,12 @@ defmodule Indexer.Fetcher.EventProcessor do
 
   @impl BufferedTask
   @decorate trace(name: "fetch", resource: "Indexer.Fetcher.EventProcessor.run/2", service: :indexer, tracer: Tracer)
-  def run({logs, function_selector} = batch, state) do
+  def run([{logs, function_selector}] = batch, state) do
     decoded = logs
     |> Enum.map(fn log ->
-      Transformer.decode_event(function_selector, log)
+      function_selector
+      |> Transformer.decode_event(log)
+      |> add_meta_properties(log, function_selector)
     end)
 
     imported = Chain.import(
@@ -53,10 +56,21 @@ defmodule Indexer.Fetcher.EventProcessor do
     end
   end
 
+  def add_meta_properties(event_params, log, function_selector) do
+    %{
+      params: event_params,
+      name: function_selector.function,
+      address_hash: log.address_hash,
+      transaction_hash: log.transaction_hash,
+      block_number: log.block_number,
+      log_index: log.index
+    }
+  end
+
   @doc "Accepts a list of maps representing events and filters out entries that have no corresponding `ContractEventTracking` row"
   def enqueue_logs(events) do
     events
     |> TrackedEventCache.batch_events()
-    |> Enum.each(&BufferedTask.buffer(__MODULE__, &1))
+    |> then(&BufferedTask.buffer(__MODULE__, &1))
   end
 end

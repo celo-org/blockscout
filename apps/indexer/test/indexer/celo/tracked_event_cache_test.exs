@@ -46,6 +46,7 @@ defmodule Indexer.Celo.TrackedEventCacheTest do
       event_topics = [gold_unlocked_topic(), gold_relocked_topic(), slasher_whitelist_added_topic()]
       smart_contract = add_trackings(event_topics)
       cache_pid = start_supervised!( {TrackedEventCache, [%{}, []]})
+      _ = :sys.get_state(cache_pid)
 
       logs = 1..20
       |> Enum.map(fn _ -> insert(:log) end)
@@ -60,6 +61,18 @@ defmodule Indexer.Celo.TrackedEventCacheTest do
       filtered_list = TrackedEventCache.filter_tracked(logs ++ relevant_logs)
 
       assert length(filtered_list) == 3
+    end
+  end
+
+  describe "batches events" do
+    test "batches up single event for processing" do
+      smart_contract = add_trackings([gold_relocked_topic()])
+      cache_pid = start_supervised!( {TrackedEventCache, [%{}, []]})
+      _ = :sys.get_state(cache_pid)
+
+      logs = gold_relocked_logs(smart_contract.address_hash)
+
+      assert [{^logs, function_selector}] = TrackedEventCache.batch_events(logs)
     end
   end
 end
