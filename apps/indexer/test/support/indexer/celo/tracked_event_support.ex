@@ -1,5 +1,4 @@
 defmodule Indexer.Celo.TrackedEventSupport do
-
   import Explorer.Factory
   alias Explorer.Chain.{Log, SmartContract}
   alias Explorer.Chain.Celo.ContractEventTracking
@@ -42,6 +41,7 @@ defmodule Indexer.Celo.TrackedEventSupport do
   def slasher_whitelist_added_topic, do: "0x92a16cb9e1846d175c3007fc61953d186452c9ea1aa34183eb4b7f88cd3f07bb"
 
   def add_trackings(event_topics, smart_contract \\ nil)
+
   def add_trackings(event_topics, nil) do
     smart_contract = create_smart_contract()
     add_trackings(event_topics, smart_contract)
@@ -49,7 +49,7 @@ defmodule Indexer.Celo.TrackedEventSupport do
 
   def add_trackings(event_topics, smart_contract) do
     event_topics
-    |> Enum.each( fn topic ->
+    |> Enum.each(fn topic ->
       {:ok, tracking} =
         smart_contract
         |> ContractEventTracking.from_event_topic(topic)
@@ -60,24 +60,34 @@ defmodule Indexer.Celo.TrackedEventSupport do
   end
 
   def gold_relocked_logs(address_hash) do
-      [
-        {"0x00000000000000000000000000000000000000000000001FBF29AF3F33C638A8","0xa823fc38a01c2f76d7057a79bb5c317710f26f7dbdea78634598d5519d0f7cb0","0x000000000000000000000000adef8d4fa068e430cae0601b45ae662caa4e1000"},
-        {"0x00000000000000000000000000000000000000000000000998B2131818B05748","0xa823fc38a01c2f76d7057a79bb5c317710f26f7dbdea78634598d5519d0f7cb0","0x0000000000000000000000002879bfd5e7c4ef331384e908aaa3bd3014b703fa"},
-        {"0x00000000000000000000000000000000000000000000002B8959185B12F21786","0xa823fc38a01c2f76d7057a79bb5c317710f26f7dbdea78634598d5519d0f7cb0","0x00000000000000000000000095508d0e7b07010ab2c091236f9a170366e6b415"},
-        {"0x000000000000000000000000000000000000000000000001A055690D9DB80000","0xa823fc38a01c2f76d7057a79bb5c317710f26f7dbdea78634598d5519d0f7cb0","0x000000000000000000000000fc80cca610664a2d0fff392b6e2e96d4a8075f93"},
-        {"0x00000000000000000000000000000000000000000000005DDBF0E8305EE6B3AB","0xa823fc38a01c2f76d7057a79bb5c317710f26f7dbdea78634598d5519d0f7cb0","0x0000000000000000000000002879bfd5e7c4ef331384e908aaa3bd3014b703fa"},
-      ]
-      |> Enum.with_index()
-      |> Enum.map(fn {{data, first_topic, second_topic}, index} ->
-        %Log{
-          first_topic: first_topic,
-          second_topic: second_topic,
-          data: data |> String.downcase(),
-          transaction_hash: nil,
-          address_hash: address_hash,
-          block_number: 77,
-          index: index
-        }
-      end)
+    [
+      {"0x00000000000000000000000000000000000000000000001FBF29AF3F33C638A8",
+       "0xa823fc38a01c2f76d7057a79bb5c317710f26f7dbdea78634598d5519d0f7cb0",
+       "0x000000000000000000000000adef8d4fa068e430cae0601b45ae662caa4e1000"},
+      {"0x00000000000000000000000000000000000000000000000998B2131818B05748",
+       "0xa823fc38a01c2f76d7057a79bb5c317710f26f7dbdea78634598d5519d0f7cb0",
+       "0x0000000000000000000000002879bfd5e7c4ef331384e908aaa3bd3014b703fa"},
+      {"0x00000000000000000000000000000000000000000000002B8959185B12F21786",
+       "0xa823fc38a01c2f76d7057a79bb5c317710f26f7dbdea78634598d5519d0f7cb0",
+       "0x00000000000000000000000095508d0e7b07010ab2c091236f9a170366e6b415"},
+      {"0x000000000000000000000000000000000000000000000001A055690D9DB80000",
+       "0xa823fc38a01c2f76d7057a79bb5c317710f26f7dbdea78634598d5519d0f7cb0",
+       "0x000000000000000000000000fc80cca610664a2d0fff392b6e2e96d4a8075f93"},
+      {"0x00000000000000000000000000000000000000000000005DDBF0E8305EE6B3AB",
+       "0xa823fc38a01c2f76d7057a79bb5c317710f26f7dbdea78634598d5519d0f7cb0",
+       "0x0000000000000000000000002879bfd5e7c4ef331384e908aaa3bd3014b703fa"}
+    ]
+    |> Enum.with_index()
+    |> Enum.map(fn {{data, first_topic, second_topic}, index} ->
+      %Log{
+        first_topic: first_topic,
+        second_topic: second_topic,
+        data: data |> String.downcase(),
+        transaction_hash: nil,
+        address_hash: address_hash,
+        block_number: 77,
+        index: index
+      }
+    end)
   end
 end

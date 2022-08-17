@@ -26,7 +26,6 @@ defmodule Indexer.Fetcher.EventProcessor do
 
   @impl BufferedTask
   def init(initial, _reducer, _) do
-
     initial
   end
 
@@ -40,24 +39,25 @@ defmodule Indexer.Fetcher.EventProcessor do
   @impl BufferedTask
   @decorate trace(name: "fetch", resource: "Indexer.Fetcher.EventProcessor.run/2", service: :indexer, tracer: Tracer)
   def run([{logs, function_selector, tracking_id}] = batch, state) do
-    decoded = logs
-    |> Enum.map(fn log ->
-      function_selector
-      |> Transformer.decode_event(log)
-      |> add_meta_properties(log, function_selector, tracking_id)
-    end)
+    decoded =
+      logs
+      |> Enum.map(fn log ->
+        function_selector
+        |> Transformer.decode_event(log)
+        |> add_meta_properties(log, function_selector, tracking_id)
+      end)
 
-    imported = Chain.import(
-      %{
+    imported =
+      Chain.import(%{
         tracked_events: %{params: decoded},
         timeout: @import_timeout
-      }
-    )
+      })
 
     case imported do
       {:ok, events} ->
         Telemetry.event(:ingested, %{tracked_contract_events: length(events)})
         :ok
+
       {:error, step, reason, _changes} ->
         Logger.error("Failed to import tracked events  #{step} - #{inspect(reason)}")
         {:retry, batch}
@@ -79,6 +79,7 @@ defmodule Indexer.Fetcher.EventProcessor do
 
   @doc "Accepts a list of maps representing events and filters out entries that have no corresponding `ContractEventTracking` row"
   def enqueue_logs(nil), do: :ok
+
   def enqueue_logs(events) when is_list(events) do
     events
     |> TrackedEventCache.batch_events()

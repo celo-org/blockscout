@@ -33,7 +33,7 @@ defmodule Indexer.Celo.TrackedEventCache do
 
   @impl true
   def handle_continue(:populate_cache, state) do
-    #create ets table
+    # create ets table
     cache_table = :ets.new(__MODULE__, [:set, :protected, :named_table, read_concurrency: true])
 
     cache_table |> build_cache()
@@ -52,17 +52,20 @@ defmodule Indexer.Celo.TrackedEventCache do
   end
 
   defp build_cache(table_ref) do
-    query = from(
-      et in ContractEventTracking,
-      where: et.enabled == true,
-      preload: [:smart_contract]
-    )
+    query =
+      from(
+        et in ContractEventTracking,
+        where: et.enabled == true,
+        preload: [:smart_contract]
+      )
 
-    cache_values = query
-                   |> Repo.all()
-                   |> Enum.map(fn cet = %ContractEventTracking{} -> {cet |> event_id(), cet} end)
+    cache_values =
+      query
+      |> Repo.all()
+      |> Enum.map(fn cet = %ContractEventTracking{} -> {cet |> event_id(), cet} end)
 
     table_ref |> :ets.delete_all_objects()
+
     cache_values
     |> Enum.each(fn {cache_id, cet} ->
       function_selector = FunctionSelector.parse_specification_item(cet.abi)
@@ -89,6 +92,7 @@ defmodule Indexer.Celo.TrackedEventCache do
         |> List.first()
         |> event_id()
         |> then(&:ets.lookup(__MODULE__, &1))
+
       {logs, function_selector, contract_event_tracking.id}
     end)
   end

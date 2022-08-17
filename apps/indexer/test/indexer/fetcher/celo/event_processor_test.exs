@@ -9,7 +9,7 @@ defmodule Indexer.Fetcher.EventProcessorTest do
   describe "queueing, processing and importing" do
     test "buffers tracked events and imports" do
       smart_contract = add_trackings([gold_relocked_topic()])
-      cache_pid = start_supervised!( {TrackedEventCache, [%{}, []]})
+      cache_pid = start_supervised!({TrackedEventCache, [%{}, []]})
       _ = :sys.get_state(cache_pid)
 
       _pid = Indexer.Fetcher.EventProcessor.Supervisor.Case.start_supervised!()
@@ -17,7 +17,7 @@ defmodule Indexer.Fetcher.EventProcessorTest do
 
       EventProcessor.enqueue_logs(logs)
 
-      #force batch to be processed
+      # force batch to be processed
       send(EventProcessor, :flush)
 
       :timer.sleep(100)
