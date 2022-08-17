@@ -13,6 +13,7 @@ defmodule Indexer.Block.FetcherTest do
   alias Indexer.Block.Fetcher
   alias Indexer.BufferedTask
   alias Indexer.Celo.TrackedEventCache
+
   alias Indexer.Fetcher.{
     CoinBalance,
     ContractCode,
