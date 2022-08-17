@@ -3534,22 +3534,16 @@ defmodule Explorer.Chain do
 
   def pending_transactions_list do
     query =
-      from(transaction in Transaction,
-        where: is_nil(transaction.block_hash) and (is_nil(transaction.error) or transaction.error != "dropped/replaced")
-      )
-
-    query
-    |> Repo.all(timeout: :infinity)
+      Transaction
+      |> pending_transactions_query()
+      |> Repo.all(timeout: :infinity)
   end
 
   def pending_transactions_count do
     query =
-      from(transaction in Transaction,
-        where: is_nil(transaction.block_hash) and (is_nil(transaction.error) or transaction.error != "dropped/replaced")
-      )
-
-    query
-    |> Repo.aggregate(:count, :hash)
+      Transaction
+      |> pending_transactions_query()
+      |> Repo.aggregate(:count, :hash)
   end
 
   @doc """
