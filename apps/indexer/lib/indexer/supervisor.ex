@@ -20,6 +20,8 @@ defmodule Indexer.Supervisor do
 
   alias Indexer.Block.{Catchup, Realtime}
 
+  alias Indexer.Celo.TrackedEventCache
+
   alias Indexer.Fetcher.{
     BlockReward,
     CeloAccount,
@@ -33,6 +35,7 @@ defmodule Indexer.Supervisor do
     CoinBalance,
     CoinBalanceOnDemand,
     ContractCode,
+    EventProcessor,
     EmptyBlocksSanitizer,
     InternalTransaction,
     PendingTransaction,
@@ -161,6 +164,8 @@ defmodule Indexer.Supervisor do
        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {CeloUnlocked.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {CeloVoters.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
+      {EventProcessor.Supervisor, [[], []]},
+      {TrackedEventCache, [[], []]},
       {CeloMaterializedViewRefresh, [[], []]},
       {InternalTransactionCache, [[], []]}
     ]
