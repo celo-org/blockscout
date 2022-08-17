@@ -14,14 +14,14 @@ defmodule Explorer.Repo.Migrations.MigrateSortedOracleEvents do
 
   @doc "Returns an ecto query that gives the next batch / page of source rows to be processed"
   def page_query(start_of_page) do
-   event_page_query(start_of_page) 
+    event_page_query(start_of_page)
   end
 
   @doc "Perform the transformation with the list of source rows to operate upon, returns a list of inserted / modified ids"
   def do_change(ids) do
-   event_change(ids) 
+    event_change(ids)
   end
 
   @doc "Handle unsuccessful insertions"
-  def handle_non_insert(ids), do: raise "Failed to insert - #{inspect(ids)}"
+  def handle_non_insert(ids), do: raise("Failed to insert - #{inspect(ids)}")
 end
