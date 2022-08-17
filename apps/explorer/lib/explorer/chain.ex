@@ -2150,7 +2150,7 @@ defmodule Explorer.Chain do
           """
           SELECT
           COUNT(*) AS last_n_blocks_count,
-          EXTRACT(EPOCH FROM (DATE_TRUNC('second', NOW()::timestamp) - MAX(timestamp))) AS last_block_age,
+          CAST(EXTRACT(EPOCH FROM (DATE_TRUNC('second', NOW()::timestamp) - MAX(timestamp))) AS INTEGER) AS last_block_age,
           AVG((gas_used/gas_limit)*100) AS average_gas_used
           FROM blocks
           WHERE number BETWEEN $1 AND $2;
