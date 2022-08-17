@@ -56,7 +56,10 @@ defmodule Indexer.Fetcher.EventProcessor do
 
     case imported do
       {:ok, imported_items} ->
-        Telemetry.event(:event_processor_ingested, %{tracked_contract_events: length(imported_items[:tracked_contract_events])})
+        Telemetry.event(:event_processor_ingested, %{
+          tracked_contract_events: length(imported_items[:tracked_contract_events])
+        })
+
         :ok
 
       {:error, step, reason, _changes} ->

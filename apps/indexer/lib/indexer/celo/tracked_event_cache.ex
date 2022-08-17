@@ -41,7 +41,7 @@ defmodule Indexer.Celo.TrackedEventCache do
     {:noreply, %{state | table_ref: cache_table}}
   end
 
-  def rebuild_cache() do
+  def rebuild_cache do
     GenServer.call(__MODULE__, :rebuild_cache)
   end
 

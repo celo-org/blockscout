@@ -31,6 +31,7 @@ defmodule Indexer.Block.Fetcher do
     CeloVoters,
     CoinBalance,
     ContractCode,
+    EventProcessor,
     InternalTransaction,
     ReplacedTransaction,
     Token,
