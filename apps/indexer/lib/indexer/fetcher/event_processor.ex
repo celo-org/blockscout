@@ -9,7 +9,7 @@ defmodule Indexer.Fetcher.EventProcessor do
   alias Explorer.Celo.Events.Transformer
   alias Explorer.Chain
   alias Indexer.{BufferedTask, Tracer}
-  alias Indexer.Celo.TrackedEventCache
+  alias Indexer.Celo.{Telemetry, TrackedEventCache}
   alias Indexer.Fetcher.Util
 
   @behaviour BufferedTask
@@ -56,6 +56,7 @@ defmodule Indexer.Fetcher.EventProcessor do
 
     case imported do
       {:ok, events} ->
+        Telemetry.event(:ingested, %{tracked_contract_events: length(events)})
         :ok
       {:error, step, reason, _changes} ->
         Logger.error("Failed to import tracked events  #{step} - #{inspect(reason)}")
@@ -77,7 +78,8 @@ defmodule Indexer.Fetcher.EventProcessor do
   end
 
   @doc "Accepts a list of maps representing events and filters out entries that have no corresponding `ContractEventTracking` row"
-  def enqueue_logs(events) do
+  def enqueue_logs(nil), do: :ok
+  def enqueue_logs(events) when is_list(events) do
     events
     |> TrackedEventCache.batch_events()
     |> then(&BufferedTask.buffer(__MODULE__, &1))

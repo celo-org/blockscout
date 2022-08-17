@@ -2,13 +2,11 @@ defmodule Indexer.Fetcher.EventProcessorTest do
   use Explorer.DataCase, async: false
 
   import Indexer.Celo.TrackedEventSupport
-  import Ecto.Query
   alias Indexer.Fetcher.EventProcessor
   alias Indexer.Celo.TrackedEventCache
   alias Explorer.Chain.Celo.TrackedContractEvent
 
-  describe "enqueue/3" do
-    ## end to end test - enqueue to import
+  describe "queueing, processing and importing" do
     test "buffers tracked events and imports" do
       smart_contract = add_trackings([gold_relocked_topic()])
       cache_pid = start_supervised!( {TrackedEventCache, [%{}, []]})
