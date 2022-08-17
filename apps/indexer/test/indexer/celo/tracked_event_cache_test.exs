@@ -72,7 +72,7 @@ defmodule Indexer.Celo.TrackedEventCacheTest do
 
       logs = gold_relocked_logs(smart_contract.address_hash)
 
-      assert [{^logs, function_selector}] = TrackedEventCache.batch_events(logs)
+      assert [{^logs, %ABI.FunctionSelector{function: "GoldRelocked"}, _tracking_id}] = TrackedEventCache.batch_events(logs)
     end
   end
 end

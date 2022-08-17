@@ -17,10 +17,12 @@ defmodule Indexer.Fetcher.EventProcessor do
   @defaults [
     flush_interval: :timer.seconds(3),
     max_batch_size: 1,
-    max_concurrency: 20,
+    max_concurrency: 5,
     task_supervisor: Indexer.Fetcher.EventProcessor.TaskSupervisor,
     metadata: [fetcher: :event_processor]
   ]
+
+  @import_timeout 60_000
 
   @impl BufferedTask
   def init(initial, _reducer, _) do
@@ -30,21 +32,26 @@ defmodule Indexer.Fetcher.EventProcessor do
 
   @doc false
   def child_spec([init_options, gen_server_options]) do
-    Util.default_child_spec(init_options, gen_server_options, __MODULE__)
+    init_options
+    |> Keyword.merge(@defaults)
+    |> Util.default_child_spec(gen_server_options, __MODULE__)
   end
 
   @impl BufferedTask
   @decorate trace(name: "fetch", resource: "Indexer.Fetcher.EventProcessor.run/2", service: :indexer, tracer: Tracer)
-  def run([{logs, function_selector}] = batch, state) do
+  def run([{logs, function_selector, tracking_id}] = batch, state) do
     decoded = logs
     |> Enum.map(fn log ->
       function_selector
       |> Transformer.decode_event(log)
-      |> add_meta_properties(log, function_selector)
+      |> add_meta_properties(log, function_selector, tracking_id)
     end)
 
     imported = Chain.import(
-      %{tracked_events: decoded, timeout: :infinity}
+      %{
+        tracked_events: %{params: decoded},
+        timeout: @import_timeout
+      }
     )
 
     case imported do
@@ -56,14 +63,16 @@ defmodule Indexer.Fetcher.EventProcessor do
     end
   end
 
-  def add_meta_properties(event_params, log, function_selector) do
+  defp add_meta_properties(event_params, log, function_selector, tracking_id) do
     %{
       params: event_params,
       name: function_selector.function,
-      address_hash: log.address_hash,
+      contract_address_hash: log.address_hash,
       transaction_hash: log.transaction_hash,
       block_number: log.block_number,
-      log_index: log.index
+      log_index: log.index,
+      topic: log.first_topic,
+      contract_event_tracking_id: tracking_id
     }
   end
 
