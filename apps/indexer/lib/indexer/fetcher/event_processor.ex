@@ -7,9 +7,10 @@ defmodule Indexer.Fetcher.EventProcessor do
   require Indexer.Tracer
 
   alias Explorer.Celo.Events.Transformer
+  alias Explorer.Celo.Telemetry
   alias Explorer.Chain
   alias Indexer.{BufferedTask, Tracer}
-  alias Indexer.Celo.{Telemetry, TrackedEventCache}
+  alias Indexer.Celo.TrackedEventCache
   alias Indexer.Fetcher.Util
 
   @behaviour BufferedTask
@@ -38,7 +39,7 @@ defmodule Indexer.Fetcher.EventProcessor do
 
   @impl BufferedTask
   @decorate trace(name: "fetch", resource: "Indexer.Fetcher.EventProcessor.run/2", service: :indexer, tracer: Tracer)
-  def run([{logs, function_selector, tracking_id}] = batch, state) do
+  def run([{logs, function_selector, tracking_id}] = batch, _state) do
     decoded =
       logs
       |> Enum.map(fn log ->
@@ -54,8 +55,8 @@ defmodule Indexer.Fetcher.EventProcessor do
       })
 
     case imported do
-      {:ok, events} ->
-        Telemetry.event(:ingested, %{tracked_contract_events: length(events)})
+      {:ok, imported_items} ->
+        Telemetry.event(:event_processor_ingested, %{tracked_contract_events: length(imported_items[:tracked_contract_events])})
         :ok
 
       {:error, step, reason, _changes} ->
