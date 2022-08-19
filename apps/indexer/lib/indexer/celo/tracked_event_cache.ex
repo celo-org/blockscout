@@ -55,10 +55,9 @@ defmodule Indexer.Celo.TrackedEventCache do
     {:reply, nil, state}
   end
 
-  def handle_info(:refresh_cache, state) do
+  def handle_info(:refresh_cache, %{table_ref: table} = state) do
     build_cache(table)
     Process.send_after(__MODULE__, :refresh_cache, @cache_refresh_interval)
-
     {:noreply, state}
   end
 
