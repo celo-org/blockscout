@@ -11,7 +11,7 @@ defmodule Mix.Tasks.TrackEvent do
   import Ecto.Query
 
   def run(args) do
-    {options, args, invalid} =
+    {options, _args, invalid} =
       OptionParser.parse(args, strict: [contract_address: :string, topics: :string, event_names: :string, all: :boolean] )
 
     validate_preconditions(invalid)
@@ -28,10 +28,10 @@ defmodule Mix.Tasks.TrackEvent do
           {:ok, cet = %ContractEventTracking{}} ->
             Logger.info("Tracking new instances of #{cet.topic} (#{cet.name}) on contract #{contract.address |> to_string()} (#{contract.name})")
           {:error, %Ecto.Changeset{errors: errors, changes: %{name: name, topic: topic}}} ->
-            Logger.error "Errors found with event #{topic} (#{name}) - #{errors}"
+            Logger.error "Errors found with event #{topic} (#{name})"
+            Logger.error inspect(errors)
         end
       end)
-      require IEx; IEx.pry
     else
       {:error, reason} ->
         raise "Failure: #{reason}"
