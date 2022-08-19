@@ -20,72 +20,77 @@ defmodule Mix.Tasks.TrackEvent do
     Mix.Task.run "app.start"
 
     with {:ok, contract} <- get_verified_contract(options[:contract_address]),
-         {:ok, filtered_events} <- extract_abis_to_track(contract, options[:topics], options[:event_names], options[:all]) do
+         {:ok, tracking_changesets} <- get_changesets(contract, options[:topics], options[:event_names], options[:all]) do
 
-      create_tracking_records(contract, filtered_events)
+      tracking_changesets
+      |> Enum.each(fn changeset ->
+        case Repo.insert(changeset) do
+          {:ok, cet = %ContractEventTracking{}} ->
+            Logger.info("Tracking new instances of #{cet.topic} (#{cet.name}) on contract #{contract.address |> to_string()} (#{contract.name})")
+          {:error, %Ecto.Changeset{errors: errors, changes: %{name: name, topic: topic}}} ->
+            Logger.error "Errors found with event #{topic} (#{name}) - #{errors}"
+        end
+      end)
+      require IEx; IEx.pry
     else
       {:error, reason} ->
         raise "Failure: #{reason}"
     end
   end
 
-  defp extract_abis_to_track(contract, _topics, _names, true), do: {:ok, events}
-  defp extract_abis_to_track(contract, _topics, names, _all) when is_binary(names) do
+  defp get_changesets(contract, _topics, _names, true) do
+    topics = get_all_event_topics(contract)
+    get_changesets(contract, topics, nil, nil)
+  end
+
+  defp get_changesets(contract, _topics, names, _all) when is_binary(names) do
     names = names |> String.split(",")
 
-    names
+    trackings = names
     |> Enum.map(fn name ->
-      ContractEventTracking.from_event_name(contract, name)
-    end)
-    matching_events =
-      events
-    |> Enum.reduce(%{}, fn event, acc ->
-      case Enum.find(names, &( &1 == event["name"])) do
-        found_name -> Map.put(acc, found_name, event)
-        nil -> acc
+      case ContractEventTracking.from_event_name(contract, name) do
+        cet = %Ecto.Changeset{valid?: true} ->
+          cet
+        %Ecto.Changeset{valid?: false, errors: errors} ->
+          raise "Errors found with event name #{name} - #{errors}"
+        nil ->
+          raise "Event name #{name} not found in contract #{contract.name}"
       end
     end)
 
-    #check that all specified names were found
-    all_keys_found  = Enum.sort(names) == Enum.sort(Map.keys(matching_events))
-
-    if all_keys_found do
-      {:ok, Map.values(matching_events)}
-    else
-      found_names = Map.keys(matching_events)
-      missing_names =
-        names
-        |> MapSet.new()
-        |> MapSet.difference(MapSet.new(found_names))
-        |> MapSet.to_list()
-
-      {:error, "Specified event names not found in contract - #{missing_names |> Enum.join(", ")}"}
-    end
+    {:ok, trackings}
   end
 
-  defp extract_abis_to_track(events, topics, _names, _all) when is_binary(topics) do
+  defp get_changesets(contract, topics, _names, _all) when is_list(topics) do
+    trackings = topics
+      |> Enum.map(fn topic ->
+      case ContractEventTracking.from_event_topic(contract, topic) do
+        cet = %Ecto.Changeset{valid?: true} ->
+          cet
+        %Ecto.Changeset{valid?: false, errors: errors} ->
+          raise "Errors found with event name #{topic} - #{errors}"
+        nil ->
+          raise "Event topic #{topic} not found in contract #{contract.name}"
+      end
+    end)
+
+    {:ok, trackings}
+  end
+
+  defp get_changesets(contract, topics, _names, _all) when is_binary(topics) do
     topics = topics |> String.split(",")
-
-  end
-  defp create_tracking_records(contract, events) do
-    require IEx; IEx.pry
+    get_changesets(contract, topics, nil, nil)
   end
 
-  defp extract_event_abis(%SmartContract{name: name, abi: abi}) do
-    events =
-      abi
-      |> Enum.filter(fn
-        %{"type" => "event"} -> true
-        _ -> false
-      end)
-
-    case events do
-      [] ->
-        {:error, "Contract at given address (#{name}) has no events defined in ABI"}
-
-      _ ->
-        {:ok, events}
-    end
+  defp get_all_event_topics(%SmartContract{abi: abi}) do
+    abi
+    |> Enum.filter(fn
+      %{"type" => "event"} -> true
+      _ -> false
+    end)
+    |> Enum.map(fn event_abi ->
+      Explorer.SmartContract.Helper.event_abi_to_topic_str(event_abi)
+    end)
   end
 
   defp validate_preconditions(invalid) do
