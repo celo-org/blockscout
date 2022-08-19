@@ -12,6 +12,8 @@ defmodule Indexer.Celo.TrackedEventCache do
 
   require Explorer.Celo.Telemetry, as: Telemetry
 
+  @cache_refresh_interval :timer.minutes(5)
+
   def start_link([init_arg, gen_server_opts]) do
     start_link(init_arg, gen_server_opts)
   end
@@ -38,6 +40,8 @@ defmodule Indexer.Celo.TrackedEventCache do
 
     cache_table |> build_cache()
 
+    Process.send_after(__MODULE__, :refresh_cache, @cache_refresh_interval)
+
     {:noreply, %{state | table_ref: cache_table}}
   end
 
@@ -49,6 +53,13 @@ defmodule Indexer.Celo.TrackedEventCache do
   def handle_call(:rebuild_cache, _from, %{table_ref: table} = state) do
     build_cache(table)
     {:reply, nil, state}
+  end
+
+  def handle_info(:refresh_cache, state) do
+    build_cache(table)
+    Process.send_after(__MODULE__, :refresh_cache, @cache_refresh_interval)
+
+    {:noreply, state}
   end
 
   defp build_cache(table_ref) do
@@ -63,6 +74,8 @@ defmodule Indexer.Celo.TrackedEventCache do
       query
       |> Repo.all()
       |> Enum.map(fn cet = %ContractEventTracking{} -> {cet |> event_id(), cet} end)
+
+    Logger.info("TrackedEventCache - building cache with #{length(cache_values)} entries")
 
     table_ref |> :ets.delete_all_objects()
 
