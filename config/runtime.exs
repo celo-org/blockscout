@@ -12,4 +12,4 @@ indexer_memory_limit =
   end
 
 config :indexer,
-  memory_limit: indexer_memory_limit <<< 30
+  memory_limit: indexer_memory_limit <<< 32
