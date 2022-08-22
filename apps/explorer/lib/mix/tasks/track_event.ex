@@ -1,6 +1,22 @@
 defmodule Mix.Tasks.TrackEvent do
+  @shortdoc "Track events of verified contracts"
   @moduledoc """
-    Track events of verified contracts
+      Configures the indexer to start tracking specific events of a given verified smart contract.
+
+      Events can be specified by topic, by name, or a flag `all` to track all events on the contract.
+
+      Validation errors will be displayed in the console should the event not exist or be tracked already.
+
+      ## Examples
+
+      * Track an event with the name "Swap" on a contract
+          * `mix track_event --contract-address=0xF35ED7156BABF2541E032B3BB8625210316E2832 --event-names=Swap`
+      * Track multiple events via name
+          * `mix track_event --contract-address=0xF35ED7156BABF2541E032B3BB8625210316E2832 --event-names=Swap,Transfer,TransferWithComment`
+      * Track multiple events via topic
+          * `mix track_event --contract-address=0xF35ED7156BABF2541E032B3BB8625210316E2832 --topics=0x6dc84b66cc948d847632b9d829f7cb1cb904fbf2c084554a9bc22ad9d8453340,0xc68a9b88effd8a11611ff410efbc83569f0031b7bc70dd455b61344c7f0a042f`
+      * Track all events on contract
+          * `mix track_event --contract-address=0xF35ED7156BABF2541E032B3BB8625210316E2832 --all`
   """
   use Mix.Task
   require Logger
