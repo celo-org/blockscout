@@ -16,7 +16,7 @@ defmodule BlockScout.Mixfile do
         credo: :test,
         dialyzer: :test
       ],
-      # start_permanent: config_env() == :prod,
+      start_permanent: config_env() == :prod,
       releases: [
         blockscout: [
           applications: [
@@ -51,9 +51,9 @@ defmodule BlockScout.Mixfile do
     ] ++ env_aliases(env)
   end
 
-  # defp env_aliases(:dev) do
-  #   []
-  # end
+  defp env_aliases(:dev) do
+    []
+  end
 
   defp env_aliases(_env) do
     [
