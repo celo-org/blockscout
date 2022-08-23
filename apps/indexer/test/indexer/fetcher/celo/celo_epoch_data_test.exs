@@ -537,14 +537,14 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
                  %{
                    account_hash: address_2_hash,
                    block_hash: block_hash,
-                   locked_gold: 124,
-                   activated_gold: 0
+                   total_locked_gold: 124,
+                   nonvoting_locked_gold: 0
                  },
                  %{
                    account_hash: address_1_hash,
                    block_hash: block_hash,
-                   locked_gold: 123,
-                   activated_gold: 0
+                   total_locked_gold: 123,
+                   nonvoting_locked_gold: 101
                  }
                ]
              }
@@ -590,6 +590,12 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
              jsonrpc: "2.0",
              method: "eth_call",
              params: [%{data: "0x30ec70f5000000000000000000000000" <> address_1_hash, to: _}, "0x2A300"]
+           },
+           %{
+             id: getAccountNonvotingLockedGold,
+             jsonrpc: "2.0",
+             method: "eth_call",
+             params: [%{data: "0x3f199b40000000000000000000000000" <> address_1_hash, to: _}, "0x2A300"]
            }
          ],
          _ ->
@@ -600,6 +606,11 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
               id: getAccountTotalLockedGold,
               jsonrpc: "2.0",
               result: "0x000000000000000000000000000000000000000000000000000000000000007b"
+            },
+            %{
+              id: getAccountNonvotingLockedGold,
+              jsonrpc: "2.0",
+              result: "0x0000000000000000000000000000000000000000000000000000000000000065"
             }
           ]
         }
@@ -615,6 +626,12 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
              jsonrpc: "2.0",
              method: "eth_call",
              params: [%{data: "0x30ec70f5000000000000000000000000" <> address_2_hash, to: _}, "0x2A300"]
+           },
+           %{
+             id: getAccountNonvotingLockedGold,
+             jsonrpc: "2.0",
+             method: "eth_call",
+             params: [%{data: "0x3f199b40000000000000000000000000" <> address_2_hash, to: _}, "0x2A300"]
            }
          ],
          _ ->
@@ -625,6 +642,11 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
               id: getAccountTotalLockedGold,
               jsonrpc: "2.0",
               result: "0x000000000000000000000000000000000000000000000000000000000000007c"
+            },
+            %{
+              id: getAccountNonvotingLockedGold,
+              jsonrpc: "2.0",
+              result: "0x0000000000000000000000000000000000000000000000000000000000000000"
             }
           ]
         }
