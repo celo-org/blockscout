@@ -8,7 +8,6 @@ defmodule Indexer.Fetcher.CeloEpochData do
   require Logger
 
   alias Explorer.Celo.{AccountReader, EpochUtil, VoterRewards}
-  alias Explorer.Celo.ContractEvents.Common.TransferEvent
   alias Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
   alias Explorer.Celo.ContractEvents.Validators.ValidatorEpochPaymentDistributedEvent
   alias Explorer.Chain
@@ -212,7 +211,7 @@ defmodule Indexer.Fetcher.CeloEpochData do
 
     epoch_rewards_with_rewards_bolster =
       epoch_rewards
-      |> Map.put(:reserve_bolster, CeloEpochRewardsChain.reserve_bolster_value(block.block_number))
+      |> Map.put(:reserve_bolster, CeloEpochRewards.reserve_bolster_value(block.block_number))
 
     Map.merge(block, %{epoch_rewards: epoch_rewards_with_rewards_bolster})
   end
