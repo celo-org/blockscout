@@ -5,6 +5,7 @@ defmodule Indexer.Fetcher.EmptyBlocksSanitizer do
   """
 
   use GenServer
+  use Indexer.Fetcher
 
   require Logger
 
