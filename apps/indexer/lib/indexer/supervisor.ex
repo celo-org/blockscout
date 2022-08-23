@@ -20,6 +20,8 @@ defmodule Indexer.Supervisor do
 
   alias Indexer.Block.{Catchup, Realtime}
 
+  alias Indexer.Celo.TrackedEventCache
+
   alias Indexer.Fetcher.{
     BlockReward,
     CeloAccount,
@@ -34,6 +36,7 @@ defmodule Indexer.Supervisor do
     CoinBalanceOnDemand,
     ContractCode,
     EmptyBlocksSanitizer,
+    EventProcessor,
     InternalTransaction,
     PendingTransaction,
     ReplacedTransaction,
@@ -159,10 +162,10 @@ defmodule Indexer.Supervisor do
        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {CeloValidatorHistory.Supervisor,
        [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
-      {CeloEpochData.Supervisor,
-       [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {CeloUnlocked.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
       {CeloVoters.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]},
+      {EventProcessor.Supervisor, [[], []]},
+      {TrackedEventCache, [[], []]},
       {CeloMaterializedViewRefresh, [[], []]},
       {InternalTransactionCache, [[], []]}
     ]
@@ -188,13 +191,29 @@ defmodule Indexer.Supervisor do
 
     fetchers_with_metrics =
       if metrics_enabled do
-        [{MetricsCron, [[]]} | fetchers_with_amb_bridge_mediators]
+        metrics_processes = [
+          {MetricsCron, [[]]},
+          {Task.Supervisor, name: Indexer.Prometheus.MetricsCron.TaskSupervisor}
+        ]
+
+        metrics_processes ++ fetchers_with_amb_bridge_mediators
       else
         fetchers_with_amb_bridge_mediators
       end
 
+    fetcher_with_epoch_rewards =
+      if System.get_env("DISPLAY_REWARDS") === "true" do
+        [
+          {CeloEpochData.Supervisor,
+           [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]}
+          | fetchers_with_metrics
+        ]
+      else
+        fetchers_with_metrics
+      end
+
     Supervisor.init(
-      fetchers_with_metrics,
+      fetcher_with_epoch_rewards,
       strategy: :one_for_one
     )
   end
