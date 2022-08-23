@@ -17,10 +17,7 @@ defmodule Indexer.Fetcher.EmptyBlocksSanitizer do
   alias Explorer.Chain.{Block, Transaction}
   alias Explorer.Chain.Import.Runner.Blocks
 
-  # unprocessed empty blocks to fetch at once
-  @limit 1000
-
-  @interval :timer.minutes(1)
+  @interval :timer.seconds(10)
 
   defstruct interval: @interval,
             json_rpc_named_arguments: []
