@@ -399,17 +399,18 @@ defmodule Explorer.Celo.AccountReader do
   def fetch_celo_account_epoch_data(account_hash, block_number) do
     data =
       call_methods([
-        {:lockedgold, "getAccountTotalLockedGold", [account_hash], block_number}
+        {:lockedgold, "getAccountTotalLockedGold", [account_hash], block_number},
+        {:lockedgold, "getAccountNonvotingLockedGold", [account_hash], block_number}
       ])
 
-    case data["getAccountTotalLockedGold"] do
-      {:ok, [locked_gold]} ->
-        {:ok,
-         %{
-           locked_gold: locked_gold,
-           activated_gold: 0
-         }}
-
+    with {:ok, [total_locked_gold]} <- data["getAccountTotalLockedGold"],
+         {:ok, [nonvoting_locked_gold]} <- data["getAccountNonvotingLockedGold"] do
+      {:ok,
+       %{
+         total_locked_gold: total_locked_gold,
+         nonvoting_locked_gold: nonvoting_locked_gold
+       }}
+    else
       # error is already in format of {:error, reason}
       error ->
         error

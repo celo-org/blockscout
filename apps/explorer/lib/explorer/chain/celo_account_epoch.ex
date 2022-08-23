@@ -18,25 +18,25 @@ defmodule Explorer.Chain.CeloAccountEpoch do
   @typedoc """
   * `account_hash` - account for which we're tracking the data
   * `block_hash` - epoch block for which we're tracking the data
-  * `locked_gold` - amount of locked gold
-  * `activated_gold` - amount of activated gold
+  * `total_locked_gold` - amount of locked gold
+  * `nonvoting_locked_gold` - amount of non-voting locked gold
   """
 
   @type t :: %__MODULE__{
           account_hash: Hash.Address.t(),
           block_hash: Hash.Full.t(),
-          locked_gold: Wei.t(),
-          activated_gold: Wei.t()
+          total_locked_gold: Wei.t(),
+          nonvoting_locked_gold: Wei.t()
         }
 
-  @attrs ~w( account_hash block_hash locked_gold activated_gold )a
+  @attrs ~w( account_hash block_hash total_locked_gold nonvoting_locked_gold )a
 
-  @required_attrs ~w( account_hash block_hash locked_gold activated_gold )a
+  @required_attrs ~w( account_hash block_hash total_locked_gold nonvoting_locked_gold )a
 
   @primary_key false
   schema "celo_accounts_epochs" do
-    field(:locked_gold, Wei)
-    field(:activated_gold, Wei)
+    field(:total_locked_gold, Wei)
+    field(:nonvoting_locked_gold, Wei)
 
     belongs_to(:block, Block,
       foreign_key: :block_hash,
