@@ -5,7 +5,7 @@ defmodule Indexer.Fetcher.EmptyBlocksSanitizer do
   """
 
   use GenServer
-  
+
   require Logger
 
   import Ecto.Query, only: [from: 2, subquery: 1]
