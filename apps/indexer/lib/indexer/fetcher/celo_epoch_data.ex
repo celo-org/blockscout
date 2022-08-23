@@ -275,7 +275,7 @@ defmodule Indexer.Fetcher.CeloEpochData do
     {changesets, all_valid} =
       Enum.map_reduce(changes, true, fn change, all_valid ->
         changeset =
-          if Map.has_key?(change, :locked_gold) do
+          if Map.has_key?(change, :total_locked_gold) do
             CeloAccountEpoch.changeset(%CeloAccountEpoch{}, change)
           else
             CeloElectionRewards.changeset(%CeloElectionRewards{}, change)
