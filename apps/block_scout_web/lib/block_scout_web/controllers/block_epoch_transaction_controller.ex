@@ -81,17 +81,21 @@ defmodule BlockScoutWeb.BlockEpochTransactionController do
           {:ok, carbon_fund_address_hash} = string_to_address_hash(address_string)
           {:ok, carbon_fund_address} = hash_to_address(carbon_fund_address_hash)
           carbon_fund_address
-        _ -> nil
+
+        _ ->
+          nil
       end
 
-      reserve_address =
-        case CoreContracts.contract_address("Reserve") do
-          {:ok, address_string} ->
-            {:ok, address_hash} = string_to_address_hash(address_string)
-            {:ok, address} = hash_to_address(address_hash)
-            address
-          _ -> nil
-        end
+    reserve_address =
+      case CoreContracts.contract_address("Reserve") do
+        {:ok, address_string} ->
+          {:ok, address_hash} = string_to_address_hash(address_string)
+          {:ok, address} = hash_to_address(address_hash)
+          address
+
+        _ ->
+          nil
+      end
 
     {:ok, community_fund_address_hash} = string_to_address_hash(@community_fund_address)
     {:ok, community_fund_address} = hash_to_address(community_fund_address_hash)
