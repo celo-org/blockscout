@@ -106,7 +106,7 @@ function updateFormState (locked) {
 const elements = {
   '[data-selector="channel-disconnected-message"]': {
     render ($el, state) {
-      if (state.channelDisconnected) $el.show()
+      if (state.channelDisconnected && !window.loading) $el.show()
     }
   },
   '[data-page="contract-verification"]': {
@@ -169,7 +169,7 @@ if ($contractVerificationPage.length) {
 
   $(function () {
     if ($('#metadata-json-dropzone').length) {
-      var dropzone = new Dropzone('#metadata-json-dropzone', {
+      const dropzone = new Dropzone('#metadata-json-dropzone', {
         autoProcessQueue: false,
         acceptedFiles: 'text/plain,application/json,.sol,.json',
         parallelUploads: 100,
@@ -197,6 +197,17 @@ if ($contractVerificationPage.length) {
           file.status = Dropzone.QUEUED
         }
       })
+
+      $('#verify-via-json-submit').on('click', function (e) {
+        e.preventDefault()
+
+        if (dropzone.files.length === 0) {
+          return
+        }
+
+        updateFormState(true)
+        dropzone.processQueue()
+      })
     }
 
     function changeVisibilityOfVerifyButton (filesLength) {
@@ -209,17 +220,6 @@ if ($contractVerificationPage.length) {
       $('.js-smart-contract-libraries-wrapper').hide()
       $('.js-btn-add-contract-libraries').show()
       $('.js-add-contract-library-wrapper').show()
-    })
-
-    $('#verify-via-json-submit').on('click', function (e) {
-      e.preventDefault()
-
-      if (dropzone.files.length === 0) {
-        return
-      }
-
-      updateFormState(true)
-      dropzone.processQueue()
     })
   })
 } else if ($contractVerificationChooseTypePage.length) {
@@ -259,6 +259,7 @@ if ($contractVerificationPage.length) {
       $('#verify_via_flattened_code_button').hide()
       $('#verify_via_sourcify_button').show()
       $('#verify_vyper_contract_button').hide()
+      $('#verify_via_standard_json_input').hide()
     }
   })
 
@@ -267,6 +268,16 @@ if ($contractVerificationPage.length) {
       $('#verify_via_flattened_code_button').hide()
       $('#verify_via_sourcify_button').hide()
       $('#verify_vyper_contract_button').show()
+      $('#verify_via_standard_json_input').hide()
+    }
+  })
+
+  $('.verify-via-standard-json-input').on('click', function () {
+    if ($(this).prop('checked')) {
+      $('#verify_via_flattened_code_button').hide()
+      $('#verify_via_sourcify_button').hide()
+      $('#verify_vyper_contract_button').hide()
+      $('#verify_via_standard_json_input').show()
     }
   })
 }

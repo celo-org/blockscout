@@ -83,7 +83,7 @@ defmodule Explorer.GraphQL do
   """
   @spec get_internal_transaction(map()) :: {:ok, InternalTransaction.t()} | {:error, String.t()}
   def get_internal_transaction(%{transaction_hash: _, index: _} = clauses) do
-    if internal_transaction = Repo.get_by(InternalTransaction.where_nonpending_block(), clauses) do
+    if internal_transaction = Repo.replica().get_by(InternalTransaction.where_nonpending_block(), clauses) do
       {:ok, internal_transaction}
     else
       {:error, "Internal transaction not found."}
@@ -118,7 +118,7 @@ defmodule Explorer.GraphQL do
   """
   @spec get_token_transfer(map()) :: {:ok, TokenTransfer.t()} | {:error, String.t()}
   def get_token_transfer(%{transaction_hash: _, log_index: _} = clauses) do
-    if token_transfer = Repo.get_by(TokenTransfer, clauses) do
+    if token_transfer = Repo.replica().get_by(TokenTransfer, clauses) do
       {:ok, token_transfer}
     else
       {:error, "Token transfer not found."}
@@ -236,11 +236,6 @@ defmodule Explorer.GraphQL do
     query =
       token_txtransfers_query()
       |> where([t], t.to_address_hash == ^address_hash or t.from_address_hash == ^address_hash)
-
-    from(
-      t in subquery(query),
-      order_by: [desc: t.block_number, asc: t.nonce]
-    )
   end
 
   def celo_tx_transfers_query_by_txhash(tx_hash) do
@@ -338,7 +333,7 @@ defmodule Explorer.GraphQL do
       },
       distinct: [desc: tt.block_number, desc: tt.transaction_hash],
       # to get the ordering from distinct clause, something is needed here too
-      order_by: [desc: tt.from_address_hash, desc: tt.to_address_hash]
+      order_by: [asc: tx.nonce, desc: tt.from_address_hash, desc: tt.to_address_hash]
     )
   end
 
