@@ -9,7 +9,7 @@ defmodule BlockScoutWeb.AddressEpochTransactionController do
 
   alias BlockScoutWeb.{AccessHelpers, Controller, EpochTransactionView}
   alias Explorer.{Chain, Market}
-  alias Explorer.Chain.{CeloElectionRewards, CeloAccountEpoch, Wei}
+  alias Explorer.Chain.{CeloAccountEpoch, CeloElectionRewards, Wei}
   alias Explorer.ExchangeRates.Token
   alias Indexer.Fetcher.CoinBalanceOnDemand
   alias Phoenix.View
