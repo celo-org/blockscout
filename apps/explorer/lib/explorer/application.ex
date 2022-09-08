@@ -70,6 +70,8 @@ defmodule Explorer.Application do
   end
 
   defp configurable_children do
+    event_source = Application.get_env(:explorer, Explorer.Chain.Events.Listener)[:event_source]
+
     [
       configure(Explorer.ExchangeRates),
       configure(Explorer.ChainSpec.GenesisData),
@@ -77,7 +79,7 @@ defmodule Explorer.Application do
       configure(Explorer.Market.History.Cataloger),
       configure(Explorer.Chain.Cache.TokenExchangeRate),
       configure(Explorer.Chain.Transaction.History.Historian),
-      configure(Explorer.Chain.Events.Listener, %{event_source: Application.get_env(:explorer, __MODULE__)[:event_source]}),
+      configure(Explorer.Chain.Events.Listener, %{event_source: event_source}),
       configure(Explorer.Counters.AddressesWithBalanceCounter),
       configure(Explorer.Counters.AddressesCounter),
       configure(Explorer.Counters.AddressTransactionsCounter),
