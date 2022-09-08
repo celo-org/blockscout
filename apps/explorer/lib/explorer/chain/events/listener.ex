@@ -28,8 +28,6 @@ defmodule Explorer.Chain.Events.Listener do
   end
 
   defp broadcast({:chain_event, event_type} = event) do
-    Logger.info("Listener Received event type - #{event_type}")
-
     Registry.dispatch(Registry.ChainEvents, event_type, fn entries ->
       for {pid, _registered_val} <- entries do
         send(pid, event)
@@ -38,8 +36,6 @@ defmodule Explorer.Chain.Events.Listener do
   end
 
   defp broadcast({:chain_event, event_type, broadcast_type, _data} = event) do
-    Logger.info("Listener Received event type - #{event_type}")
-
     Registry.dispatch(Registry.ChainEvents, {event_type, broadcast_type}, fn entries ->
       for {pid, _registered_val} <- entries do
         send(pid, event)
