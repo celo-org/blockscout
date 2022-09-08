@@ -3,6 +3,7 @@ defmodule Explorer.Chain.Events.PubSubSender do
   Sends events via Phoenix.PubSub / PG2
   """
   require Logger
+  alias Explorer.Celo.Telemetry
   alias Phoenix.PubSub
 
   @max_payload 7500
@@ -30,8 +31,8 @@ defmodule Explorer.Chain.Events.PubSubSender do
     payload_size = byte_size(payload)
 
     if payload_size < @max_payload do
-      Logger.info("Send #{payload_size} over pubsub")
       PubSub.broadcast(@pubsub_name, @pubsub_topic, {:chain_event, payload})
+      Telemetry.event(:chain_event_send, %{payload_size: payload_size})
     else
       Logger.warn("Notification can't be sent, payload size #{payload_size} exceeds the limit of #{@max_payload}.")
     end

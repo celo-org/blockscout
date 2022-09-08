@@ -105,9 +105,9 @@ defmodule Explorer.Application do
     Application.get_env(:explorer, process, [])[:enabled] == true
   end
 
-  defp configure(process = Explorer.Chain.Events.Listener) do
+  defp configure(Explorer.Chain.Events.Listener = process) do
     if should_start?(process) do
-      event_source = Application.get_env(:explorer, Explorer.Chain.Events.Listener)[:event_source]
+      event_source = Application.get_env(:explorer, process)[:event_source]
       {process, %{event_source: event_source}}
     else
       []

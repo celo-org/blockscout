@@ -6,7 +6,7 @@ defmodule Explorer.Chain.Events.DBSource do
 
   @channel "chain_event"
 
-  def setup_source() do
+  def setup_source do
     {:ok, pid} =
       :explorer
       |> Application.get_env(Explorer.Repo)
@@ -18,7 +18,6 @@ defmodule Explorer.Chain.Events.DBSource do
   end
 
   def handle_source_msg({:notification, _pid, _ref, _topic, payload}) do
-    Logger.info("Got db source message")
     payload
     |> decode_payload!()
   end

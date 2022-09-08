@@ -61,8 +61,8 @@ config :explorer,
   realtime_events_sender: Explorer.Chain.Events.SimpleSender
 
 config :explorer, Explorer.Chain.Events.Listener,
-          enabled: true,
-          event_source: Explorer.Chain.Events.PubSubSource
+  enabled: true,
+  event_source: Explorer.Chain.Events.PubSubSource
 
 variant =
   if is_nil(System.get_env("ETHEREUM_JSONRPC_VARIANT")) do
