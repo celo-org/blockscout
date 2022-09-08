@@ -2,7 +2,6 @@ defmodule Explorer.Chain.Events.DBSource do
   @moduledoc "Source of chain events via pg_notify"
 
   alias Postgrex.Notifications
-  require Logger
 
   @channel "chain_event"
 

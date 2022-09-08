@@ -3,7 +3,6 @@ defmodule Explorer.Chain.Events.PubSubSource do
 
   alias Explorer.Celo.Telemetry
   alias Phoenix.PubSub
-  require Logger
 
   @channel "chain_event"
 
