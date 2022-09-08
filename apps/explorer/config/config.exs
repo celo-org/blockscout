@@ -39,7 +39,7 @@ config :explorer, :stacktrace_depth, 20
 
 config :explorer, Explorer.Chain.Events.Listener,
   enabled:
-    if(System.get_env("DISABLE_WEBAPP") == "true" && System.get_env("DISABLE_INDEXER") == "true",
+    if (System.get_env("DISABLE_WEBAPP") == "true",
       do: false,
       else: true
     ),
