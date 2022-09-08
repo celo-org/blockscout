@@ -7843,8 +7843,7 @@ defmodule Explorer.Chain do
     query =
       from(celo_unlocked in CeloUnlocked,
         select: sum(celo_unlocked.amount),
-        # TODO clarify if we need it
-        # where: celo_unlocked.available <= fragment("NOW()")
+        where: celo_unlocked.available <= fragment("NOW()"),
         where: celo_unlocked.account_address == ^address
       )
 
