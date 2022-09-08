@@ -42,7 +42,8 @@ config :explorer, Explorer.Chain.Events.Listener,
     if(System.get_env("DISABLE_WEBAPP") == "true" && System.get_env("DISABLE_INDEXER") == "true",
       do: false,
       else: true
-    )
+    ),
+  event_source: Explorer.Chain.Events.DBSource
 
 config :explorer, Explorer.ChainSpec.GenesisData,
   enabled: true,
