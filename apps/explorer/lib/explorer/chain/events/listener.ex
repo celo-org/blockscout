@@ -1,23 +1,27 @@
 defmodule Explorer.Chain.Events.Listener do
   @moduledoc """
-  Listens and publishes events
+  Listens and dispatches events
   """
 
-  @source Application.get_env(:explorer, __MODULE__)[:event_source]
-  use @source
   use GenServer
   require Logger
 
-  def start_link(_) do
-    GenServer.start_link(__MODULE__, nil, name: __MODULE__)
+  def start_link(state) do
+    GenServer.start_link(__MODULE__, state, name: __MODULE__)
   end
 
-  def init(_) do
-    {:ok, nil, {:continue, :listen_to_source}}
+  def init(state) do
+    {:ok, state, {:continue, :listen_to_source}}
   end
 
-  def handle_continue(:listen_to_source, _state) do
-    state = @source.setup_source()
+  def handle_continue(:listen_to_source, state = %{event_source: source}) do
+    source_state = source.setup_source()
+    {:noreply, Map.merge(state, source_state)}
+  end
+
+  def handle_info(msg, state = %{event_source: source}) do
+    source.handle_source_msg(msg) |> broadcast()
+
     {:noreply, state}
   end
 

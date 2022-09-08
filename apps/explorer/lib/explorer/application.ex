@@ -77,7 +77,7 @@ defmodule Explorer.Application do
       configure(Explorer.Market.History.Cataloger),
       configure(Explorer.Chain.Cache.TokenExchangeRate),
       configure(Explorer.Chain.Transaction.History.Historian),
-      configure(Explorer.Chain.Events.Listener),
+      configure(Explorer.Chain.Events.Listener, %{event_source: Application.get_env(:explorer, __MODULE__)[:event_source]}),
       configure(Explorer.Counters.AddressesWithBalanceCounter),
       configure(Explorer.Counters.AddressesCounter),
       configure(Explorer.Counters.AddressTransactionsCounter),
@@ -104,9 +104,9 @@ defmodule Explorer.Application do
     Application.get_env(:explorer, process, [])[:enabled] == true
   end
 
-  defp configure(process) do
+  defp configure(process, state \\ %{}) do
     if should_start?(process) do
-      process
+      {process, state}
     else
       []
     end

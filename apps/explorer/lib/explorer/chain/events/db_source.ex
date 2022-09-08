@@ -2,6 +2,7 @@ defmodule Explorer.Chain.Events.DBSource do
   @moduledoc "Source of chain events via pg_notify"
 
   alias Postgrex.Notifications
+  require Logger
 
   @channel "chain_event"
 
@@ -13,25 +14,19 @@ defmodule Explorer.Chain.Events.DBSource do
 
     ref = Notifications.listen!(pid, @channel)
 
-    {pid, ref, @channel}
+    %{dbsource_pid: pid, channel_ref: ref}
   end
 
-  defmacro __using__(_opts) do
-    quote do
-      def handle_info({:notification, _pid, _ref, _topic, payload}, state) do
-        payload
-        |> decode_payload!()
-        |> broadcast()
+  def handle_source_msg({:notification, _pid, _ref, _topic, payload}) do
+    Logger.info("Got db source message")
+    payload
+    |> decode_payload!()
+  end
 
-        {:noreply, state}
-      end
-
-      # sobelow_skip ["Misc.BinToTerm"]
-      defp decode_payload!(payload) do
-        payload
-        |> Base.decode64!()
-        |> :erlang.binary_to_term()
-      end
-    end
+  # sobelow_skip ["Misc.BinToTerm"]
+  defp decode_payload!(payload) do
+    payload
+    |> Base.decode64!()
+    |> :erlang.binary_to_term()
   end
 end
