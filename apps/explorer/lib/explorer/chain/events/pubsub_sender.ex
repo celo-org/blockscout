@@ -3,9 +3,11 @@ defmodule Explorer.Chain.Events.PubSubSender do
   Sends events via Phoenix.PubSub / PG2
   """
   require Logger
+  alias Phoenix.PubSub
 
   @max_payload 7500
-  @pubsub_topic "blockscout_chain_event"
+  @pubsub_topic "chain_event"
+  @pubsub_name :chain_pubsub
 
   def send_data(event_type) do
     payload = encode_payload({:chain_event, event_type})
@@ -29,6 +31,7 @@ defmodule Explorer.Chain.Events.PubSubSender do
 
     if payload_size < @max_payload do
       Logger.info("Send #{payload_size} over pubsub")
+      PubSub.broadcast(@pubsub_name, @pubsub_topic, {:chain_event, payload})
     else
       Logger.warn("Notification can't be sent, payload size #{payload_size} exceeds the limit of #{@max_payload}.")
     end

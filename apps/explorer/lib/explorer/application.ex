@@ -59,7 +59,8 @@ defmodule Explorer.Application do
       con_cache_child_spec(RSK.cache_name(), ttl_check_interval: :timer.minutes(1), global_ttl: :timer.minutes(30)),
       Transactions,
       Accounts,
-      Uncles
+      Uncles,
+      {Phoenix.PubSub, name: :chain_pubsub}
     ]
 
     children = base_children ++ configurable_children()
@@ -70,8 +71,6 @@ defmodule Explorer.Application do
   end
 
   defp configurable_children do
-    event_source = Application.get_env(:explorer, Explorer.Chain.Events.Listener)[:event_source]
-
     [
       configure(Explorer.ExchangeRates),
       configure(Explorer.ChainSpec.GenesisData),
@@ -79,7 +78,7 @@ defmodule Explorer.Application do
       configure(Explorer.Market.History.Cataloger),
       configure(Explorer.Chain.Cache.TokenExchangeRate),
       configure(Explorer.Chain.Transaction.History.Historian),
-      configure(Explorer.Chain.Events.Listener, %{event_source: event_source}),
+      configure(Explorer.Chain.Events.Listener),
       configure(Explorer.Counters.AddressesWithBalanceCounter),
       configure(Explorer.Counters.AddressesCounter),
       configure(Explorer.Counters.AddressTransactionsCounter),
@@ -106,9 +105,18 @@ defmodule Explorer.Application do
     Application.get_env(:explorer, process, [])[:enabled] == true
   end
 
-  defp configure(process, state \\ %{}) do
+  defp configure(Explorer.Chain.Events.Listener) do
     if should_start?(process) do
-      {process, state}
+      event_source = Application.get_env(:explorer, Explorer.Chain.Events.Listener)[:event_source]
+      {process, %{event_source: event_source}}
+    else
+      []
+    end
+  end
+
+  defp configure(process) do
+    if should_start?(process) do
+      process
     else
       []
     end
