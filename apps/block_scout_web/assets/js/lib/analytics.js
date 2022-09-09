@@ -56,15 +56,15 @@ function getPageName (path) {
   switch (true) {
     case path.includes('/search'):
       return '404SearchResult'
-    case path === '/':
+    case path === `${process.env.NETWORK_PATH}/`:
       return 'home'
-    case path === '/txs':
+    case path === `${process.env.NETWORK_PATH}/txs`:
       return 'validatedTransactions'
-    case path === '/pending_transactions':
+    case path === `${process.env.NETWORK_PATH}/pending_transactions`:
       return 'pendingTransactions'
-    case path === '/blocks':
+    case path === `${process.env.NETWORK_PATH}/blocks`:
       return 'blockHistory'
-    case path === '/accounts':
+    case path === `${process.env.NETWORK_PATH}/accounts`:
       return 'allAccounts'
     case path.includes('/blocks') && path.includes('/transactions'):
       return 'blockTransactions'
@@ -109,7 +109,7 @@ function getPageName (path) {
 // returns referrer path, strips domain name from referrer
 function getReferrerPath () {
   const referrer = document.referrer
-  return referrer.replace('https://explorer.celo.org', '').replace('http://localhost:4000', '')
+  return referrer.replace(`https://explorer.celo.org/${process.env.NETWORK_PATH}`, '').replace(`http://localhost:4000/${process.env.NETWORK_PATH}`, '')
 }
 
 // returns relevant entity ID: Address, Transaction, Block, or Search Parameter
