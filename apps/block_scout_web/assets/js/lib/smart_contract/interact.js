@@ -56,7 +56,7 @@ export const callMethod = (isWalletEnabled, $functionInputs, explorerChainId, $f
             methodToCall
               .on('error', function (error) {
                 const titleAndError = formatTitleAndError(error)
-                const message = titleAndError.message + (titleAndError.txHash ? `<br><a href="/tx/${titleAndError.txHash}">More info</a>` : '')
+                const message = titleAndError.message + (titleAndError.txHash ? `<br><a href="${process.env.NETWORK_PATH}/tx/${titleAndError.txHash}">More info</a>` : '')
                 openErrorModal(titleAndError.title.length ? titleAndError.title : `Error in sending transaction for method "${functionName}"`, message, false)
               })
               .on('transactionHash', function (txHash) {
