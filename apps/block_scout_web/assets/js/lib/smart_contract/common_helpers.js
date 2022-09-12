@@ -1,3 +1,4 @@
+import Web3 from 'web3'
 import $ from 'jquery'
 import { props } from 'eth-net-props'
 
@@ -35,26 +36,22 @@ export function prepareMethodArgs ($functionInputs, inputs) {
       if (sanitizedInputValue === '' || sanitizedInputValue === '[]') {
         return [[]]
       } else {
-        if (isArrayOfTuple(inputType)) {
-          return [JSON.parse(sanitizedInputValue)]
-        } else {
-          if (sanitizedInputValue.startsWith('[') && sanitizedInputValue.endsWith(']')) {
-            sanitizedInputValue = sanitizedInputValue.substring(1, sanitizedInputValue.length - 1)
-          }
-          const inputValueElements = sanitizedInputValue.split(',')
-          const sanitizedInputValueElements = inputValueElements.map(elementValue => {
-            const elementInputType = inputType.split('[')[0]
-
-            let sanitizedElementValue = replaceDoubleQuotes(elementValue, elementInputType)
-            sanitizedElementValue = replaceSpaces(sanitizedElementValue, elementInputType)
-
-            if (isBoolInputType(elementInputType)) {
-              sanitizedElementValue = convertToBool(elementValue)
-            }
-            return sanitizedElementValue
-          })
-          return [sanitizedInputValueElements]
+        if (sanitizedInputValue.startsWith('[') && sanitizedInputValue.endsWith(']')) {
+          sanitizedInputValue = sanitizedInputValue.substring(1, sanitizedInputValue.length - 1)
         }
+        const inputValueElements = sanitizedInputValue.split(',')
+        const sanitizedInputValueElements = inputValueElements.map(elementValue => {
+          const elementInputType = inputType.split('[')[0]
+
+          let sanitizedElementValue = replaceDoubleQuotes(elementValue, elementInputType)
+          sanitizedElementValue = replaceSpaces(sanitizedElementValue, elementInputType)
+
+          if (isBoolInputType(elementInputType)) {
+            sanitizedElementValue = convertToBool(elementValue)
+          }
+          return sanitizedElementValue
+        })
+        return [sanitizedInputValueElements]
       }
     } else if (isBoolInputType(inputType)) {
       return convertToBool(sanitizedInputValue)
@@ -95,7 +92,42 @@ export const formatTitleAndError = (error) => {
   return { title: title, message: message, txHash: txHash }
 }
 
-export const getCurrentAccount = () => {
+export const getCurrentAccountPromise = (provider) => {
+  return new Promise((resolve, reject) => {
+    if (provider && provider.wc) {
+      getCurrentAccountFromWCPromise(provider)
+        .then(account => resolve(account))
+        .catch(err => {
+          reject(err)
+        })
+    } else {
+      getCurrentAccountFromMMPromise()
+        .then(account => resolve(account))
+        .catch(err => {
+          reject(err)
+        })
+    }
+  })
+}
+
+export const getCurrentAccountFromWCPromise = (provider) => {
+  return new Promise((resolve, reject) => {
+  // Get a Web3 instance for the wallet
+    const web3 = new Web3(provider)
+
+    // Get list of accounts of the connected wallet
+    web3.eth.getAccounts()
+      .then(accounts => {
+        // MetaMask does not give you all accounts, only the selected account
+        resolve(accounts[0])
+      })
+      .catch(err => {
+        reject(err)
+      })
+  })
+}
+
+export const getCurrentAccountFromMMPromise = () => {
   return new Promise((resolve, reject) => {
     window.ethereum.request({ method: 'eth_accounts' })
       .then(accounts => {
@@ -187,10 +219,6 @@ function isArrayInputType (inputType) {
 
 function isTupleInputType (inputType) {
   return inputType && inputType.includes('tuple') && !isArrayInputType(inputType)
-}
-
-function isArrayOfTuple (inputType) {
-  return inputType && inputType.includes('tuple') && isArrayInputType(inputType)
 }
 
 function isAddressInputType (inputType) {
