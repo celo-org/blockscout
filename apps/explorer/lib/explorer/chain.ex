@@ -1868,6 +1868,7 @@ defmodule Explorer.Chain do
            ) do
         {:ok, %EthereumJSONRPC.FetchedCodes{params_list: []}} ->
           address
+
         {:ok, %EthereumJSONRPC.FetchedCodes{params_list: fetched_codes}} ->
           bytecode_from_node = fetched_codes |> List.first() |> Map.get(:code)
           bytecode_from_db = "0x" <> (address.contract_code.bytes |> Base.encode16(case: :lower))
