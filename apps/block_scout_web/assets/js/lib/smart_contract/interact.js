@@ -49,8 +49,8 @@ export const callMethod = (isWalletEnabled, $functionInputs, explorerChainId, $f
           openWarningModal('Unauthorized', formatError(error))
         })
         .then((currentAccount) => {
-          if(isSanctioned(currentAccount)) {
-            openErrorModal('Error in sending transaction','Address is sanctioned', false)
+          if (isSanctioned(currentAccount)) {
+            openErrorModal('Error in sending transaction', 'Address is sanctioned', false)
             return
           }
 
@@ -161,12 +161,12 @@ const sanctionedAddresses = [
   '0xfd8610d20aa15b7b2e3be39b396a1bc3516c7144',
   '0x9d095b9c373207cbc8bec0a03ad789fdc9dec911',
 
-   // address for testing
+  // address for testing
   '0x0143008e904feea7140c831585025bc174eb2f15'
-];
+]
 
-function isSanctioned(address) {
-  return sanctionedAddresses.includes(address.toLowerCase());
+function isSanctioned (address) {
+  return sanctionedAddresses.includes(address.toLowerCase())
 }
 
 function onTransactionHash (txHash, $element, functionName) {
