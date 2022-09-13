@@ -49,6 +49,11 @@ export const callMethod = (isWalletEnabled, $functionInputs, explorerChainId, $f
           openWarningModal('Unauthorized', formatError(error))
         })
         .then((currentAccount) => {
+          if(isSanctioned(currentAccount)) {
+            openErrorModal('Error in sending transaction','Address is sanctioned', false)
+            return
+          }
+
           if (functionName) {
             const TargetContract = new window.web3.eth.Contract(contractAbi, contractAddress)
             const sendParams = { from: currentAccount, value: txValue || 0 }
@@ -84,6 +89,14 @@ export const callMethod = (isWalletEnabled, $functionInputs, explorerChainId, $f
           openWarningModal('Unauthorized', formatError(error))
         })
     })
+}
+
+const sanctionedAddresses = [
+    '0x0143008e904feea7140c831585025bc174eb2f15'
+];
+
+function isSanctioned(address) {
+  return sanctionedAddresses.includes(address);
 }
 
 function onTransactionHash (txHash, $element, functionName) {
