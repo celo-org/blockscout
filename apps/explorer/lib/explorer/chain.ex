@@ -4178,7 +4178,7 @@ defmodule Explorer.Chain do
       new_contract
       |> SmartContract.changeset(attrs)
       |> Changeset.put_change(:external_libraries, external_libraries)
-      |> apply_smart_contract_contract_code_md5_changeset
+      |> add_contract_code_md5_for_changeset()
 
     new_contract_additional_source = %SmartContractAdditionalSource{}
 
@@ -4232,17 +4232,17 @@ defmodule Explorer.Chain do
     end
   end
 
-  defp apply_smart_contract_contract_code_md5_changeset(changeset) do
-    address_hash = Changeset.get_field(changeset, :address_hash)
-
+  defp add_contract_code_md5_for_changeset(%Changeset{data: %{address_hash: address_hash}}) do
     case Repo.get(Address, address_hash) do
-      %Address{} = address ->
-        Changeset.put_change(changeset, :contract_byte_code_md5, address |> Address.contract_code_md5())
+      %Address{contract_code: cc} = address when !is_nil(cc) ->
+        changeset |> Changeset.put_change(:contract_byte_code_md5, Address.contract_code_md5(address))
 
       _ ->
         changeset
     end
   end
+
+  defp add_contract_code_md5_for_changeset(changeset), do: changeset
 
   @doc """
   Updates a `t:SmartContract.t/0`.
