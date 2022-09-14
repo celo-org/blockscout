@@ -52,7 +52,11 @@ defmodule Indexer.Temporary.UncatalogedTokenTransfers do
   end
 
   def handle_info(:scan, state) do
+    start = Timex.Duration.now(:milliseconds)
     {:ok, block_numbers} = Chain.uncataloged_token_transfer_block_numbers()
+    duration = Timex.Duration.now(:milliseconds) - start
+
+    Logger.info("UncatalogedTokenTransfers completed - duration:#{duration} block_count:#{length(block_numbers)} block_numbers:#{inspect(block_numbers)}")
 
     case block_numbers do
       [] ->
