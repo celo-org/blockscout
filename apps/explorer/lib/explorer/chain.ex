@@ -4218,7 +4218,6 @@ defmodule Explorer.Chain do
       insert_contract_query_with_additional_sources
       |> Repo.transaction()
 
-      require IEx; IEx.pry
     case insert_result do
       {:ok, %{smart_contract: smart_contract}} ->
         {:ok, smart_contract}
@@ -4254,9 +4253,13 @@ defmodule Explorer.Chain do
   defp create_address_if_not_exists(repo, address_hash) do
     address_found = from(a in Address, where: a.hash == ^address_hash) |> repo.exists?()
     unless address_found do
+      #fetch contract code
+
       %Address{}
       |> Address.changeset(%{hash: address_hash})
       |> repo.insert()
+    else
+      {:ok, nil}
     end
   end
 
