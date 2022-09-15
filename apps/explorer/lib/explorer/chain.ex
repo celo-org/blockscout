@@ -22,7 +22,8 @@ defmodule Explorer.Chain do
       where: 3
     ]
 
-  import EthereumJSONRPC, only: [integer_to_quantity: 1, json_rpc: 2, fetch_block_internal_transactions: 2, fetch_codes: 2]
+  import EthereumJSONRPC,
+    only: [integer_to_quantity: 1, json_rpc: 2, fetch_block_internal_transactions: 2, fetch_codes: 2]
 
   require Logger
 
@@ -1870,7 +1871,7 @@ defmodule Explorer.Chain do
 
       _ ->
         nil
-      end
+    end
   end
 
   defp check_bytecode_matching(address) do
@@ -4223,19 +4224,20 @@ defmodule Explorer.Chain do
         create_address_name(repo, name, address_hash)
       end)
       |> Multi.run(:smart_contract, fn repo, changes ->
-         changeset = case changes do
-           # address was just created, we can calculate md5 without db fetch
-           %{create_address_if_necessary: address = %Explorer.Chain.Address{}} ->
+        changeset =
+          case changes do
+            # address was just created, we can calculate md5 without db fetch
+            %{create_address_if_necessary: address = %Explorer.Chain.Address{}} ->
               smart_contract_changeset
               |> Changeset.put_change(:contract_byte_code_md5, Address.contract_code_md5(address))
 
-           # address already existed, will have to fetch it for md5
-          _ ->
-            smart_contract_changeset |> add_contract_code_md5_for_changeset()
+            # address already existed, will have to fetch it for md5
+            _ ->
+              smart_contract_changeset |> add_contract_code_md5_for_changeset()
           end
 
         repo.insert(changeset)
-       end)
+      end)
       |> Multi.run(:set_address_verified, fn repo, _ -> set_address_verified(repo, address_hash) end)
 
     insert_contract_query_with_additional_sources =
@@ -4271,6 +4273,7 @@ defmodule Explorer.Chain do
   end
 
   defp _do_add_md5(changeset, nil), do: changeset
+
   defp _do_add_md5(changeset, address_hash) do
     case Repo.get(Address, address_hash) do
       %Address{contract_code: cc} = address when not is_nil(cc) ->
@@ -4283,6 +4286,7 @@ defmodule Explorer.Chain do
 
   defp create_address_if_not_exists(repo, address_hash) do
     address_found = from(a in Address, where: a.hash == ^address_hash) |> repo.exists?()
+
     unless address_found do
       {:ok, code} = fetch_contract_code(address_hash)
 
@@ -4293,8 +4297,6 @@ defmodule Explorer.Chain do
       {:ok, nil}
     end
   end
-
-
 
   @doc """
   Updates a `t:SmartContract.t/0`.
