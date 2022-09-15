@@ -22,7 +22,7 @@ defmodule Explorer.Chain do
       where: 3
     ]
 
-  import EthereumJSONRPC, only: [integer_to_quantity: 1, json_rpc: 2, fetch_block_internal_transactions: 2]
+  import EthereumJSONRPC, only: [integer_to_quantity: 1, json_rpc: 2, fetch_block_internal_transactions: 2, fetch_codes: 2]
 
   require Logger
 
@@ -1852,6 +1852,25 @@ defmodule Explorer.Chain do
       nil -> {:error, :not_found}
       address -> {:ok, address}
     end
+  end
+
+  def fetch_contract_code(address_hash, block \\ "latest") do
+    json_rpc_named_arguments = Application.get_env(:explorer, :json_rpc_named_arguments)
+
+    case EthereumJSONRPC.fetch_codes(
+           [%{block_quantity: block, address: address_hash}],
+           json_rpc_named_arguments
+         ) do
+      {:ok, %EthereumJSONRPC.FetchedCodes{params_list: []}} ->
+        nil
+
+      {:ok, %EthereumJSONRPC.FetchedCodes{params_list: fetched_codes}} ->
+        contract_code = fetched_codes |> List.first() |> Map.get(:code)
+        {:ok, contract_code}
+
+      _ ->
+        nil
+      end
   end
 
   defp check_bytecode_matching(address) do
@@ -4253,15 +4272,16 @@ defmodule Explorer.Chain do
   defp create_address_if_not_exists(repo, address_hash) do
     address_found = from(a in Address, where: a.hash == ^address_hash) |> repo.exists?()
     unless address_found do
-      #fetch contract code
+      {:ok, code} = fetch_contract_code(address_hash)
 
       %Address{}
-      |> Address.changeset(%{hash: address_hash})
+      |> Address.changeset(%{hash: address_hash, contract_code: code})
       |> repo.insert()
     else
       {:ok, nil}
     end
   end
+
 
 
   @doc """
