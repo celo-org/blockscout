@@ -4197,7 +4197,6 @@ defmodule Explorer.Chain do
       new_contract
       |> SmartContract.changeset(attrs)
       |> Changeset.put_change(:external_libraries, external_libraries)
-      |> add_contract_code_md5_for_changeset()
 
     new_contract_additional_source = %SmartContractAdditionalSource{}
 
@@ -4223,7 +4222,20 @@ defmodule Explorer.Chain do
         name = Changeset.get_field(smart_contract_changeset, :name)
         create_address_name(repo, name, address_hash)
       end)
-      |> Multi.insert(:smart_contract, smart_contract_changeset)
+      |> Multi.run(:smart_contract, fn repo, changes ->
+         changeset = case changes do
+           # address was just created, we can calculate md5 without db fetch
+           %{create_address_if_necessary: address = %Explorer.Chain.Address{}} ->
+              smart_contract_changeset
+              |> Changeset.put_change(:contract_byte_code_md5, Address.contract_code_md5(address))
+
+           # address already existed, will have to fetch it for md5
+          _ ->
+            smart_contract_changeset |> add_contract_code_md5_for_changeset()
+          end
+
+        repo.insert(changeset)
+       end)
       |> Multi.run(:set_address_verified, fn repo, _ -> set_address_verified(repo, address_hash) end)
 
     insert_contract_query_with_additional_sources =
