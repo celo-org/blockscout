@@ -4285,16 +4285,19 @@ defmodule Explorer.Chain do
   end
 
   defp create_address_if_not_exists(repo, address_hash) do
-    address_found = from(a in Address, where: a.hash == ^address_hash) |> repo.exists?()
+    address_found =
+      Address
+      |> where([a], a.hash == ^address_hash)
+      |> repo.exists?()
 
-    unless address_found do
+    if address_found do
+      {:ok, nil}
+    else
       {:ok, code} = fetch_contract_code(address_hash)
 
       %Address{}
       |> Address.changeset(%{hash: address_hash, contract_code: code})
       |> repo.insert()
-    else
-      {:ok, nil}
     end
   end
 
