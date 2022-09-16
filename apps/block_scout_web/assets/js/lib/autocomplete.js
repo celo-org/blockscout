@@ -3,6 +3,7 @@ import AutoComplete from '@tarekraafat/autocomplete.js/dist/autoComplete'
 import { DateTime } from 'luxon'
 import { appendTokenIcon } from './token_icon'
 import xss from 'xss'
+import { fullPath } from './utils'
 
 const placeHolder = 'Search by address, token symbol, name, transaction hash, or block number'
 const dataSrc = async (query, id) => {
@@ -15,7 +16,7 @@ const dataSrc = async (query, id) => {
 
     // Fetch External Data Source
     const source = await fetch(
-      `/token-autocomplete?q=${query}`
+      fullPath(`/token-autocomplete?q=${query}`)
     )
     const data = await source.json()
     // Post Loading placeholder text
