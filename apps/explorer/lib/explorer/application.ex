@@ -60,8 +60,8 @@ defmodule Explorer.Application do
       Transactions,
       Accounts,
       Uncles,
-      {Phoenix.PubSub, name: :chain_pubsub},
-      {Phoenix.PubSub, name: :operations}
+      {Phoenix.PubSub, name: :chain_pubsub, id: :chain_pubsub},
+      {Phoenix.PubSub, name: :operations, id: :operations}
     ]
 
     children = base_children ++ configurable_children()
