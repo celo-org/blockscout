@@ -137,13 +137,13 @@ const selection = (event) => {
   const selectionValue = event.detail.selection.value
 
   if (selectionValue.type === 'contract' || selectionValue.type === 'address' || selectionValue.type === 'label') {
-    window.location = `/address/${selectionValue.address_hash}`
+    window.location = fullPath(`/address/${selectionValue.address_hash}`)
   } else if (selectionValue.type === 'token') {
-    window.location = `/tokens/${selectionValue.address_hash}`
+    window.location = fullPath(`/tokens/${selectionValue.address_hash}`)
   } else if (selectionValue.type === 'transaction') {
-    window.location = `/tx/${selectionValue.tx_hash}`
+    window.location = fullPath(`/tx/${selectionValue.tx_hash}`)
   } else if (selectionValue.type === 'block') {
-    window.location = `/blocks/${selectionValue.block_hash}`
+    window.location = fullPath(`/blocks/${selectionValue.block_hash}`)
   }
 }
 
