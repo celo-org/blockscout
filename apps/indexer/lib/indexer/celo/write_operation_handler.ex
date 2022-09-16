@@ -4,6 +4,7 @@ defmodule Indexer.Celo.WriteOperationHandler do
   use GenServer
 
   require Explorer.Celo.Telemetry, as: Telemetry
+  require Logger
   alias Explorer.Celo.PubSub
   alias Explorer.SmartContract.Solidity.Publisher, as: SmartContractPublisher
 
