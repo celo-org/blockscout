@@ -7,11 +7,16 @@ defmodule Explorer.Celo.PubSub do
   alias Explorer.Celo.Telemetry
   alias Phoenix.PubSub
 
+  require Logger
+
   @pubsub_name :operations
 
   @doc "Broadcast a message to publish a smart contract"
   def publish_smart_contract(address_hash, attrs) do
-    PubSub.broadcast(@pubsub_name, "smart_contract_publish", {:smart_contract_publish, address_hash, attrs, UUID.generate() } )
+    msg_id = UUID.generate()
+
+    Logger.info("Sending smart contract publish request", celo_rid: msg_id)
+    PubSub.broadcast(@pubsub_name, "smart_contract_publish", {:smart_contract_publish, address_hash, attrs, msg_id} )
     Telemetry.event(:smart_contract_publish_send, %{})
   end
 

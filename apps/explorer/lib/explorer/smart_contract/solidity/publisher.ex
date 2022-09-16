@@ -86,7 +86,8 @@ defmodule Explorer.SmartContract.Solidity.Publisher do
 
   defp create_or_update_smart_contract(address_hash, attrs) do
     if Application.get_env(:explorer, :write_api_enabled) do
-      _do_create_or_update(address_hash, attrs)
+      do_create_or_update(address_hash, attrs)
+      {:error, unverified_smart_contract(address_hash, attrs, "Verification in progress", nil, true)}
     else
       broadcast_smart_contract_upsert(address_hash, attrs)
     end
@@ -96,7 +97,7 @@ defmodule Explorer.SmartContract.Solidity.Publisher do
     PubSub.publish_smart_contract(address_hash, attrs)
   end
 
-  defp _do_create_or_update(address_hash, attrs) do
+  def do_create_or_update(address_hash, attrs) do
     if Chain.smart_contract_verified?(address_hash) do
       Chain.update_smart_contract(attrs, attrs.external_libraries, attrs.secondary_sources)
     else
