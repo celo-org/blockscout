@@ -184,12 +184,11 @@
             </dd>
           </dl>
           <%= if assigns[:locked_gold] do %>
-          <!-- Locked gold -->
+          <!-- Locked -->
           <dl class="row">
             <dt class="col-sm-4 col-md-4 col-lg-3 text-muted">
               <%= render BlockScoutWeb.CommonComponentsView, "_i_tooltip_2.html",
-                text: gettext("Locked CELO Balance") %>
-                <% # TODO change the tooltip %>
+                text: gettext("Amount of locked Celo in the protocol") %>
                 <%= gettext("Locked CELO Balance") %>
             </dt>
             <dd class="col-sm-8 col-md-8 col-lg-9">
@@ -198,13 +197,12 @@
           </dl>
           <% end %>
           <%= if assigns[:pending_gold] do %>
-          <!-- Locked gold -->
+          <!-- Pending unlocked -->
           <dl class="row">
             <dt class="col-sm-4 col-md-4 col-lg-3 text-muted">
               <%= render BlockScoutWeb.CommonComponentsView, "_i_tooltip_2.html",
-                text: gettext("Pending Locked CELO Balance") %>
-                <% # TODO change the tooltip %>
-                <%= gettext("Pending Locked CELO Balance") %>
+                text: gettext("Amount of Celo that’s in the process of being unlocked (3 days)") %>
+                <%= gettext("Pending Unlocked Gold") %>
             </dt>
             <dd class="col-sm-8 col-md-8 col-lg-9">
               <%= wei_to_ether_rounded(@pending_gold) %> <%= gettext "CELO" %>
@@ -212,13 +210,12 @@
           </dl>
           <% end %>
           <%= if assigns[:vote_activated_gold] do %>
-          <!-- Locked gold -->
+          <!-- Activated -->
           <dl class="row">
             <dt class="col-sm-4 col-md-4 col-lg-3 text-muted">
               <%= render BlockScoutWeb.CommonComponentsView, "_i_tooltip_2.html",
-                text: gettext("Vote Activated CELO Balance") %>
-                <% # TODO change the tooltip %>
-                <%= gettext("Vote Activated CELO Balance") %>
+                text: gettext("Amount of locked Celo that has been activated to vote for validator(s)") %>
+                <%= gettext("Activated Celo Balance") %>
             </dt>
             <dd class="col-sm-8 col-md-8 col-lg-9">
               <%= wei_to_ether_rounded(@vote_activated_gold) %> <%= gettext "CELO" %>
@@ -241,7 +238,7 @@
             <%= if (@address.celo_account.account_type == "validator" or @address.celo_account.account_type == "group") and System.get_env("DISPLAY_REWARDS") === "true" do%>
             <dt class="col-sm-4 col-md-4 col-lg-3 text-muted">
               <%= render BlockScoutWeb.CommonComponentsView, "_i_tooltip_2.html",
-                text: gettext("Validating and voting rewards accumulated over time.") %>
+                text: gettext("Total amount of epoch rewards this address has received, all time.") %>
               <%= gettext("Lifetime Validating | Voting Rewards") %>
             </dt>
             <dd class="col-sm-8 col-md-8 col-lg-9">
