@@ -21,8 +21,15 @@ defmodule BlockScoutWeb.AddressContractVerificationViaJsonController do
     else
       case Sourcify.check_by_address(address_hash_string) do
         {:ok, _verified_status} ->
-          get_metadata_and_publish(address_hash_string, conn)
-          redirect(conn, to: address_path)
+          case get_metadata_and_publish(address_hash_string, conn) do
+            :update_submitted ->
+              conn
+              |> put_flash(:info, "Contract submitted for verification")
+              |> redirect(to: address_path)
+
+            _ ->
+              redirect(conn, to: address_path)
+          end
 
         _ ->
           changeset =

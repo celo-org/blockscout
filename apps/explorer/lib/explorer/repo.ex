@@ -154,8 +154,10 @@ defmodule Explorer.Repo do
       adapter: Ecto.Adapters.Postgres,
       read_only: true
 
+    alias Explorer.Repo, as: ExplorerRepo
+
     def init(_, opts) do
-      extra_postgres_parameters = [application_name: get_application_name() <> "-replica1"]
+      extra_postgres_parameters = [application_name: ExplorerRepo.get_application_name() <> "-replica1"]
 
       opts =
         Keyword.update(opts, :parameters, extra_postgres_parameters, fn params ->

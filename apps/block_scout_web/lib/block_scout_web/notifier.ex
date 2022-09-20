@@ -67,6 +67,9 @@ defmodule BlockScoutWeb.Notifier do
             )
 
           {:error, result}
+
+          {:submitted}   ->
+            require IEx; IEx.pry
       end
 
     Endpoint.broadcast(
