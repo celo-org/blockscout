@@ -331,7 +331,7 @@ defmodule BlockScoutWeb.API.RPC.ContractController do
         {:error, changeset}
 
       {:update_submitted} ->
-          :update_submitted
+        :update_submitted
     end
   end
 

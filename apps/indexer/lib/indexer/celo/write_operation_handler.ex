@@ -22,7 +22,7 @@ defmodule Indexer.Celo.WriteOperationHandler do
 
   @impl true
   def init(_) do
-    state = %{ }
+    state = %{}
 
     {:ok, state, {:continue, :subscribe_to_operations}}
   end
@@ -43,7 +43,7 @@ defmodule Indexer.Celo.WriteOperationHandler do
   end
 
   @impl true
-  def handle_info(msg,state) do
+  def handle_info(msg, state) do
     Logger.info("#{__MODULE__} got unknown message #{msg |> inspect()}")
     {:noreply, state}
   end
