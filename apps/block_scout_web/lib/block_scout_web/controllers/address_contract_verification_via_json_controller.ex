@@ -24,8 +24,7 @@ defmodule BlockScoutWeb.AddressContractVerificationViaJsonController do
           case get_metadata_and_publish(address_hash_string, conn) do
             :update_submitted ->
               conn
-              |> put_flash(:info, "Contract submitted for verification")
-              |> redirect(to: address_path)
+              |> render("submitted.html", address_string: address_hash_string, path: address_path)
 
             _ ->
               redirect(conn, to: address_path)
