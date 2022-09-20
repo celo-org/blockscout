@@ -68,8 +68,8 @@ defmodule BlockScoutWeb.Notifier do
 
           {:error, result}
 
-          {:submitted}   ->
-            require IEx; IEx.pry
+          :update_submitted   ->
+            {:ok, :update_submitted}
       end
 
     Endpoint.broadcast(
