@@ -153,5 +153,16 @@ defmodule Explorer.Repo do
       otp_app: :explorer,
       adapter: Ecto.Adapters.Postgres,
       read_only: true
+
+    def init(_, opts) do
+      extra_postgres_parameters = [application_name: get_application_name() <> "-replica1"]
+
+      opts =
+        Keyword.update(opts, :parameters, extra_postgres_parameters, fn params ->
+          Keyword.merge(params, extra_postgres_parameters)
+        end)
+
+      {:ok, opts}
+    end
   end
 end
