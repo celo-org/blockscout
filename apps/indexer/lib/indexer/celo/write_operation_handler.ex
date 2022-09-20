@@ -36,7 +36,7 @@ defmodule Indexer.Celo.WriteOperationHandler do
 
   @impl true
   def handle_info({:smart_contract_publish, address_hash, attributes, msg_id}, state) do
-    Logger.info("Got smart contract publish request", celo_rid: msg_id)
+    Logger.info("Got smart contract publish request #{msg_id}")
     SmartContractPublisher.do_create_or_update(address_hash, attributes)
 
     {:noreply, state}

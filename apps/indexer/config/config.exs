@@ -82,7 +82,7 @@ config :indexer, Indexer.Tracer,
 config :logger_json, :indexer,
   metadata:
     ~w(application fetcher request_id first_block_number last_block_number missing_block_range_count missing_block_count
-       block_number step count error_count shrunk import_id transaction_id celo_rid)a,
+       block_number step count error_count shrunk import_id transaction_id)a,
   metadata_filter: [application: :indexer]
 
 config :logger, :indexer, backends: [LoggerJSON, {LoggerBackend, :logger_backend}]

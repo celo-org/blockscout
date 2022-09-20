@@ -241,7 +241,7 @@ config :explorer,
 config :logger_json, :explorer,
   metadata:
     ~w(application fetcher request_id first_block_number last_block_number missing_block_range_count missing_block_count
-       block_number step count error_count shrunk import_id transaction_id celo_rid)a,
+       block_number step count error_count shrunk import_id transaction_id)a,
   metadata_filter: [application: :explorer]
 
 config :logger, :explorer, backends: [LoggerJSON]
