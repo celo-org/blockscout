@@ -18,6 +18,7 @@ iframe#myiframe {
 .navcontainer {
     display: flex;
     justify-content: space-between;
+    clear:both;
 }
 
 .moola a {
@@ -27,6 +28,7 @@ iframe#myiframe {
     padding: 6px 14px !important;
     box-shadow: 5px 5px 5px rgb(180, 175, 175);
     color: #6C6C6C !important;
+    clear:both;
 }
 
 ul.topnav {
@@ -41,6 +43,7 @@ ul.topnav {
     border-radius: 2px;
     background-color: #fbfafc;
     width: fit-content;
+    clear:both;
 }
 
 ul.topnav li {
@@ -54,6 +57,7 @@ ul.topnav li {
     text-overflow: ellipsis;
     margin: 5px;
     flex: none;
+    clear:both;
 }
 
 .menuWrap {
@@ -76,21 +80,40 @@ ul.topnav li a {
     border-radius: 12px;
     box-shadow: 5px 5px 5px rgb(180, 175, 175);
     flex: none;
+    clear:both;
 }
 
-ul.topnav li.selected a {color: #26ba6c; font-weight: normal; border: 1px solid #26ba6c;}
+ul.topnav li.selected a {
+    color: #26ba6c; 
+    font-weight: normal; 
+    border: 1px solid #26ba6c;
+}
 
 ul.topnav li a:hover:not(.active) {color: #6C6C6C;}
 
 @media only screen and (max-width: 768px) {
-    ul.topnav {background-color: none; overflow-x: scroll; -webkit-overflow-scrolling: touch; -ms-overflow-style: -ms-autohiding-scrollbar; width: 100%;} 
+    ul.topnav {
+        background-color: none; 
+        overflow-x: scroll; 
+        -webkit-overflow-scrolling: touch; 
+        -ms-overflow-style: -ms-autohiding-scrollbar; 
+        width: 100%;
+    } 
     
-    .dark-theme-applied ul.topnav {background-color: #282945; overflow-x: scroll; white-space: nowrap; -webkit-overflow-scrolling: touch; -ms-overflow-style: -ms-autohiding-scrollbar;}
+    .dark-theme-applied ul.topnav {
+        background-color: #282945; 
+        overflow-x: scroll; 
+        white-space: nowrap; 
+        -webkit-overflow-scrolling: touch;
+        -ms-overflow-style: -ms-autohiding-scrollbar;
+    }
     
-    .topnav::-webkit-scrollbar {
-            display: none; } 
+    .topnav::-webkit-scrollbar {display: none; } 
     
-    ul.topnav li a { color: #6C6C6C; font-size: 14px; }
+    ul.topnav li a {
+        color: #6C6C6C; 
+        font-size: 14px; 
+    }
 
     .navcontainer {
         background-color: none; 

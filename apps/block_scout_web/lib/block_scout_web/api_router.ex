@@ -43,7 +43,6 @@ defmodule BlockScoutWeb.ApiRouter do
         "logs" => {RPC.LogsController, []},
         "token" => {RPC.TokenController, []},
         "stats" => {RPC.StatsController, []},
-        "makerdojo" => {RPC.MakerdojoController, []},
         "contract" => {RPC.ContractController, [:verify]},
         "transaction" => {RPC.TransactionController, []},
         "reward" => {RPC.RewardController, []}
@@ -65,7 +64,6 @@ defmodule BlockScoutWeb.ApiRouter do
         "logs" => {RPC.LogsController, []},
         "token" => {RPC.TokenController, []},
         "stats" => {RPC.StatsController, []},
-        "makerdojo" => {RPC.MakerdojoController, []},
         "contract" => {RPC.ContractController, [:verify]},
         "transaction" => {RPC.TransactionController, []},
         "reward" => {RPC.RewardController, []}
