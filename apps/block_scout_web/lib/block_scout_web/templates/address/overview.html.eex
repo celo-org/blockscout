@@ -239,7 +239,7 @@
             <dt class="col-sm-4 col-md-4 col-lg-3 text-muted">
               <%= render BlockScoutWeb.CommonComponentsView, "_i_tooltip_2.html",
                 text: gettext("Total amount of epoch rewards this address has received, all time.") %>
-              <%= gettext("Lifetime Validating | Voting Rewards") %>
+              <%= gettext("Validator Rewards | Voting Rewards") %>
             </dt>
             <dd class="col-sm-8 col-md-8 col-lg-9">
               <%= wei_to_ether_rounded(@validator_or_group_sum) %> <%= gettext "cUSD" %> | <%= wei_to_ether_rounded(@voting_sum) %> <%= gettext "CELO" %>
