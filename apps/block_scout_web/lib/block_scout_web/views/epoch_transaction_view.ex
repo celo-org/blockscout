@@ -3,6 +3,7 @@ defmodule BlockScoutWeb.EpochTransactionView do
 
   alias Explorer.Celo.EpochUtil
   alias Explorer.Chain.Wei
+  alias Explorer.Chain
 
   def get_reward_currency(reward_type) do
     case reward_type do

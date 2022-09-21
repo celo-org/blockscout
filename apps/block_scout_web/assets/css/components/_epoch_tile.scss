@@ -1,0 +1,27 @@
+.epoch-aggregated-tile-reward-count {
+  color: #35D07F;
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &.epoch-aggregated-tile-reward-count-disabled {
+    color: #6c757d;
+    cursor: default;
+  
+    &:hover {
+      text-decoration: none;
+    }  
+  }
+}
+
+.epoch-aggregated-tile-transactions-list-hidden {
+  display: none;
+}
+
+.epoch-aggregated-tile-transactions-list-items {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}

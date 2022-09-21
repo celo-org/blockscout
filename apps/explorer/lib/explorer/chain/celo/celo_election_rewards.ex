@@ -7,6 +7,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
 
   import Ecto.Query,
     only: [
+      select: 3,
       from: 2,
       limit: 2,
       offset: 2,
@@ -68,6 +69,69 @@ defmodule Explorer.Chain.CeloElectionRewards do
       [:account_hash, :reward_type, :block_number, :associated_account_hash],
       name: :celo_election_rewards_account_hash_block_number_reward_type
     )
+  end
+
+  def base_aggregated_block_query(block_number, reward_types) do
+    {:ok, zero_wei} = Wei.cast(0)
+
+    from(rewards in __MODULE__,
+      group_by: rewards.block_number,
+      group_by: rewards.reward_type,
+      where: rewards.amount != ^zero_wei,
+      where: rewards.block_number == ^block_number,
+      where: rewards.reward_type in ^reward_types
+    )
+  end
+
+  def aggregated_voter_and_validator_query(block_number) do
+    query = base_aggregated_block_query(block_number, ["validator", "voter"])
+
+    query
+    |> select([rewards], %{
+      reward_type: rewards.reward_type,
+      amount: sum(rewards.amount),
+      count: count()
+    })
+  end
+
+  def aggregated_validator_group_query(block_number) do
+    query = base_aggregated_block_query(block_number, ["group"])
+
+    query
+    |> select([rewards], %{
+      reward_type: rewards.reward_type,
+      amount: sum(rewards.amount),
+      validator_count: fragment("COUNT(DISTINCT(associated_account_hash))"),
+      group_count: fragment("COUNT(DISTINCT(account_hash))"),
+      count: count()
+    })
+  end
+
+  def get_aggregated_for_block_number(block_number) do
+    default = %{voter: nil, group: nil, validator: nil}
+    validator_group_query = aggregated_validator_group_query(block_number)
+    voter_and_validator_query = aggregated_voter_and_validator_query(block_number)
+
+    default
+    |> Map.merge(
+      voter_and_validator_query
+      |> Repo.all()
+      |> Enum.map(fn rewards -> {String.to_atom(rewards.reward_type), rewards} end)
+      |> Map.new()
+      |> Map.put(:group, validator_group_query |> Repo.one())
+    )
+  end
+
+  def get_sample_rewards_for_block_number(block_number) do
+    voter_rewards = get_rewards_for_block(block_number, "voter")
+    validator_rewards = get_rewards_for_block(block_number, "validator")
+    group_rewards = get_rewards_for_block(block_number, "group")
+
+    %{
+      voter: voter_rewards,
+      validator: validator_rewards,
+      group: group_rewards,
+    }
   end
 
   def base_address_query(account_hash_list, reward_type_list) do
@@ -193,6 +257,32 @@ defmodule Explorer.Chain.CeloElectionRewards do
         where: reward.block_number == ^block_number,
         limit: ^page_size,
         offset: ^items_count
+      )
+
+    Repo.all(query)
+  end
+
+  def get_rewards_for_block(block_number, reward_type) do
+    {:ok, zero_wei} = Wei.cast(0)
+
+    query =
+      from(reward in __MODULE__,
+        join: acc in CeloAccount,
+        on: reward.associated_account_hash == acc.address,
+        select: %{
+          account_hash: reward.account_hash,
+          amount: reward.amount,
+          associated_account_name: acc.name,
+          associated_account_hash: reward.associated_account_hash,
+          block_number: reward.block_number,
+          date: reward.block_timestamp,
+          reward_type: reward.reward_type
+        },
+        order_by: [desc: reward.account_hash, asc: reward.reward_type],
+        where: reward.amount != ^zero_wei,
+        where: reward.block_number == ^block_number,
+        where: reward.reward_type == ^reward_type,
+        limit: 20, # TODO constant
       )
 
     Repo.all(query)
