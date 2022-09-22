@@ -40,16 +40,16 @@
 
 <section class="container" data-page="stats-list" id="stats-container">
     <section class="fs-14" data-page="stats-details">
-    <div class="row">
-        <div class="col-md-12">
-        <%= if stats_enabled do %>
-            <!-- Stats Details -->
-            <div class="makerdojo">
-            <iframe width=100%  src="<%= attestations_url %>" name="myiframe" id="myiframe" frameborder="0" style="border:0;height:100vh;width:100%;" allowfullscreen></iframe>
+        <div class="row">
+            <div class="col-md-12">
+            <%= if stats_enabled do %>
+                <!-- Stats Details -->
+                <div class="makerdojo">
+                <iframe width=100%  src="<%= attestations_url %>" name="myiframe" id="myiframe" frameborder="0" style="border:0;height:100vh;width:100%;" allowfullscreen></iframe>
+                </div>
+            <% end %>
             </div>
-        <% end %>
         </div>
-    </div>
     </section>
-<script defer data-cfasync="false" src="<%= static_path(@conn, "/js/stats.js") %>"></script>
+    <script defer data-cfasync="false" src="<%= static_path(@conn, "/js/stats.js") %>"></script>
 </section>
