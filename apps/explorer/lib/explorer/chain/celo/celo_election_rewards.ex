@@ -38,6 +38,8 @@ defmodule Explorer.Chain.CeloElectionRewards do
           reward_type: String.t()
         }
 
+  @sample_epoch_block_transaction_limit 20
+
   @primary_key false
   schema "celo_election_rewards" do
     field(:amount, Wei)
@@ -120,18 +122,6 @@ defmodule Explorer.Chain.CeloElectionRewards do
       |> Map.new()
       |> Map.put(:group, validator_group_query |> Repo.one())
     )
-  end
-
-  def get_sample_rewards_for_block_number(block_number) do
-    voter_rewards = get_rewards_for_block(block_number, "voter")
-    validator_rewards = get_rewards_for_block(block_number, "validator")
-    group_rewards = get_rewards_for_block(block_number, "group")
-
-    %{
-      voter: voter_rewards,
-      validator: validator_rewards,
-      group: group_rewards,
-    }
   end
 
   def base_address_query(account_hash_list, reward_type_list) do
@@ -262,27 +252,33 @@ defmodule Explorer.Chain.CeloElectionRewards do
     Repo.all(query)
   end
 
-  def get_rewards_for_block(block_number, reward_type) do
+  def get_sample_rewards_for_block_number(block_number) do
+    voter_rewards = get_sample_rewards_for_block_number(block_number, "voter")
+    validator_rewards = get_sample_rewards_for_block_number(block_number, "validator")
+    group_rewards = get_sample_rewards_for_block_number(block_number, "group")
+
+    %{
+      voter: voter_rewards,
+      validator: validator_rewards,
+      group: group_rewards
+    }
+  end
+
+  defp get_sample_rewards_for_block_number(block_number, reward_type) do
     {:ok, zero_wei} = Wei.cast(0)
 
     query =
       from(reward in __MODULE__,
-        join: acc in CeloAccount,
-        on: reward.associated_account_hash == acc.address,
         select: %{
           account_hash: reward.account_hash,
           amount: reward.amount,
-          associated_account_name: acc.name,
-          associated_account_hash: reward.associated_account_hash,
-          block_number: reward.block_number,
-          date: reward.block_timestamp,
-          reward_type: reward.reward_type
+          associated_account_hash: reward.associated_account_hash
         },
-        order_by: [desc: reward.account_hash, asc: reward.reward_type],
+        order_by: [desc: reward.amount],
         where: reward.amount != ^zero_wei,
         where: reward.block_number == ^block_number,
         where: reward.reward_type == ^reward_type,
-        limit: 20, # TODO constant
+        limit: @sample_epoch_block_transaction_limit
       )
 
     Repo.all(query)

@@ -26,7 +26,6 @@ defmodule BlockScoutWeb.BlockEpochTransactionController do
            }
          ) do
       {:ok, block} ->
-
         epoch_rewards = CeloEpochRewards.get_celo_epoch_rewards_for_block(block.number)
 
         json(
