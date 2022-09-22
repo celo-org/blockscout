@@ -118,7 +118,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
     |> Map.merge(
       voter_and_validator_query
       |> Repo.all()
-      |> Enum.map(fn rewards -> {String.to_atom(rewards.reward_type), rewards} end)
+      |> Enum.map(fn rewards -> {String.to_existing_atom(rewards.reward_type), rewards} end)
       |> Map.new()
       |> Map.put(:group, validator_group_query |> Repo.one())
     )
