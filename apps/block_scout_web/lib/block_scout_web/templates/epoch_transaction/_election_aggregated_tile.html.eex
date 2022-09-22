@@ -50,7 +50,7 @@
         <%= for reward <- @rewards do %>
           <li class="epoch-aggregated-tile-transactions-list-item">
             <%= if @reward_type == "group" do %>
-            <span class="epoch-aggregated-tile-transactions-list-item-address">
+            <span class="epoch-aggregated-tile-transactions-list-item-address col-xs-12 col-lg-5">
               <%= with {:ok, address} <- Chain.hash_to_address(reward.associated_account_hash) do %>
                 <%= render BlockScoutWeb.AddressView,
                   "_link.html",
@@ -72,14 +72,14 @@
               <% end %>
             </span>
 
-            <span class="epoch-aggregated-tile-transactions-list-item-amount">
+            <span class="epoch-aggregated-tile-transactions-list-item-amount col-xs-12 col-lg-4 ml-3 ml-sm-0">
               <%= wei_to_ether_rounded(reward.amount) %>
               <%= link to: address_transaction_path(BlockScoutWeb.Endpoint, :index, get_reward_currency_address(@reward_type)), "data-test": "address_hash_link" do %>
                 <%= get_reward_currency(@reward_type) %>
               <% end %>
             </span>
           <% else %>
-            <span class="epoch-aggregated-tile-transactions-list-item-address">
+            <span class="epoch-aggregated-tile-transactions-list-item-address col-xs-12 col-lg-5">
               <%= with {:ok, address} <- Chain.hash_to_address(reward.account_hash) do %>
                 <%= render BlockScoutWeb.AddressView,
                   "_link.html",
@@ -89,7 +89,7 @@
                   truncate: true %>
               <% end %>
             </span>
-            <span class="epoch-aggregated-tile-transactions-list-item-amount">
+            <span class="epoch-aggregated-tile-transactions-list-item-amount col-xs-12 col-lg-4 ml-3 ml-sm-0">
               <%= wei_to_ether_rounded(reward.amount) %>
 
               <%= link to: address_transaction_path(BlockScoutWeb.Endpoint, :index, get_reward_currency_address(@reward_type)), "data-test": "address_hash_link" do %>
