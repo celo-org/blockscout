@@ -42,4 +42,7 @@ defmodule BlockScoutWeb.EpochTransactionView do
       )
     )
   end
+
+  def get_total_reward_value(nil), do: %Wei{value: Decimal.new(0)}
+  def get_total_reward_value(%{amount: amount}), do: amount
 end

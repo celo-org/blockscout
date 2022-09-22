@@ -144,7 +144,7 @@ defmodule BlockScoutWeb.BlockEpochTransactionController do
     total = CeloElectionRewards.get_aggregated_for_block_number(block.number)
     sample_rewards = CeloElectionRewards.get_sample_rewards_for_block_number(block.number)
 
-    items_with_rewards_bolster ++
+    aggregated_tiles =
       Enum.map(
         [:voter, :group, :validator],
         fn type ->
@@ -158,6 +158,8 @@ defmodule BlockScoutWeb.BlockEpochTransactionController do
           )
         end
       )
+
+    items_with_rewards_bolster ++ aggregated_tiles
   end
 
   def index(conn, %{"block_hash_or_number" => formatted_block_hash_or_number}) do
