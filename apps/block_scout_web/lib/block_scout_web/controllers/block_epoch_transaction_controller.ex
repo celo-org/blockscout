@@ -33,9 +33,7 @@ defmodule BlockScoutWeb.BlockEpochTransactionController do
           %{
             items:
               epoch_rewards
-              |> prepare_epoch_transaction_items(block),
-            # TODO remove?
-            next_page_path: ""
+              |> prepare_epoch_transaction_items(block)
           }
         )
 
