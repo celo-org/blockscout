@@ -15,7 +15,7 @@ defmodule Explorer.Celo.PubSub do
   def publish_smart_contract(address_hash, attrs) do
     msg_id = UUID.generate()
 
-    Logger.info("Sending smart contract publish request")
+    Logger.info("Sending smart contract publish request #{msg_id}")
     PubSub.broadcast(@pubsub_name, "smart_contract_publish", {:smart_contract_publish, address_hash, attrs, msg_id})
     Telemetry.event(:smart_contract_publish_send, %{})
   end
