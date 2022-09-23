@@ -46,6 +46,7 @@ ul.topnav li {
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
     margin: 14px 5px;
+    text-align: center;
 }
 
 .menuWrap {
@@ -60,14 +61,12 @@ ul.topnav li a {
     color: #6C6C6C;
     font-size: 18px;
     font-weight: lighter;
-    text-align: center;
     padding: 0px 25px;
     text-decoration: none;
     border: none;
     margin: 4px 4px 3px 4px;
     border-radius: 12px;
     box-shadow: 5px 5px 5px rgb(180, 175, 175);
-    flex: none;
 }
 
 ul.topnav li.selected a {
