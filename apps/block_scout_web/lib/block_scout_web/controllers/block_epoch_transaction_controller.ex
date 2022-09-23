@@ -51,8 +51,8 @@ defmodule BlockScoutWeb.BlockEpochTransactionController do
 
   defp prepare_epoch_transaction_items(nil, _), do: []
 
-  defp get_epoch_transaction_address_hashes(%{number: block_number}) do
-    address_strings = [
+  defp get_epoch_transaction_address_strings(%{number: block_number}),
+    do: [
       {:carbon,
        case AccountReader.get_carbon_offsetting_partner(block_number) do
          {:ok, address_string} ->
@@ -78,6 +78,9 @@ defmodule BlockScoutWeb.BlockEpochTransactionController do
            nil
        end}
     ]
+
+  defp get_epoch_transaction_address_hashes(%{number: block_number} = block) do
+    address_strings = get_epoch_transaction_address_strings(block)
 
     address_strings
     |> Enum.map(fn {type, address_string} ->
