@@ -6,35 +6,24 @@
 %>
 
 <nav class="menu-wrap" data-selector="stats-nabvar">
-    <div class="navcontainer">
-        <div class="leftbuttons">
-            <ul class="topnav" id="topnav">
-                <li class="stats-link selected" data-tab-id="1">
-                    <a href="<%= attestations_url %>" target="myiframe">
-                        <%= gettext("Attestations") %>
-                    </a>
-                </li>
-                <li class="stats-link" data-tab-id="2">
-                    <a href="<%= uniswap_url %>" target="myiframe">
-                        <%= gettext("Uniswap") %>
-                    </a>
-                </li>
-                <li class="stats-link" data-tab-id="3">
-                    <a  href="<%= moola_url %>" target="myiframe" >
-                        <%= gettext("Moola") %>
-                    </a>
-                </li>
-            </ul>
-        </div>
-        <div class="rightbuttons">
-            <ul class="topnav" id="topnav">
-                <li class="stats-link moola" data-tab-id="3">
-                    <a class="btn" href="https://makerdojo.io/" target="_blank" >
-                    <%=  gettext("QUERY ON MAKERDOJO!") %>
-                    </a>
-                </li>
-            </ul>
-        </div>
+    <div class="leftbuttons">
+        <ul class="topnav" id="topnav">
+            <li class="stats-link selected" data-tab-id="1">
+                <a href="<%= attestations_url %>" target="myiframe">
+                    <%= gettext("Attestations") %>
+                </a>
+            </li>
+            <li class="stats-link" data-tab-id="2">
+                <a href="<%= uniswap_url %>" target="myiframe">
+                    <%= gettext("Uniswap") %>
+                </a>
+            </li>
+            <li class="stats-link" data-tab-id="3">
+                <a  href="<%= moola_url %>" target="myiframe" >
+                    <%= gettext("Moola") %>
+                </a>
+            </li>
+        </ul>
     </div>
 </nav>
 

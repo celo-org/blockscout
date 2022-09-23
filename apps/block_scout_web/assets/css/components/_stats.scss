@@ -15,12 +15,6 @@ iframe#myiframe {
     }
 }
 
-.navcontainer {
-    display: flex;
-    justify-content: space-between;
-    clear:both;
-}
-
 .moola a {
     background: #F3F3F3 !important;
     border: none !important;
@@ -28,7 +22,6 @@ iframe#myiframe {
     padding: 6px 14px !important;
     box-shadow: 5px 5px 5px rgb(180, 175, 175);
     color: #6C6C6C !important;
-    clear:both;
 }
 
 ul.topnav {
@@ -41,8 +34,6 @@ ul.topnav {
     overflow: hidden;
     border-radius: 2px;
     background-color: #fbfafc;
-    width: fit-content;
-    clear:both;
 }
 
 ul.topnav li {
@@ -54,9 +45,7 @@ ul.topnav li {
     flex-grow: 1; /* allow items to grow up to 150px wide if the container is big enough */
     -o-text-overflow: ellipsis;
     text-overflow: ellipsis;
-    margin: 5px;
-    flex: none;
-    clear:both;
+    margin: 14px 5px;
 }
 
 .menuWrap {
@@ -79,7 +68,6 @@ ul.topnav li a {
     border-radius: 12px;
     box-shadow: 5px 5px 5px rgb(180, 175, 175);
     flex: none;
-    clear:both;
 }
 
 ul.topnav li.selected a {
