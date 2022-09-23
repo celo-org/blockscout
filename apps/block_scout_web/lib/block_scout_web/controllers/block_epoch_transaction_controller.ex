@@ -84,9 +84,8 @@ defmodule BlockScoutWeb.BlockEpochTransactionController do
       if is_nil(address_string) do
         {type, nil}
       else
-        with {:ok, address_hash} <- string_to_address_hash(address_string) do
-          {type, address_hash}
-        else
+        case string_to_address_hash(address_string) do
+          {:ok, address_hash} -> {type, address_hash}
           _ -> {type, nil}
         end
       end
