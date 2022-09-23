@@ -117,8 +117,8 @@ defmodule Explorer.Chain.CeloElectionRewards do
     default = %{group: aggregated_validator_group, voter: nil, validator: nil}
 
     voter_and_validator_query
-      |> Repo.all()
-      |> Enum.into(default, fn rewards -> {String.to_existing_atom(rewards.reward_type), rewards} end)
+    |> Repo.all()
+    |> Enum.into(default, fn rewards -> {String.to_existing_atom(rewards.reward_type), rewards} end)
   end
 
   def base_address_query(account_hash_list, reward_type_list) do
