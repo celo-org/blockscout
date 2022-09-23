@@ -114,16 +114,11 @@ defmodule Explorer.Chain.CeloElectionRewards do
     voter_and_validator_query = aggregated_voter_and_validator_query(block_number)
 
     aggregated_validator_group = validator_group_query |> Repo.one()
-    aggregated_voter_and_validator = voter_and_validator_query |> Repo.all()
+    default = %{group: aggregated_validator_group, voter: nil, validator: nil}
 
-    Map.merge(
-      %{group: aggregated_validator_group, voter: nil, validator: nil},
-      Map.new(
-        Enum.map(aggregated_voter_and_validator, fn rewards ->
-          {String.to_existing_atom(rewards.reward_type), rewards}
-        end)
-      )
-    )
+    voter_and_validator_query
+      |> Repo.all()
+      |> Enum.into(default, fn rewards -> {String.to_existing_atom(rewards.reward_type), rewards} end)
   end
 
   def base_address_query(account_hash_list, reward_type_list) do
