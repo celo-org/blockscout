@@ -38,7 +38,7 @@ defmodule Mix.Tasks.TrackEvent do
     MixTask.run("app.start")
 
     with {:ok, contract} <- get_verified_contract(options[:contract_address]),
-         {:ok, tracking_changesets} <- get_changesets(contract, options[:topics], options[:event_names], options[:all]) do
+         {:ok, tracking_changesets} <- create_changesets(contract, options[:topics], options[:event_names], options[:all]) do
       tracking_changesets
       |> Enum.each(fn changeset ->
         case Repo.insert(changeset) do
@@ -58,12 +58,12 @@ defmodule Mix.Tasks.TrackEvent do
     end
   end
 
-  defp get_changesets(contract, _topics, _names, true) do
+  defp create_changesets(contract, _topics, _names, true) do
     topics = get_all_event_topics(contract)
-    get_changesets(contract, topics, nil, nil)
+    create_changesets(contract, topics, nil, nil)
   end
 
-  defp get_changesets(contract, _topics, names, _all) when is_binary(names) do
+  defp create_changesets(contract, _topics, names, _all) when is_binary(names) do
     names = names |> String.split(",")
 
     trackings =
@@ -84,7 +84,7 @@ defmodule Mix.Tasks.TrackEvent do
     {:ok, trackings}
   end
 
-  defp get_changesets(contract, topics, _names, _all) when is_list(topics) do
+  defp create_changesets(contract, topics, _names, _all) when is_list(topics) do
     trackings =
       topics
       |> Enum.map(fn topic ->
@@ -103,9 +103,9 @@ defmodule Mix.Tasks.TrackEvent do
     {:ok, trackings}
   end
 
-  defp get_changesets(contract, topics, _names, _all) when is_binary(topics) do
+  defp create_changesets(contract, topics, _names, _all) when is_binary(topics) do
     topics = topics |> String.split(",")
-    get_changesets(contract, topics, nil, nil)
+    create_changesets(contract, topics, nil, nil)
   end
 
   defp get_all_event_topics(%SmartContract{abi: abi}) do
