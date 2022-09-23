@@ -183,6 +183,45 @@
               <% end %>
             </dd>
           </dl>
+          <%= if assigns[:locked_gold] do %>
+          <!-- Locked -->
+          <dl class="row">
+            <dt class="col-sm-4 col-md-4 col-lg-3 text-muted">
+              <%= render BlockScoutWeb.CommonComponentsView, "_i_tooltip_2.html",
+                text: gettext("Amount of locked Celo in the protocol") %>
+                <%= gettext("Locked CELO Balance") %>
+            </dt>
+            <dd class="col-sm-8 col-md-8 col-lg-9">
+              <%= wei_to_ether_rounded(@locked_gold) %> <%= gettext "CELO" %>
+            </dd>
+          </dl>
+          <% end %>
+          <%= if assigns[:pending_gold] do %>
+          <!-- Pending unlocked -->
+          <dl class="row">
+            <dt class="col-sm-4 col-md-4 col-lg-3 text-muted">
+              <%= render BlockScoutWeb.CommonComponentsView, "_i_tooltip_2.html",
+                text: gettext("Amount of Celo that’s in the process of being unlocked (3 days)") %>
+                <%= gettext("Pending Unlocked Gold") %>
+            </dt>
+            <dd class="col-sm-8 col-md-8 col-lg-9">
+              <%= wei_to_ether_rounded(@pending_gold) %> <%= gettext "CELO" %>
+            </dd>
+          </dl>
+          <% end %>
+          <%= if assigns[:vote_activated_gold] do %>
+          <!-- Activated -->
+          <dl class="row">
+            <dt class="col-sm-4 col-md-4 col-lg-3 text-muted">
+              <%= render BlockScoutWeb.CommonComponentsView, "_i_tooltip_2.html",
+                text: gettext("Amount of locked Celo that has been activated to vote for validator(s)") %>
+                <%= gettext("Activated Celo Balance") %>
+            </dt>
+            <dd class="col-sm-8 col-md-8 col-lg-9">
+              <%= wei_to_ether_rounded(@vote_activated_gold) %> <%= gettext "CELO" %>
+            </dd>
+          </dl>
+          <% end %>
           <%= if assigns[:voting_sum] do %>
           <!-- Rewards -->
           <dl class="row">
@@ -199,8 +238,8 @@
             <%= if (@address.celo_account.account_type == "validator" or @address.celo_account.account_type == "group") and System.get_env("DISPLAY_REWARDS") === "true" do%>
             <dt class="col-sm-4 col-md-4 col-lg-3 text-muted">
               <%= render BlockScoutWeb.CommonComponentsView, "_i_tooltip_2.html",
-                text: gettext("Validating and voting rewards accumulated over time.") %>
-              <%= gettext("Lifetime Validating | Voting Rewards") %>
+                text: gettext("Total amount of epoch rewards this address has received, all time.") %>
+              <%= gettext("Validator Rewards | Voting Rewards") %>
             </dt>
             <dd class="col-sm-8 col-md-8 col-lg-9">
               <%= wei_to_ether_rounded(@validator_or_group_sum) %> <%= gettext "cUSD" %> | <%= wei_to_ether_rounded(@voting_sum) %> <%= gettext "CELO" %>
@@ -229,11 +268,19 @@
             <dd class="col-sm-8 col-md-8 col-lg-9" data-test="address_transaction_count">
               <%= if @conn.request_path |> String.contains?("/transactions") do %>
                 <a href="#txs" class="page-link bs-label large btn-no-border-link-to-tems" data-selector="transaction-count">
-                  <%= render BlockScoutWeb.CommonComponentsView, "_loading_spinner.html", loading_text: gettext("Fetching transactions...") %>
+                  <%= if @address.transactions_count do %>
+                    <%= Number.Delimit.number_to_delimited(@address.transactions_count, precision: 0) %> <%= gettext("Transactions") %>
+                  <% else %>
+                    <%= render BlockScoutWeb.CommonComponentsView, "_loading_spinner.html", loading_text: gettext("Fetching transactions...") %>
+                  <% end %>
                 </a>
               <% else %>
                 <a href="<%= AccessHelpers.get_path(@conn, :address_transaction_path, :index, @address.hash)%>#txs" class="page-link bs-label large btn-no-border-link-to-tems" data-selector="transaction-count">
-                  <%= render BlockScoutWeb.CommonComponentsView, "_loading_spinner.html", loading_text: gettext("Fetching transactions...") %>
+                  <%= if @address.token_transfers_count do %>
+                    <%= Number.Delimit.number_to_delimited(@address.transactions_count, precision: 0) %> <%= gettext("Transactions") %>
+                  <% else %>
+                    <%= render BlockScoutWeb.CommonComponentsView, "_loading_spinner.html", loading_text: gettext("Fetching transactions...") %>
+                  <% end %>
                 </a>
               <% end %>
             </dd>
@@ -248,11 +295,19 @@
             <dd class="col-sm-8 col-md-8 col-lg-9" data-test="address_transfer_count">
               <%= if @conn.request_path |> String.contains?("/token-transfers") do %>
                 <a href="#transfers" class="page-link bs-label large btn-no-border-link-to-tems" data-selector="transfer-count">
-                  <%= render BlockScoutWeb.CommonComponentsView, "_loading_spinner.html", loading_text: gettext("Fetching transfers...") %>
+                  <%= if @address.token_transfers_count do %>
+                    <%= Number.Delimit.number_to_delimited(@address.token_transfers_count, precision: 0) %> <%= gettext("Transfers") %>
+                  <% else %>
+                    <%= render BlockScoutWeb.CommonComponentsView, "_loading_spinner.html", loading_text: gettext("Fetching transfers...") %>
+                  <% end %>
                 </a>
               <% else %>
                 <a href="<%= AccessHelpers.get_path(@conn, :address_token_transfers_path, :index, @address.hash)%>#transfers" class="page-link bs-label large btn-no-border-link-to-tems" data-selector="transfer-count">
-                  <%= render BlockScoutWeb.CommonComponentsView, "_loading_spinner.html", loading_text: gettext("Fetching transfers...") %>
+                  <%= if @address.token_transfers_count do %>
+                    <%= Number.Delimit.number_to_delimited(@address.token_transfers_count, precision: 0) %> <%= gettext("Transfers") %>
+                  <% else %>
+                    <%= render BlockScoutWeb.CommonComponentsView, "_loading_spinner.html", loading_text: gettext("Fetching transfers...") %>
+                  <% end %>
                 </a>
               <% end %>
             </dd>
