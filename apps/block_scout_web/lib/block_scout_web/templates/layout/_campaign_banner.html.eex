@@ -5,5 +5,4 @@
   <button type="button" class="campaign-banner-close" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
-  <script defer data-cfasync="false" src="<%= static_path(@conn, "/js/campaign-banner.js") %>"></script>
 </div>
