@@ -37,9 +37,17 @@ defmodule Indexer.Fetcher.EventBackfill do
   @impl BufferedTask
   def init(initial, reducer, _) do
     {:ok, final} =
-      Chain.stream_events_to_backfill(initial, fn {address, event_topic, tracking_id}, acc ->
-        # start backfill from {block_number, log_index} = {0,0}
-        {address, event_topic, {0, 0}, tracking_id}
+      Chain.stream_events_to_backfill(initial, fn cet = %ContractEventTracking{}, acc ->
+#        # start backfill from {block_number, log_index} = {0,0}
+#        backfill_from = case cet.backfilled_up_to do
+#          # default start from {0,0}
+#          nil ->
+#            {0,0}
+#          progress when is_map(progress) ->
+#            {progress["block_number"], progress["log_index"]}
+#        end
+#
+        cet
         |> reducer.(acc)
       end)
 
@@ -53,7 +61,7 @@ defmodule Indexer.Fetcher.EventBackfill do
     |> Util.default_child_spec(gen_server_options, __MODULE__)
   end
 
-  # deduplicates entries based on the contract address and topic
+  # deduplicates entries based on the tracking event instance id
   @impl BufferedTask
   def dedup_entries(%BufferedTask{dedup_entries: true, bound_queue: bound_queue} = task, entries) do
     contract_address_and_topic = fn {_address, _topic, _progress, tracking_id} -> tracking_id end

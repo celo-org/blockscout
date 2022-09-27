@@ -2900,8 +2900,7 @@ defmodule Explorer.Chain do
         join: sc in SmartContract,
         on: sc.id == cet.smart_contract_id,
         where: cet.backfilled == false,
-        where: cet.enabled == true,
-        select: {sc.address_hash, cet.topic, cet.id}
+        where: cet.enabled == true
       )
 
     Repo.stream_reduce(query, initial, reducer)

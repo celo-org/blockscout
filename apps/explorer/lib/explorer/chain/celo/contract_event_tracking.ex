@@ -23,7 +23,7 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
         }
 
   @attrs ~w(
-          abi name topic smart_contract_id backfilled enabled
+          abi name topic smart_contract_id backfilled enabled backfilled_up_to
         )a
 
   @required ~w(
@@ -36,6 +36,7 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
     field(:topic, :string)
     field(:backfilled, :boolean)
     field(:enabled, :boolean)
+    field(:backfilled_up_to, :map)
 
     belongs_to(:smart_contract, SmartContract)
     has_one(:address, through: [:smart_contract, :address])
