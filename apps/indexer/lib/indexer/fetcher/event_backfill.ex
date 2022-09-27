@@ -36,19 +36,21 @@ defmodule Indexer.Fetcher.EventBackfill do
 
   @impl BufferedTask
   def init(initial, reducer, _) do
+    Logger.info("Init backfill")
     {:ok, final} =
-      Chain.stream_events_to_backfill(initial, fn cet = %ContractEventTracking{}, acc ->
-#        # start backfill from {block_number, log_index} = {0,0}
-#        backfill_from = case cet.backfilled_up_to do
-#          # default start from {0,0}
-#          nil ->
-#            {0,0}
-#          progress when is_map(progress) ->
-#            {progress["block_number"], progress["log_index"]}
-#        end
-#
-        cet
-        |> reducer.(acc)
+      Chain.stream_events_to_backfill(initial, fn {address, topic, from, tracking_id}, acc ->
+
+        backfill_from = case from do
+          # by default start from {block_number, log_index} = {0,0}
+          nil ->
+            {0,0}
+
+          # otherwise we are restarting a partially completed backfill job, decode progress directly into a tuple
+          progress when is_map(progress) ->
+            {progress["block_number"], progress["log_index"]}
+        end
+
+        {address, topic, backfill_from, tracking_id} |> reducer.(acc)
       end)
 
     final
@@ -64,24 +66,26 @@ defmodule Indexer.Fetcher.EventBackfill do
   # deduplicates entries based on the tracking event instance id
   @impl BufferedTask
   def dedup_entries(%BufferedTask{dedup_entries: true, bound_queue: bound_queue} = task, entries) do
-    contract_address_and_topic = fn {_address, _topic, _progress, tracking_id} -> tracking_id end
+    get_tracking_id = fn { _address, _topic, _from, tracking_id} -> tracking_id end
 
+    #items that are currently being processed in concurrent tasks, or exist in queue already
     running_entries =
       task
       |> currently_processed_items()
-      |> then(&(&1 ++ bound_queue))
-      |> Enum.map(contract_address_and_topic)
+      |> then(&(&1 ++ :queue.to_list(bound_queue.queue)))
+      |> Enum.map(get_tracking_id)
       |> MapSet.new()
 
     entries
-    |> Enum.uniq_by(contract_address_and_topic)
+    |> Enum.uniq_by(get_tracking_id)
     |> Enum.filter(fn i ->
-      MapSet.member?(running_entries, contract_address_and_topic.(i)) == false
+      MapSet.member?(running_entries, get_tracking_id.(i)) == false
     end)
   end
 
   @impl BufferedTask
-  def run([{address, topic, from, tracking_id}], %{page_size: page_size, throttle_time: throttle}) do
+  def run([{address, topic, from, tracking_id}],
+        %{page_size: page_size, throttle_time: throttle}) do
     events = get_page_of_events(address, topic, from, page_size)
     EventProcessor.enqueue_logs(events)
 
@@ -95,11 +99,14 @@ defmodule Indexer.Fetcher.EventBackfill do
       %Log{block_number: max_bn, index: max_i} =
         events |> Enum.max_by(fn %Log{block_number: bn, index: i} -> {bn, i} end)
 
-      Logger.debug(
+      Logger.info(
         "Backfilled page size #{page_size} of event #{topic} on contract #{address |> to_string()} - block_number:#{max_bn} index:#{max_i}"
       )
 
-      {:retry, [{address, topic, {max_bn, max_i}, tracking_id}]}
+      end_of_page = {max_bn, max_i}
+      update_event_page(tracking_id, end_of_page)
+
+      {:retry, [{address, topic, end_of_page, tracking_id}]}
     end
   end
 
@@ -108,6 +115,15 @@ defmodule Indexer.Fetcher.EventBackfill do
 
     tracking_record
     |> ContractEventTracking.changeset(%{backfilled: true, smart_contract_id: tracking_record.smart_contract_id})
+    |> Repo.update()
+  end
+
+  def update_event_page(tracking_id, {block_number, log_index}) do
+    tracking_record = Repo.get_by(ContractEventTracking, id: tracking_id)
+
+    tracking_record
+    |> ContractEventTracking.changeset(%{backfilled_up_to: %{block_number: block_number, log_index: log_index},
+      smart_contract_id: tracking_record.smart_contract_id})
     |> Repo.update()
   end
 
