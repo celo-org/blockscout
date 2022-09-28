@@ -1,9 +1,9 @@
-<div class="campaign-banner campaign-banner-closed" data-campaign-id="dummy-campaign-id">
+<div class="campaign-banner campaign-banner-closed" data-campaign-id="<%= @id %>">
   <div class="campaign-banner-content">
-    🚀 Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's <a href="#">standard</a>
+    <%= raw(@content) # TODO not ideal, maybe let's introduce a CTA field that would contain a URL, then we can safely escape everything %>
   </div>
   <button type="button" class="campaign-banner-close" aria-label="Close">
     <span aria-hidden="true">&times;</span>
   </button>
-  <script defer data-cfasync="false" src="<%= static_path(@conn, "/js/campaign-banner.js") %>"></script>
+  <script defer data-cfasync="false" src="<%= static_path(BlockScoutWeb.Endpoint, "/js/campaign-banner.js") %>"></script>
 </div>

@@ -7,6 +7,7 @@ defmodule BlockScoutWeb.Application do
 
   require Logger
 
+  alias BlockScoutWeb.CampaignBanner
   alias BlockScoutWeb.Counters.BlocksIndexedCounter
   alias BlockScoutWeb.LoggerBackend
   alias BlockScoutWeb.{Endpoint, Prometheus}
@@ -30,7 +31,8 @@ defmodule BlockScoutWeb.Application do
         {Absinthe.Subscription, Endpoint},
         {RealtimeEventHandler, name: RealtimeEventHandler},
         {StakingEventHandler, name: StakingEventHandler},
-        {BlocksIndexedCounter, name: BlocksIndexedCounter}
+        {BlocksIndexedCounter, name: BlocksIndexedCounter},
+        {CampaignBanner, name: CampaignBanner}
       ]
       |> cluster_process(Application.get_env(:block_scout_web, :environment))
 
