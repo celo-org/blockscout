@@ -62,7 +62,7 @@ defmodule Explorer.SmartContract.Helper do
   def get_all_events(contract = %SmartContract{address_hash: address, abi: abi}) do
     proxy = Chain.proxy_contract?(address, abi)
 
-    if proxy do
+    events = if proxy do
       implementation_events =
         contract
         |> get_implementation_contract()
@@ -72,6 +72,12 @@ defmodule Explorer.SmartContract.Helper do
     else
       filter_events(contract.abi)
     end
+
+    # add the topic directly on the abi (not actually part of the abi itself but used ubiquitously
+    # then dedup by the topic
+    events
+    |> Enum.map(fn event -> Map.put(event, "topic", event_abi_to_topic_str(event)) end)
+    |> Enum.uniq_by(& &1.topic)
   end
 
   defp get_implementation_contract(%SmartContract{address_hash: address_hash, abi: abi}) do
