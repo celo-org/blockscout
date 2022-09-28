@@ -39,6 +39,7 @@ defmodule Mix.Tasks.TrackEvent do
 
     with {:ok, contract} <- SmartContractHelper.get_verified_contract(options[:contract_address]),
          {:ok, tracking_changesets} <- create_changesets(contract, options[:topics], options[:event_names], options[:all]) do
+
       tracking_changesets
       |> Enum.each(fn changeset ->
         case Repo.insert(changeset) do
@@ -59,8 +60,19 @@ defmodule Mix.Tasks.TrackEvent do
   end
 
   defp create_changesets(contract, _topics, _names, true) do
-    topics = get_all_event_topics(contract)
-    create_changesets(contract, topics, nil, nil)
+    changesets = contract
+    |> SmartContractHelper.get_all_events()
+    |> Enum.map(fn event_abi = %{"name" => name} ->
+      case ContractEventTracking.from_event_abi(contract, event_abi) do
+        cet = %Ecto.Changeset{valid?: true} ->
+          cet
+
+        %Ecto.Changeset{valid?: false, errors: errors} ->
+          raise "Errors found with event name #{name} - #{errors}"
+      end
+    end)
+
+    {:ok, changesets}
   end
 
   defp create_changesets(contract, _topics, names, _all) when is_binary(names) do

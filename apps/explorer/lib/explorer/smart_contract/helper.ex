@@ -73,11 +73,11 @@ defmodule Explorer.SmartContract.Helper do
       filter_events(contract.abi)
     end
 
-    # add the topic directly on the abi (not actually part of the abi itself but used ubiquitously
+    # add the topic directly on the abi (not actually part of the abi itself but used ubiquitously)
     # then dedup by the topic
     events
     |> Enum.map(fn event -> Map.put(event, "topic", event_abi_to_topic_str(event)) end)
-    |> Enum.uniq_by(& &1.topic)
+    |> Enum.uniq_by(& Map.get(&1, "topic"))
   end
 
   defp get_implementation_contract(%SmartContract{address_hash: address_hash, abi: abi}) do
