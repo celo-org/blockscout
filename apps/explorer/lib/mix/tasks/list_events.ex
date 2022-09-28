@@ -8,7 +8,6 @@ defmodule Mix.Tasks.ListEvents do
   alias Mix.Task, as: MixTask
 
   import Ecto.Query
-  import Mix.Tasks.TrackEvent, only: [get_verified_contract: 1]
 
   def run(args) do
     {options, _args, invalid} =
@@ -19,15 +18,9 @@ defmodule Mix.Tasks.ListEvents do
     # start ecto repo
     MixTask.run("app.start")
 
-    with {:ok, contract} <- get_verified_contract(options[:contract_address]),
-                is_proxy <- Chain.proxy_contract?(contract.address_hash, contract.abi) do
+    with {:ok, contract} <- SmartContractHelper.get_verified_contract(options[:contract_address]) do
 
-      events = if is_proxy do
-        implementation_contract = get_implementation_contract(contract)
-          filter_events(contract.abi) ++ filter_events(implementation_contract.abi)
-        else
-          filter_events(contract.abi)
-      end
+      events = SmartContractHelper.get_all_events(contract)
 
       already_tracked_events = contract |> get_event_trackings()
 
@@ -51,16 +44,6 @@ defmodule Mix.Tasks.ListEvents do
   def get_event_trackings(contract) do
     from( cet in Explorer.Chain.Celo.ContractEventTracking, where: cet.smart_contract_id == ^contract.id)
     |> Repo.all()
-  end
-
-  def filter_events(abi) do
-    abi |> Enum.filter(&(&1["type"] == "event"))
-  end
-
-  def get_implementation_contract(%{address_hash: address_hash, abi: abi}) do
-    implementation_address = Chain.get_implementation_address_hash(address_hash, abi)
-    {:ok, contract } = get_verified_contract(implementation_address)
-    contract
   end
 
   def list_events(contract, events, already_tracked_events) do

@@ -5,19 +5,17 @@ defmodule Indexer.Fetcher.EventBackfill do
   require Logger
 
   alias Ecto.Adapters.SQL
-  alias Explorer.Celo.Events.Transformer
   alias Explorer.Celo.Telemetry
   alias Explorer.{Chain, Repo}
   alias Explorer.Chain.Celo.ContractEventTracking
   alias Explorer.Chain.{Hash, Log}
   alias Explorer.Chain.Hash.Address
-  alias Indexer.{BufferedTask, Tracer}
+  alias Indexer.BufferedTask
   alias Indexer.Fetcher.{EventProcessor, Util}
 
   require Telemetry
 
   use BufferedTask
-  import Ecto.Query
 
   @defaults [
     flush_interval: :timer.seconds(3),
@@ -36,7 +34,6 @@ defmodule Indexer.Fetcher.EventBackfill do
 
   @impl BufferedTask
   def init(initial, reducer, _) do
-    Logger.info("Init backfill")
     {:ok, final} =
       Chain.stream_events_to_backfill(initial, fn {address, topic, from, tracking_id}, acc ->
 

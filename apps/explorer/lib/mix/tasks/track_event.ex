@@ -37,7 +37,7 @@ defmodule Mix.Tasks.TrackEvent do
     # start ecto repo
     MixTask.run("app.start")
 
-    with {:ok, contract} <- get_verified_contract(options[:contract_address]),
+    with {:ok, contract} <- SmartContractHelper.get_verified_contract(options[:contract_address]),
          {:ok, tracking_changesets} <- create_changesets(contract, options[:topics], options[:event_names], options[:all]) do
       tracking_changesets
       |> Enum.each(fn changeset ->
@@ -126,25 +126,6 @@ defmodule Mix.Tasks.TrackEvent do
 
     unless System.get_env("DATABASE_URL") do
       raise "No database connection provided - set DATABASE_URL env variable"
-    end
-  end
-
-  def get_verified_contract(address_string) do
-    case Explorer.Chain.Hash.Address.cast(address_string) do
-      :error ->
-        {:error, "Invalid format for address hash"}
-
-      {:ok, address} ->
-        query = from(sm in SmartContract, where: sm.address_hash == ^address)
-        contract = query |> Repo.one()
-
-        case contract do
-          sm = %SmartContract{} ->
-            {:ok, sm}
-
-          nil ->
-            {:error, "No verified contract found at address #{address_string}"}
-        end
     end
   end
 end
