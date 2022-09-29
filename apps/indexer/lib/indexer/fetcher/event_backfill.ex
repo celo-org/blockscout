@@ -36,16 +36,16 @@ defmodule Indexer.Fetcher.EventBackfill do
   def init(initial, reducer, _) do
     {:ok, final} =
       Chain.stream_events_to_backfill(initial, fn {address, topic, from, tracking_id}, acc ->
+        backfill_from =
+          case from do
+            # by default start from {block_number, log_index} = {0,0}
+            nil ->
+              {0, 0}
 
-        backfill_from = case from do
-          # by default start from {block_number, log_index} = {0,0}
-          nil ->
-            {0,0}
-
-          # otherwise we are restarting a partially completed backfill job, decode progress directly into a tuple
-          progress when is_map(progress) ->
-            {progress["block_number"], progress["log_index"]}
-        end
+            # otherwise we are restarting a partially completed backfill job, decode progress directly into a tuple
+            progress when is_map(progress) ->
+              {progress["block_number"], progress["log_index"]}
+          end
 
         {address, topic, backfill_from, tracking_id} |> reducer.(acc)
       end)
@@ -63,9 +63,9 @@ defmodule Indexer.Fetcher.EventBackfill do
   # deduplicates entries based on the tracking event instance id
   @impl BufferedTask
   def dedup_entries(%BufferedTask{dedup_entries: true, bound_queue: bound_queue} = task, entries) do
-    get_tracking_id = fn { _address, _topic, _from, tracking_id} -> tracking_id end
+    get_tracking_id = fn {_address, _topic, _from, tracking_id} -> tracking_id end
 
-    #items that are currently being processed in concurrent tasks, or exist in queue already
+    # items that are currently being processed in concurrent tasks, or exist in queue already
     running_entries =
       task
       |> currently_processed_items()
@@ -81,8 +81,10 @@ defmodule Indexer.Fetcher.EventBackfill do
   end
 
   @impl BufferedTask
-  def run([{address, topic, from, tracking_id}],
-        %{page_size: page_size, throttle_time: throttle}) do
+  def run(
+        [{address, topic, from, tracking_id}],
+        %{page_size: page_size, throttle_time: throttle}
+      ) do
     events = get_page_of_events(address, topic, from, page_size)
     EventProcessor.enqueue_logs(events)
 
@@ -119,8 +121,10 @@ defmodule Indexer.Fetcher.EventBackfill do
     tracking_record = Repo.get_by(ContractEventTracking, id: tracking_id)
 
     tracking_record
-    |> ContractEventTracking.changeset(%{backfilled_up_to: %{block_number: block_number, log_index: log_index},
-      smart_contract_id: tracking_record.smart_contract_id})
+    |> ContractEventTracking.changeset(%{
+      backfilled_up_to: %{block_number: block_number, log_index: log_index},
+      smart_contract_id: tracking_record.smart_contract_id
+    })
     |> Repo.update()
   end
 

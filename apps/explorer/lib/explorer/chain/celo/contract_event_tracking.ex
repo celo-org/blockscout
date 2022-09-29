@@ -64,8 +64,8 @@ defmodule Explorer.Chain.Celo.ContractEventTracking do
   end
 
   @doc "Creates Tracking row directly from event abi. Doesn't test event existence on smart contract to support abis of proxied events"
-  def from_event_abi(smart_contract, event_abi = %{"name" => name, "topic" => topic}) do
-    #remove "topic" from abi as it is a generated property
+  def from_event_abi(smart_contract, %{"name" => name, "topic" => topic} = event_abi) do
+    # remove "topic" from abi as it is a generated property
     event_abi = Map.delete(event_abi, "topic")
 
     %ContractEventTracking{}
