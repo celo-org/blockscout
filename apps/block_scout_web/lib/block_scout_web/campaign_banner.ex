@@ -93,11 +93,11 @@ defmodule BlockScoutWeb.CampaignBanner do
     Logger.info("Refreshing campaign data")
 
     with {:ok, backend_response} <- fetch_campaign_backend_data(),
-         {:ok, raw_campaigns_data} <- parse_campaign_backend_data(backend_response),
-         {:ok, campaigns_data} <- prepare_campaign_data(raw_campaigns_data) do
+         {:ok, raw_campaign_data} <- parse_campaign_backend_data(backend_response),
+         {:ok, campaign_data} <- prepare_campaign_data(raw_campaign_data) do
       Logger.info("Successfuly refreshed campaign data")
 
-      campaigns_data
+      campaign_data
     else
       {:error, reason} ->
         Logger.error("Error refreshing campaign data: #{reason}")
