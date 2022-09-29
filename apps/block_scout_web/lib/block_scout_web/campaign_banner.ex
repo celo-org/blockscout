@@ -23,7 +23,7 @@ defmodule BlockScoutWeb.CampaignBanner do
 
       {:ok, refresh_campaign_data()}
     else
-      {:ok, nil}
+      {:ok, []}
     end
   end
 
@@ -43,40 +43,69 @@ defmodule BlockScoutWeb.CampaignBanner do
     GenServer.call(__MODULE__, :get_campaign_data)
   end
 
-  defp refresh_campaign_data do
-    Logger.info("Refreshing campaign data")
-
+  defp fetch_campaign_backend_data do
     case HTTPoison.get(@backend_url, [], follow_redirect: true) do
       {:ok, %HTTPoison.Response{body: body, status_code: 200}} ->
-        case Jason.decode(body, keys: :atoms) do
-          {:ok, response} ->
-            case response do
-              %{status: "success", data: [%{campaign: name, content: content}]} ->
-                Logger.info("Campaign data refresh successful")
+        {:ok, body}
 
-                %{id: name |> String.downcase() |> String.replace(" ", "-"), content: content}
+      _ ->
+        {:error, :error_response_from_api}
+    end
+  end
 
-              %{status: "success", data: []} ->
-                Logger.info("No campaigns available")
-
-                nil
-
-              _ ->
-                Logger.error("Unexpected response from API: #{response}")
-
-                nil
-            end
+  defp parse_campaign_backend_data(backend_response) do
+    case Jason.decode(backend_response, keys: :atoms) do
+      {:ok, response} ->
+        case response do
+          %{status: "success", data: campaigns_data} ->
+            {:ok, campaigns_data}
 
           _ ->
-            Logger.error("Malformed response from API: #{body}")
-
-            nil
+            {:error, :backend_response_malformed}
         end
 
       _ ->
-        Logger.error("Error response from API")
+        {:error, :json_malformed}
+    end
+  end
 
-        nil
+  defp prepare_campaign_data(raw_campaigns_data) do
+    {:ok,
+     raw_campaigns_data
+     |> Enum.map(fn %{
+                      campaign: name,
+                      content: content,
+                      cta_content: cta_content,
+                      cta_url: cta_url,
+                      preset: preset
+                    } ->
+       %{
+         id: name |> String.downcase() |> String.replace(" ", "-"),
+         content: content,
+         cta_content: cta_content,
+         cta_url: cta_url,
+         preset: preset
+       }
+     end)}
+  end
+
+  defp refresh_campaign_data do
+    Logger.info("Refreshing campaign data")
+
+    with {:ok, backend_response} <- fetch_campaign_backend_data(),
+         {:ok, raw_campaigns_data} <- parse_campaign_backend_data(backend_response),
+         {:ok, campaigns_data} <- prepare_campaign_data(raw_campaigns_data) do
+      Logger.info("Successfuly refreshed campaign data")
+
+      campaigns_data
+    else
+      {:error, reason} ->
+        Logger.error("Error refreshing campaign data: #{reason}")
+
+        []
+
+      _ ->
+        []
     end
   end
 end

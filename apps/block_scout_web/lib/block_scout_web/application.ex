@@ -7,9 +7,8 @@ defmodule BlockScoutWeb.Application do
 
   require Logger
 
-  alias BlockScoutWeb.CampaignBanner
+  alias BlockScoutWeb.{CampaignBanner, LoggerBackend}
   alias BlockScoutWeb.Counters.BlocksIndexedCounter
-  alias BlockScoutWeb.LoggerBackend
   alias BlockScoutWeb.{Endpoint, Prometheus}
   alias BlockScoutWeb.{RealtimeEventHandler, StakingEventHandler}
   alias Prometheus.{Exporter, GenericInstrumenter}
