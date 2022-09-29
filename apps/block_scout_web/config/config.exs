@@ -117,7 +117,7 @@ campaign_banner_refresh_interval =
   end
 
 config :block_scout_web, BlockScoutWeb.CampaignBanner,
-  backend_url: System.get_env("CAMPAIGN_BANNER_BACKEND_URL", nil),
+  backend_url: System.get_env("CAMPAIGN_BANNER_BACKEND_URL", ""),
   refresh_interval: campaign_banner_refresh_interval
 
 # Configures the endpoint

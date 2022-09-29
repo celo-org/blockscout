@@ -8,7 +8,7 @@ defmodule BlockScoutWeb.CampaignBanner do
   require Logger
 
   config = Application.get_env(:block_scout_web, __MODULE__)
-  @backend_url Keyword.get(config, :backend_url)
+  @backend_url Keyword.get(config, :backend_url, "")
   @refresh_interval Keyword.get(config, :refresh_interval, 60)
 
   @spec start_link(term()) :: GenServer.on_start()
@@ -18,7 +18,7 @@ defmodule BlockScoutWeb.CampaignBanner do
 
   @impl GenServer
   def init(_) do
-    if not is_nil(@backend_url) and @backend_url != "" do
+    if @backend_url != "" do
       Process.send_after(self(), :refresh_campaign_data, :timer.minutes(@refresh_interval))
 
       {:ok, refresh_campaign_data()}
@@ -39,7 +39,7 @@ defmodule BlockScoutWeb.CampaignBanner do
     {:reply, state, state}
   end
 
-  def get_campaign_data() do
+  def get_campaign_data do
     GenServer.call(__MODULE__, :get_campaign_data)
   end
 
@@ -49,7 +49,7 @@ defmodule BlockScoutWeb.CampaignBanner do
         {:ok, body}
 
       _ ->
-        {:error, :error_response_from_api}
+        {:error, :error_calling_backend_api}
     end
   end
 
@@ -75,8 +75,8 @@ defmodule BlockScoutWeb.CampaignBanner do
      |> Enum.map(fn %{
                       campaign: name,
                       content: content,
-                      cta_content: cta_content,
-                      cta_url: cta_url,
+                      ctaContent: cta_content,
+                      ctaUrl: cta_url,
                       preset: preset
                     } ->
        %{
