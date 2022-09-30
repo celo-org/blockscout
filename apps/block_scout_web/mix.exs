@@ -16,6 +16,9 @@ defmodule BlockScoutWeb.Mixfile do
         ignore_warnings: "../../.dialyzer-ignore"
       ],
       elixir: "~> 1.10",
+      elixirc_options: [
+        warnings_as_errors: true
+      ],
       elixirc_paths: elixirc_paths(Mix.env()),
       lockfile: "../../mix.lock",
       package: package(),

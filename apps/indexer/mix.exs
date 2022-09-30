@@ -11,6 +11,9 @@ defmodule Indexer.MixProject do
       deps_path: "../../deps",
       description: "Fetches block chain data from on-chain node for later reading with Explorer.",
       elixir: "~> 1.10",
+      elixirc_options: [
+        warnings_as_errors: true
+      ],
       elixirc_paths: elixirc_paths(Mix.env()),
       lockfile: "../../mix.lock",
       start_permanent: Mix.env() == :prod,
