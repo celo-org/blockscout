@@ -100,6 +100,15 @@ config :indexer, Indexer.Block.Fetcher, enable_gold_token: true
 config :indexer, Indexer.Prometheus.MetricsCron, metrics_fetcher_blocks_count: 1000
 config :indexer, Indexer.Prometheus.MetricsCron, metrics_cron_interval: System.get_env("METRICS_CRON_INTERVAL") || "2"
 
+
+config :indexer, :telemetry_config, [
+  [name: [:blockscout, :ingested], type: :histogram, label: "indexer_ingested", meta: %{
+    buckets: :exponential,
+    help: "Blockchain primitives ingested by type",
+    metric_labels: [:type]
+  }]
+]
+
 config :prometheus, Indexer.Prometheus.Exporter,
   path: "/metrics/indexer",
   format: :text,
