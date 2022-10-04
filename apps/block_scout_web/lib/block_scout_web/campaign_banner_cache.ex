@@ -21,7 +21,7 @@ defmodule BlockScoutWeb.CampaignBannerCache do
 
   @impl GenServer
   def init(_) do
-    should_fetch_campaign_data = @backend_url != ""
+    should_fetch_campaign_data? = @backend_url != ""
 
     state = %{
       config: %{
@@ -31,7 +31,7 @@ defmodule BlockScoutWeb.CampaignBannerCache do
       campaign_data: @default_campaign_data
     }
 
-    if should_fetch_campaign_data do
+    if should_fetch_campaign_data? do
       {:ok, state, {:continue, :fetch_campaign_data}}
     else
       {:ok, state}
@@ -114,36 +114,44 @@ defmodule BlockScoutWeb.CampaignBannerCache do
     end
   end
 
+  defp check_item_payload(%{
+         campaign: campaign,
+         content: content,
+         ctaContent: ctaContent,
+         ctaUrl: ctaUrl,
+         preset: preset
+       })
+       when is_bitstring(campaign) and is_bitstring(content) and is_bitstring(ctaContent) and
+              is_bitstring(ctaUrl) and is_bitstring(preset),
+       do: true
+
+  defp check_item_payload(payload) do
+    Logger.warn("Unknown payload encountered: #{inspect(payload)}")
+
+    false
+  end
+
+  defp prepare_item_payload(%{
+         campaign: name,
+         content: content,
+         ctaContent: cta_content,
+         ctaUrl: cta_url,
+         preset: preset
+       }) do
+    %{
+      id: name |> String.downcase() |> String.replace(" ", "-"),
+      content: content,
+      cta_content: cta_content,
+      cta_url: cta_url,
+      preset: preset
+    }
+  end
+
   defp prepare_campaign_data(raw_campaigns_data) when is_list(raw_campaigns_data) do
     {:ok,
      raw_campaigns_data
-     |> Enum.filter(fn item ->
-       Map.has_key?(item, :campaign) &&
-         is_bitstring(item[:campaign]) &&
-         Map.has_key?(item, :content) &&
-         is_bitstring(item[:content]) &&
-         Map.has_key?(item, :ctaContent) &&
-         is_bitstring(item[:ctaContent]) &&
-         Map.has_key?(item, :ctaUrl) &&
-         is_bitstring(item[:ctaUrl]) &&
-         Map.has_key?(item, :preset) &&
-         is_bitstring(item[:preset])
-     end)
-     |> Enum.map(fn %{
-                      campaign: name,
-                      content: content,
-                      ctaContent: cta_content,
-                      ctaUrl: cta_url,
-                      preset: preset
-                    } ->
-       %{
-         id: name |> String.downcase() |> String.replace(" ", "-"),
-         content: content,
-         cta_content: cta_content,
-         cta_url: cta_url,
-         preset: preset
-       }
-     end)}
+     |> Enum.filter(&check_item_payload/1)
+     |> Enum.map(&prepare_item_payload/1)}
   end
 
   defp prepare_campaign_data(_), do: []
