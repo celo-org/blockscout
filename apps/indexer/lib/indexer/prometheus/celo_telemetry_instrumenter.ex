@@ -7,19 +7,22 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
   def setup do
     event_config = Application.get_env(:indexer, :telemetry_config)
 
-    event_config |> Enum.each(&(configure_event(&1)))
+    event_config |> Enum.each(&configure_event(&1))
   end
 
   def configure_event(event_config) do
     case process_config(event_config) do
       [name, type, label, meta] ->
         attach_event(name, type, label, meta)
-      {:error, msg} -> Logger.error("Error configuring event #{inspect(event_config)}: #{msg}")
+
+      {:error, msg} ->
+        Logger.error("Error configuring event #{inspect(event_config)}: #{msg}")
     end
   end
 
   def attach_event(name, :summary, label, %{metric_labels: metric_labels, help: help} = meta) do
     Logger.info("Attach event #{name |> inspect()}")
+
     Summary.declare(
       name: label,
       labels: metric_labels,
@@ -31,6 +34,7 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
 
   def attach_event(name, :histogram, label, %{buckets: buckets, metric_labels: metric_labels, help: help} = meta) do
     Logger.info("Attach event #{name |> inspect()}")
+
     Histogram.new(
       name: label,
       buckets: buckets,
@@ -46,7 +50,8 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
 
   defp handler_id(event_name), do: "event_handler_id_#{event_name |> Enum.join() |> to_string()}"
 
-  def handle_event(_name, measurements, _metadata, %{type: :histogram, label: label} = config) when is_map(measurements) do
+  def handle_event(_name, measurements, _metadata, %{type: :histogram, label: label} = config)
+      when is_map(measurements) do
     measurements
     |> Enum.each(fn {name, value} ->
       Histogram.observe(
@@ -56,7 +61,8 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
     end)
   end
 
-  def handle_event(_name, measurements, _metadata, %{type: :summary, label: label} = config) when is_map(measurements) do
+  def handle_event(_name, measurements, _metadata, %{type: :summary, label: label} = config)
+      when is_map(measurements) do
     measurements
     |> Enum.each(fn {name, value} ->
       Summary.observe(
@@ -80,8 +86,9 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
 
     # return error tuple if that is found in metric_def, otherwise return metric_def
     metric_def
-    |> Enum.find(metric_def, fn {:error, _} -> true
-            _ -> false
-         end)
+    |> Enum.find(metric_def, fn
+      {:error, _} -> true
+      _ -> false
+    end)
   end
 end
