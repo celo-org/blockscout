@@ -117,12 +117,12 @@ defmodule BlockScoutWeb.CampaignBannerCache do
   defp check_item_payload(%{
          campaign: campaign,
          content: content,
-         ctaContent: ctaContent,
-         ctaUrl: ctaUrl,
+         ctaContent: cta_content,
+         ctaUrl: cta_url,
          preset: preset
        })
-       when is_bitstring(campaign) and is_bitstring(content) and is_bitstring(ctaContent) and
-              is_bitstring(ctaUrl) and is_bitstring(preset),
+       when is_bitstring(campaign) and is_bitstring(content) and is_bitstring(cta_content) and
+              is_bitstring(cta_url) and is_bitstring(preset),
        do: true
 
   defp check_item_payload(payload) do

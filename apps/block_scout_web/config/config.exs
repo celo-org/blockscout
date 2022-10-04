@@ -116,7 +116,7 @@ campaign_banner_refresh_interval =
     _ -> 60
   end
 
-config :block_scout_web, BlockScoutWeb.CampaignBanner,
+config :block_scout_web, BlockScoutWeb.CampaignBannerCache,
   backend_url: System.get_env("CAMPAIGN_BANNER_BACKEND_URL", ""),
   refresh_interval: campaign_banner_refresh_interval
 
