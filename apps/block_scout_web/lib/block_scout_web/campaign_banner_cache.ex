@@ -10,7 +10,6 @@ defmodule BlockScoutWeb.CampaignBannerCache do
   alias __MODULE__
 
   config = Application.get_env(:block_scout_web, __MODULE__)
-  @backend_url System.get_env("CAMPAIGN_BANNER_BACKEND_URL", "")
   @refresh_interval Keyword.get(config, :refresh_interval, 60)
   @default_campaign_data []
 
@@ -21,11 +20,12 @@ defmodule BlockScoutWeb.CampaignBannerCache do
 
   @impl GenServer
   def init(_) do
-    should_fetch_campaign_data? = @backend_url != ""
+    backend_url = System.get_env("CAMPAIGN_BANNER_BACKEND_URL", "")
+    should_fetch_campaign_data? = backend_url != ""
 
     state = %{
       config: %{
-        backend_url: @backend_url,
+        backend_url: backend_url,
         refresh_interval: @refresh_interval
       },
       campaign_data: @default_campaign_data
