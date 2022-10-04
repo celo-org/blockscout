@@ -102,9 +102,9 @@ config :indexer, Indexer.Prometheus.MetricsCron, metrics_cron_interval: System.g
 
 
 config :indexer, :telemetry_config, [
-  [name: [:blockscout, :ingested], type: :histogram, label: "indexer_ingested", meta: %{
-    buckets: :exponential,
-    help: "Blockchain primitives ingested by type",
+  [name: [:blockscout, :ingested], type: :summary, label: "indexer_import_ingested", meta: %{
+    buckets: :default,
+    help: "Blockchain primitives ingested via `Import.all` by type",
     metric_labels: [:type]
   }]
 ]

@@ -136,6 +136,10 @@ defmodule Explorer.Chain.Import do
 
   defp emit_ingestion_metrics(data) do
     data
+    |> Enum.filter(fn
+      {_, n} when is_list(n) -> true
+      _ -> false
+    end)
     |> Enum.into(%{}, fn {type, imported_data} -> {type, length(imported_data)} end)
     |> then(&( Telemetry.event(:ingested, &1) ))
   end

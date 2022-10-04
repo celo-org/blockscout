@@ -2,6 +2,7 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
   @moduledoc "Instrumentation for Celo telemetry"
 
   use Prometheus.Metric
+  require Logger
 
   def setup do
     event_config = Application.get_env(:indexer, :telemetry_config)
@@ -17,7 +18,19 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
     end
   end
 
+  def attach_event(name, :summary, label, %{metric_labels: metric_labels, help: help} = meta) do
+    Logger.info("Attach event #{name |> inspect()}")
+    Summary.declare(
+      name: label,
+      labels: metric_labels,
+      help: help
+    )
+
+    :telemetry.attach(handler_id(name), name, &__MODULE__.handle_event/4, %{type: :summary, label: label})
+  end
+
   def attach_event(name, :histogram, label, %{buckets: buckets, metric_labels: metric_labels, help: help} = meta) do
+    Logger.info("Attach event #{name |> inspect()}")
     Histogram.new(
       name: label,
       buckets: buckets,
@@ -26,17 +39,27 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
       help: help
     )
 
-    :telemetry.attach(handler_id(name), name, &CeloInstrumenter.handle_event/4, %{type: :histogram, label: label})
+    :telemetry.attach(handler_id(name), name, &__MODULE__.handle_event/4, %{type: :histogram, label: label})
   end
 
   def attach_event(name, _type, _label, _meta), do: Logger.info("Not adding metric nope #{name |> inspect()}")
 
-  defp handler_id(event_name), do: "event_handler_id_#{event_name |> to_string()}"
+  defp handler_id(event_name), do: "event_handler_id_#{event_name |> Enum.join() |> to_string()}"
 
   def handle_event(_name, measurements, _metadata, %{type: :histogram, label: label} = config) when is_map(measurements) do
     measurements
     |> Enum.each(fn {name, value} ->
       Histogram.observe(
+        [name: label, labels: [name]],
+        value
+      )
+    end)
+  end
+
+  def handle_event(_name, measurements, _metadata, %{type: :summary, label: label} = config) when is_map(measurements) do
+    measurements
+    |> Enum.each(fn {name, value} ->
+      Summary.observe(
         [name: label, labels: [name]],
         value
       )
@@ -57,10 +80,8 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
 
     # return error tuple if that is found in metric_def, otherwise return metric_def
     metric_def
-    |> Enum.find(metric_def,
-         fn {:error, _} -> true
-                           fn n -> false end
+    |> Enum.find(metric_def, fn {:error, _} -> true
+            _ -> false
          end)
   end
-
 end
