@@ -10,7 +10,7 @@ defmodule BlockScoutWeb.CampaignBannerCache do
   alias __MODULE__
 
   config = Application.get_env(:block_scout_web, __MODULE__)
-  @backend_url Keyword.get(config, :backend_url, "")
+  @backend_url System.get_env("CAMPAIGN_BANNER_BACKEND_URL", "")
   @refresh_interval Keyword.get(config, :refresh_interval, 60)
   @default_campaign_data []
 
