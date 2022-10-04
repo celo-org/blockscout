@@ -116,8 +116,7 @@ campaign_banner_refresh_interval =
     _ -> 60
   end
 
-config :block_scout_web, BlockScoutWeb.CampaignBannerCache,
-  refresh_interval: campaign_banner_refresh_interval
+config :block_scout_web, BlockScoutWeb.CampaignBannerCache, refresh_interval: campaign_banner_refresh_interval
 
 # Configures the endpoint
 config :block_scout_web, BlockScoutWeb.Endpoint,
