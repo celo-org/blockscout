@@ -468,9 +468,9 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
 
       # Test on_conflict cause
       reserve_bolster_value = 123_456_789
-      put_in(input, [:epoch_rewards, :reserve_bolster], reserve_bolster_value)
+      input_with_reserve_bolster = put_in(input, [:epoch_rewards, :reserve_bolster], reserve_bolster_value)
 
-      assert CeloEpochDataFetcher.import_items(input) == :ok
+      assert CeloEpochDataFetcher.import_items(input_with_reserve_bolster) == :ok
       reward = Repo.one!(from(rewards in CeloEpochRewards) |> where([r], r.block_number == ^block_number))
 
       {:ok, amount_in_wei} = Wei.cast(reserve_bolster_value)
