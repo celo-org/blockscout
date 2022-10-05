@@ -37,19 +37,19 @@ block_transformer =
   end
 
 config :indexer,
-       block_transformer: block_transformer,
-       ecto_repos: [Explorer.Repo],
-       metadata_updater_seconds_interval:
-         String.to_integer(System.get_env("TOKEN_METADATA_UPDATE_INTERVAL") || "#{10 * 60 * 60}"),
-       health_check_port: port || 4001,
-       first_block: System.get_env("FIRST_BLOCK") || "",
-       last_block: System.get_env("LAST_BLOCK") || "",
-       metrics_enabled: System.get_env("METRICS_ENABLED") || false,
-       trace_first_block: System.get_env("TRACE_FIRST_BLOCK") || "",
-       trace_last_block: System.get_env("TRACE_LAST_BLOCK") || ""
+  block_transformer: block_transformer,
+  ecto_repos: [Explorer.Repo],
+  metadata_updater_seconds_interval:
+    String.to_integer(System.get_env("TOKEN_METADATA_UPDATE_INTERVAL") || "#{10 * 60 * 60}"),
+  health_check_port: port || 4001,
+  first_block: System.get_env("FIRST_BLOCK") || "",
+  last_block: System.get_env("LAST_BLOCK") || "",
+  metrics_enabled: System.get_env("METRICS_ENABLED") || false,
+  trace_first_block: System.get_env("TRACE_FIRST_BLOCK") || "",
+  trace_last_block: System.get_env("TRACE_LAST_BLOCK") || ""
 
 config :indexer, Indexer.Fetcher.PendingTransaction.Supervisor,
-       disabled?: System.get_env("ETHEREUM_JSONRPC_VARIANT") == "besu"
+  disabled?: System.get_env("ETHEREUM_JSONRPC_VARIANT") == "besu"
 
 token_balance_on_demand_fetcher_threshold =
   if System.get_env("TOKEN_BALANCE_ON_DEMAND_FETCHER_THRESHOLD_MINUTES") do
@@ -75,15 +75,15 @@ config :indexer, Indexer.Fetcher.InternalTransaction.Supervisor, disabled?: fals
 config :indexer, Indexer.Supervisor, enabled: System.get_env("DISABLE_INDEXER") != "true"
 
 config :indexer, Indexer.Tracer,
-       service: :indexer,
-       adapter: SpandexDatadog.Adapter,
-       trace_key: :blockscout
+  service: :indexer,
+  adapter: SpandexDatadog.Adapter,
+  trace_key: :blockscout
 
 config :logger_json, :indexer,
-       metadata:
-         ~w(application fetcher request_id first_block_number last_block_number missing_block_range_count missing_block_count
+  metadata:
+    ~w(application fetcher request_id first_block_number last_block_number missing_block_range_count missing_block_count
        block_number step count error_count shrunk import_id transaction_id)a,
-       metadata_filter: [application: :indexer]
+  metadata_filter: [application: :indexer]
 
 config :logger, :indexer, backends: [LoggerJSON, {LoggerBackend, :logger_backend}]
 
@@ -121,9 +121,9 @@ config :indexer, :telemetry_config, [
 ]
 
 config :prometheus, Indexer.Prometheus.Exporter,
-       path: "/metrics/indexer",
-       format: :text,
-       registry: :default
+  path: "/metrics/indexer",
+  format: :text,
+  registry: :default
 
 indexer_empty_blocks_sanitizer_batch_size =
   if System.get_env("INDEXER_EMPTY_BLOCKS_SANITIZER_BATCH_SIZE") do
@@ -136,7 +136,7 @@ indexer_empty_blocks_sanitizer_batch_size =
   end
 
 config :indexer, Indexer.Fetcher.EmptyBlocksSanitizer.Supervisor,
-       disabled?: System.get_env("INDEXER_DISABLE_EMPTY_BLOCK_SANITIZER", "false") == "true"
+  disabled?: System.get_env("INDEXER_DISABLE_EMPTY_BLOCK_SANITIZER", "false") == "true"
 
 config :indexer, Indexer.Fetcher.EmptyBlocksSanitizer, batch_size: indexer_empty_blocks_sanitizer_batch_size
 

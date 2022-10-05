@@ -139,7 +139,7 @@ defmodule Explorer.Chain.Import do
     data
     |> Enum.reduce(%{}, fn
       {change_key, change_list}, acc when is_list(change_list) and change_list != [] ->
-        {change_key, length(change_list)}
+        acc |> Map.put(change_key, length(change_list))
 
       _, acc ->
         acc
