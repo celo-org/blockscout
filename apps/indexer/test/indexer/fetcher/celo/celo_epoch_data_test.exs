@@ -475,7 +475,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
 
       {:ok, amount_in_wei} = Wei.cast(reserve_bolster_value)
 
-      assert reward.amount == amount_in_wei
+      assert reward.reserve_bolster == amount_in_wei
     end
 
     test "with missing data removes rewards type" do
