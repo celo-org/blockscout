@@ -20,7 +20,7 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
     end
   end
 
-  def attach_event(name, :summary, label, %{metric_labels: metric_labels, help: help} = meta) do
+  def attach_event(name, :summary, label, %{metric_labels: metric_labels, help: help} = _meta) do
     Logger.info("Attach event #{name |> inspect()}")
 
     Summary.declare(
@@ -32,7 +32,7 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
     :telemetry.attach(handler_id(name), name, &__MODULE__.handle_event/4, %{type: :summary, label: label})
   end
 
-  def attach_event(name, :counter, label, %{help: help} = meta) do
+  def attach_event(name, :counter, label, %{help: help} = _meta) do
     Logger.info("Attach event #{name |> inspect()}")
 
     Counter.declare(
@@ -43,7 +43,7 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
     :telemetry.attach(handler_id(name), name, &__MODULE__.handle_event/4, %{type: :counter, label: label})
   end
 
-  def attach_event(name, :histogram, label, %{buckets: buckets, metric_labels: metric_labels, help: help} = meta) do
+  def attach_event(name, :histogram, label, %{buckets: buckets, metric_labels: metric_labels, help: help} = _meta) do
     Logger.info("Attach event #{name |> inspect()}")
 
     Histogram.new(
