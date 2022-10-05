@@ -10,7 +10,7 @@ defmodule Indexer.MixProject do
       deps: deps(),
       deps_path: "../../deps",
       description: "Fetches block chain data from on-chain node for later reading with Explorer.",
-      elixir: "~> 1.10",
+      elixir: "~> 1.12",
       elixirc_options: [
         warnings_as_errors: true
       ],
