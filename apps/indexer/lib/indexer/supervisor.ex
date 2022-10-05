@@ -172,7 +172,8 @@ defmodule Indexer.Supervisor do
       {TrackedEventCache, [[], []]},
       {CeloMaterializedViewRefresh, [[], []]},
       {InternalTransactionCache, [[], []]},
-      {Indexer.Celo.WriteOperationHandler, [[], []]}
+      {Indexer.Celo.WriteOperationHandler, [[], []]},
+      {CeloEpochData.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]}
     ]
 
     fetchers_with_bridged_tokens =
@@ -206,19 +207,8 @@ defmodule Indexer.Supervisor do
         fetchers_with_amb_bridge_mediators
       end
 
-    fetcher_with_epoch_rewards =
-      if System.get_env("DISPLAY_REWARDS") === "true" do
-        [
-          {CeloEpochData.Supervisor,
-           [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]}
-          | fetchers_with_metrics
-        ]
-      else
-        fetchers_with_metrics
-      end
-
     Supervisor.init(
-      fetcher_with_epoch_rewards,
+      fetchers_with_metrics,
       strategy: :one_for_one
     )
   end
