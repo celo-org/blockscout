@@ -32,6 +32,17 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
     :telemetry.attach(handler_id(name), name, &__MODULE__.handle_event/4, %{type: :summary, label: label})
   end
 
+  def attach_event(name, :counter, label, %{help: help} = meta) do
+    Logger.info("Attach event #{name |> inspect()}")
+
+    Counter.declare(
+      name: label,
+      help: help
+    )
+
+    :telemetry.attach(handler_id(name), name, &__MODULE__.handle_event/4, %{type: :counter, label: label})
+  end
+
   def attach_event(name, :histogram, label, %{buckets: buckets, metric_labels: metric_labels, help: help} = meta) do
     Logger.info("Attach event #{name |> inspect()}")
 
@@ -46,11 +57,15 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
     :telemetry.attach(handler_id(name), name, &__MODULE__.handle_event/4, %{type: :histogram, label: label})
   end
 
-  def attach_event(name, _type, _label, _meta), do: Logger.info("Not adding metric nope #{name |> inspect()}")
+  def attach_event(name, _type, _label, _meta), do: Logger.info("Unhandled metric attach request: #{name |> inspect()}")
 
   defp handler_id(event_name), do: "event_handler_id_#{event_name |> Enum.join() |> to_string()}"
 
-  def handle_event(_name, measurements, _metadata, %{type: :histogram, label: label} = config)
+  def handle_event(_name, _measurements, _metadata, %{type: :counter, label: label}) do
+    Counter.inc([name: label])
+  end
+
+  def handle_event(_name, measurements, _metadata, %{type: :histogram, label: label})
       when is_map(measurements) do
     measurements
     |> Enum.each(fn {name, value} ->
@@ -61,7 +76,7 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
     end)
   end
 
-  def handle_event(_name, measurements, _metadata, %{type: :summary, label: label} = config)
+  def handle_event(_name, measurements, _metadata, %{type: :summary, label: label})
       when is_map(measurements) do
     measurements
     |> Enum.each(fn {name, value} ->
