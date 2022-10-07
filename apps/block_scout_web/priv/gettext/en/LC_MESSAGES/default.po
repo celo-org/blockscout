@@ -379,7 +379,7 @@ msgstr ""
 
 #, elixir-format
 #: lib/block_scout_web/templates/block/_link.html.eex:2
-#: lib/block_scout_web/templates/epoch_transaction/_election_aggregated_tile.html.eex:115 lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:91
+#: lib/block_scout_web/templates/epoch_transaction/_election_aggregated_tile.html.eex:115 lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:113
 #: lib/block_scout_web/templates/epoch_transaction/_epoch_tile.html.eex:58 lib/block_scout_web/templates/internal_transaction/_tile.html.eex:28
 #: lib/block_scout_web/templates/tokens/transfer/_token_transfer.html.eex:43
 msgid "Block #%{number}"
@@ -1153,7 +1153,7 @@ msgid "Enter the Vyper Contract Code"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/epoch_transaction/_election_aggregated_tile.html.eex:111 lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:87
+#: lib/block_scout_web/templates/epoch_transaction/_election_aggregated_tile.html.eex:111 lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:109
 #: lib/block_scout_web/templates/epoch_transaction/_epoch_tile.html.eex:54
 msgid "Epoch #"
 msgstr ""
@@ -1374,7 +1374,7 @@ msgid "IMPORTANT: This information is a best guess based on similar functions fr
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/epoch_transaction/_election_aggregated_tile.html.eex:121 lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:97
+#: lib/block_scout_web/templates/epoch_transaction/_election_aggregated_tile.html.eex:121 lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:119
 #: lib/block_scout_web/templates/epoch_transaction/_epoch_tile.html.eex:64 lib/block_scout_web/templates/internal_transaction/_tile.html.eex:38
 #: lib/block_scout_web/templates/transaction/_tile.html.eex:80
 msgid "IN"
@@ -2137,7 +2137,7 @@ msgstr ""
 
 #, elixir-format
 #: lib/block_scout_web/templates/epoch_transaction/_election_aggregated_tile.html.eex:22 lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:24
-#: lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:45 lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:67
+#: lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:48 lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:73
 msgid "Rewards: "
 msgstr ""
 
@@ -3107,8 +3107,8 @@ msgid "Validator Group Rewards"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:36
-#: lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:58
+#: lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:40
+#: lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:65
 msgid "Validator Group:"
 msgstr ""
 
@@ -3134,7 +3134,8 @@ msgid "Validator Reward"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/epoch_transaction/_election_aggregated_tile.html.eex:12 lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:13
+#: lib/block_scout_web/templates/epoch_transaction/_election_aggregated_tile.html.eex:12
+#: lib/block_scout_web/templates/epoch_transaction/_election_aggregated_tile.html.eex:38 lib/block_scout_web/templates/epoch_transaction/_election_tile.html.eex:13
 msgid "Validator Rewards"
 msgstr ""
 
@@ -3673,26 +3674,6 @@ msgid "Type of the token standard"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/address/overview.html.eex:218
-msgid "Activated Celo Balance"
-msgstr ""
-
-#, elixir-format
-#: lib/block_scout_web/templates/address/overview.html.eex:204
-msgid "Amount of Celo that’s in the process of being unlocked (3 days)"
-msgstr ""
-
-#, elixir-format
-#: lib/block_scout_web/templates/address/overview.html.eex:191
-msgid "Amount of locked Celo in the protocol"
-msgstr ""
-
-#, elixir-format
-#: lib/block_scout_web/templates/address/overview.html.eex:217
-msgid "Amount of locked Celo that has been activated to vote for validator(s)"
-msgstr ""
-
-#, elixir-format
 #: lib/block_scout_web/templates/makerdojo/index.html.eex:13
 msgid "Attestations"
 msgstr ""
@@ -3713,7 +3694,7 @@ msgid "Moola"
 msgstr ""
 
 #, elixir-format
-#: lib/block_scout_web/templates/address/overview.html.eex:205
+#: lib/block_scout_web/templates/address/overview.html.eex:218
 msgid "Pending Unlocked Gold"
 msgstr ""
 
@@ -3734,7 +3715,6 @@ msgstr ""
 
 #, elixir-format
 #: lib/block_scout_web/templates/epoch_transaction/_election_aggregated_tile.html.eex:35
-#: lib/block_scout_web/templates/epoch_transaction/_election_aggregated_tile.html.eex:38
 msgid "Validators"
 msgstr ""
 
@@ -3748,7 +3728,27 @@ msgstr ""
 msgid "cLabs"
 msgstr ""
 
-#, elixir-format
+#, elixir-format, fuzzy
+#: lib/block_scout_web/templates/address/overview.html.eex:205
+msgid "Activated CELO Balance"
+msgstr ""
+
+#, elixir-format, fuzzy
+#: lib/block_scout_web/templates/address/overview.html.eex:217
+msgid "Amount of CELO that’s in the process of being unlocked (3 days)"
+msgstr ""
+
+#, elixir-format, fuzzy
+#: lib/block_scout_web/templates/address/overview.html.eex:191
+msgid "Amount of locked CELO in the protocol"
+msgstr ""
+
+#, elixir-format, fuzzy
+#: lib/block_scout_web/templates/address/overview.html.eex:204
+msgid "Amount of locked CELO that has been activated to vote for validator(s)"
+msgstr ""
+
+#, elixir-format, fuzzy
 #: lib/block_scout_web/templates/epoch_transaction/_election_aggregated_tile.html.eex:103
-msgid "rewards more (hidden)"
+msgid "rewards more"
 msgstr ""
