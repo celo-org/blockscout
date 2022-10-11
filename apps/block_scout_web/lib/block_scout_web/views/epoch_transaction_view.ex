@@ -45,16 +45,7 @@ defmodule BlockScoutWeb.EpochTransactionView do
   end
 
   def separate_visible_rewards(rewards) when is_list(rewards) do
-    visible_batch = Enum.take(rewards, @visible_rewards_batch_size)
-
-    remaining_batch =
-      if Enum.count(rewards) > @visible_rewards_batch_size do
-        Enum.take(rewards, -(Enum.count(rewards) - @visible_rewards_batch_size))
-      else
-        []
-      end
-
-    {visible_batch, remaining_batch}
+    rewards |> Enum.split(@visible_rewards_batch_size)
   end
 
   def get_total_reward_value(nil), do: %Wei{value: Decimal.new(0)}
