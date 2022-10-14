@@ -14,7 +14,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
       where: 3
     ]
 
-  alias Explorer.Chain.{CeloAccount, Hash, Wei}
+  alias Explorer.Chain.{Block, CeloAccount, CeloAccountEpoch, Hash, Wei}
   alias Explorer.Repo
 
   @required_attrs ~w(account_hash amount associated_account_hash block_number block_timestamp reward_type)a
@@ -140,6 +140,47 @@ defmodule Explorer.Chain.CeloElectionRewards do
     query |> where_non_zero_reward()
   end
 
+  def base_api_address_query(account_hash_list, reward_type_list) do
+    query =
+      from(rewards in __MODULE__,
+        join: block in Block,
+        on: rewards.block_number == block.number,
+        join: celo_account_epoch in CeloAccountEpoch,
+        on: rewards.account_hash == celo_account_epoch.account_hash and celo_account_epoch.block_hash == block.hash,
+        select: %{
+          block_hash: block.hash,
+          block_number: block.number,
+          epoch_number: fragment("? / 17280", rewards.block_number),
+          voter_address_hash: rewards.account_hash,
+          voter_locked_gold: celo_account_epoch.total_locked_gold,
+          voter_activated_gold:
+            fragment(
+              "? - ?",
+              celo_account_epoch.total_locked_gold,
+              celo_account_epoch.nonvoting_locked_gold
+            ),
+          group_address_hash: rewards.associated_account_hash,
+          date: rewards.block_timestamp,
+          amount: rewards.amount
+        },
+        order_by: [desc: rewards.block_number, asc: rewards.reward_type],
+        where: rewards.account_hash in ^account_hash_list,
+        where: rewards.reward_type in ^reward_type_list
+      )
+
+    query
+  end
+
+  def base_sum_rewards_address_query(account_hash_list, reward_type_list) do
+    from(rewards in __MODULE__,
+      select: %{
+        amount: fragment("COALESCE(SUM(?), 0)", rewards.amount)
+      },
+      where: rewards.account_hash in ^account_hash_list,
+      where: rewards.reward_type in ^reward_type_list
+    )
+  end
+
   def get_rewards(account_hash_list, reward_type_list, from, to) when from == nil and to == nil,
     do: get_rewards(account_hash_list, reward_type_list, ~U[2020-04-22 16:00:00.000000Z], DateTime.utc_now())
 
@@ -170,6 +211,67 @@ defmodule Explorer.Chain.CeloElectionRewards do
       to: to
     }
   end
+
+  def get_epoch_rewards(account_hash_list, reward_type_list, from, to, pagination_params)
+      when from == nil and to == nil,
+      do:
+        get_epoch_rewards(
+          account_hash_list,
+          reward_type_list,
+          ~U[2020-04-22 16:00:00.000000Z],
+          DateTime.utc_now(),
+          pagination_params
+        )
+
+  def get_epoch_rewards(account_hash_list, reward_type_list, from, to, pagination_params) when from == nil,
+    do: get_epoch_rewards(account_hash_list, reward_type_list, ~U[2020-04-22 16:00:00.000000Z], to, pagination_params)
+
+  def get_epoch_rewards(account_hash_list, reward_type_list, from, to, pagination_params) when to == nil,
+    do: get_epoch_rewards(account_hash_list, reward_type_list, from, DateTime.utc_now(), pagination_params)
+
+  def get_epoch_rewards(
+        account_hash_list,
+        group_hash_list,
+        from,
+        to,
+        pagination_params
+      ) do
+    {items_count, page_size} = extract_pagination_params(pagination_params)
+
+    query = base_api_address_query(account_hash_list, ["voter"])
+    sum_query = base_sum_rewards_address_query(account_hash_list, ["voter"])
+
+    rewards =
+      query
+      |> timestamp_query(from, to)
+      |> group_address_hash_query(group_hash_list)
+      |> limit(^page_size)
+      |> offset(^items_count)
+      |> Repo.all()
+
+    sum_rewards = sum_query |> timestamp_query(from, to) |> group_address_hash_query(group_hash_list) |> Repo.one()
+
+    {:ok, total_amount} = Wei.cast(sum_rewards.amount)
+
+    %{
+      rewards: rewards,
+      total_amount: total_amount,
+      from: from,
+      to: to
+    }
+  end
+
+  defp timestamp_query(query, from, to) do
+    query |> where([rewards], fragment("? BETWEEN ? AND ?", rewards.block_timestamp, ^from, ^to))
+  end
+
+  defp group_address_hash_query(query, []), do: query
+
+  defp group_address_hash_query(query, group_address_list) when is_list(group_address_list) do
+    query |> where([rewards], rewards.associated_account_hash in ^group_address_list)
+  end
+
+  defp group_address_hash_query(query, _), do: query
 
   def get_paginated_rewards_for_address(account_hash_list, reward_type_list, pagination_params) do
     {items_count, page_size} = extract_pagination_params(pagination_params)
