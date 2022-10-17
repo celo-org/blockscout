@@ -241,10 +241,10 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
         check_type(json, hex_token_id)
 
       {:ok, %Response{body: body}} ->
-        {:error, body}
+        {:ok, error: inspect(body)}
 
       {:error, %Error{reason: reason}} ->
-        {:error, reason}
+        {:ok, error: inspect(reason)}
     end
   rescue
     e ->
