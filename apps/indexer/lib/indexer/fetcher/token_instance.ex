@@ -16,9 +16,9 @@ defmodule Indexer.Fetcher.TokenInstance do
   use BufferedTask
 
   @defaults [
-    flush_interval: 300,
+    flush_interval: 1000,
     max_batch_size: 1,
-    max_concurrency: 10,
+    max_concurrency: 3,
     task_supervisor: Indexer.Fetcher.TokenInstance.TaskSupervisor
   ]
 
