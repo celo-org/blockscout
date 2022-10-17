@@ -6,6 +6,7 @@
 - [#5105](https://github.com/blockscout/blockscout/pull/5105) - Redesign token page
 - [#5016](https://github.com/blockscout/blockscout/pull/5016) - Add view for internal transactions error
 - [#4690](https://github.com/blockscout/blockscout/pull/4690) - Improve pagination: introduce pagination with random access to pages; Integrate it to the Transactions List page
+- [#6168](https://github.com/blockscout/blockscout/pull/6168) - Token instance fetcher checks instance owner and updates current token balance
 
 ### Fixes
 - [#5216](https://github.com/blockscout/blockscout/pull/5216) - Add token-transfers-toggle.js to the `block_transaction/index.html.eex`
