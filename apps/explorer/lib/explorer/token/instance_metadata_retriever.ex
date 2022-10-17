@@ -248,7 +248,7 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
           fetcher: :token_instances
         )
 
-        {:ok, error: @non_200_response_error}
+        {:ok, %{error: @non_200_response_error}}
 
       {:error, %Error{reason: reason}} ->
         Logger.info(
@@ -256,7 +256,7 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
           fetcher: :token_instances
         )
 
-        {:ok, error: @library_error}
+        {:ok, %{error: @library_error}}
     end
   rescue
     e ->
@@ -264,7 +264,7 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
         fetcher: :token_instances
       )
 
-      {:ok, error: @unhandled_error}
+      {:ok, %{error: @unhandled_error}}
   end
 
   defp decode_json(body) do
