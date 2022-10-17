@@ -8,6 +8,8 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
   alias Explorer.SmartContract.Reader
   alias HTTPoison.{Error, Response}
 
+  @timeout 60_000
+
   @token_uri "c87b56dd"
 
   @abi [
@@ -226,7 +228,10 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
   defp fetch_metadata_inner(uri, hex_token_id) do
     prepared_uri = substitute_token_id_to_token_uri(uri, hex_token_id)
 
-    case HTTPoison.get(prepared_uri) do
+    case HTTPoison.get(prepared_uri,
+           timeout: @timeout,
+           recv_timeout: @timeout
+         ) do
       {:ok, %Response{body: body, status_code: 200, headers: headers}} ->
         if Enum.member?(headers, {"Content-Type", "image/png"}) do
           json = %{"image" => prepared_uri}
