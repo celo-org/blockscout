@@ -19,6 +19,7 @@ defmodule Indexer.Fetcher.TokenInstance do
     flush_interval: :timer.seconds(5),
     poll: true,
     poll_interval: :timer.minutes(20),
+    dedup_entries: true,
     max_batch_size: 1,
     max_concurrency: 3,
     task_supervisor: Indexer.Fetcher.TokenInstance.TaskSupervisor
