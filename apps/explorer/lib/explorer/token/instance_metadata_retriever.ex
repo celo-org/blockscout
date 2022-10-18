@@ -61,9 +61,6 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
 
   @no_uri_error "no uri"
   @vm_execution_error "VM execution error"
-  @unhandled_error "unhandled error"
-  @non_200_response_error "non 200 HTTP response"
-  @library_error "library error"
 
   # https://eips.ethereum.org/EIPS/eip-1155#metadata
   @erc1155_token_id_placeholder "{id}"
@@ -253,7 +250,7 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
           fetcher: :token_instances
         )
 
-        {:ok, %{error: @non_200_response_error}}
+        {:error, body}
 
       {:error, %Error{reason: reason}} ->
         Logger.info(
@@ -261,7 +258,7 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
           fetcher: :token_instances
         )
 
-        {:ok, %{error: @library_error}}
+        {:error, reason}
     end
   rescue
     e ->
@@ -269,7 +266,7 @@ defmodule Explorer.Token.InstanceMetadataRetriever do
         fetcher: :token_instances
       )
 
-      {:ok, %{error: @unhandled_error}}
+      {:error, :request_error}
   end
 
   defp decode_json(body) do
