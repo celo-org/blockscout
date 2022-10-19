@@ -219,7 +219,7 @@ defmodule Indexer.Block.Fetcher do
          transactions_with_receipts = Receipts.put(transactions_params_without_receipts, receipts),
          %{token_transfers: normal_token_transfers, tokens: normal_tokens} = TokenTransfers.parse(logs),
 
-         #Get required core contract addresses from the registry
+         # Get required core contract addresses from the registry
          {:ok, celo_token} = Util.get_address("GoldToken"),
          {:ok, stable_token_usd} = Util.get_address("StableToken"),
          {:ok, oracle_address} = Util.get_address("SortedOracles"),
