@@ -256,7 +256,7 @@ defmodule Indexer.Block.Fetcher do
          %{mint_transfers: mint_transfers} = MintTransfers.parse(logs),
          %FetchedBeneficiaries{params_set: beneficiary_params_set, errors: beneficiaries_errors} =
            fetch_beneficiaries(blocks, json_rpc_named_arguments),
-         tokens = [normal_tokens | %{contract_address_hash: celo_token, type: "ERC-20"}],
+         tokens = [normal_tokens | [%{contract_address_hash: celo_token, type: "ERC-20"}]],
          token_transfers = normal_token_transfers ++ celo_token_transfers,
          addresses =
            Addresses.extract_addresses(%{
