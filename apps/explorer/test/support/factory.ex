@@ -20,6 +20,7 @@ defmodule Explorer.Factory do
     Address.CoinBalanceDaily,
     Block,
     CeloAccount,
+    CeloAccountEpoch,
     CeloContractEvent,
     CeloCoreContract,
     CeloElectionRewards,
@@ -775,6 +776,22 @@ defmodule Explorer.Factory do
       name: "Validator #123",
       locked_gold: wei_per_ether * 4,
       nonvoting_locked_gold: wei_per_ether * 4
+    }
+  end
+
+  def celo_account_epoch_factory do
+    wei_per_ether = 1_000_000_000_000_000_000
+    random_value = Enum.random(1..100)
+    total_locked_gold = wei_per_ether * random_value
+    # Can't be more than total_locked_gold
+    nonvoting_locked_gold = wei_per_ether * Enum.random(1..random_value)
+
+    %CeloAccountEpoch{
+      account_hash: address_hash(),
+      block_hash: block_hash(),
+      block_number: block_number(),
+      total_locked_gold: total_locked_gold,
+      nonvoting_locked_gold: nonvoting_locked_gold
     }
   end
 

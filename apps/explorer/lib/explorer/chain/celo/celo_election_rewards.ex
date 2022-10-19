@@ -163,7 +163,13 @@ defmodule Explorer.Chain.CeloElectionRewards do
           date: rewards.block_timestamp,
           amount: rewards.amount
         },
-        order_by: [desc: rewards.block_number, asc: rewards.reward_type],
+        # TODO check if there are appropriate indexes
+        order_by: [
+          desc: rewards.block_number,
+          asc: rewards.account_hash,
+          asc: rewards.associated_account_hash,
+          asc: rewards.reward_type
+        ],
         where: rewards.account_hash in ^account_hash_list,
         where: rewards.reward_type in ^reward_type_list
       )
