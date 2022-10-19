@@ -244,22 +244,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
     %{bytes: Base.decode16!(str, case: :mixed)}
   end
 
-  defp add_gold_token_balances(gold_token, addresses, acc) do
-    Enum.reduce(addresses, acc, fn
-      %{fetched_coin_balance_block_number: bn, hash: hash}, acc ->
-        MapSet.put(acc, %{
-          address_hash: decode(hash),
-          token_contract_address_hash: decode(gold_token),
-          block_number: bn,
-          token_type: "ERC-20",
-          token_id: nil
-        })
-
-      _, acc ->
-        acc
-    end)
-  end
-
   defp import_internal_transaction(internal_transactions_params, unique_numbers) do
     internal_transactions_params_without_failed_creations = remove_failed_creations(internal_transactions_params)
 
@@ -270,10 +254,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
     # Gold token special updates
     token_transfers =
-      with true <- Application.get_env(:indexer, Indexer.Block.Fetcher, [])[:enable_gold_token],
-           {:ok, gold_token} <- Util.get_address("GoldToken") do
-        set = add_gold_token_balances(gold_token, addresses_params, MapSet.new())
-        TokenBalance.async_fetch(MapSet.to_list(set))
+      with {:ok, gold_token} <- Util.get_address("GoldToken") do
 
         %{token_transfers: celo_token_transfers} =
           TokenTransfers.parse_itx(internal_transactions_params_without_failed_creations, gold_token)
