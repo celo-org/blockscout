@@ -250,8 +250,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
     # Gold token special updates
     {:ok, gold_token} = Util.get_address("GoldToken")
 
-    token_transfers =
-      %{token_transfers: celo_token_transfers} =
+    %{token_transfers: token_transfers} =
       TokenTransfers.parse_itx(internal_transactions_params_without_failed_creations, gold_token)
 
     token_transfers_addresses_params =
