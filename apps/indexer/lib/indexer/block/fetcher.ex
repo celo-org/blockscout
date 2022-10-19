@@ -184,26 +184,6 @@ defmodule Indexer.Block.Fetcher do
     Application.get_env(:indexer, __MODULE__, [])[key]
   end
 
-  defp read_addresses do
-    with {:ok, celo_token} <- Util.get_address("GoldToken"),
-         {:ok, stable_token_usd} <- Util.get_address("StableToken"),
-         {:ok, stable_token_eur} <- Util.get_address("StableTokenEUR"),
-         {:ok, stable_token_real} <- Util.get_address("StableTokenBRL"),
-         {:ok, oracle_address} <- Util.get_address("SortedOracles") do
-      tokens = %{
-        celo: celo_token,
-        cusd: stable_token_usd,
-        ceur: stable_token_eur,
-        creal: stable_token_real
-      }
-
-      {:ok, tokens, oracle_address, true}
-    else
-      _err ->
-        {:ok, %{celo: nil, cusd: nil, ceur: nil, creal: nil}, nil, false}
-    end
-  end
-
   @decorate span(tracer: Tracer)
   @spec fetch_and_import_range(t, Range.t()) ::
           {:ok, %{inserted: %{}, errors: [EthereumJSONRPC.Transport.error()]}}
@@ -228,34 +208,25 @@ defmodule Indexer.Block.Fetcher do
              errors: blocks_errors
            }}} <- {:blocks, EthereumJSONRPC.fetch_blocks_by_range(range, json_rpc_named_arguments)},
          blocks = TransformBlocks.transform_blocks(blocks_params),
-         {:logs, {:ok, %{logs: extra_logs}}} <- {:logs, EthereumJSONRPC.fetch_logs(range, json_rpc_named_arguments)},
+
+         # Fetch and process logs
+         {:logs, {:ok, %{logs: epoch_logs}}} <- {:logs, EthereumJSONRPC.fetch_logs(range, json_rpc_named_arguments)},
          {:receipts, {:ok, receipt_params}} <- {:receipts, Receipts.fetch(state, transactions_params_without_receipts)},
          %{logs: tx_logs, receipts: receipts} = receipt_params,
-         logs = tx_logs ++ process_extra_logs(extra_logs),
+         logs = tx_logs ++ process_extra_logs(epoch_logs),
          new_core_contracts = process_celo_core_contracts(logs),
          celo_contract_events = EventMap.celo_rpc_to_event_params(logs),
          transactions_with_receipts = Receipts.put(transactions_params_without_receipts, receipts),
          %{token_transfers: normal_token_transfers, tokens: normal_tokens} = TokenTransfers.parse(logs),
-         try_celo_token_enabled = config(:enable_gold_token),
-         {:ok,
-          %{
-            celo: celo_token,
-            cusd: stable_token_usd,
-            creal: _,
-            ceur: _
-          }, oracle_address,
-          celo_token_enabled} <-
-           (if try_celo_token_enabled do
-              read_addresses()
-            else
-              {:ok, %{celo: nil, cusd: nil, ceur: nil, creal: nil}, nil, false}
-            end),
-         %{token_transfers: celo_token_transfers} =
-           (if celo_token_enabled do
-              TokenTransfers.parse_tx(transactions_with_receipts, celo_token)
-            else
-              %{token_transfers: []}
-            end),
+
+         #Get required core contract addresses from the registry
+         {:ok, celo_token} = Util.get_address("GoldToken"),
+         {:ok, stable_token_usd} = Util.get_address("StableToken"),
+         {:ok, oracle_address} = Util.get_address("SortedOracles"),
+
+         # Create CELO token transfers from native tx values
+         %{token_transfers: celo_token_transfers} = TokenTransfers.parse_tx(transactions_with_receipts, celo_token),
+
          # Non CELO fees should be handled by events
          %{
            accounts: celo_accounts,
@@ -307,12 +278,7 @@ defmodule Indexer.Block.Fetcher do
              transactions: transactions_with_receipts,
              wallets: celo_wallets,
              # The address of the CELO token has to be added to the addresses table
-             celo_token:
-               if celo_token_enabled do
-                 [%{hash: celo_token, block_number: last_block}]
-               else
-                 []
-               end
+             celo_token: [%{hash: celo_token, block_number: last_block}]
            }),
          celo_transfers =
            normal_token_transfers
@@ -339,12 +305,7 @@ defmodule Indexer.Block.Fetcher do
          address_token_balances_from_transfers =
            AddressTokenBalances.params_set(%{token_transfers_params: token_transfers}),
          # Also update the CELO token balances
-         address_token_balances =
-           (if celo_token_enabled do
-              add_celo_token_balances(celo_token, addresses, address_token_balances_from_transfers)
-            else
-              address_token_balances_from_transfers
-            end),
+         address_token_balances = add_celo_token_balances(celo_token, addresses, address_token_balances_from_transfers),
          {:ok, inserted} <-
            __MODULE__.import(
              state,
