@@ -248,15 +248,11 @@ defmodule Indexer.Fetcher.InternalTransaction do
       })
 
     # Gold token special updates
-    token_transfers =
-      with {:ok, gold_token} <- Util.get_address("GoldToken") do
-        %{token_transfers: celo_token_transfers} =
-          TokenTransfers.parse_itx(internal_transactions_params_without_failed_creations, gold_token)
+    {:ok, gold_token} = Util.get_address("GoldToken")
 
-        celo_token_transfers
-      else
-        _ -> []
-      end
+    token_transfers =
+      %{token_transfers: celo_token_transfers} =
+      TokenTransfers.parse_itx(internal_transactions_params_without_failed_creations, gold_token)
 
     token_transfers_addresses_params =
       Addresses.extract_addresses(%{
