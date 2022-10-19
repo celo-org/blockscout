@@ -17,7 +17,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
   alias Explorer.Chain.Cache.{Accounts, Blocks}
   alias Indexer.{BufferedTask, Tracer}
   alias Indexer.Fetcher.InternalTransaction.Supervisor, as: InternalTransactionSupervisor
-  alias Indexer.Fetcher.TokenBalance
   alias Indexer.Transform.{Addresses, TokenTransfers}
 
   use BufferedTask
@@ -238,10 +237,6 @@ defmodule Indexer.Fetcher.InternalTransaction do
   # block_hash is required for TokenTransfers.parse_itx
   defp add_block_hash(block_hash, internal_transactions) do
     Enum.map(internal_transactions, fn a -> Map.put(a, :block_hash, block_hash) end)
-  end
-
-  defp decode("0x" <> str) do
-    %{bytes: Base.decode16!(str, case: :mixed)}
   end
 
   defp import_internal_transaction(internal_transactions_params, unique_numbers) do

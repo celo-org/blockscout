@@ -180,10 +180,6 @@ defmodule Indexer.Block.Fetcher do
     end)
   end
 
-  defp config(key) do
-    Application.get_env(:indexer, __MODULE__, [])[key]
-  end
-
   @decorate span(tracer: Tracer)
   @spec fetch_and_import_range(t, Range.t()) ::
           {:ok, %{inserted: %{}, errors: [EthereumJSONRPC.Transport.error()]}}
@@ -260,13 +256,7 @@ defmodule Indexer.Block.Fetcher do
          %{mint_transfers: mint_transfers} = MintTransfers.parse(logs),
          %FetchedBeneficiaries{params_set: beneficiary_params_set, errors: beneficiaries_errors} =
            fetch_beneficiaries(blocks, json_rpc_named_arguments),
-         tokens =
-           normal_tokens ++
-             (if celo_token_enabled do
-                [%{contract_address_hash: celo_token, type: "ERC-20"}]
-              else
-                []
-              end),
+         tokens = normal_tokens ++ [%{contract_address_hash: celo_token, type: "ERC-20"}],
          token_transfers = normal_token_transfers ++ celo_token_transfers,
          addresses =
            Addresses.extract_addresses(%{
