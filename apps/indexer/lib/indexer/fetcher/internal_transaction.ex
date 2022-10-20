@@ -16,6 +16,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
   alias Explorer.Chain.{Block, Transaction}
   alias Explorer.Chain.Cache.{Accounts, Blocks}
   alias Indexer.{BufferedTask, Tracer}
+  alias Indexer.Fetcher.TokenBalance
   alias Indexer.Fetcher.InternalTransaction.Supervisor, as: InternalTransactionSupervisor
   alias Indexer.Transform.{Addresses, TokenTransfers}
 
@@ -248,7 +249,8 @@ defmodule Indexer.Fetcher.InternalTransaction do
       })
 
     # Enqueue fetching of celo balances for addresses referenced in itx
-    fetch_celo_balances_for(addresses_params)
+    {:ok, gold_token} = Util.get_address("GoldToken")
+    fetch_celo_balances_for(addresses_params, gold_token)
 
     %{token_transfers: token_transfers} =
       TokenTransfers.parse_itx(internal_transactions_params_without_failed_creations, gold_token)
@@ -326,9 +328,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
     end)
   end
 
-  defp fetch_celo_balances_for(addresses) do
-    {:ok, gold_token} = Util.get_address("GoldToken")
-
+  defp fetch_celo_balances_for(addresses, gold_token) do
     addresses
     |> add_gold_token_balances(gold_token, MapSet.new())
     |> MapSet.to_list()
