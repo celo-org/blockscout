@@ -128,8 +128,8 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "celo" => "0",
           "wei" => "0"
         },
-        "from" => "2022-01-03 00:00:00.000000Z",
-        "to" => "2022-01-06 00:00:00.000000Z"
+        "from" => "2022-01-03T00:00:00.000000Z",
+        "to" => "2022-01-06T00:00:00.000000Z"
       }
 
       response =
@@ -158,10 +158,6 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
       %Address{hash: group_1_hash} = insert(:address)
       %Address{hash: group_2_hash} = insert(:address)
 
-      # TODO maybe not needed after changing the FK
-      insert(:celo_account, address: group_1_hash)
-      insert(:celo_account, address: group_2_hash)
-
       block_1 =
         insert(
           :block,
@@ -183,21 +179,19 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           timestamp: ~U[2022-01-03T17:42:43.162804Z]
         )
 
-      %CeloAccountEpoch{total_locked_gold: locked_gold_1_1, nonvoting_locked_gold: nonvoting_gold_1_1} =
-        insert(
-          :celo_account_epoch,
-          account_hash: voter_1_hash,
-          block_hash: block_1.hash,
-          block_number: block_1.number
-        )
+      insert(
+        :celo_account_epoch,
+        account_hash: voter_1_hash,
+        block_hash: block_1.hash,
+        block_number: block_1.number
+      )
 
-      %CeloAccountEpoch{total_locked_gold: locked_gold_1_2, nonvoting_locked_gold: nonvoting_gold_1_2} =
-        insert(
-          :celo_account_epoch,
-          account_hash: voter_1_hash,
-          block_hash: block_2.hash,
-          block_number: block_2.number
-        )
+      insert(
+        :celo_account_epoch,
+        account_hash: voter_1_hash,
+        block_hash: block_2.hash,
+        block_number: block_2.number
+      )
 
       %CeloAccountEpoch{total_locked_gold: locked_gold_1_3, nonvoting_locked_gold: nonvoting_gold_1_3} =
         insert(
@@ -231,61 +225,55 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           block_number: block_3.number
         )
 
-      %CeloElectionRewards{amount: reward_amount_1_1_1} =
-        insert(
-          :celo_election_rewards,
-          account_hash: voter_1_hash,
-          associated_account_hash: group_1_hash,
-          block_number: block_1.number,
-          block_timestamp: block_1.timestamp,
-          amount: wei_per_ether * 1,
-          reward_type: "voter"
-        )
+      insert(
+        :celo_election_rewards,
+        account_hash: voter_1_hash,
+        associated_account_hash: group_1_hash,
+        block_number: block_1.number,
+        block_timestamp: block_1.timestamp,
+        amount: wei_per_ether * 1,
+        reward_type: "voter"
+      )
 
-      %CeloElectionRewards{amount: reward_amount_1_1_2} =
-        insert(
-          :celo_election_rewards,
-          account_hash: voter_1_hash,
-          associated_account_hash: group_1_hash,
-          block_number: block_2.number,
-          block_timestamp: block_2.timestamp,
-          amount: wei_per_ether * 2,
-          reward_type: "voter"
-        )
+      insert(
+        :celo_election_rewards,
+        account_hash: voter_1_hash,
+        associated_account_hash: group_1_hash,
+        block_number: block_2.number,
+        block_timestamp: block_2.timestamp,
+        amount: wei_per_ether * 2,
+        reward_type: "voter"
+      )
 
-      %CeloElectionRewards{amount: reward_amount_1_1_3} =
-        insert(
-          :celo_election_rewards,
-          account_hash: voter_1_hash,
-          associated_account_hash: group_1_hash,
-          block_number: block_3.number,
-          block_timestamp: block_3.timestamp,
-          amount: wei_per_ether * 3,
-          reward_type: "voter"
-        )
+      insert(
+        :celo_election_rewards,
+        account_hash: voter_1_hash,
+        associated_account_hash: group_1_hash,
+        block_number: block_3.number,
+        block_timestamp: block_3.timestamp,
+        amount: wei_per_ether * 3,
+        reward_type: "voter"
+      )
 
-      # Should we add (remove existing?) foreign key celo_election_rewards.associated_account_hash -> addresses.hash?
-      %CeloElectionRewards{amount: reward_amount_1_2_1} =
-        insert(
-          :celo_election_rewards,
-          account_hash: voter_1_hash,
-          associated_account_hash: group_2_hash,
-          block_number: block_1.number,
-          block_timestamp: block_1.timestamp,
-          amount: wei_per_ether * 4,
-          reward_type: "voter"
-        )
+      insert(
+        :celo_election_rewards,
+        account_hash: voter_1_hash,
+        associated_account_hash: group_2_hash,
+        block_number: block_1.number,
+        block_timestamp: block_1.timestamp,
+        amount: wei_per_ether * 4,
+        reward_type: "voter"
+      )
 
-      %CeloElectionRewards{amount: reward_amount_1_2_2} =
-        insert(
-          :celo_election_rewards,
-          account_hash: voter_1_hash,
-          associated_account_hash: group_2_hash,
-          block_number: block_2.number,
-          block_timestamp: block_2.timestamp,
-          amount: wei_per_ether * 5,
-          reward_type: "voter"
-        )
+      insert(
+        :celo_election_rewards,
+        account_hash: voter_1_hash,
+        associated_account_hash: group_2_hash,
+        block_number: block_2.number,
+        block_timestamp: block_2.timestamp,
+        amount: wei_per_ether * 5,
+        reward_type: "voter"
+      )
 
       %CeloElectionRewards{amount: reward_amount_1_2_3} =
         insert(
@@ -320,16 +308,15 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           reward_type: "voter"
         )
 
-      %CeloElectionRewards{amount: reward_amount_2_1_3} =
-        insert(
-          :celo_election_rewards,
-          account_hash: voter_2_hash,
-          associated_account_hash: group_1_hash,
-          block_number: block_3.number,
-          block_timestamp: block_3.timestamp,
-          amount: wei_per_ether * 9,
-          reward_type: "voter"
-        )
+      insert(
+        :celo_election_rewards,
+        account_hash: voter_2_hash,
+        associated_account_hash: group_1_hash,
+        block_number: block_3.number,
+        block_timestamp: block_3.timestamp,
+        amount: wei_per_ether * 9,
+        reward_type: "voter"
+      )
 
       %CeloElectionRewards{amount: reward_amount_2_2_1} =
         insert(
@@ -562,7 +549,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
 
   defp generic_rewards_schema do
     resolve_schema(%{
-      "type" => "object",
+      "type" => ["object", "null"],
       "required" => ["total", "from", "to", "rewards"],
       "properties" => %{
         "total" => %{
