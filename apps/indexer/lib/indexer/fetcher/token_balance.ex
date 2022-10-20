@@ -34,6 +34,8 @@ defmodule Indexer.Fetcher.TokenBalance do
   @max_retries 3
 
   @spec async_fetch([]) :: :ok
+  def async_fetch([]), do: :ok
+
   def async_fetch(token_balances) do
     formatted_params = Enum.map(token_balances, &entry/1)
     BufferedTask.buffer(__MODULE__, formatted_params, :infinity)
