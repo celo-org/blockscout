@@ -231,6 +231,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         associated_account_hash: group_1_hash,
         block_number: block_1.number,
         block_timestamp: block_1.timestamp,
+        block_hash: block_1.hash,
         amount: wei_per_ether * 1,
         reward_type: "voter"
       )
@@ -241,6 +242,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         associated_account_hash: group_1_hash,
         block_number: block_2.number,
         block_timestamp: block_2.timestamp,
+        block_hash: block_2.hash,
         amount: wei_per_ether * 2,
         reward_type: "voter"
       )
@@ -251,6 +253,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         associated_account_hash: group_1_hash,
         block_number: block_3.number,
         block_timestamp: block_3.timestamp,
+        block_hash: block_3.hash,
         amount: wei_per_ether * 3,
         reward_type: "voter"
       )
@@ -261,6 +264,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         associated_account_hash: group_2_hash,
         block_number: block_1.number,
         block_timestamp: block_1.timestamp,
+        block_hash: block_1.hash,
         amount: wei_per_ether * 4,
         reward_type: "voter"
       )
@@ -271,6 +275,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         associated_account_hash: group_2_hash,
         block_number: block_2.number,
         block_timestamp: block_2.timestamp,
+        block_hash: block_2.hash,
         amount: wei_per_ether * 5,
         reward_type: "voter"
       )
@@ -282,6 +287,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           associated_account_hash: group_2_hash,
           block_number: block_3.number,
           block_timestamp: block_3.timestamp,
+          block_hash: block_3.hash,
           amount: wei_per_ether * 6,
           reward_type: "voter"
         )
@@ -293,6 +299,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           associated_account_hash: group_1_hash,
           block_number: block_1.number,
           block_timestamp: block_1.timestamp,
+          block_hash: block_1.hash,
           amount: wei_per_ether * 7,
           reward_type: "voter"
         )
@@ -304,6 +311,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           associated_account_hash: group_1_hash,
           block_number: block_2.number,
           block_timestamp: block_2.timestamp,
+          block_hash: block_2.hash,
           amount: wei_per_ether * 8,
           reward_type: "voter"
         )
@@ -314,6 +322,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         associated_account_hash: group_1_hash,
         block_number: block_3.number,
         block_timestamp: block_3.timestamp,
+        block_hash: block_3.hash,
         amount: wei_per_ether * 9,
         reward_type: "voter"
       )
@@ -325,6 +334,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           associated_account_hash: group_2_hash,
           block_number: block_1.number,
           block_timestamp: block_1.timestamp,
+          block_hash: block_1.hash,
           amount: wei_per_ether * 10,
           reward_type: "voter"
         )
@@ -336,6 +346,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           associated_account_hash: group_2_hash,
           block_number: block_2.number,
           block_timestamp: block_2.timestamp,
+          block_hash: block_2.hash,
           amount: wei_per_ether * 11,
           reward_type: "voter"
         )
@@ -347,6 +358,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           associated_account_hash: group_2_hash,
           block_number: block_3.number,
           block_timestamp: block_3.timestamp,
+          block_hash: block_3.hash,
           amount: wei_per_ether * 12,
           reward_type: "voter"
         )
@@ -358,6 +370,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         associated_account_hash: group_1_hash,
         block_number: block_1.number,
         block_timestamp: block_1.timestamp,
+        block_hash: block_1.hash,
         amount: wei_per_ether * 7,
         reward_type: "validator"
       )
@@ -368,6 +381,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         associated_account_hash: group_1_hash,
         block_number: block_2.number,
         block_timestamp: block_2.timestamp,
+        block_hash: block_2.hash,
         amount: wei_per_ether * 8,
         reward_type: "validator"
       )
@@ -378,6 +392,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         associated_account_hash: group_1_hash,
         block_number: block_3.number,
         block_timestamp: block_3.timestamp,
+        block_hash: block_3.hash,
         amount: wei_per_ether * 9,
         reward_type: "validator"
       )
@@ -388,6 +403,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         associated_account_hash: group_2_hash,
         block_number: block_1.number,
         block_timestamp: block_1.timestamp,
+        block_hash: block_1.hash,
         amount: wei_per_ether * 10,
         reward_type: "validator"
       )
@@ -398,6 +414,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         associated_account_hash: group_2_hash,
         block_number: block_2.number,
         block_timestamp: block_2.timestamp,
+        block_hash: block_2.hash,
         amount: wei_per_ether * 11,
         reward_type: "validator"
       )
@@ -408,6 +425,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         associated_account_hash: group_2_hash,
         block_number: block_3.number,
         block_timestamp: block_3.timestamp,
+        block_hash: block_3.hash,
         amount: wei_per_ether * 12,
         reward_type: "validator"
       )

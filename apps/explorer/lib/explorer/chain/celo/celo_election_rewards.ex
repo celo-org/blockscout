@@ -26,6 +26,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
     the associated account is a validator group and in the case of validator group rewards, it is a validator.
    * `block_number` - the number of the block.
    * `block_timestamp` - the timestamp of the block.
+   * `block_hash` - the hash of the block.
    * `reward_type` - can be voter, validator or validator group. please note that validators and validator groups can
     themselves vote so it's possible for an account to get both voter and validator rewards for an epoch.
   """
@@ -35,6 +36,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
           associated_account_hash: Hash.Address.t(),
           block_number: integer,
           block_timestamp: DateTime.t(),
+          block_hash: Hash.Full.t(),
           reward_type: String.t()
         }
 
@@ -48,6 +50,13 @@ defmodule Explorer.Chain.CeloElectionRewards do
     field(:reward_type, :string)
 
     timestamps()
+
+    belongs_to(:block, Block,
+      foreign_key: :block_hash,
+      primary_key: true,
+      references: :hash,
+      type: Hash.Full
+    )
 
     belongs_to(:address, Explorer.Chain.Address,
       foreign_key: :account_hash,
@@ -143,13 +152,13 @@ defmodule Explorer.Chain.CeloElectionRewards do
   def base_api_address_query(account_hash_list, reward_type_list) do
     query =
       from(rewards in __MODULE__,
-        join: block in Block,
-        on: rewards.block_number == block.number,
         join: celo_account_epoch in CeloAccountEpoch,
-        on: rewards.account_hash == celo_account_epoch.account_hash and celo_account_epoch.block_hash == block.hash,
+        on:
+          rewards.account_hash == celo_account_epoch.account_hash and
+            celo_account_epoch.block_hash == rewards.block_hash,
         select: %{
-          block_hash: block.hash,
-          block_number: block.number,
+          block_hash: rewards.block_hash,
+          block_number: rewards.block_number,
           epoch_number: fragment("? / 17280", rewards.block_number),
           voter_address_hash: rewards.account_hash,
           voter_locked_gold: celo_account_epoch.total_locked_gold,
@@ -163,18 +172,29 @@ defmodule Explorer.Chain.CeloElectionRewards do
           date: rewards.block_timestamp,
           amount: rewards.amount
         },
-        # TODO check if there are appropriate indexes
         order_by: [
-          desc: rewards.block_number,
+          desc: rewards.block_timestamp,
+          asc: rewards.reward_type,
           asc: rewards.account_hash,
-          asc: rewards.associated_account_hash,
-          asc: rewards.reward_type
-        ],
-        where: rewards.account_hash in ^account_hash_list,
-        where: rewards.reward_type in ^reward_type_list
+          asc: rewards.associated_account_hash
+        ]
       )
 
-    query
+    query_with_reward_types =
+      if Enum.count(reward_type_list) > 1 do
+        query |> where([rewards], rewards.reward_type in ^reward_type_list)
+      else
+        query |> where([rewards], rewards.reward_type == ^Enum.at(reward_type_list, 0))
+      end
+
+    query_with_account_hashes =
+      if Enum.count(account_hash_list) > 1 do
+        query_with_reward_types |> where([rewards], rewards.account_hash in ^account_hash_list)
+      else
+        query_with_reward_types |> where([rewards], rewards.account_hash == ^Enum.at(account_hash_list, 0))
+      end
+
+    query_with_account_hashes
   end
 
   def base_sum_rewards_address_query(account_hash_list, reward_type_list) do

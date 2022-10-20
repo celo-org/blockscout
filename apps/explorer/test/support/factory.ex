@@ -819,6 +819,7 @@ defmodule Explorer.Factory do
       amount: Decimal.new(1),
       associated_account_hash: address_hash(),
       block_number: block_number(),
+      block_hash: block_hash(),
       block_timestamp: DateTime.utc_now(),
       reward_type: "voter"
     }
