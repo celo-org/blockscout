@@ -119,7 +119,8 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         amount: 8_943_276_509_843_275_698_432_756,
         associated_account_hash: group_hash,
         block_number: block_number,
-        block_timestamp: block_timestamp
+        block_timestamp: block_timestamp,
+        block_hash: block_hash
       )
 
       expected_result = %{
