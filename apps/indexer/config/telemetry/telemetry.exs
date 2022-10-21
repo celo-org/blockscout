@@ -11,7 +11,7 @@ config :indexer, :telemetry_config, [
     meta: %{
       help: "Blockchain primitives ingested via `Import.all` by type",
       metric_labels: [:type],
-      function: Indexer.Celo.Telemetry.Helper.filter_imports/1
+      function: &Indexer.Celo.Telemetry.Helper.filter_imports/1
     }
   ],
   [

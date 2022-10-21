@@ -1,4 +1,10 @@
 defmodule Indexer.Celo.Telemetry.Helper do
+  @moduledoc "Helper functions for telemetry event processing"
+
+  @doc """
+    Filters out changes from the full list of imports to only those that we care about
+    This is necessary as Import.all will return a mapping of each Ecto.Multi stage id to count of rows affected
+  """
   def filter_imports(changes) do
     changes
     |> Enum.reduce(%{}, fn import, acc ->
