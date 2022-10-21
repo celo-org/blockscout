@@ -25,6 +25,6 @@ config :indexer, :telemetry_config, [
 ]
 
 config :prometheus, Indexer.Prometheus.Exporter,
-       path: "/metrics/indexer",
-       format: :text,
-       registry: :default
+  path: "/metrics/indexer",
+  format: :text,
+  registry: :default

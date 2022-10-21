@@ -9,11 +9,10 @@ defmodule Indexer.Celo.Telemetry.Helper do
     changes
     |> Enum.reduce(%{}, fn import, acc ->
       case take_import(import) do
-        {key, count} ->  Map.put(acc, key, count)
+        {key, count} -> Map.put(acc, key, count)
         nil -> acc
       end
     end)
-
   end
 
   defp take_import({:insert_celo_election_rewards_items, count}), do: {:celo_election_rewards, count}
@@ -27,25 +26,28 @@ defmodule Indexer.Celo.Telemetry.Helper do
   defp take_import({:insert_wallets, count}), do: {:celo_wallets, count}
   defp take_import({:insert_celo_voters, count}), do: {:celo_voters, count}
   defp take_import({:insert_account_epoch_items, count}), do: {:celo_account_epoch, count}
-  defp take_import(cl = {:celo_unlocked, _}), do: cl
-  defp take_import(cce = {:celo_contract_event, _}), do: cce
-  defp take_import(ccc = {:celo_core_contracts, _}), do: ccc
-  defp take_import(epoch_rewards = {:celo_epoch_rewards, _}), do: epoch_rewards
+  defp take_import({:celo_unlocked, _} = cl), do: cl
+  defp take_import({:celo_contract_event, _} = cce), do: cce
+  defp take_import({:celo_core_contracts, _} = ccc), do: ccc
+  defp take_import({:celo_epoch_rewards, _} = epoch_rewards), do: epoch_rewards
 
   defp take_import({:tracked_contract_events, count}), do: {:contract_event, count}
 
-  defp take_import(address_coin_balances_daily = {:address_coin_balances_daily, _}), do: address_coin_balances_daily
-  defp take_import(address_coin_balances = {:address_coin_balances, _}), do: address_coin_balances
-  defp take_import(an = {:insert_names, count}), do: {:address_names, count}
-  defp take_import(address_token_balances = {:address_token_balances, _}), do: address_token_balances
-  defp take_import(address_current_token_balances = {:address_current_token_balances, _}), do: address_current_token_balances
-  defp take_import(addresses = {:addresses, _}), do: addresses
-  defp take_import(tx = {:transactions, _}), do: tx
-  defp take_import(blocks = {:blocks, _}), do: blocks
-  defp take_import(tt = {:token_transfers, _}), do: tt
-  defp take_import(t = {:tokens, _}), do: t
-  defp take_import(logs = {:logs, _}), do: logs
-  defp take_import(itx = {:internal_transactions, _}), do: itx
+  defp take_import({:address_coin_balances_daily, _} = address_coin_balances_daily), do: address_coin_balances_daily
+  defp take_import({:address_coin_balances, _} = address_coin_balances), do: address_coin_balances
+  defp take_import({:insert_names, count} = an), do: {:address_names, count}
+  defp take_import({:address_token_balances, _} = address_token_balances), do: address_token_balances
+
+  defp take_import({:address_current_token_balances, _} = address_current_token_balances),
+    do: address_current_token_balances
+
+  defp take_import({:addresses, _} = addresses), do: addresses
+  defp take_import({:transactions, _} = tx), do: tx
+  defp take_import({:blocks, _} = blocks), do: blocks
+  defp take_import({:token_transfers, _} = tt), do: tt
+  defp take_import({:tokens, _} = t), do: t
+  defp take_import({:logs, _} = logs), do: logs
+  defp take_import({:internal_transactions, _} = itx), do: itx
 
   defp take_import(_), do: nil
 end

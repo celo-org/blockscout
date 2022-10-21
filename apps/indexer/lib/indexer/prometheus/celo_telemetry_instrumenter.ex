@@ -71,7 +71,6 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
 
   def handle_event(_name, measurements, _metadata, %{type: :histogram, label: label} = meta)
       when is_map(measurements) do
-
     measurements
     |> process_measurements(meta)
     |> Enum.each(fn {name, value} ->
@@ -84,7 +83,6 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
 
   def handle_event(_name, measurements, _metadata, %{type: :summary, label: label} = meta)
       when is_map(measurements) do
-
     measurements
     |> process_measurements(meta)
     |> Enum.each(fn {name, value} ->
