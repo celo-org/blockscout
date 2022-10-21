@@ -452,6 +452,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
             associated_account_hash: group_hash,
             block_number: block_number,
             block_timestamp: ~U[2022-05-10 14:18:54.093055Z],
+            block_hash: block_hash,
             reward_type: "voter"
           }
         ],
@@ -462,6 +463,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
             associated_account_hash: group_hash,
             block_number: block_number,
             block_timestamp: ~U[2022-05-10 14:18:54.093055Z],
+            block_hash: block_hash,
             reward_type: "validator"
           }
         ],
@@ -472,6 +474,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
             associated_account_hash: validator_hash,
             block_number: block_number,
             block_timestamp: ~U[2022-05-10 14:18:54.093055Z],
+            block_hash: block_hash,
             reward_type: "group"
           }
         ]
