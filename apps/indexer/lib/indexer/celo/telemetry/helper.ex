@@ -16,12 +16,31 @@ defmodule Indexer.Celo.Telemetry.Helper do
 
   end
 
-  defp take_import(epoch_rewards = {:celo_epoch_rewards, _}), do: epoch_rewards
+  defp take_import({:insert_celo_election_rewards_items, count}), do: {:celo_election_rewards, count}
+  defp take_import({:insert_celo_params_items, count}), do: {:celo_params, count}
+  defp take_import({:insert_celo_signer_items, count}), do: {:celo_signers, count}
+  defp take_import({:insert_validator_group_items, count}), do: {:celo_validator_group, count}
+  defp take_import({:insert_validator_history_items, count}), do: {:celo_validator_history, count}
+  defp take_import({:insert_validator_status_items, count}), do: {:celo_validator_status, count}
+  defp take_import({:insert_celo_accounts, count}), do: {:celo_accounts, count}
+  defp take_import({:insert_celo_validators, count}), do: {:celo_validators, count}
+  defp take_import({:insert_wallets, count}), do: {:celo_wallets, count}
+  defp take_import({:insert_celo_voters, count}), do: {:celo_voters, count}
   defp take_import({:insert_account_epoch_items, count}), do: {:celo_account_epoch, count}
+  defp take_import(cl = {:celo_unlocked, _}), do: cl
+  defp take_import(cce = {:celo_contract_event, _}), do: cce
+  defp take_import(ccc = {:celo_core_contracts, _}), do: ccc
+  defp take_import(epoch_rewards = {:celo_epoch_rewards, _}), do: epoch_rewards
+
+  defp take_import({:tracked_contract_events, count}), do: {:contract_event, count}
+
   defp take_import(addresses = {:addresses, _}), do: addresses
   defp take_import(tx = {:transactions, _}), do: tx
   defp take_import(blocks = {:blocks, _}), do: blocks
+  defp take_import(tt = {:token_transfers, _}), do: tt
   defp take_import(t = {:tokens, _}), do: t
+  defp take_import(logs = {:logs, _}), do: logs
   defp take_import(itx = {:internal_transactions, _}), do: itx
+
   defp take_import(_), do: nil
 end
