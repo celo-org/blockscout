@@ -307,7 +307,6 @@ defmodule Indexer.Block.Fetcher do
 
          # extract address token balances from token transfers
          address_token_balances = AddressTokenBalances.params_set(%{token_transfers_params: token_transfers}),
-
          {:ok, inserted} <-
            __MODULE__.import(
              state,
