@@ -34,6 +34,11 @@ defmodule Indexer.Celo.Telemetry.Helper do
 
   defp take_import({:tracked_contract_events, count}), do: {:contract_event, count}
 
+  defp take_import(address_coin_balances_daily = {:address_coin_balances_daily, _}), do: address_coin_balances_daily
+  defp take_import(address_coin_balances = {:address_coin_balances, _}), do: address_coin_balances
+  defp take_import(an = {:insert_names, count}), do: {:address_names, count}
+  defp take_import(address_token_balances = {:address_token_balances, _}), do: address_token_balances
+  defp take_import(address_current_token_balances = {:address_current_token_balances, _}), do: address_current_token_balances
   defp take_import(addresses = {:addresses, _}), do: addresses
   defp take_import(tx = {:transactions, _}), do: tx
   defp take_import(blocks = {:blocks, _}), do: blocks
