@@ -308,9 +308,6 @@ defmodule Indexer.Block.Fetcher do
          # extract address token balances from token transfers
          address_token_balances = AddressTokenBalances.params_set(%{token_transfers_params: token_transfers}),
 
-         # 20/10/22 : Assert that celo token balances are still inserted correctly and remove the referenced code below
-         # address_token_balances = add_celo_token_balances(celo_token, addresses, address_token_balances_from_transfers),
-
          {:ok, inserted} <-
            __MODULE__.import(
              state,
