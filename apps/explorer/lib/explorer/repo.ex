@@ -1,4 +1,4 @@
-defmodule Explorer.Repo do
+defmodule Explorer.Repo.Local do
   use Ecto.Repo,
     otp_app: :explorer,
     adapter: Ecto.Adapters.Postgres
@@ -7,13 +7,15 @@ defmodule Explorer.Repo do
 
   alias Explorer.Repo.ConfigHelper
 
+  @env Mix.env()
+
   @doc """
   Dynamically loads the repository url from the
   DATABASE_URL environment variable.
   """
   def init(_, opts) do
     db_url = System.get_env("DATABASE_URL")
-    repo_conf = Application.get_env(:explorer, Explorer.Repo)
+    repo_conf = Application.get_env(:explorer, Explorer.Repo.Local)
 
     merged =
       %{url: db_url}
@@ -24,7 +26,7 @@ defmodule Explorer.Repo do
         _, _, v2 -> v2
       end)
 
-    Application.put_env(:explorer, Explorer.Repo, merged)
+    Application.put_env(:explorer, Explorer.Repo.Local, merged)
 
     extra_postgres_parameters = [application_name: get_application_name()]
 
@@ -32,9 +34,31 @@ defmodule Explorer.Repo do
       Keyword.update(opts, :parameters, extra_postgres_parameters, fn params ->
         Keyword.merge(params, extra_postgres_parameters)
       end)
+      |> Keyword.put(:url, db_url)
 
-    {:ok, Keyword.put(opts, :url, db_url)}
+
+    Fly.Postgres.config_repo_url(opts, @env)
   end
+
+  def get_application_name do
+    case Mix.env() do
+      :dev ->
+        System.get_env("USER", "anon") <> "_dev_blockscout"
+
+      :prod ->
+        System.get_env("HOSTNAME", "blockscout_production")
+
+      _ ->
+        "blockscout"
+    end
+  end
+end
+
+defmodule Explorer.Repo do
+  use Fly.Repo, local_repo: Explorer.Repo.Local
+  require Logger
+
+  def replica, do: __MODULE__
 
   def logged_transaction(fun_or_multi, opts \\ []) do
     transaction_id = :erlang.unique_integer([:positive])
@@ -129,52 +153,5 @@ defmodule Explorer.Repo do
     stream_in_transaction(query, &Enum.reduce(&1, initial, reducer))
   end
 
-  def get_application_name do
-    case Mix.env() do
-      :dev ->
-        System.get_env("USER", "anon") <> "_dev_blockscout"
 
-      :prod ->
-        System.get_env("HOSTNAME", "blockscout_production")
-
-      _ ->
-        "blockscout"
-    end
-  end
-
-  def replica, do: __MODULE__
-
-  defmodule Replica1 do
-    use Ecto.Repo,
-      otp_app: :explorer,
-      adapter: Ecto.Adapters.Postgres,
-      read_only: true
-
-    alias Explorer.Repo, as: ExplorerRepo
-
-    def init(_, opts) do
-      db_url = Application.get_env(:explorer, Explorer.Repo.Replica1)[:url]
-      repo_conf = Application.get_env(:explorer, Explorer.Repo.Replica1)
-
-      merged =
-        %{url: db_url}
-        |> ConfigHelper.get_db_config()
-        |> Keyword.merge(repo_conf, fn
-          _key, v1, nil -> v1
-          _key, nil, v2 -> v2
-          _, _, v2 -> v2
-        end)
-
-      Application.put_env(:explorer, Explorer.Repo.Replica1, merged)
-
-      extra_postgres_parameters = [application_name: ExplorerRepo.get_application_name() <> "-replica1"]
-
-      opts =
-        Keyword.update(opts, :parameters, extra_postgres_parameters, fn params ->
-          Keyword.merge(params, extra_postgres_parameters)
-        end)
-
-      {:ok, Keyword.put(opts, :url, db_url)}
-    end
-  end
 end

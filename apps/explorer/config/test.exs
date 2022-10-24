@@ -4,7 +4,7 @@ import Config
 config :bcrypt_elixir, log_rounds: 4
 
 # Configure your database
-config :explorer, Explorer.Repo,
+config :explorer, Explorer.Repo.Local,
   url: System.get_env("DATABASE_URL") || "postgresql://postgres:postgres@localhost:5432/explorer_test",
   database: "explorer_test",
   hostname: "localhost",
@@ -14,6 +14,7 @@ config :explorer, Explorer.Repo,
   ownership_timeout: :timer.minutes(7),
   timeout: :timer.seconds(60),
   queue_target: 1000,
+  priv: "priv/repo",
   # deactivate ecto logs for test output
   log: false
 

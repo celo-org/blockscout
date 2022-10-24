@@ -7,7 +7,7 @@ import Config
 
 # General application configuration
 config :explorer,
-  ecto_repos: [Explorer.Repo],
+  ecto_repos: [Explorer.Repo.Local],
   coin: System.get_env("COIN") || "CELO",
   coin_name: System.get_env("COIN_NAME") || "CELO",
   coingecko_coin_id: System.get_env("COINGECKO_COIN_ID"),
@@ -250,14 +250,6 @@ config :logger_json, :explorer,
   metadata_filter: [application: :explorer]
 
 config :logger, :explorer, backends: [LoggerJSON]
-
-# config :logger, :explorer,
-#  # keep synced with `config/config.exs`
-#  format: "$dateT$time $metadata[$level] $message\n",
-#  metadata:
-#    ~w(application fetcher request_id first_block_number last_block_number missing_block_range_count missing_block_count
-#       block_number step count error_count shrunk import_id transaction_id)a,
-#  metadata_filter: [application: :explorer]
 
 config :spandex_ecto, SpandexEcto.EctoLogger,
   service: :ecto,
