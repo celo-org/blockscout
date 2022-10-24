@@ -21,8 +21,8 @@ defmodule BlockScoutWeb.API.RPC.EpochView do
         celo: to_string(rewards.total_amount |> Wei.to(:ether)),
         wei: to_string(rewards.total_amount)
       },
-      from: rewards.from |> DateTime.to_iso8601(),
-      to: rewards.to |> DateTime.to_iso8601(),
+      from: to_string(rewards.from),
+      to: to_string(rewards.to),
       rewards: Enum.map(rewards.rewards, &prepare_voter_reward(&1))
     }
   end

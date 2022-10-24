@@ -38,6 +38,44 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
       assert :ok = ExJsonSchema.Validator.validate(schema, response)
     end
 
+    test "with an invalid 'from' param", %{conn: conn} do
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "epoch",
+          "action" => "getvoterrewards",
+          "voterAddress" => "0x0000000000000000000000000000000000000001",
+          "from" => "invalid"
+        })
+        |> json_response(200)
+
+      assert response["message"] =~ "Wrong format for block number provided"
+      assert response["status"] == "0"
+      assert Map.has_key?(response, "result")
+      refute response["result"]
+      schema = generic_rewards_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
+
+    test "with an invalid 'to' param", %{conn: conn} do
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "epoch",
+          "action" => "getvoterrewards",
+          "voterAddress" => "0x0000000000000000000000000000000000000001",
+          "to" => "invalid"
+        })
+        |> json_response(200)
+
+      assert response["message"] =~ "Wrong format for block number provided"
+      assert response["status"] == "0"
+      assert Map.has_key?(response, "result")
+      refute response["result"]
+      schema = generic_rewards_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
+
     test "with an invalid group address hash", %{conn: conn} do
       response =
         conn
@@ -94,6 +132,88 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
       assert :ok = ExJsonSchema.Validator.validate(schema, response)
     end
 
+    test "with provided only 'to' parameter", %{conn: conn} do
+      %Block{hash: block_hash, number: block_number} =
+        insert(
+          :block,
+          number: 17280 * 902,
+          timestamp: ~U[2022-01-05T17:42:43.162804Z]
+        )
+
+      insert(
+        :celo_epoch_rewards,
+        block_number: block_number,
+        block_hash: block_hash
+      )
+
+      expected_result = %{
+        "rewards" => [],
+        "total" => %{
+          "celo" => "0",
+          "wei" => "0"
+        },
+        "from" => "17280",
+        "to" => "#{block_number}"
+      }
+
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "epoch",
+          "action" => "getvoterrewards",
+          "voterAddress" => "0x0000000000000000000000000000000000000002",
+          "to" => "#{block_number + 17279}"
+        })
+        |> json_response(200)
+
+      assert response["result"] == expected_result
+      assert response["status"] == "1"
+      assert response["message"] == "OK"
+      schema = generic_rewards_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
+
+    test "with provided only 'from' parameter", %{conn: conn} do
+      %Block{hash: block_hash, number: block_number} =
+        insert(
+          :block,
+          number: 17280 * 902,
+          timestamp: ~U[2022-01-05T17:42:43.162804Z]
+        )
+
+      insert(
+        :celo_epoch_rewards,
+        block_number: block_number,
+        block_hash: block_hash
+      )
+
+      expected_result = %{
+        "rewards" => [],
+        "total" => %{
+          "celo" => "0",
+          "wei" => "0"
+        },
+        "from" => "123465600",
+        "to" => "#{block_number}"
+      }
+
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "epoch",
+          "action" => "getvoterrewards",
+          "voterAddress" => "0x0000000000000000000000000000000000000002",
+          "from" => "123456789"
+        })
+        |> json_response(200)
+
+      assert response["result"] == expected_result
+      assert response["status"] == "1"
+      assert response["message"] == "OK"
+      schema = generic_rewards_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
+
     test "with an address that doesn't exist, but there is valid data for other address", %{conn: conn} do
       # Make sure that there's data available for other address
       %Address{hash: voter_hash} = insert(:address)
@@ -123,14 +243,20 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         block_hash: block_hash
       )
 
+      insert(
+        :celo_epoch_rewards,
+        block_number: block_number,
+        block_hash: block_hash
+      )
+
       expected_result = %{
         "rewards" => [],
         "total" => %{
           "celo" => "0",
           "wei" => "0"
         },
-        "from" => "2022-01-03T00:00:00.000000Z",
-        "to" => "2022-01-06T00:00:00.000000Z"
+        "from" => "17280",
+        "to" => "#{block_number}"
       }
 
       response =
@@ -138,9 +264,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         |> get("/api", %{
           "module" => "epoch",
           "action" => "getvoterrewards",
-          "voterAddress" => "0x0000000000000000000000000000000000000002",
-          "from" => "2022-01-03T00:00:00.000000Z",
-          "to" => "2022-01-06T00:00:00.000000Z"
+          "voterAddress" => "0x0000000000000000000000000000000000000002"
         })
         |> json_response(200)
 
@@ -450,8 +574,8 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "celo" => to_string(Wei.to(total_rewards, :ether)),
           "wei" => to_string(total_rewards)
         },
-        "from" => "2022-01-01T00:00:00.000000Z",
-        "to" => "2022-01-02T23:59:00.000000Z"
+        "from" => "#{block_1.number}",
+        "to" => "#{block_2.number}"
       }
 
       response_first_page =
@@ -461,8 +585,8 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "action" => "getvoterrewards",
           "voterAddress" => to_string(voter_2_hash),
           "page_size" => "3",
-          "from" => "2022-01-01T00:00:00.000000Z",
-          "to" => "2022-01-02T23:59:00.000000Z"
+          "from" => "#{block_1.number - 1}",
+          "to" => "#{block_2.number + 1}"
         })
         |> json_response(200)
 
@@ -482,8 +606,8 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "celo" => to_string(Wei.to(total_rewards, :ether)),
           "wei" => to_string(total_rewards)
         },
-        "from" => "2022-01-01T00:00:00.000000Z",
-        "to" => "2022-01-02T23:59:00.000000Z"
+        "from" => "#{block_1.number}",
+        "to" => "#{block_2.number}"
       }
 
       response_second_page =
@@ -494,8 +618,8 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "voterAddress" => to_string(voter_2_hash),
           "page_size" => "3",
           "items_count" => "3",
-          "from" => "2022-01-01T00:00:00.000000Z",
-          "to" => "2022-01-02T23:59:00.000000Z"
+          "from" => "#{block_1.number - 1}",
+          "to" => "#{block_2.number + 1}"
         })
         |> json_response(200)
 
@@ -520,8 +644,8 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "celo" => to_string(Wei.to(total_rewards_single_group_multiple_voters, :ether)),
           "wei" => to_string(total_rewards_single_group_multiple_voters)
         },
-        "from" => "2022-01-03T00:00:00.000000Z",
-        "to" => "2022-01-04T00:00:00.000000Z"
+        "from" => "#{block_3.number}",
+        "to" => "#{block_3.number}"
       }
 
       response_single_group_multiple_voters =
@@ -531,8 +655,8 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "action" => "getvoterrewards",
           "voterAddress" => "#{to_string(voter_2_hash)},#{to_string(voter_1_hash)}",
           "groupAddress" => to_string(group_2_hash),
-          "from" => "2022-01-03T00:00:00.000000Z",
-          "to" => "2022-01-04T00:00:00.000000Z"
+          "from" => "#{block_3.number}",
+          "to" => "#{block_3.number}"
         })
         |> json_response(200)
 

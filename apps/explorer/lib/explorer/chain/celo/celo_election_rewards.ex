@@ -14,7 +14,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
       where: 3
     ]
 
-  alias Explorer.Chain.{Block, CeloAccount, CeloAccountEpoch, Hash, Wei}
+  alias Explorer.Chain.{Block, CeloAccount, CeloAccountEpoch, CeloEpochRewards, Hash, Wei}
   alias Explorer.Repo
 
   @required_attrs ~w(account_hash amount associated_account_hash block_number block_timestamp block_hash reward_type)a
@@ -173,7 +173,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
           amount: rewards.amount
         },
         order_by: [
-          desc: rewards.block_timestamp,
+          desc: rewards.block_number,
           asc: rewards.reward_type,
           asc: rewards.account_hash,
           asc: rewards.associated_account_hash
@@ -197,7 +197,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
     query_with_account_hashes
   end
 
-  def base_sum_rewards_address_query(account_hash_list, reward_type_list) do
+  def base_sum_rewards_api_address_query(account_hash_list, reward_type_list) do
     from(rewards in __MODULE__,
       select: %{
         amount: fragment("COALESCE(SUM(?), 0)", rewards.amount)
@@ -244,16 +244,23 @@ defmodule Explorer.Chain.CeloElectionRewards do
         get_epoch_rewards(
           account_hash_list,
           reward_type_list,
-          ~U[2020-04-22 16:00:00.000000Z],
-          DateTime.utc_now(),
+          17_280,
+          CeloEpochRewards.get_last_epoch_block_number(),
           pagination_params
         )
 
   def get_epoch_rewards(account_hash_list, reward_type_list, from, to, pagination_params) when from == nil,
-    do: get_epoch_rewards(account_hash_list, reward_type_list, ~U[2020-04-22 16:00:00.000000Z], to, pagination_params)
+    do: get_epoch_rewards(account_hash_list, reward_type_list, 17_280, to, pagination_params)
 
   def get_epoch_rewards(account_hash_list, reward_type_list, from, to, pagination_params) when to == nil,
-    do: get_epoch_rewards(account_hash_list, reward_type_list, from, DateTime.utc_now(), pagination_params)
+    do:
+      get_epoch_rewards(
+        account_hash_list,
+        reward_type_list,
+        from,
+        CeloEpochRewards.get_last_epoch_block_number(),
+        pagination_params
+      )
 
   def get_epoch_rewards(
         account_hash_list,
@@ -265,17 +272,17 @@ defmodule Explorer.Chain.CeloElectionRewards do
     {items_count, page_size} = extract_pagination_params(pagination_params)
 
     query = base_api_address_query(account_hash_list, ["voter"])
-    sum_query = base_sum_rewards_address_query(account_hash_list, ["voter"])
+    sum_query = base_sum_rewards_api_address_query(account_hash_list, ["voter"])
 
     rewards =
       query
-      |> timestamp_query(from, to)
+      |> block_number_query(from, to)
       |> group_address_hash_query(group_hash_list)
       |> limit(^page_size)
       |> offset(^items_count)
       |> Repo.all()
 
-    sum_rewards = sum_query |> timestamp_query(from, to) |> group_address_hash_query(group_hash_list) |> Repo.one()
+    sum_rewards = sum_query |> block_number_query(from, to) |> group_address_hash_query(group_hash_list) |> Repo.one()
 
     {:ok, total_amount} = Wei.cast(sum_rewards.amount)
 
@@ -287,8 +294,10 @@ defmodule Explorer.Chain.CeloElectionRewards do
     }
   end
 
-  defp timestamp_query(query, from, to) do
-    query |> where([rewards], fragment("? BETWEEN ? AND ?", rewards.block_timestamp, ^from, ^to))
+  defp block_number_query(query, from, to) do
+    query
+    |> where([rewards], rewards.block_number >= ^from)
+    |> where([rewards], rewards.block_number <= ^to)
   end
 
   defp group_address_hash_query(query, []), do: query

@@ -9,8 +9,8 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
          {:group_address_param, group_address_param} <- get_address(params, "groupAddress"),
          {:voter_format, {:ok, voter_hash_list}} <- to_address_hash_list(voter_address_param, :voter_format),
          {:group_format, {:ok, group_hash_list}} <- to_address_hash_list(group_address_param, :group_format),
-         {:date_param, {:ok, from, _}} <- fetch_date(params["from"]),
-         {:date_param, {:ok, to, _}} <- fetch_date(params["to"]),
+         {:block_number_param, {:ok, from}} <- fetch_block_number(params["from"], :up),
+         {:block_number_param, {:ok, to}} <- fetch_block_number(params["to"], :down),
          rewards <- CeloElectionRewards.get_epoch_rewards(voter_hash_list, group_hash_list, from, to, params) do
       render(conn, :getvoterrewards, rewards: rewards)
     else
@@ -23,8 +23,8 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
       {:group_format, :error} ->
         render(conn, :error, error: "One or more group addresses are invalid")
 
-      {:date_param, {:error, _}} ->
-        render(conn, :error, error: "Please only ISO 8601 formatted dates")
+      {:block_number_param, :error} ->
+        render(conn, :error, error: "Wrong format for block number provided")
     end
   end
 
@@ -67,10 +67,16 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
     |> Enum.map(&String.trim/1)
   end
 
-  defp fetch_date(date) do
-    case date do
-      nil -> {:date_param, {:ok, nil, nil}}
-      date -> {:date_param, DateTime.from_iso8601(date)}
-    end
+  defp fetch_block_number(nil, _), do: {:block_number_param, {:ok, nil}}
+
+  defp fetch_block_number(block_number, rounding) do
+    {:block_number_param,
+     case Integer.parse(block_number) do
+       {int, ""} -> {:ok, int |> round_to_closest_epoch_number(rounding)}
+       _ -> :error
+     end}
   end
+
+  defp round_to_closest_epoch_number(block_number, :up), do: ceil(block_number / 17_280) * 17_280
+  defp round_to_closest_epoch_number(block_number, :down), do: floor(block_number / 17_280) * 17_280
 end
