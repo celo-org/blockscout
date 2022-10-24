@@ -64,6 +64,8 @@ defmodule Explorer.GenericPagingOptions do
     end
   end
 
+  defp extract_page_number(_, _), do: 1
+
   defp extract_page_number(%{"page_number" => page_number}) when is_bitstring(page_number) do
     case Integer.parse(page_number) do
       {page_number, _} -> if page_number < 1, do: 1, else: page_number
@@ -72,8 +74,6 @@ defmodule Explorer.GenericPagingOptions do
   end
 
   defp extract_page_number(_), do: 1
-
-  defp extract_page_number(_, _), do: 1
 
   defp extract_order_field(%{"order_field" => order_field}, allowed_order_fields) when is_list(allowed_order_fields),
     do: if(Enum.member?(allowed_order_fields, order_field), do: order_field, else: Enum.at(allowed_order_fields, 0))
