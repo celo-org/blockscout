@@ -3844,6 +3844,16 @@ defmodule BlockScoutWeb.Etherscan do
         placeholder: "toBlockNumber",
         type: "string",
         description: "The previous epoch block after the provided one. Defaults to currently last epoch block."
+      },
+      %{
+        key: "page_number",
+        type: "integer",
+        description: "A nonnegative integer that represents the page number to be used for pagination."
+      },
+      %{
+        key: "page_size",
+        type: "integer",
+        description: "A nonnegative integer that represents the maximum number of records to return when paginating."
       }
     ],
     responses: [

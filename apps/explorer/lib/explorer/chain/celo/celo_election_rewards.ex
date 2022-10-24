@@ -15,7 +15,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
     ]
 
   alias Explorer.Chain.{Block, CeloAccount, CeloAccountEpoch, CeloEpochRewards, Hash, Wei}
-  alias Explorer.Repo
+  alias Explorer.{GenericPagingOptions, Repo}
 
   @required_attrs ~w(account_hash amount associated_account_hash block_number block_timestamp block_hash reward_type)a
 
@@ -238,7 +238,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
     }
   end
 
-  def get_epoch_rewards(account_hash_list, reward_type_list, from, to, pagination_params)
+  def get_epoch_rewards(account_hash_list, reward_type_list, from, to, page_number, page_size)
       when from == nil and to == nil,
       do:
         get_epoch_rewards(
@@ -246,20 +246,22 @@ defmodule Explorer.Chain.CeloElectionRewards do
           reward_type_list,
           17_280,
           CeloEpochRewards.get_last_epoch_block_number(),
-          pagination_params
+          page_number,
+          page_size
         )
 
-  def get_epoch_rewards(account_hash_list, reward_type_list, from, to, pagination_params) when from == nil,
-    do: get_epoch_rewards(account_hash_list, reward_type_list, 17_280, to, pagination_params)
+  def get_epoch_rewards(account_hash_list, reward_type_list, from, to, page_number, page_size) when from == nil,
+    do: get_epoch_rewards(account_hash_list, reward_type_list, 17_280, to, page_number, page_size)
 
-  def get_epoch_rewards(account_hash_list, reward_type_list, from, to, pagination_params) when to == nil,
+  def get_epoch_rewards(account_hash_list, reward_type_list, from, to, page_number, page_size) when to == nil,
     do:
       get_epoch_rewards(
         account_hash_list,
         reward_type_list,
         from,
         CeloEpochRewards.get_last_epoch_block_number(),
-        pagination_params
+        page_number,
+        page_size
       )
 
   def get_epoch_rewards(
@@ -267,19 +269,19 @@ defmodule Explorer.Chain.CeloElectionRewards do
         group_hash_list,
         from,
         to,
-        pagination_params
+        page_number,
+        page_size
       ) do
-    {items_count, page_size} = extract_pagination_params(pagination_params)
-
     query = base_api_address_query(account_hash_list, ["voter"])
     sum_query = base_sum_rewards_api_address_query(account_hash_list, ["voter"])
+    offset = (page_number - 1) * page_size
 
     rewards =
       query
       |> block_number_query(from, to)
       |> group_address_hash_query(group_hash_list)
+      |> offset(^offset)
       |> limit(^page_size)
-      |> offset(^items_count)
       |> Repo.all()
 
     sum_rewards = sum_query |> block_number_query(from, to) |> group_address_hash_query(group_hash_list) |> Repo.one()

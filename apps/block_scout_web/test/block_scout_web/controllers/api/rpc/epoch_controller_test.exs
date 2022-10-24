@@ -616,8 +616,8 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "module" => "epoch",
           "action" => "getvoterrewards",
           "voterAddress" => to_string(voter_2_hash),
+          "page_number" => "2",
           "page_size" => "3",
-          "items_count" => "3",
           "from" => "#{block_1.number - 1}",
           "to" => "#{block_2.number + 1}"
         })

@@ -1,8 +1,10 @@
 defmodule BlockScoutWeb.API.RPC.EpochController do
   use BlockScoutWeb, :controller
 
-  alias Explorer.Chain
+  alias Explorer.{Chain, GenericPagingOptions}
   alias Explorer.Chain.CeloElectionRewards
+
+  @api_voter_rewards_max_page_size 100
 
   def getvoterrewards(conn, params) do
     with {:voter_address_param, {:ok, voter_address_param}} <- fetch_address(params, "voterAddress"),
@@ -11,7 +13,10 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
          {:group_format, {:ok, group_hash_list}} <- to_address_hash_list(group_address_param, :group_format),
          {:block_number_param, {:ok, from}} <- fetch_block_number(params["from"], :up),
          {:block_number_param, {:ok, to}} <- fetch_block_number(params["to"], :down),
-         rewards <- CeloElectionRewards.get_epoch_rewards(voter_hash_list, group_hash_list, from, to, params) do
+         %{page_size: page_size, page_number: page_number} <-
+           GenericPagingOptions.extract_paging_options_from_params(params, @api_voter_rewards_max_page_size),
+         rewards <-
+           CeloElectionRewards.get_epoch_rewards(voter_hash_list, group_hash_list, from, to, page_number, page_size) do
       render(conn, :getvoterrewards, rewards: rewards)
     else
       {:voter_address_param, :error} ->
