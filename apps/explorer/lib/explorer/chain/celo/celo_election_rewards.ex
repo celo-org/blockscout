@@ -149,7 +149,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
     query |> where_non_zero_reward()
   end
 
-  def base_api_address_query() do
+  def base_api_address_query do
     from(rewards in __MODULE__,
       join: celo_account_epoch in CeloAccountEpoch,
       on:
@@ -180,7 +180,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
     )
   end
 
-  def base_sum_and_count_rewards_api_address_query() do
+  def base_sum_and_count_rewards_api_address_query do
     from(rewards in __MODULE__,
       select: %{
         sum: fragment("COALESCE(SUM(?), 0)", rewards.amount),
