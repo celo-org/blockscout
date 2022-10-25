@@ -17,10 +17,7 @@ defmodule BlockScoutWeb.API.RPC.EpochView do
 
   defp prepare_voter_rewards(rewards) do
     %{
-      totalAmount: %{
-        celo: to_string(rewards.total_amount |> Wei.to(:ether)),
-        wei: to_string(rewards.total_amount)
-      },
+      totalAmount: rewards.total_amount |> to_celo_wei_amount,
       totalCount: to_string(rewards.total_count),
       from: to_string(rewards.from),
       to: to_string(rewards.to),
@@ -37,20 +34,17 @@ defmodule BlockScoutWeb.API.RPC.EpochView do
       blockNumber: to_string(reward.block_number),
       epochNumber: to_string(reward.epoch_number),
       voterAddress: to_string(reward.voter_address_hash),
-      voterLockedGold: %{
-        celo: to_string(voter_locked_gold_wei |> Wei.to(:ether)),
-        wei: to_string(voter_locked_gold_wei)
-      },
-      voterActivatedGold: %{
-        celo: to_string(voter_activated_gold_wei |> Wei.to(:ether)),
-        wei: to_string(voter_activated_gold_wei)
-      },
+      voterLockedGold: voter_locked_gold_wei |> to_celo_wei_amount,
+      voterActivatedGold: voter_activated_gold_wei |> to_celo_wei_amount,
       groupAddress: to_string(reward.group_address_hash),
       date: reward.date |> DateTime.to_iso8601(),
-      amount: %{
-        celo: to_string(reward.amount |> Wei.to(:ether)),
-        wei: to_string(reward.amount)
-      }
+      amount: reward.amount |> to_celo_wei_amount
     }
   end
+
+  defp to_celo_wei_amount(wei),
+    do: %{
+      celo: to_string(wei |> Wei.to(:ether)),
+      wei: to_string(wei)
+    }
 end
