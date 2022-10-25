@@ -230,22 +230,21 @@ defmodule Explorer.Chain.CeloElectionRewards do
     }
   end
 
-  def get_epoch_rewards(account_hash_list, reward_type_list, from, to, page_number, page_size)
-      when from == nil and to == nil,
-      do:
-        get_epoch_rewards(
-          account_hash_list,
-          reward_type_list,
-          17_280,
-          CeloEpochRewards.get_last_epoch_block_number(),
-          page_number,
-          page_size
-        )
+  def get_epoch_rewards(account_hash_list, reward_type_list, nil = _from, nil = _to, page_number, page_size),
+    do:
+      get_epoch_rewards(
+        account_hash_list,
+        reward_type_list,
+        17_280,
+        CeloEpochRewards.get_last_epoch_block_number(),
+        page_number,
+        page_size
+      )
 
-  def get_epoch_rewards(account_hash_list, reward_type_list, from, to, page_number, page_size) when from == nil,
+  def get_epoch_rewards(account_hash_list, reward_type_list, nil = _from, to, page_number, page_size),
     do: get_epoch_rewards(account_hash_list, reward_type_list, 17_280, to, page_number, page_size)
 
-  def get_epoch_rewards(account_hash_list, reward_type_list, from, to, page_number, page_size) when to == nil,
+  def get_epoch_rewards(account_hash_list, reward_type_list, from, nil = _to, page_number, page_size),
     do:
       get_epoch_rewards(
         account_hash_list,
