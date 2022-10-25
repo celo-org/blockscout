@@ -1,5 +1,5 @@
 defmodule Explorer.Repo.Migrations.AddBlockHashToCeloEpochRewards do
-  @doc """
+  @moduledoc """
   This migration adds block_hash column to celo_election_rewards which allows to avoid expensive join with blocks table
   """
   use Ecto.Migration
