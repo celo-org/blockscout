@@ -17,10 +17,11 @@ defmodule BlockScoutWeb.API.RPC.EpochView do
 
   defp prepare_voter_rewards(rewards) do
     %{
-      total: %{
+      totalAmount: %{
         celo: to_string(rewards.total_amount |> Wei.to(:ether)),
         wei: to_string(rewards.total_amount)
       },
+      totalCount: to_string(rewards.total_count),
       from: to_string(rewards.from),
       to: to_string(rewards.to),
       rewards: Enum.map(rewards.rewards, &prepare_voter_reward(&1))

@@ -149,63 +149,55 @@ defmodule Explorer.Chain.CeloElectionRewards do
     query |> where_non_zero_reward()
   end
 
-  def base_api_address_query(account_hash_list, reward_type_list) do
-    query =
-      from(rewards in __MODULE__,
-        join: celo_account_epoch in CeloAccountEpoch,
-        on:
-          rewards.account_hash == celo_account_epoch.account_hash and
-            celo_account_epoch.block_hash == rewards.block_hash,
-        select: %{
-          block_hash: rewards.block_hash,
-          block_number: rewards.block_number,
-          epoch_number: fragment("? / 17280", rewards.block_number),
-          voter_address_hash: rewards.account_hash,
-          voter_locked_gold: celo_account_epoch.total_locked_gold,
-          voter_activated_gold:
-            fragment(
-              "? - ?",
-              celo_account_epoch.total_locked_gold,
-              celo_account_epoch.nonvoting_locked_gold
-            ),
-          group_address_hash: rewards.associated_account_hash,
-          date: rewards.block_timestamp,
-          amount: rewards.amount
-        },
-        order_by: [
-          desc: rewards.block_number,
-          asc: rewards.reward_type,
-          asc: rewards.account_hash,
-          asc: rewards.associated_account_hash
-        ]
-      )
-
-    query_with_reward_types =
-      if Enum.count(reward_type_list) > 1 do
-        query |> where([rewards], rewards.reward_type in ^reward_type_list)
-      else
-        query |> where([rewards], rewards.reward_type == ^Enum.at(reward_type_list, 0))
-      end
-
-    query_with_account_hashes =
-      if Enum.count(account_hash_list) > 1 do
-        query_with_reward_types |> where([rewards], rewards.account_hash in ^account_hash_list)
-      else
-        query_with_reward_types |> where([rewards], rewards.account_hash == ^Enum.at(account_hash_list, 0))
-      end
-
-    query_with_account_hashes
-  end
-
-  def base_sum_rewards_api_address_query(account_hash_list, reward_type_list) do
+  def base_api_address_query() do
     from(rewards in __MODULE__,
+      join: celo_account_epoch in CeloAccountEpoch,
+      on:
+        rewards.account_hash == celo_account_epoch.account_hash and
+          celo_account_epoch.block_hash == rewards.block_hash,
       select: %{
-        amount: fragment("COALESCE(SUM(?), 0)", rewards.amount)
+        block_hash: rewards.block_hash,
+        block_number: rewards.block_number,
+        epoch_number: fragment("? / 17280", rewards.block_number),
+        voter_address_hash: rewards.account_hash,
+        voter_locked_gold: celo_account_epoch.total_locked_gold,
+        voter_activated_gold:
+          fragment(
+            "? - ?",
+            celo_account_epoch.total_locked_gold,
+            celo_account_epoch.nonvoting_locked_gold
+          ),
+        group_address_hash: rewards.associated_account_hash,
+        date: rewards.block_timestamp,
+        amount: rewards.amount
       },
-      where: rewards.account_hash in ^account_hash_list,
-      where: rewards.reward_type in ^reward_type_list
+      order_by: [
+        desc: rewards.block_number,
+        asc: rewards.reward_type,
+        asc: rewards.account_hash,
+        asc: rewards.associated_account_hash
+      ]
     )
   end
+
+  def base_sum_and_count_rewards_api_address_query() do
+    from(rewards in __MODULE__,
+      select: %{
+        sum: fragment("COALESCE(SUM(?), 0)", rewards.amount),
+        count: fragment("COUNT(*)")
+      }
+    )
+  end
+
+  defp account_hash_query(query, [account_hash]), do: query |> where([rewards], rewards.account_hash == ^account_hash)
+
+  defp account_hash_query(query, account_hash_list),
+    do: query |> where([rewards], rewards.account_hash in ^account_hash_list)
+
+  defp reward_type_query(query, [reward_type]), do: query |> where([rewards], rewards.reward_type == ^reward_type)
+
+  defp reward_type_query(query, reward_type_list),
+    do: query |> where([rewards], rewards.reward_type in ^reward_type_list)
 
   def get_rewards(account_hash_list, reward_type_list, from, to) when from == nil and to == nil,
     do: get_rewards(account_hash_list, reward_type_list, ~U[2020-04-22 16:00:00.000000Z], DateTime.utc_now())
@@ -272,25 +264,34 @@ defmodule Explorer.Chain.CeloElectionRewards do
         page_number,
         page_size
       ) do
-    query = base_api_address_query(account_hash_list, ["voter"])
-    sum_query = base_sum_rewards_api_address_query(account_hash_list, ["voter"])
+    query = base_api_address_query()
+    total_query = base_sum_and_count_rewards_api_address_query()
     offset = (page_number - 1) * page_size
 
     rewards =
       query
       |> block_number_query(from, to)
+      |> reward_type_query(["voter"])
+      |> account_hash_query(account_hash_list)
       |> group_address_hash_query(group_hash_list)
       |> offset(^offset)
       |> limit(^page_size)
       |> Repo.all()
 
-    sum_rewards = sum_query |> block_number_query(from, to) |> group_address_hash_query(group_hash_list) |> Repo.one()
+    total =
+      total_query
+      |> block_number_query(from, to)
+      |> reward_type_query(["voter"])
+      |> account_hash_query(account_hash_list)
+      |> group_address_hash_query(group_hash_list)
+      |> Repo.one()
 
-    {:ok, total_amount} = Wei.cast(sum_rewards.amount)
+    {:ok, total_amount} = Wei.cast(total.sum)
 
     %{
       rewards: rewards,
       total_amount: total_amount,
+      total_count: total.count,
       from: from,
       to: to
     }

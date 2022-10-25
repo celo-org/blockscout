@@ -137,7 +137,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         insert(
           :block,
           number: 17280 * 902,
-          timestamp: ~U[2022-01-05T17:42:43.162804Z]
+          timestamp: ~U[2022-10-12T18:53:12.162804Z]
         )
 
       insert(
@@ -148,10 +148,11 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
 
       expected_result = %{
         "rewards" => [],
-        "total" => %{
+        "totalAmount" => %{
           "celo" => "0",
           "wei" => "0"
         },
+        "totalCount" => "0",
         "from" => "17280",
         "to" => "#{block_number}"
       }
@@ -178,7 +179,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         insert(
           :block,
           number: 17280 * 902,
-          timestamp: ~U[2022-01-05T17:42:43.162804Z]
+          timestamp: ~U[2022-10-12T18:53:12.162804Z]
         )
 
       insert(
@@ -189,10 +190,11 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
 
       expected_result = %{
         "rewards" => [],
-        "total" => %{
+        "totalAmount" => %{
           "celo" => "0",
           "wei" => "0"
         },
+        "totalCount" => "0",
         "from" => "123465600",
         "to" => "#{block_number}"
       }
@@ -223,7 +225,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         insert(
           :block,
           number: 17280 * 902,
-          timestamp: ~U[2022-01-05T17:42:43.162804Z]
+          timestamp: ~U[2022-10-12T18:53:12.162804Z]
         )
 
       insert(
@@ -251,10 +253,11 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
 
       expected_result = %{
         "rewards" => [],
-        "total" => %{
+        "totalAmount" => %{
           "celo" => "0",
           "wei" => "0"
         },
+        "totalCount" => "0",
         "from" => "17280",
         "to" => "#{block_number}"
       }
@@ -276,7 +279,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
     end
 
     test "with valid voter addresses", %{conn: conn} do
-      wei_per_ether = 1_000_000_000_000_000_000
+      max_reward_base = 1_000_000_000_000_000_000
 
       %Address{hash: voter_1_hash} = insert(:address)
       %Address{hash: voter_2_hash} = insert(:address)
@@ -287,21 +290,21 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         insert(
           :block,
           number: 17280 * 902,
-          timestamp: ~U[2022-01-01T17:42:43.162804Z]
+          timestamp: ~U[2022-10-12T18:53:12.162804Z]
         )
 
       block_2 =
         insert(
           :block,
           number: 17280 * 903,
-          timestamp: ~U[2022-01-02T17:42:43.162804Z]
+          timestamp: ~U[2022-10-13T18:53:12.162804Z]
         )
 
       block_3 =
         insert(
           :block,
           number: 17280 * 904,
-          timestamp: ~U[2022-01-03T17:42:43.162804Z]
+          timestamp: ~U[2022-10-14T18:53:12.162804Z]
         )
 
       insert(
@@ -357,7 +360,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         block_number: block_1.number,
         block_timestamp: block_1.timestamp,
         block_hash: block_1.hash,
-        amount: wei_per_ether * 1,
+        amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 1 * :rand.uniform_real()),
         reward_type: "voter"
       )
 
@@ -368,7 +371,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         block_number: block_2.number,
         block_timestamp: block_2.timestamp,
         block_hash: block_2.hash,
-        amount: wei_per_ether * 2,
+        amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 2 * :rand.uniform_real()),
         reward_type: "voter"
       )
 
@@ -379,7 +382,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         block_number: block_3.number,
         block_timestamp: block_3.timestamp,
         block_hash: block_3.hash,
-        amount: wei_per_ether * 3,
+        amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 3 * :rand.uniform_real()),
         reward_type: "voter"
       )
 
@@ -390,7 +393,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         block_number: block_1.number,
         block_timestamp: block_1.timestamp,
         block_hash: block_1.hash,
-        amount: wei_per_ether * 4,
+        amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 4 * :rand.uniform_real()),
         reward_type: "voter"
       )
 
@@ -401,7 +404,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         block_number: block_2.number,
         block_timestamp: block_2.timestamp,
         block_hash: block_2.hash,
-        amount: wei_per_ether * 5,
+        amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 5 * :rand.uniform_real()),
         reward_type: "voter"
       )
 
@@ -413,7 +416,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           block_number: block_3.number,
           block_timestamp: block_3.timestamp,
           block_hash: block_3.hash,
-          amount: wei_per_ether * 6,
+          amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 6 * :rand.uniform_real()),
           reward_type: "voter"
         )
 
@@ -425,7 +428,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           block_number: block_1.number,
           block_timestamp: block_1.timestamp,
           block_hash: block_1.hash,
-          amount: wei_per_ether * 7,
+          amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 7 * :rand.uniform_real()),
           reward_type: "voter"
         )
 
@@ -437,7 +440,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           block_number: block_2.number,
           block_timestamp: block_2.timestamp,
           block_hash: block_2.hash,
-          amount: wei_per_ether * 8,
+          amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 8 * :rand.uniform_real()),
           reward_type: "voter"
         )
 
@@ -448,7 +451,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         block_number: block_3.number,
         block_timestamp: block_3.timestamp,
         block_hash: block_3.hash,
-        amount: wei_per_ether * 9,
+        amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 9 * :rand.uniform_real()),
         reward_type: "voter"
       )
 
@@ -460,7 +463,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           block_number: block_1.number,
           block_timestamp: block_1.timestamp,
           block_hash: block_1.hash,
-          amount: wei_per_ether * 10,
+          amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 10 * :rand.uniform_real()),
           reward_type: "voter"
         )
 
@@ -472,7 +475,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           block_number: block_2.number,
           block_timestamp: block_2.timestamp,
           block_hash: block_2.hash,
-          amount: wei_per_ether * 11,
+          amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 11 * :rand.uniform_real()),
           reward_type: "voter"
         )
 
@@ -484,7 +487,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           block_number: block_3.number,
           block_timestamp: block_3.timestamp,
           block_hash: block_3.hash,
-          amount: wei_per_ether * 12,
+          amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 12 * :rand.uniform_real()),
           reward_type: "voter"
         )
 
@@ -496,7 +499,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         block_number: block_1.number,
         block_timestamp: block_1.timestamp,
         block_hash: block_1.hash,
-        amount: wei_per_ether * 7,
+        amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 7 * :rand.uniform_real()),
         reward_type: "validator"
       )
 
@@ -507,7 +510,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         block_number: block_2.number,
         block_timestamp: block_2.timestamp,
         block_hash: block_2.hash,
-        amount: wei_per_ether * 8,
+        amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 8 * :rand.uniform_real()),
         reward_type: "validator"
       )
 
@@ -518,7 +521,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         block_number: block_3.number,
         block_timestamp: block_3.timestamp,
         block_hash: block_3.hash,
-        amount: wei_per_ether * 9,
+        amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 9 * :rand.uniform_real()),
         reward_type: "validator"
       )
 
@@ -529,7 +532,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         block_number: block_1.number,
         block_timestamp: block_1.timestamp,
         block_hash: block_1.hash,
-        amount: wei_per_ether * 10,
+        amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 10 * :rand.uniform_real()),
         reward_type: "validator"
       )
 
@@ -540,7 +543,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         block_number: block_2.number,
         block_timestamp: block_2.timestamp,
         block_hash: block_2.hash,
-        amount: wei_per_ether * 11,
+        amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 11 * :rand.uniform_real()),
         reward_type: "validator"
       )
 
@@ -551,7 +554,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         block_number: block_3.number,
         block_timestamp: block_3.timestamp,
         block_hash: block_3.hash,
-        amount: wei_per_ether * 12,
+        amount: round(Enum.random(1_000_000_000_000..max_reward_base) * 12 * :rand.uniform_real()),
         reward_type: "validator"
       )
 
@@ -570,10 +573,11 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
             {block_1, voter_2_hash, group_1_hash, reward_amount_2_1_1, locked_gold_2_1, nonvoting_gold_2_1}
           ]
           |> Enum.map(&map_tuple_to_api_item/1),
-        "total" => %{
+        "totalAmount" => %{
           "celo" => to_string(Wei.to(total_rewards, :ether)),
           "wei" => to_string(total_rewards)
         },
+        "totalCount" => "4",
         "from" => "#{block_1.number}",
         "to" => "#{block_2.number}"
       }
@@ -602,10 +606,11 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
             {block_1, voter_2_hash, group_2_hash, reward_amount_2_2_1, locked_gold_2_1, nonvoting_gold_2_1}
           ]
           |> Enum.map(&map_tuple_to_api_item/1),
-        "total" => %{
+        "totalAmount" => %{
           "celo" => to_string(Wei.to(total_rewards, :ether)),
           "wei" => to_string(total_rewards)
         },
+        "totalCount" => "4",
         "from" => "#{block_1.number}",
         "to" => "#{block_2.number}"
       }
@@ -640,10 +645,11 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
             {block_3, voter_2_hash, group_2_hash, reward_amount_2_2_3, locked_gold_2_3, nonvoting_gold_2_3}
           ]
           |> Enum.map(&map_tuple_to_api_item/1),
-        "total" => %{
+        "totalAmount" => %{
           "celo" => to_string(Wei.to(total_rewards_single_group_multiple_voters, :ether)),
           "wei" => to_string(total_rewards_single_group_multiple_voters)
         },
+        "totalCount" => "2",
         "from" => "#{block_3.number}",
         "to" => "#{block_3.number}"
       }
@@ -668,7 +674,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
     end
   end
 
-  defp map_tuple_to_api_item({block, voter_hash, group_hash, reward_amount, locked_gold, nonvoting_locked_gold}) do
+  defp map_tuple_to_api_item({block, voter_hash, group_hash, reward_amount, locked_gold, nonvoting_locked_gold} = tuple) do
     activated_gold = locked_gold |> Wei.sub(nonvoting_locked_gold)
 
     %{
@@ -693,9 +699,9 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
   defp generic_rewards_schema do
     resolve_schema(%{
       "type" => ["object", "null"],
-      "required" => ["total", "from", "to", "rewards"],
+      "required" => ["totalAmount", "totalCount", "from", "to", "rewards"],
       "properties" => %{
-        "total" => %{
+        "totalAmount" => %{
           "type" => "object",
           "required" => ["celo", "wei"],
           "properties" => %{
@@ -703,6 +709,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
             "wei" => %{"type" => "string"}
           }
         },
+        "totalCount" => %{"type" => "string"},
         "from" => %{"type" => "string"},
         "to" => %{"type" => "string"},
         "rewards" => generic_epoch_rewards_schema()
