@@ -46,15 +46,18 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
   defp to_address_hash_list(nil, key), do: {key, {:ok, []}}
 
   defp to_address_hash_list(address_hashes_string, key) do
-    uncast_hashes = split_address_input_string(address_hashes_string)
+    cast_hashes =
+      address_hashes_string
+      |> split_address_input_string
+      |> Enum.map(fn str ->
+        case Chain.string_to_address_hash(str) do
+          {:ok, hash} -> hash
+          _ -> false
+        end
+      end)
 
-    cast_hashes = Enum.map(uncast_hashes, &Chain.string_to_address_hash/1)
-
-    if Enum.all?(cast_hashes, fn
-         {:ok, _} -> true
-         _ -> false
-       end) do
-      {key, {:ok, Enum.map(cast_hashes, fn {:ok, hash} -> hash end)}}
+    if Enum.all?(cast_hashes) do
+      {key, {:ok, cast_hashes}}
     else
       {key, :error}
     end
