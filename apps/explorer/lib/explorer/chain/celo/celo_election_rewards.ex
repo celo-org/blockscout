@@ -14,7 +14,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
       where: 3
     ]
 
-  alias Explorer.Celo.{EpochUtil}
+  alias Explorer.Celo.EpochUtil
   alias Explorer.Chain.{Block, CeloAccount, CeloAccountEpoch, CeloEpochRewards, Hash, Wei}
   alias Explorer.Repo
 
