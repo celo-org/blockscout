@@ -33,21 +33,9 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
     end
   end
 
-  defp get_address(params, key) when key == "groupAddress" do
-    {:group_address_param, Map.get(params, key)}
-  end
+  defp get_address(params, "groupAddress" = key), do: {:group_address_param, Map.get(params, key)}
 
-  defp fetch_address(params, key) when key == "voterAddress" do
-    {:voter_address_param, Map.fetch(params, key)}
-  end
-
-  defp fetch_address(params, key) when key == "groupAddress" do
-    {:group_address_param, Map.fetch(params, key)}
-  end
-
-  defp fetch_address(params, key) when key == "validatorAddress" do
-    {:validator_address_param, Map.fetch(params, key)}
-  end
+  defp fetch_address(params, "voterAddress" = key), do: {:voter_address_param, Map.fetch(params, key)}
 
   defp to_address_hash_list(nil, key), do: {key, {:ok, []}}
 
