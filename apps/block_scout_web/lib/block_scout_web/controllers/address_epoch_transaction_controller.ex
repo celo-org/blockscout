@@ -20,7 +20,15 @@ defmodule BlockScoutWeb.AddressEpochTransactionController do
          {:ok, false} <- AccessHelpers.restricted_access?(address_hash_string, params) do
       paging_options_keyword = paging_options(params)
       %Explorer.PagingOptions{page_size: page_size} = Keyword.get(paging_options_keyword, :paging_options)
+
+      start = :os.system_time(:milli_seconds)
+
       epoch_transactions = get_rewards(address, Map.put(params, "page_size", page_size))
+
+      IO.inspect("===================== QUERY ============================")
+      IO.inspect(:os.system_time(:milli_seconds) - start)
+      IO.inspect("===================== /QUERY ============================")
+
       {epoch_transactions, next_page} = split_list_by_page(epoch_transactions)
 
       next_page_path =
