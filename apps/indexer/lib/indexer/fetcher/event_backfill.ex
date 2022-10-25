@@ -151,6 +151,6 @@ defmodule Indexer.Fetcher.EventBackfill do
 
     # map raw results back into Explorer.Chain.Log structs
     result.rows
-    |> Enum.map(&Repo.load(Log, {result.columns, &1}))
+    |> Enum.map(&Repo.Local.load(Log, {result.columns, &1}))
   end
 end
