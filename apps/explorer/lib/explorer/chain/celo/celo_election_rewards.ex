@@ -14,6 +14,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
       where: 3
     ]
 
+  alias Explorer.Celo.{EpochUtil}
   alias Explorer.Chain.{Block, CeloAccount, CeloAccountEpoch, CeloEpochRewards, Hash, Wei}
   alias Explorer.Repo
 
@@ -267,9 +268,12 @@ defmodule Explorer.Chain.CeloElectionRewards do
     total_query = base_sum_and_count_rewards_api_address_query()
     offset = (page_number - 1) * page_size
 
+    from_block_number_rounded = from |> EpochUtil.round_to_closest_epoch_block_number(:up)
+    to_block_number_rounded = to |> EpochUtil.round_to_closest_epoch_block_number(:down)
+
     rewards =
       query
-      |> block_number_query(from, to)
+      |> block_number_query(from_block_number_rounded, to_block_number_rounded)
       |> reward_type_query(["voter"])
       |> account_hash_query(account_hash_list)
       |> group_address_hash_query(group_hash_list)
@@ -279,7 +283,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
 
     total =
       total_query
-      |> block_number_query(from, to)
+      |> block_number_query(from_block_number_rounded, to_block_number_rounded)
       |> reward_type_query(["voter"])
       |> account_hash_query(account_hash_list)
       |> group_address_hash_query(group_hash_list)

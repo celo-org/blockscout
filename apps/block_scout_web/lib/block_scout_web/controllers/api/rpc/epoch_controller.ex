@@ -11,8 +11,8 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
          {:group_address_param, group_address_param} <- get_address(params, "groupAddress"),
          {:voter_format, {:ok, voter_hash_list}} <- to_address_hash_list(voter_address_param, :voter_format),
          {:group_format, {:ok, group_hash_list}} <- to_address_hash_list(group_address_param, :group_format),
-         {:block_number_param, {:ok, from}} <- fetch_block_number(params["from"], :up),
-         {:block_number_param, {:ok, to}} <- fetch_block_number(params["to"], :down),
+         {:block_number_param, {:ok, from}} <- fetch_block_number(params["from"]),
+         {:block_number_param, {:ok, to}} <- fetch_block_number(params["to"]),
          %{page_size: page_size, page_number: page_number} <-
            GenericPagingOptions.extract_paging_options_from_params(params, @api_voter_rewards_max_page_size),
          rewards <-
@@ -30,6 +30,12 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
 
       {:block_number_param, :error} ->
         render(conn, :error, error: "Wrong format for block number provided")
+
+      {:block_number_param, {:error, :invalid_format}} ->
+        render(conn, :error, error: "Wrong format for block number provided")
+
+      {:block_number_param, {:error, :invalid_number}} ->
+        render(conn, :error, error: "Block number must be greater than 0")
     end
   end
 
@@ -60,16 +66,14 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
     |> Enum.map(&String.trim/1)
   end
 
-  defp fetch_block_number(nil, _), do: {:block_number_param, {:ok, nil}}
+  defp fetch_block_number(nil), do: {:block_number_param, {:ok, nil}}
 
-  defp fetch_block_number(block_number, rounding) do
+  defp fetch_block_number(block_number) do
     {:block_number_param,
      case Integer.parse(block_number) do
-       {int, ""} -> {:ok, int |> round_to_closest_epoch_number(rounding)}
-       _ -> :error
+       {int, ""} when int < 1 -> {:error, :invalid_number}
+       {int, ""} -> {:ok, int}
+       _ -> {:error, :invalid_format}
      end}
   end
-
-  defp round_to_closest_epoch_number(block_number, :up), do: ceil(block_number / 17_280) * 17_280
-  defp round_to_closest_epoch_number(block_number, :down), do: floor(block_number / 17_280) * 17_280
 end

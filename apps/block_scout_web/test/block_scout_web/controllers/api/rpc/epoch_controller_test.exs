@@ -76,6 +76,44 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
       assert :ok = ExJsonSchema.Validator.validate(schema, response)
     end
 
+    test "with a <1 'from' param", %{conn: conn} do
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "epoch",
+          "action" => "getvoterrewards",
+          "voterAddress" => "0x0000000000000000000000000000000000000001",
+          "from" => "-1"
+        })
+        |> json_response(200)
+
+      assert response["message"] =~ "Block number must be greater than 0"
+      assert response["status"] == "0"
+      assert Map.has_key?(response, "result")
+      refute response["result"]
+      schema = generic_rewards_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
+
+    test "with a <1 'to' param", %{conn: conn} do
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "epoch",
+          "action" => "getvoterrewards",
+          "voterAddress" => "0x0000000000000000000000000000000000000001",
+          "to" => "0"
+        })
+        |> json_response(200)
+
+      assert response["message"] =~ "Block number must be greater than 0"
+      assert response["status"] == "0"
+      assert Map.has_key?(response, "result")
+      refute response["result"]
+      schema = generic_rewards_schema()
+      assert :ok = ExJsonSchema.Validator.validate(schema, response)
+    end
+
     test "with an invalid group address hash", %{conn: conn} do
       response =
         conn
@@ -154,7 +192,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         },
         "totalCount" => "0",
         "from" => "17280",
-        "to" => "#{block_number}"
+        "to" => "#{block_number + 17279}"
       }
 
       response =
@@ -195,7 +233,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "wei" => "0"
         },
         "totalCount" => "0",
-        "from" => "123465600",
+        "from" => "123456789",
         "to" => "#{block_number}"
       }
 
@@ -578,8 +616,8 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "wei" => to_string(total_rewards)
         },
         "totalCount" => "4",
-        "from" => "#{block_1.number}",
-        "to" => "#{block_2.number}"
+        "from" => "#{block_1.number - 1}",
+        "to" => "#{block_2.number + 1}"
       }
 
       response_first_page =
@@ -611,8 +649,8 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "wei" => to_string(total_rewards)
         },
         "totalCount" => "4",
-        "from" => "#{block_1.number}",
-        "to" => "#{block_2.number}"
+        "from" => "#{block_1.number - 1}",
+        "to" => "#{block_2.number + 1}"
       }
 
       response_second_page =
@@ -674,7 +712,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
     end
   end
 
-  defp map_tuple_to_api_item({block, voter_hash, group_hash, reward_amount, locked_gold, nonvoting_locked_gold} = tuple) do
+  defp map_tuple_to_api_item({block, voter_hash, group_hash, reward_amount, locked_gold, nonvoting_locked_gold}) do
     activated_gold = locked_gold |> Wei.sub(nonvoting_locked_gold)
 
     %{
