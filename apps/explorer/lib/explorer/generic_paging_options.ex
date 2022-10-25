@@ -41,12 +41,11 @@ defmodule Explorer.GenericPagingOptions do
 
   defp extract_page_size(%{"page_size" => page_size}, max_page_size) when is_bitstring(page_size) do
     case Integer.parse(page_size) do
+      {page_size, _} when page_size > max_page_size or page_size < 1 ->
+        max_page_size
+
       {page_size, _} ->
-        if page_size > max_page_size or page_size < 1 do
-          max_page_size
-        else
-          page_size
-        end
+        page_size
 
       :error ->
         max_page_size
@@ -59,10 +58,11 @@ defmodule Explorer.GenericPagingOptions do
 
   defp extract_page_number(%{"page_number" => page_number}, total_page_count) when is_bitstring(page_number) do
     case Integer.parse(page_number) do
+      {page_number, _} when page_number > total_page_count ->
+        min(total_page_count, page_number)
+
       {page_number, _} ->
-        if page_number > total_page_count,
-          do: min(total_page_count, page_number),
-          else: page_number |> filter_non_negative_page_number
+        page_number |> filter_non_negative_page_number
 
       :error ->
         1
