@@ -143,6 +143,27 @@ defmodule Explorer.GenericPagingOptionsTest do
                )
     end
 
+    test "does not allow to provide negative page number or page size" do
+      assert %{
+               order_dir: "desc",
+               order_field: "txns",
+               page_number: 1,
+               page_size: 10
+             } ==
+               GenericPagingOptions.extract_paging_options_from_params(
+                 %{
+                   "page_number" => "-2",
+                   "page_size" => "-1"
+                 },
+                 101,
+                 ["txns", "name", "date"],
+                 "desc",
+                 10
+               )
+    end
+  end
+
+  describe "extract_paging_options_from_params/2" do
     test "does not allow to exceed default page size" do
       assert %{
                order_dir: nil,

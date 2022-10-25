@@ -59,8 +59,13 @@ defmodule Explorer.GenericPagingOptions do
 
   defp extract_page_number(%{"page_number" => page_number}, total_page_count) when is_bitstring(page_number) do
     case Integer.parse(page_number) do
-      {page_number, _} -> if page_number > total_page_count, do: min(total_page_count, page_number), else: page_number
-      :error -> 1
+      {page_number, _} ->
+        if page_number > total_page_count,
+          do: min(total_page_count, page_number),
+          else: page_number |> filter_non_negative_page_number
+
+      :error ->
+        1
     end
   end
 
@@ -68,7 +73,7 @@ defmodule Explorer.GenericPagingOptions do
 
   defp extract_page_number(%{"page_number" => page_number}) when is_bitstring(page_number) do
     case Integer.parse(page_number) do
-      {page_number, _} -> if page_number < 1, do: 1, else: page_number
+      {page_number, _} -> page_number |> filter_non_negative_page_number
       :error -> 1
     end
   end
@@ -83,4 +88,7 @@ defmodule Explorer.GenericPagingOptions do
 
   defp extract_order_dir(%{"order_dir" => order_dir}, _) when order_dir == "desc" or order_dir == "asc", do: order_dir
   defp extract_order_dir(_, default_order_dir), do: default_order_dir
+
+  defp filter_non_negative_page_number(page_number) when page_number < 1, do: 1
+  defp filter_non_negative_page_number(page_number), do: page_number
 end
