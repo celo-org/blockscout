@@ -939,7 +939,11 @@ defmodule BlockScoutWeb.Etherscan do
       ],
       "from" => "15586560",
       "to" => "15603840",
-      "total" => %{"celo" => "2.606411279779432352", "wei" => "2606411279779432352"}
+      "totalAmount" => %{
+        "celo" => "2.606411279779432352",
+        "wei" => "2606411279779432352"
+      },
+      "totalCount" => "123"
     }
   }
 
@@ -1761,7 +1765,8 @@ defmodule BlockScoutWeb.Etherscan do
     fields: %{
       from: @block_number_type,
       to: @block_number_type,
-      total: @celo_and_wei_amount_type,
+      totalAmount: @celo_and_wei_amount_type,
+      totalCount: %{type: "string"},
       rewards: @epoch_voter_rewards
     }
   }
@@ -3847,11 +3852,13 @@ defmodule BlockScoutWeb.Etherscan do
       },
       %{
         key: "page_number",
+        placeholder: "pageNumber",
         type: "integer",
         description: "A nonnegative integer that represents the page number to be used for pagination."
       },
       %{
         key: "page_size",
+        placeholder: "pageSize",
         type: "integer",
         description: "A nonnegative integer that represents the maximum number of records to return when paginating."
       }
