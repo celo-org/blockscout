@@ -1,19 +1,13 @@
-# credo:disable-for-this-file
 defmodule Explorer.Celo.Metrics.BlockchainMetrics do
   @moduledoc "A context to collect blockchain metric functions"
 
-  alias Ecto.Adapters.SQL
+  alias Explorer.Chain.PendingBlockOperation
   alias Explorer.Repo
+  import Ecto.Query
 
   def pending_blockcount do
-    # todo: use ecto
+    query = from(b in PendingBlockOperation, select: fragment("count(*)"), where: b.fetch_internal_transactions == true)
 
-    {:ok, %{rows: [[block_count]]}} =
-      SQL.query(
-        Repo,
-        "select count(*) from pending_block_operations where fetch_internal_transactions = true"
-      )
-
-    block_count
+    query |> Repo.one()
   end
 end
