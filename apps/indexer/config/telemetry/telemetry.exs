@@ -21,6 +21,24 @@ config :indexer, :telemetry_config, [
     meta: %{
       help: "Number of chain events sent via pubsub"
     }
+  ],
+  [
+    name: [:fly_postgres, :local_exec],
+    type: :summary,
+    label: "indexer_local_db_query",
+    meta: %{
+      metric_labels: [:func],
+      help: "DB queries executed against local db"
+    }
+  ],
+  [
+    name: [:fly_postgres, :remote_exec],
+    type: :summary,
+    label: "indexer_remote_db_query",
+    meta: %{
+      metric_labels: [:func],
+      help: "DB queries rpc'd to primary"
+    }
   ]
 ]
 
