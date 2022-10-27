@@ -221,7 +221,6 @@ defmodule Explorer.Chain.SmartContract do
           implementation_name: String.t() | nil
         }
 
-  @timestamps_opts [type: :utc_datetime_usec]
   schema "smart_contracts" do
     field(:name, :string)
     field(:compiler_version, :string)
@@ -255,7 +254,7 @@ defmodule Explorer.Chain.SmartContract do
       type: Hash.Address
     )
 
-    timestamps()
+    timestamps(type: :utc_datetime_usec)
   end
 
   def preload_decompiled_smart_contract(contract) do

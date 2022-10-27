@@ -185,7 +185,7 @@ history_fetch_interval =
 
 config :explorer, Explorer.History.Process, history_fetch_interval: history_fetch_interval
 
-config :explorer, Explorer.Repo, migration_timestamps: [type: :utc_datetime_usec]
+config :explorer, Explorer.Repo.Local, migration_timestamps: [type: :utc_datetime_usec]
 
 config :explorer, Explorer.Tracer,
   service: :explorer,
