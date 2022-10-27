@@ -1,4 +1,6 @@
 defmodule Explorer.Repo.Local do
+  @moduledoc "Ecto repo for Explorer library"
+
   use Ecto.Repo,
     otp_app: :explorer,
     adapter: Ecto.Adapters.Postgres
@@ -8,8 +10,6 @@ defmodule Explorer.Repo.Local do
   require Logger
 
   alias Explorer.Repo.ConfigHelper
-
-  @env Mix.env()
 
   @doc """
   Dynamically loads the repository url from the
@@ -39,7 +39,7 @@ defmodule Explorer.Repo.Local do
       |> Keyword.put(:url, db_url)
 
 
-    Fly.Postgres.config_repo_url(opts, @env)
+    {:ok, Keyword.put(opts, :url, db_url)}
   end
 
   def get_application_name do
@@ -57,6 +57,8 @@ defmodule Explorer.Repo.Local do
 end
 
 defmodule Explorer.Repo do
+  @moduledoc "RPC wrapper for Explorer library, will forward write operations for execution on indexer pod"
+
   use Fly.Repo, local_repo: Explorer.Repo.Local
   require Logger
 
