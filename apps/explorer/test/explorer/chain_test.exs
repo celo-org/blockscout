@@ -1,5 +1,5 @@
 defmodule Explorer.ChainTest do
-  use Explorer.DataCase
+  use Explorer.DataCase, async: false
   use EthereumJSONRPC.Case
 
   require Ecto.Query
