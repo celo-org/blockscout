@@ -382,7 +382,7 @@ jobs:
     needs: build-and-cache
     services:
       postgres:
-        image: postgres:10-bullseye
+        image: postgres
         env:
           # Match apps/explorer/config/test.exs config :explorer, Explorer.Repo, database
           POSTGRES_DB: explorer_test

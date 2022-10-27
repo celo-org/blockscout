@@ -1,5 +1,5 @@
 defmodule Explorer.ChainTest do
-  use Explorer.DataCase, async: false
+  use Explorer.DataCase
   use EthereumJSONRPC.Case
 
   require Ecto.Query
@@ -4600,7 +4600,7 @@ defmodule Explorer.ChainTest do
 
   describe "address_hash_to_smart_contract/1" do
     test "fetches a smart contract" do
-      smart_contract = insert(:smart_contract, contract_code_md5: "123", inserted_at: Timex.now(), updated_at: Timex.now())
+      smart_contract = insert(:smart_contract, contract_code_md5: "123")
 
       assert ^smart_contract = Chain.address_hash_to_smart_contract(smart_contract.address_hash)
     end
