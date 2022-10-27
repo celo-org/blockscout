@@ -160,15 +160,15 @@ defmodule Explorer.Chain.CeloElectionRewards do
         block_hash: rewards.block_hash,
         block_number: rewards.block_number,
         epoch_number: fragment("? / 17280", rewards.block_number),
-        voter_address_hash: rewards.account_hash,
-        voter_locked_gold: celo_account_epoch.total_locked_gold,
-        voter_activated_gold:
+        account_hash: rewards.account_hash,
+        account_locked_gold: celo_account_epoch.total_locked_gold,
+        account_activated_gold:
           fragment(
             "? - ?",
             celo_account_epoch.total_locked_gold,
             celo_account_epoch.nonvoting_locked_gold
           ),
-        group_address_hash: rewards.associated_account_hash,
+        associated_account_hash: rewards.associated_account_hash,
         date: rewards.block_timestamp,
         amount: rewards.amount
       },
@@ -231,25 +231,35 @@ defmodule Explorer.Chain.CeloElectionRewards do
     }
   end
 
-  def get_epoch_rewards(account_hash_list, reward_type_list, nil = _from, nil = _to, page_number, page_size),
-    do:
-      get_epoch_rewards(
+  def get_epoch_rewards(
         account_hash_list,
         reward_type_list,
-        17_280,
-        CeloEpochRewards.get_last_epoch_block_number(),
+        group_hash_list,
+        nil = _from,
+        nil = _to,
         page_number,
         page_size
-      )
+      ),
+      do:
+        get_epoch_rewards(
+          account_hash_list,
+          reward_type_list,
+          group_hash_list,
+          17_280,
+          CeloEpochRewards.get_last_epoch_block_number(),
+          page_number,
+          page_size
+        )
 
-  def get_epoch_rewards(account_hash_list, reward_type_list, nil = _from, to, page_number, page_size),
-    do: get_epoch_rewards(account_hash_list, reward_type_list, 17_280, to, page_number, page_size)
+  def get_epoch_rewards(account_hash_list, reward_type_list, group_hash_list, nil = _from, to, page_number, page_size),
+    do: get_epoch_rewards(account_hash_list, reward_type_list, group_hash_list, 17_280, to, page_number, page_size)
 
-  def get_epoch_rewards(account_hash_list, reward_type_list, from, nil = _to, page_number, page_size),
+  def get_epoch_rewards(account_hash_list, reward_type_list, group_hash_list, from, nil = _to, page_number, page_size),
     do:
       get_epoch_rewards(
         account_hash_list,
         reward_type_list,
+        group_hash_list,
         from,
         CeloEpochRewards.get_last_epoch_block_number(),
         page_number,
@@ -258,6 +268,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
 
   def get_epoch_rewards(
         account_hash_list,
+        reward_type_list,
         group_hash_list,
         from,
         to,
@@ -274,7 +285,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
     rewards =
       query
       |> block_number_query(from_block_number_rounded, to_block_number_rounded)
-      |> reward_type_query(["voter"])
+      |> reward_type_query(reward_type_list)
       |> account_hash_query(account_hash_list)
       |> group_address_hash_query(group_hash_list)
       |> offset(^offset)
@@ -284,7 +295,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
     total =
       total_query
       |> block_number_query(from_block_number_rounded, to_block_number_rounded)
-      |> reward_type_query(["voter"])
+      |> reward_type_query(reward_type_list)
       |> account_hash_query(account_hash_list)
       |> group_address_hash_query(group_hash_list)
       |> Repo.one()

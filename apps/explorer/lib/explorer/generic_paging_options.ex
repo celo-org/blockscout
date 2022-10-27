@@ -17,13 +17,14 @@ defmodule Explorer.GenericPagingOptions do
         default_order_dir,
         max_page_size
       ) do
-    page_size = extract_page_size(params, max_page_size)
+    uniformed_params = params |> uniform_params
+    page_size = extract_page_size(uniformed_params, max_page_size)
 
     %{
-      order_field: extract_order_field(params, allowed_order_fields),
-      order_dir: extract_order_dir(params, default_order_dir),
+      order_field: extract_order_field(uniformed_params, allowed_order_fields),
+      order_dir: extract_order_dir(uniformed_params, default_order_dir),
       page_size: page_size,
-      page_number: extract_page_number(params, ceil(total_item_count / page_size))
+      page_number: extract_page_number(uniformed_params, ceil(total_item_count / page_size))
     }
   end
 
@@ -31,11 +32,13 @@ defmodule Explorer.GenericPagingOptions do
         params,
         max_page_size
       ) do
+    uniformed_params = params |> uniform_params
+
     %{
       order_field: nil,
       order_dir: nil,
-      page_size: extract_page_size(params, max_page_size),
-      page_number: extract_page_number(params)
+      page_size: extract_page_size(uniformed_params, max_page_size),
+      page_number: extract_page_number(uniformed_params)
     }
   end
 
@@ -91,4 +94,13 @@ defmodule Explorer.GenericPagingOptions do
 
   defp filter_non_negative_page_number(page_number) when page_number < 1, do: 1
   defp filter_non_negative_page_number(page_number), do: page_number
+
+  defp uniform_params(params) do
+    %{
+      "order_field" => Map.get(params, "orderField", Map.get(params, "order_field")),
+      "order_dir" => Map.get(params, "orderDir", Map.get(params, "order_dir")),
+      "page_size" => Map.get(params, "pageSize", Map.get(params, "page_size")),
+      "page_number" => Map.get(params, "pageNumber", Map.get(params, "page_number"))
+    }
+  end
 end
