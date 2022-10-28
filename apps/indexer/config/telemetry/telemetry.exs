@@ -33,7 +33,7 @@ config :indexer, :telemetry_config, [
     }
   ],
   [
-    name: [:fly_postgres, :remote_exec],
+    name: [:fly_postgres, :primary_exec],
     type: :summary,
     metric_id: "indexer_remote_db_query",
     meta: %{
