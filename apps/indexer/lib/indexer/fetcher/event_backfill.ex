@@ -146,7 +146,7 @@ defmodule Indexer.Fetcher.EventBackfill do
     {:ok, result} =
       Telemetry.wrap(
         :backfill_page_fetch,
-        SQL.query(Repo, @backfill_query, [topic, address_bytes, from_block_number, from_log_index, page_size])
+        SQL.query(Repo.Local, @backfill_query, [topic, address_bytes, from_block_number, from_log_index, page_size])
       )
 
     # map raw results back into Explorer.Chain.Log structs

@@ -6,6 +6,7 @@ defmodule Explorer.Celo.Metrics.BlockchainMetrics do
   import Ecto.Query
   alias Ecto.Adapters.SQL
 
+
   def pending_blockcount do
     query = from(b in PendingBlockOperation, select: fragment("count(*)"), where: b.fetch_internal_transactions == true)
 

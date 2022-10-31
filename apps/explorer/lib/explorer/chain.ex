@@ -3707,7 +3707,7 @@ defmodule Explorer.Chain do
         Logger.warn("Couldn't retrieve tx count from celo_transaction_stats - falling back to PG gc estimation")
 
         %Postgrex.Result{rows: [[rows]]} =
-          SQL.query!(Repo, "SELECT reltuples::BIGINT AS estimate FROM pg_class WHERE relname='transactions'")
+          SQL.query!(Repo.Local, "SELECT reltuples::BIGINT AS estimate FROM pg_class WHERE relname='transactions'")
 
         rows
 
@@ -6948,7 +6948,7 @@ defmodule Explorer.Chain do
     # Each competitor can have several claimed accounts.
     # Final final score is the sum of account scores modified with the multiplier that is read from Google sheets
     result =
-      SQL.query(Repo, """
+      SQL.query(Repo.Local, """
         SELECT
           competitors.address,
           COALESCE(( SELECT name FROM celo_account WHERE address =  competitors.address), 'Unknown account'),
