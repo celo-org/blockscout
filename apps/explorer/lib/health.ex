@@ -5,7 +5,6 @@ defmodule Explorer.Health do
 
   alias Explorer.Repo.Local, as: Repo
   alias Ecto.Adapters.SQL
-  alias Explorer.Repo.Local, as: Repo
 
   @doc """
   Check if app is ready

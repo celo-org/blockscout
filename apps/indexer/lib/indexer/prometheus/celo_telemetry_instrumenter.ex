@@ -80,7 +80,7 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
   defp handler_id(event_name), do: "event_handler_id_#{event_name |> Enum.join() |> to_string()}"
 
   ## Handle events
-  def handle_event(_name, measurements, metadata, %{type: :counter, metric_id: metric_id}) do
+  def handle_event(_name, _measurements, _metadata, %{type: :counter, metric_id: metric_id}) do
     Counter.inc(name: metric_id)
   end
 
