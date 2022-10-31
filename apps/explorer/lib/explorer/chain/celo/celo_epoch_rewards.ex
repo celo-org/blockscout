@@ -127,4 +127,7 @@ defmodule Explorer.Chain.CeloEpochRewards do
         0
     end
   end
+
+  def get_last_epoch_block_number,
+    do: Repo.one(from(rewards in __MODULE__, select: fragment("MAX(block_number)")))
 end

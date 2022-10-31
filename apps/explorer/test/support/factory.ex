@@ -20,9 +20,11 @@ defmodule Explorer.Factory do
     Address.CoinBalanceDaily,
     Block,
     CeloAccount,
+    CeloAccountEpoch,
     CeloContractEvent,
     CeloCoreContract,
     CeloElectionRewards,
+    CeloEpochRewards,
     CeloPendingEpochOperation,
     CeloVoterVotes,
     ContractMethod,
@@ -783,6 +785,22 @@ defmodule Explorer.Factory do
     }
   end
 
+  def celo_account_epoch_factory do
+    wei_per_ether = 1_000_000_000_000_000_000
+    random_value = Enum.random(100..10_000)
+    total_locked_gold = wei_per_ether * random_value
+    # Can't be more than total_locked_gold
+    nonvoting_locked_gold = wei_per_ether * Enum.random(1..(random_value - 1))
+
+    %CeloAccountEpoch{
+      account_hash: address_hash(),
+      block_hash: block_hash(),
+      block_number: block_number(),
+      total_locked_gold: round(total_locked_gold * :rand.uniform_real()),
+      nonvoting_locked_gold: round(nonvoting_locked_gold * :rand.uniform_real())
+    }
+  end
+
   def celo_unlocked_factory do
     %CeloUnlocked{
       account_address: address_hash(),
@@ -807,8 +825,17 @@ defmodule Explorer.Factory do
       amount: Decimal.new(1),
       associated_account_hash: address_hash(),
       block_number: block_number(),
+      block_hash: block_hash(),
       block_timestamp: DateTime.utc_now(),
       reward_type: "voter"
+    }
+  end
+
+  def celo_epoch_rewards_factory do
+    %CeloEpochRewards{
+      block_number: block_number(),
+      block_hash: block_hash(),
+      epoch_number: round(block_number() / 17_280)
     }
   end
 
