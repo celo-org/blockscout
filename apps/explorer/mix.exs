@@ -116,7 +116,8 @@ defmodule Explorer.Mixfile do
       {:logger_json, "~> 3.2"},
       {:observer_cli, "~> 1.6"},
       {:phoenix_pubsub, "~> 2.0"},
-      {:fly_postgres, github: "clabs-co/fly_postgres_elixir", ref: "eaa407b9934d610ef96555b517a8434e03f2dfbd"}
+      {:fly_postgres, github: "clabs-co/fly_postgres_elixir", ref: "bb695f2"}
+      #{:fly_postgres, path: "../../../fly_postgres_elixir"}
     ]
   end
 
