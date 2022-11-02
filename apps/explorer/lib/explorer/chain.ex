@@ -4235,9 +4235,9 @@ defmodule Explorer.Chain do
 
     insert_result =
       insert_contract_query_with_additional_sources
-      |> Repo.transaction()
+      |> Repo.Remote.transaction()
 
-    create_address_name(Repo, Changeset.get_field(smart_contract_changeset, :name), address_hash)
+    create_address_name(Repo.Remote, Changeset.get_field(smart_contract_changeset, :name), address_hash)
 
     case insert_result do
       {:ok, %{smart_contract: smart_contract}} ->
