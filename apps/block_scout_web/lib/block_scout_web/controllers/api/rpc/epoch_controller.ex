@@ -5,21 +5,30 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
   alias Explorer.Chain.CeloElectionRewards
 
   @api_voter_rewards_max_page_size 100
+  @api_validator_rewards_max_page_size 100
 
   def getvoterrewards(conn, params) do
-    with {:voter_address_param, {:ok, voter_address_param}} <- fetch_address(params, "voterAddress"),
+    with {:address_param, {:ok, address_param}} <- fetch_address(params, "voterAddress"),
          {:group_address_param, group_address_param} <- get_address(params, "groupAddress"),
-         {:voter_format, {:ok, voter_hash_list}} <- to_address_hash_list(voter_address_param, :voter_format),
+         {:voter_format, {:ok, voter_hash_list}} <- to_address_hash_list(address_param, :voter_format),
          {:group_format, {:ok, group_hash_list}} <- to_address_hash_list(group_address_param, :group_format),
          {:block_number_param, {:ok, from}} <- fetch_block_number(params["from"]),
          {:block_number_param, {:ok, to}} <- fetch_block_number(params["to"]),
          %{page_size: page_size, page_number: page_number} <-
            GenericPagingOptions.extract_paging_options_from_params(params, @api_voter_rewards_max_page_size),
          rewards <-
-           CeloElectionRewards.get_epoch_rewards(voter_hash_list, group_hash_list, from, to, page_number, page_size) do
+           CeloElectionRewards.get_epoch_rewards(
+             voter_hash_list,
+             ["voter"],
+             group_hash_list,
+             from,
+             to,
+             page_number,
+             page_size
+           ) do
       render(conn, :getvoterrewards, rewards: rewards)
     else
-      {:voter_address_param, :error} ->
+      {:address_param, :error} ->
         render(conn, :error, error: "Query parameter 'voterAddress' is required")
 
       {:voter_format, :error} ->
@@ -39,9 +48,50 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
     end
   end
 
+  def getvalidatorrewards(conn, params) do
+    with {:address_param, {:ok, address_param}} <- fetch_address(params, "validatorAddress"),
+         {:group_address_param, group_address_param} <- get_address(params, "groupAddress"),
+         {:validator_format, {:ok, validator_hash_list}} <- to_address_hash_list(address_param, :validator_format),
+         {:group_format, {:ok, group_hash_list}} <- to_address_hash_list(group_address_param, :group_format),
+         {:block_number_param, {:ok, from}} <- fetch_block_number(params["from"]),
+         {:block_number_param, {:ok, to}} <- fetch_block_number(params["to"]),
+         %{page_size: page_size, page_number: page_number} <-
+           GenericPagingOptions.extract_paging_options_from_params(params, @api_validator_rewards_max_page_size),
+         rewards <-
+           CeloElectionRewards.get_epoch_rewards(
+             validator_hash_list,
+             ["validator"],
+             group_hash_list,
+             from,
+             to,
+             page_number,
+             page_size
+           ) do
+      render(conn, :getvalidatorrewards, rewards: rewards)
+    else
+      {:address_param, :error} ->
+        render(conn, :error, error: "Query parameter 'validatorAddress' is required")
+
+      {:validator_format, :error} ->
+        render(conn, :error, error: "One or more validator addresses are invalid")
+
+      {:group_format, :error} ->
+        render(conn, :error, error: "One or more group addresses are invalid")
+
+      {:block_number_param, :error} ->
+        render(conn, :error, error: "Wrong format for block number provided")
+
+      {:block_number_param, {:error, :invalid_format}} ->
+        render(conn, :error, error: "Wrong format for block number provided")
+
+      {:block_number_param, {:error, :invalid_number}} ->
+        render(conn, :error, error: "Block number must be greater than 0")
+    end
+  end
+
   defp get_address(params, "groupAddress" = key), do: {:group_address_param, Map.get(params, key)}
 
-  defp fetch_address(params, "voterAddress" = key), do: {:voter_address_param, Map.fetch(params, key)}
+  defp fetch_address(params, key), do: {:address_param, Map.fetch(params, key)}
 
   defp to_address_hash_list(nil, key), do: {key, {:ok, []}}
 
