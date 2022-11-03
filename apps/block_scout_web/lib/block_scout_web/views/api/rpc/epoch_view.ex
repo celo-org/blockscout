@@ -10,6 +10,11 @@ defmodule BlockScoutWeb.API.RPC.EpochView do
     RPCView.render("show.json", data: prepare_response(json, rewards))
   end
 
+  def render(json, %{epoch: epoch})
+      when json in ~w(getepoch.json) do
+    RPCView.render("show.json", data: prepare_response(json, epoch))
+  end
+
   def render("error.json", assigns) do
     RPCView.render("error.json", assigns)
   end
@@ -22,6 +27,37 @@ defmodule BlockScoutWeb.API.RPC.EpochView do
 
   def prepare_response("getgrouprewards.json", rewards),
     do: rewards |> wrap_rewards([{"validatorAddress", :associated_account_hash}], :cusd)
+
+  def prepare_response("getepoch.json", nil),
+    do: nil
+
+  def prepare_response("getepoch.json", epoch),
+    do: %{
+      "blockNumber" => to_string(epoch.block_number),
+      "blockHash" => to_string(epoch.block_hash),
+      "validatorTargetEpochRewards" => to_string(epoch.validator_target_epoch_rewards),
+      "voterTargetEpochRewards" => to_string(epoch.voter_target_epoch_rewards),
+      "communityTargetEpochRewards" => to_string(epoch.community_target_epoch_rewards),
+      "carbonOffsettingTargetEpochRewards" => to_string(epoch.carbon_offsetting_target_epoch_rewards),
+      "targetTotalSupply" => to_string(epoch.target_total_supply),
+      "rewardsMultiplier" => to_string(epoch.rewards_multiplier),
+      "rewardsMultiplierMax" => to_string(epoch.rewards_multiplier_max),
+      "rewardsMultiplierUnder" => to_string(epoch.rewards_multiplier_under),
+      "rewardsMultiplierOver" => to_string(epoch.rewards_multiplier_over),
+      "targetVotingYield" => to_string(epoch.target_voting_yield),
+      "targetVotingYieldMax" => to_string(epoch.target_voting_yield_max),
+      "targetVotingYieldAdjustmentFactor" => to_string(epoch.target_voting_yield_adjustment_factor),
+      "targetVotingFraction" => to_string(epoch.target_voting_fraction),
+      "votingFraction" => to_string(epoch.voting_fraction),
+      "totalLockedGold" => to_string(epoch.total_locked_gold),
+      "totalNonVoting" => to_string(epoch.total_non_voting),
+      "totalVotes" => to_string(epoch.total_votes),
+      "electableValidatorsMax" => to_string(epoch.electable_validators_max),
+      "reserveGoldBalance" => to_string(epoch.reserve_gold_balance),
+      "goldTotalSupply" => to_string(epoch.gold_total_supply),
+      "stableUsdTotalSupply" => to_string(epoch.stable_usd_total_supply),
+      "reserveBolster" => to_string(epoch.reserve_bolster)
+    }
 
   def wrap_rewards(rewards, meta, currency) do
     %{
