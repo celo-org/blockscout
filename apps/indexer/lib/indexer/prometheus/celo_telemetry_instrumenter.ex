@@ -80,14 +80,14 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
   defp handler_id(event_name), do: "event_handler_id_#{event_name |> Enum.join() |> to_string()}"
 
   ## Handle events
-  def handle_event(_name, _measurements, _metadata, %{type: :counter, metric_id: metric_id}) do
+  def handle_event(_handler_id, _measurements, _metadata, %{type: :counter, metric_id: metric_id}) do
     Counter.inc(name: metric_id)
   end
 
-  def handle_event(_name, measurements, _metadata, %{type: :histogram, metric_id: metric_id} = meta)
+  def handle_event(_handler_id, measurements, event_metadata, %{type: :histogram, metric_id: metric_id} = def_meta)
       when is_map(measurements) do
     measurements
-    |> process_measurements(meta)
+    |> process_measurements(def_meta, event_metadata)
     |> Enum.each(fn {name, value} ->
       Histogram.observe(
         [name: metric_id, labels: [name]],
@@ -96,10 +96,10 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
     end)
   end
 
-  def handle_event(_name, measurements, _metadata, %{type: :summary, metric_id: metric_id} = meta)
+  def handle_event(_handler_id, measurements, event_metadata, %{type: :summary, metric_id: metric_id} = def_meta)
       when is_map(measurements) do
     measurements
-    |> process_measurements(meta)
+    |> process_measurements(def_meta, event_metadata)
     |> Enum.each(fn {name, value} ->
       Summary.observe(
         [name: metric_id, labels: [name]],
@@ -108,15 +108,16 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
     end)
   end
 
-  def handle_event(name, _measurements, _metadata, _config) do
-    Logger.error("unhandled metric #{name |> inspect()}")
+  def handle_event(handler_id, _measurements, _metadata, _config) do
+    Logger.error("unhandled metric #{handler_id |> inspect()}")
   end
 
-  defp process_measurements(measurements, %{function: function} = meta) do
+  defp process_measurements(measurements, event_meta, %{function: function} = event_definition_meta) do
+    meta = Map.merge(event_definition_meta, event_meta)
     function.(measurements, meta)
   end
 
-  defp process_measurements(measurements, _), do: measurements
+  defp process_measurements(measurements, _, _), do: measurements
 
   defp process_config(event) do
     name = Keyword.get(event, :name, {:error, "no event name"})
