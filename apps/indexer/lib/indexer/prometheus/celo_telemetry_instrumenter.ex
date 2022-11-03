@@ -100,7 +100,7 @@ defmodule Indexer.Prometheus.CeloInstrumenter do
       when is_map(measurements) do
     measurements
     |> process_measurements(def_meta, event_metadata)
-    |> Enum.each(fn {name, value} = e ->
+    |> Enum.each(fn {name, value} ->
       Summary.observe(
         [name: metric_id, labels: [name]],
         value
