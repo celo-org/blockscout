@@ -51,6 +51,5 @@ defmodule Indexer.Celo.Telemetry.Helper do
 
   defp take_import(_), do: nil
 
-
   def transform_db_call(_measurements, %{func: function_name}), do: %{function_name => 1}
 end

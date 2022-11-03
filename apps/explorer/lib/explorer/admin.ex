@@ -53,26 +53,15 @@ defmodule Explorer.Admin do
   """
   @spec register_owner(map()) :: {:ok, %{user: User.t(), admin: Administrator.t()}} | {:error, Changeset.t()}
   def register_owner(params) do
-    register_operation = Ecto.Multi.new()
-    |> Ecto.Multi.run(:create_account, fn _repo, _changes ->
-      Accounts.register_new_account(params)
+    Repo.transaction(fn ->
+      with {:ok, user} <- Accounts.register_new_account(params),
+           {:ok, admin} <- promote_user(user, "owner") do
+        %{admin: admin, user: user}
+      else
+        {:error, error} ->
+          Repo.rollback(error)
+      end
     end)
-    |> Ecto.Multi.run(:promote_user, fn
-      _repo, %{create_account: user} ->
-        promote_user(user, "owner")
-    end)
-    |> Ecto.Multi.run(:handle_result, fn
-      _repo, %{create_account: user, promote_user: admin} ->
-      {:ok, %{admin: admin, user: user}}
-    end)
-
-   case register_operation |> Repo.transaction() do
-     {:ok, %{handle_result: result}} ->
-       {:ok, result}
-
-     {:error, _failed_stage, failed_changeset, _changes} ->
-       {:error, failed_changeset}
-   end
   end
 
   defp promote_user(%User{id: user_id}, role) do

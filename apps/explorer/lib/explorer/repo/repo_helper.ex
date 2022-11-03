@@ -1,8 +1,8 @@
 defmodule Explorer.Repo.RepoHelper do
   @moduledoc """
-    This module adds some custom functions to the Explorer.Repo module that existed previously, but need to exist on both
-    the Fly.Repo wrapper and the direct native Repo.Local repo.
-"""
+      This module adds some custom functions to the Explorer.Repo module that existed previously, but need to exist on both
+      the Fly.Repo wrapper and the direct native Repo.Local repo.
+  """
   defmacro __using__(_) do
     quote do
       require Logger

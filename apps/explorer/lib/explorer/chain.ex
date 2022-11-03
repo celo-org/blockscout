@@ -95,6 +95,7 @@ defmodule Explorer.Chain do
   alias Explorer.Counters.{AddressesCounter, AddressesWithBalanceCounter}
   alias Explorer.Market.MarketHistoryCache
   alias Explorer.{PagingOptions, Repo}
+  alias Explorer.Repo.Remote, as: RemoteRepo
   alias Explorer.SmartContract.{Helper, Reader}
   alias Explorer.Staking.ContractState
 
@@ -2172,8 +2173,6 @@ defmodule Explorer.Chain do
       0
   end
 
-
-
   @spec fetch_count_consensus_block() :: non_neg_integer
   def fetch_count_consensus_block do
     query =
@@ -4235,7 +4234,7 @@ defmodule Explorer.Chain do
 
     insert_result =
       insert_contract_query_with_additional_sources
-      |> Repo.Remote.transaction()
+      |> RemoteRepo.transaction()
 
     create_address_name(Repo.Remote, Changeset.get_field(smart_contract_changeset, :name), address_hash)
 
@@ -7317,8 +7316,6 @@ defmodule Explorer.Chain do
   defp boolean_to_check_result(true), do: :ok
 
   defp boolean_to_check_result(false), do: :not_found
-
-
 
   @doc """
   Fetches the first trace from the Parity trace URL.

@@ -1,11 +1,10 @@
 defmodule Explorer.Celo.Metrics.BlockchainMetrics do
   @moduledoc "A context to collect blockchain metric functions"
 
+  alias Explorer.{Chain, Repo}
   alias Explorer.Chain.PendingBlockOperation
-  alias Explorer.Repo
   import Ecto.Query
   alias Ecto.Adapters.SQL
-
 
   def pending_blockcount do
     query = from(b in PendingBlockOperation, select: fragment("count(*)"), where: b.fetch_internal_transactions == true)
@@ -20,7 +19,7 @@ defmodule Explorer.Celo.Metrics.BlockchainMetrics do
   @spec metrics_fetcher(integer | nil) ::
           {non_neg_integer, non_neg_integer, non_neg_integer, float}
   def metrics_fetcher(n) do
-    last_block_number = Explorer.Chain.fetch_max_block_number()
+    last_block_number = Chain.fetch_max_block_number()
 
     if last_block_number == 0 do
       {0, 0, 0, 0}

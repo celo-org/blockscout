@@ -3,8 +3,8 @@ defmodule Explorer.Health do
   Check various health attributes of the application
   """
 
-  alias Explorer.Repo.Local, as: Repo
   alias Ecto.Adapters.SQL
+  alias Explorer.Repo.Local, as: Repo
 
   @doc """
   Check if app is ready

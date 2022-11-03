@@ -1,3 +1,4 @@
+# credo:disable-for-this-file Credo.Check.Consistency.MultiAliasImportRequireUse
 defmodule Explorer.Repo.Local do
   @moduledoc "Ecto repo for Explorer library"
 
@@ -33,11 +34,11 @@ defmodule Explorer.Repo.Local do
     extra_postgres_parameters = [application_name: get_application_name()]
 
     opts =
-      Keyword.update(opts, :parameters, extra_postgres_parameters, fn params ->
+      opts
+      |> Keyword.update(:parameters, extra_postgres_parameters, fn params ->
         Keyword.merge(params, extra_postgres_parameters)
       end)
       |> Keyword.put(:url, db_url)
-
 
     {:ok, Keyword.put(opts, :url, db_url)}
   end
