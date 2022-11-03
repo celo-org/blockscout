@@ -6,6 +6,7 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
 
   @api_voter_rewards_max_page_size 100
   @api_validator_rewards_max_page_size 100
+  @api_group_rewards_max_page_size 100
 
   def getvoterrewards(conn, params) do
     with {:address_param, {:ok, address_param}} <- fetch_address(params, "voterAddress"),
@@ -89,7 +90,50 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
     end
   end
 
+  def getgrouprewards(conn, params) do
+    with {:address_param, {:ok, group_address_param}} <- fetch_address(params, "groupAddress"),
+         {:validator_address_param, validator_address_param} <- get_address(params, "validatorAddress"),
+         {:group_format, {:ok, group_hash_list}} <- to_address_hash_list(group_address_param, :group_format),
+         {:validator_format, {:ok, validator_hash_list}} <-
+           to_address_hash_list(validator_address_param, :validator_format),
+         {:block_number_param, {:ok, from}} <- fetch_block_number(params["from"]),
+         {:block_number_param, {:ok, to}} <- fetch_block_number(params["to"]),
+         %{page_size: page_size, page_number: page_number} <-
+           GenericPagingOptions.extract_paging_options_from_params(params, @api_group_rewards_max_page_size),
+         rewards <-
+           CeloElectionRewards.get_epoch_rewards(
+             group_hash_list,
+             ["group"],
+             validator_hash_list,
+             from,
+             to,
+             page_number,
+             page_size
+           ) do
+      render(conn, :getgrouprewards, rewards: rewards)
+    else
+      {:address_param, :error} ->
+        render(conn, :error, error: "Query parameter 'groupAddress' is required")
+
+      {:validator_format, :error} ->
+        render(conn, :error, error: "One or more validator addresses are invalid")
+
+      {:group_format, :error} ->
+        render(conn, :error, error: "One or more group addresses are invalid")
+
+      {:block_number_param, :error} ->
+        render(conn, :error, error: "Wrong format for block number provided")
+
+      {:block_number_param, {:error, :invalid_format}} ->
+        render(conn, :error, error: "Wrong format for block number provided")
+
+      {:block_number_param, {:error, :invalid_number}} ->
+        render(conn, :error, error: "Block number must be greater than 0")
+    end
+  end
+
   defp get_address(params, "groupAddress" = key), do: {:group_address_param, Map.get(params, key)}
+  defp get_address(params, "validatorAddress" = key), do: {:validator_address_param, Map.get(params, key)}
 
   defp fetch_address(params, key), do: {:address_param, Map.fetch(params, key)}
 
