@@ -10,7 +10,7 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
 
   def getvoterrewards(conn, params) do
     with {:address_param, {:ok, address_param}} <- fetch_address(params, "voterAddress"),
-         {:group_address_param, group_address_param} <- get_address(params, "groupAddress"),
+         {:address_param, group_address_param} <- get_address(params, "groupAddress"),
          {:voter_format, {:ok, voter_hash_list}} <- to_address_hash_list(address_param, :voter_format),
          {:group_format, {:ok, group_hash_list}} <- to_address_hash_list(group_address_param, :group_format),
          {:block_number_param, {:ok, from}} <- fetch_block_number(params["from"]),
@@ -38,9 +38,6 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
       {:group_format, :error} ->
         render(conn, :error, error: "One or more group addresses are invalid")
 
-      {:block_number_param, :error} ->
-        render(conn, :error, error: "Wrong format for block number provided")
-
       {:block_number_param, {:error, :invalid_format}} ->
         render(conn, :error, error: "Wrong format for block number provided")
 
@@ -51,7 +48,7 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
 
   def getvalidatorrewards(conn, params) do
     with {:address_param, {:ok, address_param}} <- fetch_address(params, "validatorAddress"),
-         {:group_address_param, group_address_param} <- get_address(params, "groupAddress"),
+         {:address_param, group_address_param} <- get_address(params, "groupAddress"),
          {:validator_format, {:ok, validator_hash_list}} <- to_address_hash_list(address_param, :validator_format),
          {:group_format, {:ok, group_hash_list}} <- to_address_hash_list(group_address_param, :group_format),
          {:block_number_param, {:ok, from}} <- fetch_block_number(params["from"]),
@@ -79,9 +76,6 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
       {:group_format, :error} ->
         render(conn, :error, error: "One or more group addresses are invalid")
 
-      {:block_number_param, :error} ->
-        render(conn, :error, error: "Wrong format for block number provided")
-
       {:block_number_param, {:error, :invalid_format}} ->
         render(conn, :error, error: "Wrong format for block number provided")
 
@@ -92,7 +86,7 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
 
   def getgrouprewards(conn, params) do
     with {:address_param, {:ok, group_address_param}} <- fetch_address(params, "groupAddress"),
-         {:validator_address_param, validator_address_param} <- get_address(params, "validatorAddress"),
+         {:address_param, validator_address_param} <- get_address(params, "validatorAddress"),
          {:group_format, {:ok, group_hash_list}} <- to_address_hash_list(group_address_param, :group_format),
          {:validator_format, {:ok, validator_hash_list}} <-
            to_address_hash_list(validator_address_param, :validator_format),
@@ -121,9 +115,6 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
       {:group_format, :error} ->
         render(conn, :error, error: "One or more group addresses are invalid")
 
-      {:block_number_param, :error} ->
-        render(conn, :error, error: "Wrong format for block number provided")
-
       {:block_number_param, {:error, :invalid_format}} ->
         render(conn, :error, error: "Wrong format for block number provided")
 
@@ -132,8 +123,7 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
     end
   end
 
-  defp get_address(params, "groupAddress" = key), do: {:group_address_param, Map.get(params, key)}
-  defp get_address(params, "validatorAddress" = key), do: {:validator_address_param, Map.get(params, key)}
+  defp get_address(params, key), do: {:address_param, Map.get(params, key)}
 
   defp fetch_address(params, key), do: {:address_param, Map.fetch(params, key)}
 
