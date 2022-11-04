@@ -5,7 +5,8 @@ defmodule BlockScoutWeb.API.RPC.EpochView do
 
   alias Explorer.Chain.Wei
 
-  def render(json, %{rewards: rewards}) when json in ~w(getvoterrewards.json getvalidatorrewards.json) do
+  def render(json, %{rewards: rewards})
+      when json in ~w(getvoterrewards.json getvalidatorrewards.json getgrouprewards.json) do
     RPCView.render("show.json", data: prepare_response(json, rewards))
   end
 
@@ -18,6 +19,9 @@ defmodule BlockScoutWeb.API.RPC.EpochView do
 
   def prepare_response("getvalidatorrewards.json", rewards),
     do: rewards |> wrap_rewards([{"groupAddress", :associated_account_hash}], :cusd)
+
+  def prepare_response("getgrouprewards.json", rewards),
+    do: rewards |> wrap_rewards([{"validatorAddress", :associated_account_hash}], :cusd)
 
   def wrap_rewards(rewards, meta, currency) do
     %{
