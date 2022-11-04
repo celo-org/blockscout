@@ -17,6 +17,7 @@ Examples:
 
     ./remote_iex.sh alfajores indexer 3
     ./remote_iex.sh rc1staging web
+    ./remote_iex.sh rc1 indexer 1
 '
     exit
 fi
@@ -64,7 +65,13 @@ main() {
     echo "Looking for pod on $current_context cluster in namespace $namespace"
 
     local pod_name=$(get_pod "$namespace" "$pod" "$suffix")
-    echo "Found matching pod: $pod_name"
+
+    if [[ -z "${pod_name}" ]]; then
+        echo "Couldn't find a matching pod"
+        return 1
+    else
+        echo "Found matching pod: $pod_name"
+    fi
 
     local blockscout_ip=$(get_pod_ip "$namespace" "$pod_name")
     echo "Cluster IP: $blockscout_ip"
