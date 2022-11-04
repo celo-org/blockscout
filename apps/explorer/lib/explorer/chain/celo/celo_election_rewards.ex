@@ -280,16 +280,16 @@ defmodule Explorer.Chain.CeloElectionRewards do
     }
   end
 
-  defp block_timestamp_query_from(query, _from = nil), do: query
+  defp block_timestamp_query_from(query, nil = _from), do: query
   defp block_timestamp_query_from(query, from), do: query |> where([rewards], rewards.block_timestamp >= ^from)
 
-  defp block_timestamp_query_to(query, _to = nil), do: query
+  defp block_timestamp_query_to(query, nil = _to), do: query
   defp block_timestamp_query_to(query, to), do: query |> where([rewards], rewards.block_timestamp <= ^to)
 
-  defp block_number_query_from(query, _from = nil), do: query
+  defp block_number_query_from(query, nil = _from), do: query
   defp block_number_query_from(query, from), do: query |> where([rewards], rewards.block_number >= ^from)
 
-  defp block_number_query_to(query, _to = nil), do: query
+  defp block_number_query_to(query, nil = _to), do: query
   defp block_number_query_to(query, to), do: query |> where([rewards], rewards.block_number <= ^to)
 
   defp block_timestamp_query(query, from, to),
