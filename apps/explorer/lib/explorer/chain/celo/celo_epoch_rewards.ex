@@ -99,6 +99,10 @@ defmodule Explorer.Chain.CeloEpochRewards do
     Repo.one(from(rewards in __MODULE__, where: rewards.block_number == ^block_number))
   end
 
+  def get_celo_epoch_rewards_for_epoch_number(epoch_number) do
+    Repo.one(from(rewards in __MODULE__, where: rewards.epoch_number == ^epoch_number))
+  end
+
   def reserve_bolster_value(epoch_block_number) do
     query =
       from(

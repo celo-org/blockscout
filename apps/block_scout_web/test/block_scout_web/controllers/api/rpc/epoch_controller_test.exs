@@ -1265,6 +1265,138 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
     end
   end
 
+  describe "getepoch" do
+    test "with missing epoch number", %{conn: conn} do
+      response =
+        conn
+        |> get("/api", %{"module" => "epoch", "action" => "getepoch"})
+        |> json_response(200)
+
+      assert response["message"] =~ "'epochNumber' is required"
+      assert response["status"] == "0"
+      assert Map.has_key?(response, "result")
+      refute response["result"]
+
+      assert :ok = ExJsonSchema.Validator.validate(epoch_block_schema(), response)
+    end
+
+    test "with invalid epoch number", %{conn: conn} do
+      response =
+        conn
+        |> get("/api", %{"module" => "epoch", "action" => "getepoch", "epochNumber" => "invalid"})
+        |> json_response(200)
+
+      assert response["message"] =~ "Wrong format for epoch number provided"
+      assert response["status"] == "0"
+      assert Map.has_key?(response, "result")
+      refute response["result"]
+
+      assert :ok = ExJsonSchema.Validator.validate(epoch_block_schema(), response)
+    end
+
+    test "with epoch number < 1", %{conn: conn} do
+      response =
+        conn
+        |> get("/api", %{"module" => "epoch", "action" => "getepoch", "epochNumber" => "-1"})
+        |> json_response(200)
+
+      assert response["message"] =~ "Epoch number must be greater than 0"
+      assert response["status"] == "0"
+      assert Map.has_key?(response, "result")
+      refute response["result"]
+
+      assert :ok = ExJsonSchema.Validator.validate(epoch_block_schema(), response)
+    end
+
+    test "with epoch number for which there is no data", %{conn: conn} do
+      response =
+        conn
+        |> get("/api", %{"module" => "epoch", "action" => "getepoch", "epochNumber" => "920"})
+        |> json_response(200)
+
+      assert response["result"] == nil
+      assert response["status"] == "1"
+      assert response["message"] == "OK"
+
+      assert :ok = ExJsonSchema.Validator.validate(epoch_block_schema(), response)
+    end
+
+    test "with valid epoch number", %{conn: conn} do
+      %Block{hash: block_hash, number: block_number} =
+        insert(
+          :block,
+          number: 17280 * 920,
+          timestamp: ~U[2022-10-30T18:53:12.162804Z]
+        )
+
+      insert(
+        :celo_epoch_rewards,
+        epoch_number: 920,
+        block_number: block_number,
+        block_hash: block_hash,
+        voter_target_epoch_rewards: 1,
+        community_target_epoch_rewards: 2,
+        carbon_offsetting_target_epoch_rewards: 3,
+        target_total_supply: 4,
+        rewards_multiplier: 5,
+        rewards_multiplier_max: 6,
+        rewards_multiplier_under: 7,
+        rewards_multiplier_over: 8,
+        target_voting_yield: 9,
+        target_voting_yield_max: 10,
+        target_voting_yield_adjustment_factor: 11,
+        target_voting_fraction: 12,
+        voting_fraction: 13,
+        total_locked_gold: 14,
+        total_non_voting: 15,
+        total_votes: 16,
+        electable_validators_max: 17,
+        reserve_gold_balance: 18,
+        gold_total_supply: 19,
+        stable_usd_total_supply: 20,
+        reserve_bolster: 21,
+        validator_target_epoch_rewards: 22
+      )
+
+      response =
+        conn
+        |> get("/api", %{"module" => "epoch", "action" => "getepoch", "epochNumber" => "920"})
+        |> json_response(200)
+
+      assert response["result"] == %{
+               "blockNumber" => to_string(block_number),
+               "blockHash" => to_string(block_hash),
+               "carbonOffsettingTargetEpochRewards" => "3",
+               "communityTargetEpochRewards" => "2",
+               "electableValidatorsMax" => "17",
+               "goldTotalSupply" => "19",
+               "reserveBolster" => "21",
+               "reserveGoldBalance" => "18",
+               "rewardsMultiplier" => "5",
+               "rewardsMultiplierMax" => "6",
+               "rewardsMultiplierOver" => "8",
+               "rewardsMultiplierUnder" => "7",
+               "stableUsdTotalSupply" => "20",
+               "targetTotalSupply" => "4",
+               "targetVotingFraction" => "12",
+               "targetVotingYield" => "9",
+               "targetVotingYieldAdjustmentFactor" => "11",
+               "targetVotingYieldMax" => "10",
+               "totalLockedGold" => "14",
+               "totalNonVoting" => "15",
+               "totalVotes" => "16",
+               "validatorTargetEpochRewards" => "22",
+               "voterTargetEpochRewards" => "1",
+               "votingFraction" => "13"
+             }
+
+      assert response["status"] == "1"
+      assert response["message"] == "OK"
+
+      assert :ok = ExJsonSchema.Validator.validate(epoch_block_schema(), response)
+    end
+  end
+
   defp setup_epoch_data(context) do
     max_reward_base = 1_000_000_000_000_000_000
 
@@ -1903,6 +2035,64 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
         "wei" => to_string(locked_gold)
       }
     }
+  end
+
+  defp epoch_block_schema do
+    resolve_schema(%{
+      "type" => ["object", "null"],
+      "required" => [
+        "blockHash",
+        "blockNumber",
+        "validatorTargetEpochRewards",
+        "voterTargetEpochRewards",
+        "communityTargetEpochRewards",
+        "carbonOffsettingTargetEpochRewards",
+        "targetTotalSupply",
+        "rewardsMultiplier",
+        "rewardsMultiplierMax",
+        "rewardsMultiplierUnder",
+        "rewardsMultiplierOver",
+        "targetVotingYield",
+        "targetVotingYieldMax",
+        "targetVotingYieldAdjustmentFactor",
+        "targetVotingFraction",
+        "votingFraction",
+        "totalLockedGold",
+        "totalNonVoting",
+        "totalVotes",
+        "electableValidatorsMax",
+        "reserveGoldBalance",
+        "goldTotalSupply",
+        "stableUsdTotalSupply",
+        "reserveBolster"
+      ],
+      "properties" => %{
+        "blockHash" => %{"type" => "string"},
+        "blockNumber" => %{"type" => "string"},
+        "validatorTargetEpochRewards" => %{"type" => "string"},
+        "voterTargetEpochRewards" => %{"type" => "string"},
+        "communityTargetEpochRewards" => %{"type" => "string"},
+        "carbonOffsettingTargetEpochRewards" => %{"type" => "string"},
+        "targetTotalSupply" => %{"type" => "string"},
+        "rewardsMultiplier" => %{"type" => "string"},
+        "rewardsMultiplierMax" => %{"type" => "string"},
+        "rewardsMultiplierUnder" => %{"type" => "string"},
+        "rewardsMultiplierOver" => %{"type" => "string"},
+        "targetVotingYield" => %{"type" => "string"},
+        "targetVotingYieldMax" => %{"type" => "string"},
+        "targetVotingYieldAdjustmentFactor" => %{"type" => "string"},
+        "targetVotingFraction" => %{"type" => "string"},
+        "votingFraction" => %{"type" => "string"},
+        "totalLockedGold" => %{"type" => "string"},
+        "totalNonVoting" => %{"type" => "string"},
+        "totalVotes" => %{"type" => "string"},
+        "electableValidatorsMax" => %{"type" => "string"},
+        "reserveGoldBalance" => %{"type" => "string"},
+        "goldTotalSupply" => %{"type" => "string"},
+        "stableUsdTotalSupply" => %{"type" => "string"},
+        "reserveBolster" => %{"type" => "string"}
+      }
+    })
   end
 
   defp rewards_schema do

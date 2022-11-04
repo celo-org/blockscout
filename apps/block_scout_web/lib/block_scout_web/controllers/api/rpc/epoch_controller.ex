@@ -2,7 +2,7 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
   use BlockScoutWeb, :controller
 
   alias Explorer.{Chain, GenericPagingOptions}
-  alias Explorer.Chain.CeloElectionRewards
+  alias Explorer.Chain.{CeloElectionRewards, CeloEpochRewards}
 
   @api_voter_rewards_max_page_size 100
   @api_validator_rewards_max_page_size 100
@@ -123,6 +123,23 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
     end
   end
 
+  def getepoch(conn, params) do
+    with {:block_number_param, {:ok, epoch_number}} <- get_block_number(params["epochNumber"]),
+         epoch_rewards <-
+           CeloEpochRewards.get_celo_epoch_rewards_for_epoch_number(epoch_number) do
+      render(conn, :getepoch, epoch: epoch_rewards)
+    else
+      {:block_number_param, nil} ->
+        render(conn, :error, error: "Query parameter 'epochNumber' is required")
+
+      {:block_number_param, {:error, :invalid_format}} ->
+        render(conn, :error, error: "Wrong format for epoch number provided")
+
+      {:block_number_param, {:error, :invalid_number}} ->
+        render(conn, :error, error: "Epoch number must be greater than 0")
+    end
+  end
+
   defp get_address(params, key), do: {:address_param, Map.get(params, key)}
 
   defp fetch_address(params, key), do: {:address_param, Map.fetch(params, key)}
@@ -163,4 +180,7 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
        _ -> {:error, :invalid_format}
      end}
   end
+
+  defp get_block_number(nil), do: {:block_number_param, nil}
+  defp get_block_number(block_number_param), do: fetch_block_number(block_number_param)
 end
