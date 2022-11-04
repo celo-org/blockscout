@@ -195,10 +195,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
   defp account_hash_query(query, account_hash_list),
     do: query |> where([rewards], rewards.account_hash in ^account_hash_list)
 
-  defp reward_type_query(query, [reward_type]), do: query |> where([rewards], rewards.reward_type == ^reward_type)
-
-  defp reward_type_query(query, reward_type_list),
-    do: query |> where([rewards], rewards.reward_type in ^reward_type_list)
+  defp reward_type_query(query, reward_type), do: query |> where([rewards], rewards.reward_type == ^reward_type)
 
   def get_rewards(account_hash_list, reward_type_list, from, to) when from == nil and to == nil,
     do: get_rewards(account_hash_list, reward_type_list, ~U[2020-04-22 16:00:00.000000Z], DateTime.utc_now())
@@ -232,72 +229,42 @@ defmodule Explorer.Chain.CeloElectionRewards do
   end
 
   def get_epoch_rewards(
+        reward_type,
         account_hash_list,
-        reward_type_list,
-        group_hash_list,
-        nil = _from,
-        nil = _to,
+        associated_account_hash_list,
         page_number,
-        page_size
-      ),
-      do:
-        get_epoch_rewards(
-          account_hash_list,
-          reward_type_list,
-          group_hash_list,
-          17_280,
-          CeloEpochRewards.get_last_epoch_block_number(),
-          page_number,
-          page_size
-        )
-
-  def get_epoch_rewards(account_hash_list, reward_type_list, group_hash_list, nil = _from, to, page_number, page_size),
-    do: get_epoch_rewards(account_hash_list, reward_type_list, group_hash_list, 17_280, to, page_number, page_size)
-
-  def get_epoch_rewards(account_hash_list, reward_type_list, group_hash_list, from, nil = _to, page_number, page_size),
-    do:
-      get_epoch_rewards(
-        account_hash_list,
-        reward_type_list,
-        group_hash_list,
-        from,
-        CeloEpochRewards.get_last_epoch_block_number(),
-        page_number,
-        page_size
-      )
-
-  def get_epoch_rewards(
-        account_hash_list,
-        reward_type_list,
-        group_hash_list,
-        from,
-        to,
-        page_number,
-        page_size
+        page_size,
+        opts \\ []
       ) do
     query = base_api_address_query()
     total_query = base_sum_and_count_rewards_api_address_query()
     offset = (page_number - 1) * page_size
 
-    from_block_number_rounded = from |> EpochUtil.round_to_closest_epoch_block_number(:up)
-    to_block_number_rounded = to |> EpochUtil.round_to_closest_epoch_block_number(:down)
+    block_number_from = Keyword.get(opts, :block_number_from)
+    block_number_to = Keyword.get(opts, :block_number_to)
+    date_from = Keyword.get(opts, :date_from)
+    date_to = Keyword.get(opts, :date_to)
+    block_number_from_rounded = block_number_from |> EpochUtil.round_to_closest_epoch_block_number(:up)
+    block_number_to_rounded = block_number_to |> EpochUtil.round_to_closest_epoch_block_number(:down)
 
     rewards =
       query
-      |> block_number_query(from_block_number_rounded, to_block_number_rounded)
-      |> reward_type_query(reward_type_list)
+      |> block_number_query(block_number_from_rounded, block_number_to_rounded)
+      |> block_timestamp_query(date_from, date_to)
+      |> reward_type_query(reward_type)
       |> account_hash_query(account_hash_list)
-      |> group_address_hash_query(group_hash_list)
+      |> group_address_hash_query(associated_account_hash_list)
       |> offset(^offset)
       |> limit(^page_size)
       |> Repo.all()
 
     total =
       total_query
-      |> block_number_query(from_block_number_rounded, to_block_number_rounded)
-      |> reward_type_query(reward_type_list)
+      |> block_number_query(block_number_from_rounded, block_number_to_rounded)
+      |> block_timestamp_query(Keyword.get(opts, :date_from), Keyword.get(opts, :date_to))
+      |> reward_type_query(reward_type)
       |> account_hash_query(account_hash_list)
-      |> group_address_hash_query(group_hash_list)
+      |> group_address_hash_query(associated_account_hash_list)
       |> Repo.one()
 
     {:ok, total_amount} = Wei.cast(total.sum)
@@ -306,16 +273,29 @@ defmodule Explorer.Chain.CeloElectionRewards do
       rewards: rewards,
       total_amount: total_amount,
       total_count: total.count,
-      from: from,
-      to: to
+      blockNumberFrom: block_number_from,
+      blockNumberTo: block_number_to,
+      dateFrom: date_from,
+      dateTo: date_to
     }
   end
 
-  defp block_number_query(query, from, to) do
-    query
-    |> where([rewards], rewards.block_number >= ^from)
-    |> where([rewards], rewards.block_number <= ^to)
-  end
+  defp block_timestamp_query_from(query, _from = nil), do: query
+  defp block_timestamp_query_from(query, from), do: query |> where([rewards], rewards.block_timestamp >= ^from)
+
+  defp block_timestamp_query_to(query, _to = nil), do: query
+  defp block_timestamp_query_to(query, to), do: query |> where([rewards], rewards.block_timestamp <= ^to)
+
+  defp block_number_query_from(query, _from = nil), do: query
+  defp block_number_query_from(query, from), do: query |> where([rewards], rewards.block_number >= ^from)
+
+  defp block_number_query_to(query, _to = nil), do: query
+  defp block_number_query_to(query, to), do: query |> where([rewards], rewards.block_number <= ^to)
+
+  defp block_timestamp_query(query, from, to),
+    do: query |> block_timestamp_query_from(from) |> block_timestamp_query_to(to)
+
+  defp block_number_query(query, from, to), do: query |> block_number_query_from(from) |> block_number_query_to(to)
 
   defp group_address_hash_query(query, []), do: query
 

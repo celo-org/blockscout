@@ -63,8 +63,10 @@ defmodule BlockScoutWeb.API.RPC.EpochView do
     %{
       totalRewardAmounts: rewards.total_amount |> prepare_amounts(currency),
       totalRewardCount: to_string(rewards.total_count),
-      from: to_string(rewards.from),
-      to: to_string(rewards.to),
+      blockNumberFrom: to_string(rewards.blockNumberFrom),
+      blockNumberTo: to_string(rewards.blockNumberTo),
+      dateFrom: to_string(rewards.dateFrom),
+      dateTo: to_string(rewards.dateTo),
       rewards: Enum.map(rewards.rewards, fn reward -> prepare_rewards_response_item(reward, meta, currency) end)
     }
   end
