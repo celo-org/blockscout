@@ -5,6 +5,7 @@ defmodule Explorer.Celo.Events.ContractEventStream do
 
   use GenServer
   require Logger
+  alias Explorer.Chain.CeloContractEvent
 
   @doc "Accept a list of events and buffer for sending"
   def enqueue(events) do
@@ -15,6 +16,9 @@ defmodule Explorer.Celo.Events.ContractEventStream do
 
   @doc "Transform celo contract event to expected json format"
   def transform_event(event) do
+    event
+    |> Explorer.Celo.ContractEvents.EventMap.celo_contract_event_to_concrete_event()
+    |> Explorer.Celo.ContractEvents.EventTransformer.to_event_stream_format()
 
   end
 
