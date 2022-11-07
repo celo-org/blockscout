@@ -3,7 +3,7 @@ defmodule Explorer.Chain.Events.Publisher do
   Publishes events related to the Chain context.
   """
 
-  require Logger
+  alias Explorer.Celo.Events.ContractEventStream
 
   # Tags from import runner phase
   @allowed_events ~w(addresses address_coin_balances address_token_balances blocks block_rewards celo_contract_event last_block_number staking_update token_transfers transactions contract_verification_result)a
@@ -37,8 +37,7 @@ defmodule Explorer.Chain.Events.Publisher do
 
   defp send_data(event_type, broadcast_type, event_data) do
     if event_type == :celo_contract_event do
-      Logger.info("Got celo contract event")
-      binding() |> IO.inspect()
+      ContractEventStream.enqueue(event_data)
     end
 
     sender().send_data(event_type, broadcast_type, event_data)
