@@ -94,7 +94,7 @@ defmodule Explorer.Celo.ContractEvents.Common do
 
   @doc "Standardise addresses for event streaming"
   def format_address_for_streaming(%Hash{} = address),
-      do: address |> to_string() |> String.downcase()
+    do: address |> to_string() |> String.downcase()
 
   def format_address_for_streaming(nil), do: ""
   def format_address_for_streaming("\\x" <> rest), do: ("0x" <> rest) |> String.downcase()

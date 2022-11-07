@@ -39,11 +39,10 @@ defmodule Explorer.Celo.Events.ContractEventStream do
     {:ok, %{buffer: buffer, timer: timer}, {:continue, :connect_to_beanstalk}}
   end
 
-
   @impl true
   def handle_continue(:connect_to_beanstalk, state) do
     # charlist type required for erlang library
-    host = System.get_env("BEANSTALKD_HOST") |> to_charlist()
+    host = "BEANSTALKD_HOST" |> System.get_env() |> to_charlist()
 
     {port, _} = "BEANSTALKD_PORT" |> System.get_env() |> Integer.parse()
     tube = "BEANSTALKD_TUBE" |> System.get_env("default")
@@ -79,6 +78,7 @@ defmodule Explorer.Celo.Events.ContractEventStream do
     Logger.info("Flushing event buffer before shutdown...")
     run(buffer, pid)
   end
+
   def terminate(reason, _state) do
     Logger.error("Unknown termination - #{inspect(reason)}")
   end
@@ -88,23 +88,24 @@ defmodule Explorer.Celo.Events.ContractEventStream do
     events
     |> List.flatten()
     |> Enum.map(fn event ->
-        to_send = event |> transform_event()
+      to_send = event |> transform_event()
 
-        # put event in pipe, if failed then log + return the event for retry
-        case ElixirTalk.put(beanstalk_pid, to_send) do
-          {:inserted, _insertion_count} ->
-            :telemetry.execute(
-              [:explorer, :contract_event_stream, :inserted],
-              %{topic: event.topic, contract_address: event.contract_address_hash |> to_string()},
-              %{}
-            )
-            nil
-          error ->
-            Logger.error("Error sending event to beanstalkd - #{inspect(error)}")
-            event
-        end
+      # put event in pipe, if failed then log + return the event for retry
+      case ElixirTalk.put(beanstalk_pid, to_send) do
+        {:inserted, _insertion_count} ->
+          :telemetry.execute(
+            [:explorer, :contract_event_stream, :inserted],
+            %{topic: event.topic, contract_address: event.contract_address_hash |> to_string()},
+            %{}
+          )
+
+          nil
+
+        error ->
+          Logger.error("Error sending event to beanstalkd - #{inspect(error)}")
+          event
+      end
     end)
-    |> Enum.filter(&( !is_nil(&1)))
-
+    |> Enum.filter(&(!is_nil(&1)))
   end
 end

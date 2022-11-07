@@ -21,6 +21,7 @@ defmodule Explorer.Application do
     Transactions,
     Uncles
   }
+
   alias Explorer.Chain.Supply.RSK
 
   alias Explorer.Market.MarketHistoryCache
@@ -98,7 +99,7 @@ defmodule Explorer.Application do
       configure(Explorer.Validator.MetadataProcessor),
       configure(Explorer.Staking.ContractState),
       configure(MinMissingBlockNumber),
-      configure(ContractEventStream),
+      configure(ContractEventStream)
     ]
     |> List.flatten()
   end
