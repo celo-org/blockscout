@@ -5,7 +5,7 @@ defmodule Explorer.Celo.Events.ContractEventStream do
 
   use GenServer
   require Logger
-  alias Explorer.Chain.CeloContractEvent
+  alias Explorer.Celo.ContractEvents.{EventMap, EventTransformer}
 
   @doc "Accept a list of events and buffer for sending"
   def enqueue(events) do
@@ -18,9 +18,8 @@ defmodule Explorer.Celo.Events.ContractEventStream do
   @doc "Transform celo contract event to expected json format"
   def transform_event(event) do
     event
-    |> Explorer.Celo.ContractEvents.EventMap.celo_contract_event_to_concrete_event()
-    |> Explorer.Celo.ContractEvents.EventTransformer.to_event_stream_format()
-
+    |> EventMap.celo_contract_event_to_concrete_event()
+    |> EventTransformer.to_event_stream_format()
   end
 
   # callbacks
@@ -35,7 +34,7 @@ defmodule Explorer.Celo.Events.ContractEventStream do
   def init(buffer) do
     Process.flag(:trap_exit, true)
     timer = Process.send_after(self(), :tick, @flush_interval_ms)
-    Logger.info("Init stream")
+    Logger.info("Init event stream")
 
     {:ok, %{buffer: buffer, timer: timer}, {:continue, :connect_to_beanstalk}}
   end
@@ -43,12 +42,14 @@ defmodule Explorer.Celo.Events.ContractEventStream do
 
   @impl true
   def handle_continue(:connect_to_beanstalk, state) do
-#    host = System.get_env("BEANSTALKD_HOST")
-#    port = "BEANSTALKD_PORT" |> System.get_env() |> Integer.parse()
-#    tube = "BEANSTALKD_TUBE" |> System.get_env("default")
+    # charlist type required for erlang library
+    host = System.get_env("BEANSTALKD_HOST") |> to_charlist()
 
-    pid = nil #connect_beanstalkd(host, port)
-    #{:using, ^tube} = ElixirTalk.use(pid, tube)
+    {port, _} = "BEANSTALKD_PORT" |> System.get_env() |> Integer.parse()
+    tube = "BEANSTALKD_TUBE" |> System.get_env("default")
+
+    pid = connect_beanstalkd(host, port)
+    {:using, ^tube} = ElixirTalk.use(pid, tube)
 
     {:noreply, Map.put(state, :beanstalkd_pid, pid)}
   end
@@ -60,8 +61,6 @@ defmodule Explorer.Celo.Events.ContractEventStream do
 
   @impl true
   def handle_cast({:enqueue, event}, %{buffer: buffer} = state) do
-    Logger.info("Enqueue impl")
-
     {:noreply, %{state | buffer: [event | buffer]}}
   end
 
@@ -80,6 +79,9 @@ defmodule Explorer.Celo.Events.ContractEventStream do
     Logger.info("Flushing event buffer before shutdown...")
     run(buffer, pid)
   end
+  def terminate(reason, _state) do
+    Logger.error("Unknown termination - #{inspect(reason)}")
+  end
 
   # attempts to send everything, failed events will be returned to the buffer
   defp run(events, beanstalk_pid) do
@@ -88,15 +90,19 @@ defmodule Explorer.Celo.Events.ContractEventStream do
     |> Enum.map(fn event ->
         to_send = event |> transform_event()
 
-        Logger.info("sending #{to_send}")
-        nil
         # put event in pipe, if failed then log + return the event for retry
-#        case ElixirTalk.put(beanstalk_pid, to_send) do
-#          {:inserted, _insertion_count} -> nil
-#          error ->
-#            Logger.error("Error sending event to beanstalkd - #{inspect(error)}")
-#            event
-#        end
+        case ElixirTalk.put(beanstalk_pid, to_send) do
+          {:inserted, _insertion_count} ->
+            :telemetry.execute(
+              [:explorer, :contract_event_stream, :inserted],
+              %{topic: event.topic, contract_address: event.contract_address_hash |> to_string()},
+              %{}
+            )
+            nil
+          error ->
+            Logger.error("Error sending event to beanstalkd - #{inspect(error)}")
+            event
+        end
     end)
     |> Enum.filter(&( !is_nil(&1)))
 
