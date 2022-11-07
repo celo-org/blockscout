@@ -10,8 +10,6 @@ defmodule Explorer.Celo.Events.ContractEventStream do
   @doc "Accept a list of events and buffer for sending"
   def enqueue(events) do
     GenServer.cast(__MODULE__, {:enqueue, events})
-
-    Logger.info("Enqueue")
     {:ok, events}
   end
 
