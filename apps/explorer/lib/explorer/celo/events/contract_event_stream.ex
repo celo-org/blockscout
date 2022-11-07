@@ -11,6 +11,7 @@ defmodule Explorer.Celo.Events.ContractEventStream do
   def enqueue(events) do
     GenServer.cast(__MODULE__, {:enqueue, events})
 
+    Logger.info("Enqueue")
     {:ok, events}
   end
 
@@ -34,6 +35,7 @@ defmodule Explorer.Celo.Events.ContractEventStream do
   def init(buffer) do
     Process.flag(:trap_exit, true)
     timer = Process.send_after(self(), :tick, @flush_interval_ms)
+    Logger.info("Init stream")
 
     {:ok, %{buffer: buffer, timer: timer}, {:continue, :connect_to_beanstalk}}
   end
@@ -41,12 +43,12 @@ defmodule Explorer.Celo.Events.ContractEventStream do
 
   @impl true
   def handle_continue(:connect_to_beanstalk, state) do
-    host = System.get_env("BEANSTALKD_HOST")
-    port = "BEANSTALKD_PORT" |> System.get_env() |> Integer.parse()
-    tube = "BEANSTALKD_TUBE" |> System.get_env("default")
+#    host = System.get_env("BEANSTALKD_HOST")
+#    port = "BEANSTALKD_PORT" |> System.get_env() |> Integer.parse()
+#    tube = "BEANSTALKD_TUBE" |> System.get_env("default")
 
-    pid = connect_beanstalkd(host, port)
-    {:using, ^tube} = ElixirTalk.use(pid, tube)
+    pid = nil #connect_beanstalkd(host, port)
+    #{:using, ^tube} = ElixirTalk.use(pid, tube)
 
     {:noreply, Map.put(state, :beanstalkd_pid, pid)}
   end
@@ -58,6 +60,8 @@ defmodule Explorer.Celo.Events.ContractEventStream do
 
   @impl true
   def handle_cast({:enqueue, event}, %{buffer: buffer} = state) do
+    Logger.info("Enqueue impl")
+
     {:noreply, %{state | buffer: [event | buffer]}}
   end
 
@@ -80,16 +84,19 @@ defmodule Explorer.Celo.Events.ContractEventStream do
   # attempts to send everything, failed events will be returned to the buffer
   defp run(events, beanstalk_pid) do
     events
+    |> List.flatten()
     |> Enum.map(fn event ->
         to_send = event |> transform_event()
 
+        Logger.info("sending #{to_send}")
+        nil
         # put event in pipe, if failed then log + return the event for retry
-        case ElixirTalk.put(beanstalk_pid, to_send) do
-          {:inserted, _insertion_count} -> nil
-          error ->
-            Logger.error("Error sending event to beanstalkd - #{inspect(error)}")
-            event
-        end
+#        case ElixirTalk.put(beanstalk_pid, to_send) do
+#          {:inserted, _insertion_count} -> nil
+#          error ->
+#            Logger.error("Error sending event to beanstalkd - #{inspect(error)}")
+#            event
+#        end
     end)
     |> Enum.filter(&( !is_nil(&1)))
 
