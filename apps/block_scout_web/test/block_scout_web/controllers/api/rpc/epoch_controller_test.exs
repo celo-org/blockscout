@@ -3,7 +3,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
 
   import Explorer.Factory
 
-  alias Explorer.Chain.{Address, Block, CeloAccountEpoch, CeloElectionRewards, Wei}
+  alias Explorer.Chain.{Address, Block, Wei}
 
   describe "getvoterrewards" do
     setup [:setup_epoch_data]
@@ -229,11 +229,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "celo" => "0",
           "wei" => "0"
         },
-        "totalRewardCount" => "0",
-        "blockNumberFrom" => "",
-        "blockNumberTo" => "#{block_number + 17279}",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "0"
       }
 
       response =
@@ -273,11 +269,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "celo" => "0",
           "wei" => "0"
         },
-        "totalRewardCount" => "0",
-        "blockNumberFrom" => "123456789",
-        "blockNumberTo" => "",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "0"
       }
 
       response =
@@ -338,11 +330,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "celo" => "0",
           "wei" => "0"
         },
-        "totalRewardCount" => "0",
-        "blockNumberFrom" => "",
-        "blockNumberTo" => "",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "0"
       }
 
       response =
@@ -400,11 +388,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "celo" => to_string(Wei.to(total_rewards, :ether)),
           "wei" => to_string(total_rewards)
         },
-        "totalRewardCount" => "4",
-        "blockNumberFrom" => "#{block_1.number - 1}",
-        "blockNumberTo" => "#{block_2.number + 1}",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "4"
       }
 
       response_first_page =
@@ -414,8 +398,8 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "action" => "getvoterrewards",
           "voterAddress" => to_string(voter_2_hash),
           "page_size" => "3",
-          "blockNumberFrom" => "#{block_1.number - 1}",
-          "blockNumberTo" => "#{block_2.number + 1}"
+          "dateFrom" => "#{block_1.timestamp}",
+          "dateTo" => "#{block_2.timestamp}"
         })
         |> json_response(200)
 
@@ -435,11 +419,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "celo" => to_string(Wei.to(total_rewards, :ether)),
           "wei" => to_string(total_rewards)
         },
-        "totalRewardCount" => "4",
-        "blockNumberFrom" => "#{block_1.number - 1}",
-        "blockNumberTo" => "#{block_2.number + 1}",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "4"
       }
 
       response_second_page =
@@ -476,11 +456,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "celo" => to_string(Wei.to(total_rewards_single_group_multiple_voters, :ether)),
           "wei" => to_string(total_rewards_single_group_multiple_voters)
         },
-        "totalRewardCount" => "2",
-        "blockNumberFrom" => "#{block_3.number}",
-        "blockNumberTo" => "#{block_3.number}",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "2"
       }
 
       response_single_group_multiple_voters =
@@ -725,11 +701,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
       expected_result = %{
         "rewards" => [],
         "totalRewardAmounts" => %{"cUSD" => "0"},
-        "totalRewardCount" => "0",
-        "blockNumberFrom" => "",
-        "blockNumberTo" => "#{block_number + 17279}",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "0"
       }
 
       response =
@@ -766,11 +738,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
       expected_result = %{
         "rewards" => [],
         "totalRewardAmounts" => %{"cUSD" => "0"},
-        "totalRewardCount" => "0",
-        "blockNumberFrom" => "123456789",
-        "blockNumberTo" => "",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "0"
       }
 
       response =
@@ -803,11 +771,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
       expected_result = %{
         "rewards" => [],
         "totalRewardAmounts" => %{"cUSD" => "0"},
-        "totalRewardCount" => "0",
-        "blockNumberFrom" => "",
-        "blockNumberTo" => "",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "0"
       }
 
       response =
@@ -862,11 +826,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           ]
           |> Enum.map(fn tuple -> map_tuple_to_api_item(:validator, tuple) end),
         "totalRewardAmounts" => %{"cUSD" => to_string(total_rewards |> Wei.to(:ether))},
-        "totalRewardCount" => "4",
-        "blockNumberFrom" => "#{block_1.number - 1}",
-        "blockNumberTo" => "#{block_2.number + 1}",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "4"
       }
 
       response_first_page =
@@ -876,8 +836,8 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "action" => "getvalidatorrewards",
           "validatorAddress" => to_string(validator_2_hash),
           "page_size" => "3",
-          "blockNumberFrom" => "#{block_1.number - 1}",
-          "blockNumberTo" => "#{block_2.number + 1}"
+          "dateFrom" => "#{to_string(block_1.timestamp)}",
+          "dateTo" => "#{to_string(block_2.timestamp)}"
         })
         |> json_response(200)
 
@@ -894,11 +854,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           ]
           |> Enum.map(fn tuple -> map_tuple_to_api_item(:validator, tuple) end),
         "totalRewardAmounts" => %{"cUSD" => to_string(total_rewards |> Wei.to(:ether))},
-        "totalRewardCount" => "4",
-        "blockNumberFrom" => "#{block_1.number - 1}",
-        "blockNumberTo" => "#{block_2.number + 1}",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "4"
       }
 
       response_second_page =
@@ -932,11 +888,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           ]
           |> Enum.map(fn tuple -> map_tuple_to_api_item(:validator, tuple) end),
         "totalRewardAmounts" => %{"cUSD" => to_string(total_rewards_single_group_multiple_voters |> Wei.to(:ether))},
-        "totalRewardCount" => "2",
-        "blockNumberFrom" => "#{block_3.number}",
-        "blockNumberTo" => "#{block_3.number}",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "2"
       }
 
       response_single_group_multiple_voters =
@@ -1181,11 +1133,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
       expected_result = %{
         "rewards" => [],
         "totalRewardAmounts" => %{"cUSD" => "0"},
-        "totalRewardCount" => "0",
-        "blockNumberFrom" => "",
-        "blockNumberTo" => "#{block_number + 17279}",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "0"
       }
 
       response =
@@ -1222,11 +1170,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
       expected_result = %{
         "rewards" => [],
         "totalRewardAmounts" => %{"cUSD" => "0"},
-        "totalRewardCount" => "0",
-        "blockNumberFrom" => "123456789",
-        "blockNumberTo" => "",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "0"
       }
 
       response =
@@ -1259,11 +1203,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
       expected_result = %{
         "rewards" => [],
         "totalRewardAmounts" => %{"cUSD" => "0"},
-        "totalRewardCount" => "0",
-        "blockNumberFrom" => "",
-        "blockNumberTo" => "",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "0"
       }
 
       response =
@@ -1318,11 +1258,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           ]
           |> Enum.map(fn tuple -> map_tuple_to_api_item(:group, tuple) end),
         "totalRewardAmounts" => %{"cUSD" => to_string(total_rewards |> Wei.to(:ether))},
-        "totalRewardCount" => "4",
-        "blockNumberFrom" => "#{block_1.number - 1}",
-        "blockNumberTo" => "#{block_2.number + 1}",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "4"
       }
 
       response_first_page =
@@ -1332,8 +1268,8 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "action" => "getgrouprewards",
           "groupAddress" => to_string(group_2_hash),
           "page_size" => "3",
-          "blockNumberFrom" => "#{block_1.number - 1}",
-          "blockNumberTo" => "#{block_2.number + 1}"
+          "dateFrom" => "#{block_1.timestamp}",
+          "dateTo" => "#{block_2.timestamp}"
         })
         |> json_response(200)
 
@@ -1350,11 +1286,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           ]
           |> Enum.map(fn tuple -> map_tuple_to_api_item(:group, tuple) end),
         "totalRewardAmounts" => %{"cUSD" => to_string(total_rewards |> Wei.to(:ether))},
-        "totalRewardCount" => "4",
-        "blockNumberFrom" => "#{block_1.number - 1}",
-        "blockNumberTo" => "#{block_2.number + 1}",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "4"
       }
 
       response_second_page =
@@ -1388,11 +1320,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           ]
           |> Enum.map(fn tuple -> map_tuple_to_api_item(:group, tuple) end),
         "totalRewardAmounts" => %{"cUSD" => to_string(total_rewards_single_validator_multiple_voters |> Wei.to(:ether))},
-        "totalRewardCount" => "2",
-        "blockNumberFrom" => "#{block_3.number}",
-        "blockNumberTo" => "#{block_3.number}",
-        "dateFrom" => "",
-        "dateTo" => ""
+        "totalRewardCount" => "2"
       }
 
       response_single_group_multiple_validators =
@@ -2248,7 +2176,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
   defp rewards_schema do
     resolve_schema(%{
       "type" => ["object", "null"],
-      "required" => ["totalRewardAmounts", "totalRewardCount", "blockNumberFrom", "blockNumberTo", "rewards"],
+      "required" => ["totalRewardAmounts", "totalRewardCount", "rewards"],
       "properties" => %{
         "totalRewardAmounts" => %{
           "type" => "object",
@@ -2259,8 +2187,6 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           }
         },
         "totalRewardCount" => %{"type" => "string"},
-        "blockNumberFrom" => %{"type" => "string"},
-        "blockNumberTo" => %{"type" => "string"},
         "rewards" => %{
           "type" => "array",
           "items" => %{

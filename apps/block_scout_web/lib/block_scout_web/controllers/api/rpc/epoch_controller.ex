@@ -207,7 +207,7 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
   defp fetch_date(date_param) do
     {:date_param,
      case DateTime.from_iso8601(date_param) do
-       {:ok, datetime} -> {:ok, datetime}
+       {:ok, datetime, _} -> {:ok, datetime}
        _ -> {:error, :invalid_format}
      end}
   end
