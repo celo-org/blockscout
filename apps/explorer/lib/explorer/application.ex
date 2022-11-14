@@ -7,6 +7,8 @@ defmodule Explorer.Application do
 
   alias Explorer.Admin
 
+  alias Explorer.Celo.Events.ContractEventStream
+
   alias Explorer.Chain.Cache.{
     Accounts,
     AddressSum,
@@ -38,7 +40,9 @@ defmodule Explorer.Application do
 
     # Children to start in all environments
     base_children = [
-      Explorer.Repo,
+      {Fly.RPC, []},
+      Explorer.Repo.Local,
+      {Fly.Postgres.LSN.Tracker, repo: Explorer.Repo.Local},
       Supervisor.child_spec({SpandexDatadog.ApiServer, datadog_opts()}, id: SpandexDatadog.ApiServer),
       Supervisor.child_spec({Task.Supervisor, name: Explorer.HistoryTaskSupervisor}, id: Explorer.HistoryTaskSupervisor),
       Supervisor.child_spec({Task.Supervisor, name: Explorer.MarketTaskSupervisor}, id: Explorer.MarketTaskSupervisor),
@@ -96,7 +100,8 @@ defmodule Explorer.Application do
       configure(Explorer.Counters.Bridge),
       configure(Explorer.Validator.MetadataProcessor),
       configure(Explorer.Staking.ContractState),
-      configure(MinMissingBlockNumber)
+      configure(MinMissingBlockNumber),
+      configure(ContractEventStream)
     ]
     |> List.flatten()
   end

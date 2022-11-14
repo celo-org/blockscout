@@ -388,7 +388,7 @@ jobs:
           # Match apps/explorer/config/test.exs config :explorer, Explorer.Repo, database
           POSTGRES_DB: explorer_test
           # match PGPASSWORD for elixir image above
-          POSTGRES_PASSWORD: 1234
+          POSTGRES_PASSWORD: postgres
           # match PGUSER for elixir image above
           POSTGRES_USER: postgres
         # Set health checks to wait until postgres has started
@@ -464,7 +464,7 @@ jobs:
           # Match apps/explorer/config/test.exs config :explorer, Explorer.Repo, database
           POSTGRES_DB: explorer_test
           # match PGPASSWORD for elixir image above
-          POSTGRES_PASSWORD: 1234
+          POSTGRES_PASSWORD: postgres
           # match PGUSER for elixir image above
           POSTGRES_USER: postgres
         # Set health checks to wait until postgres has started
@@ -534,7 +534,7 @@ jobs:
           # Match apps/explorer/config/test.exs config :explorer, Explorer.Repo, database
           POSTGRES_DB: explorer_test
           # match PGPASSWORD for elixir image above
-          POSTGRES_PASSWORD: 1234
+          POSTGRES_PASSWORD: postgres
           # match PGUSER for elixir image above
           POSTGRES_USER: postgres
         # Set health checks to wait until postgres has started
