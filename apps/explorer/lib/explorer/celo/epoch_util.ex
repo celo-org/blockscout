@@ -29,6 +29,7 @@ defmodule Explorer.Celo.EpochUtil do
     end
   end
 
+  def round_to_closest_epoch_block_number(nil = _block_number, _), do: nil
   def round_to_closest_epoch_block_number(block_number, :up), do: ceil(block_number / 17_280) * 17_280
   def round_to_closest_epoch_block_number(block_number, :down) when block_number < 17_280, do: 17_280
   def round_to_closest_epoch_block_number(block_number, :down), do: floor(block_number / 17_280) * 17_280

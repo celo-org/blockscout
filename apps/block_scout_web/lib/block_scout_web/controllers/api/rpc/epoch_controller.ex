@@ -13,19 +13,23 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
          {:address_param, group_address_param} <- get_address(params, "groupAddress"),
          {:voter_format, {:ok, voter_hash_list}} <- to_address_hash_list(address_param, :voter_format),
          {:group_format, {:ok, group_hash_list}} <- to_address_hash_list(group_address_param, :group_format),
-         {:block_number_param, {:ok, from}} <- fetch_block_number(params["from"]),
-         {:block_number_param, {:ok, to}} <- fetch_block_number(params["to"]),
+         {:block_number_param, {:ok, block_number_from}} <- fetch_block_number(params["blockNumberFrom"]),
+         {:block_number_param, {:ok, block_number_to}} <- fetch_block_number(params["blockNumberTo"]),
+         {:date_param, {:ok, date_from}} <- fetch_date(params["dateFrom"]),
+         {:date_param, {:ok, date_to}} <- fetch_date(params["dateTo"]),
          %{page_size: page_size, page_number: page_number} <-
            GenericPagingOptions.extract_paging_options_from_params(params, @api_voter_rewards_max_page_size),
          rewards <-
            CeloElectionRewards.get_epoch_rewards(
+             "voter",
              voter_hash_list,
-             ["voter"],
              group_hash_list,
-             from,
-             to,
              page_number,
-             page_size
+             page_size,
+             block_number_from: block_number_from,
+             block_number_to: block_number_to,
+             date_from: date_from,
+             date_to: date_to
            ) do
       render(conn, :getvoterrewards, rewards: rewards)
     else
@@ -43,6 +47,9 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
 
       {:block_number_param, {:error, :invalid_number}} ->
         render(conn, :error, error: "Block number must be greater than 0")
+
+      {:date_param, {:error, :invalid_format}} ->
+        render(conn, :error, error: "Wrong format for date provided")
     end
   end
 
@@ -51,19 +58,23 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
          {:address_param, group_address_param} <- get_address(params, "groupAddress"),
          {:validator_format, {:ok, validator_hash_list}} <- to_address_hash_list(address_param, :validator_format),
          {:group_format, {:ok, group_hash_list}} <- to_address_hash_list(group_address_param, :group_format),
-         {:block_number_param, {:ok, from}} <- fetch_block_number(params["from"]),
-         {:block_number_param, {:ok, to}} <- fetch_block_number(params["to"]),
+         {:block_number_param, {:ok, block_number_from}} <- fetch_block_number(params["blockNumberFrom"]),
+         {:block_number_param, {:ok, block_number_to}} <- fetch_block_number(params["blockNumberTo"]),
+         {:date_param, {:ok, date_from}} <- fetch_date(params["dateFrom"]),
+         {:date_param, {:ok, date_to}} <- fetch_date(params["dateTo"]),
          %{page_size: page_size, page_number: page_number} <-
            GenericPagingOptions.extract_paging_options_from_params(params, @api_validator_rewards_max_page_size),
          rewards <-
            CeloElectionRewards.get_epoch_rewards(
+             "validator",
              validator_hash_list,
-             ["validator"],
              group_hash_list,
-             from,
-             to,
              page_number,
-             page_size
+             page_size,
+             block_number_from: block_number_from,
+             block_number_to: block_number_to,
+             date_from: date_from,
+             date_to: date_to
            ) do
       render(conn, :getvalidatorrewards, rewards: rewards)
     else
@@ -81,6 +92,9 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
 
       {:block_number_param, {:error, :invalid_number}} ->
         render(conn, :error, error: "Block number must be greater than 0")
+
+      {:date_param, {:error, :invalid_format}} ->
+        render(conn, :error, error: "Wrong format for date provided")
     end
   end
 
@@ -90,19 +104,23 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
          {:group_format, {:ok, group_hash_list}} <- to_address_hash_list(group_address_param, :group_format),
          {:validator_format, {:ok, validator_hash_list}} <-
            to_address_hash_list(validator_address_param, :validator_format),
-         {:block_number_param, {:ok, from}} <- fetch_block_number(params["from"]),
-         {:block_number_param, {:ok, to}} <- fetch_block_number(params["to"]),
+         {:block_number_param, {:ok, block_number_from}} <- fetch_block_number(params["blockNumberFrom"]),
+         {:block_number_param, {:ok, block_number_to}} <- fetch_block_number(params["blockNumberTo"]),
+         {:date_param, {:ok, date_from}} <- fetch_date(params["dateFrom"]),
+         {:date_param, {:ok, date_to}} <- fetch_date(params["dateTo"]),
          %{page_size: page_size, page_number: page_number} <-
            GenericPagingOptions.extract_paging_options_from_params(params, @api_group_rewards_max_page_size),
          rewards <-
            CeloElectionRewards.get_epoch_rewards(
+             "group",
              group_hash_list,
-             ["group"],
              validator_hash_list,
-             from,
-             to,
              page_number,
-             page_size
+             page_size,
+             block_number_from: block_number_from,
+             block_number_to: block_number_to,
+             date_from: date_from,
+             date_to: date_to
            ) do
       render(conn, :getgrouprewards, rewards: rewards)
     else
@@ -120,6 +138,9 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
 
       {:block_number_param, {:error, :invalid_number}} ->
         render(conn, :error, error: "Block number must be greater than 0")
+
+      {:date_param, {:error, :invalid_format}} ->
+        render(conn, :error, error: "Wrong format for date provided")
     end
   end
 
@@ -177,6 +198,16 @@ defmodule BlockScoutWeb.API.RPC.EpochController do
      case Integer.parse(block_number) do
        {int, ""} when int < 1 -> {:error, :invalid_number}
        {int, ""} -> {:ok, int}
+       _ -> {:error, :invalid_format}
+     end}
+  end
+
+  defp fetch_date(nil), do: {:date_param, {:ok, nil}}
+
+  defp fetch_date(date_param) do
+    {:date_param,
+     case DateTime.from_iso8601(date_param) do
+       {:ok, datetime, _} -> {:ok, datetime}
        _ -> {:error, :invalid_format}
      end}
   end
