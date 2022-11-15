@@ -8,9 +8,9 @@ defmodule Explorer.Export.CSV.EpochTransactionExporter do
       from: 2
     ]
 
+  alias Explorer.Celo.EpochUtil
   alias Explorer.Chain
   alias Explorer.Chain.{Address, CeloElectionRewards, Wei}
-  alias Explorer.Celo.EpochUtil
 
   @behaviour Explorer.Export.CSV.Exporter
 
