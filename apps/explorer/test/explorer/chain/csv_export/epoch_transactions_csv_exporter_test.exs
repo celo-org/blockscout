@@ -20,6 +20,11 @@ defmodule Explorer.CSV.Export.EpochTransactionsCsvExporterTest do
       %Address{hash: from_address_hash_validator} = insert(:address)
       %Address{hash: from_address_hash_group} = insert(:address)
 
+      insert(:celo_account, address: to_address.hash)
+      insert(:celo_account, address: from_address_hash_voter)
+      insert(:celo_account, address: from_address_hash_validator)
+      insert(:celo_account, address: from_address_hash_group)
+
       ignored_block_before =
         insert(
           :block,
