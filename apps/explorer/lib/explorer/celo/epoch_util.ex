@@ -4,7 +4,7 @@ defmodule Explorer.Celo.EpochUtil do
   """
   alias Explorer.Chain
   alias Explorer.Chain.CeloElectionRewards
-  alias Explorer.Celo.{Util}
+  alias Explorer.Celo.Util
 
   def epoch_by_block_number(bn) do
     div(bn, 17_280)

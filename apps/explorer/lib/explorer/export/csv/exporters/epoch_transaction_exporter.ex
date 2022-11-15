@@ -10,7 +10,7 @@ defmodule Explorer.Export.CSV.EpochTransactionExporter do
 
   alias Explorer.Chain
   alias Explorer.Chain.{Address, CeloElectionRewards, Wei}
-  alias Explorer.Celo.{EpochUtil}
+  alias Explorer.Celo.EpochUtil
 
   @behaviour Explorer.Export.CSV.Exporter
 
@@ -32,8 +32,6 @@ defmodule Explorer.Export.CSV.EpochTransactionExporter do
 
   @impl true
   def query(%Address{hash: address_hash}, from, to) do
-    IO.inspect(address_hash)
-
     from_block = Chain.convert_date_to_min_block(from)
     to_block = Chain.convert_date_to_max_block(to)
 

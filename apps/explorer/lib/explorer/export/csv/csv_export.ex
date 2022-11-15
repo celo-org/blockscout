@@ -5,7 +5,7 @@ defmodule Explorer.Export.CSV do
   alias Explorer.Repo
   alias NimbleCSV.RFC4180
   alias Plug.Conn
-  alias Explorer.Export.CSV.{TokenTransferExporter, TransactionExporter, EpochTransactionExporter}
+  alias Explorer.Export.CSV.{EpochTransactionExporter, TokenTransferExporter, TransactionExporter}
 
   @transaction_timeout :timer.minutes(5) + :timer.seconds(10)
   @query_timeout :timer.minutes(5)
