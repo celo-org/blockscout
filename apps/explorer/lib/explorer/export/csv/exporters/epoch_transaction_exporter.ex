@@ -2,42 +2,44 @@ defmodule Explorer.Export.CSV.EpochTransactionExporter do
   @moduledoc "Export all Epoch Transactions for given address"
 
   import Ecto.Query
-  alias Explorer.Chain
-  alias Explorer.Chain.{Address, CeloElectionRewards, Wei}
-  import Explorer.Export.CSV.Utils
 
   import Ecto.Query,
     only: [
       from: 2
     ]
 
+  alias Explorer.Chain.{Address, CeloElectionRewards, Wei}
+  alias Explorer.Celo.{EpochUtil}
+
   @behaviour Explorer.Export.CSV.Exporter
 
   @preloads []
 
   @row_header [
-    "EpochNumber",
+    "Epoch",
     "BlockNumber",
-    "Timestamp",
+    "TimestampUTC",
+    "EpochTxType",
     "FromAddress",
-    "RewardType",
-    "Value"
+    "ToAddress",
+    "TokenSymbol",
+    "TokenContractAddress",
+    "Type",
+    "Value",
+    "ValueInWei"
   ]
 
   @impl true
   def query(%Address{hash: address_hash}, _from, _to) do
-    #    from_block = Chain.convert_date_to_min_block(from)
-    #    to_block = Chain.convert_date_to_max_block(to)
-
     from(rewards in CeloElectionRewards,
       select: %{
-        associated_account_hash: rewards.associated_account_hash,
-        value: rewards.amount,
-        from_address: rewards.associated_account_hash,
+        epoch_number: fragment("? / 17280", rewards.block_number),
         block_number: rewards.block_number,
         timestamp: rewards.block_timestamp,
-        epoch_number: fragment("? / 17280", rewards.block_number),
-        reward_type: rewards.reward_type
+        epoch_tx_type: rewards.reward_type,
+        from_address: rewards.associated_account_hash,
+        to_address: rewards.account_hash,
+        value_wei: rewards.amount
       },
       order_by: [desc: rewards.block_number, asc: rewards.reward_type],
       where: rewards.account_hash == ^address_hash,
@@ -52,14 +54,37 @@ defmodule Explorer.Export.CSV.EpochTransactionExporter do
   def row_names, do: @row_header
 
   @impl true
-  def transform(epoch_transaction, address) do
+  def transform(epoch_transaction, _address) do
     [
+      #      "Epoch",
       epoch_transaction.epoch_number,
+      #      "BlockNumber",
       epoch_transaction.block_number,
+      #      "TimestampUTC",
       to_string(epoch_transaction.timestamp),
-      to_string(epoch_transaction.associated_account_hash),
-      epoch_transaction.reward_type,
-      Wei.to(epoch_transaction.value, :wei)
+      #      "EpochTxType",
+      epoch_transaction.epoch_tx_type |> reward_type_to_human_readable,
+      #      "FromAddress",
+      to_string(epoch_transaction.from_address),
+      #      "ToAddress",
+      to_string(epoch_transaction.to_address),
+      #      "TokenSymbol",
+      epoch_transaction.epoch_tx_type |> token_symbol(),
+      #      "TokenContractAddress",
+      epoch_transaction.epoch_tx_type |> EpochUtil.get_reward_currency_address_hash(),
+      #      "Type",
+      "IN",
+      #      "Value",
+      Wei.to(epoch_transaction.value_wei, :ether),
+      #      "ValueInWei",
+      Wei.to(epoch_transaction.value_wei, :wei)
     ]
   end
+
+  defp reward_type_to_human_readable("voter"), do: "Voter Rewards"
+  defp reward_type_to_human_readable("validator"), do: "Validator Rewards"
+  defp reward_type_to_human_readable("group"), do: "Validator Group Rewards"
+
+  defp token_symbol("voter"), do: "CELO"
+  defp token_symbol(type) when type in ["validator", "group"], do: "cUSD"
 end
