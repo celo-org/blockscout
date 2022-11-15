@@ -15,17 +15,43 @@ defmodule Explorer.CSV.Export.EpochTransactionsCsvExporterTest do
       })
 
       to_address = insert(:address)
-      epoch_number = 902
 
       %Address{hash: from_address_hash_voter} = insert(:address)
       %Address{hash: from_address_hash_validator} = insert(:address)
       %Address{hash: from_address_hash_group} = insert(:address)
 
+      ignored_block_before =
+        insert(
+          :block,
+          number: 17_280 * 901,
+          timestamp: ~U[2022-10-11T18:53:12.162804Z]
+        )
+
+      insert(
+        :block,
+        number: 17_280 * 901 + 1,
+        timestamp: ~U[2022-10-11T18:53:12.162804Z]
+      )
+
       block =
         insert(
           :block,
-          number: 17_280 * epoch_number,
+          number: 17_280 * 902,
           timestamp: ~U[2022-10-12T18:53:12.162804Z]
+        )
+
+      block_2 =
+        insert(
+          :block,
+          number: 17_280 * 903,
+          timestamp: ~U[2022-10-13T18:53:12.162804Z]
+        )
+
+      ignored_block_after =
+        insert(
+          :block,
+          number: 17_280 * 904,
+          timestamp: ~U[2022-10-14T18:53:12.162804Z]
         )
 
       voter_reward =
@@ -39,13 +65,34 @@ defmodule Explorer.CSV.Export.EpochTransactionsCsvExporterTest do
           reward_type: "voter"
         )
 
+      # Inserting another voter rewards, but for block that should not be picked up because of the time range
+      insert(
+        :celo_election_rewards,
+        account_hash: to_address.hash,
+        associated_account_hash: from_address_hash_voter,
+        block_number: ignored_block_before.number,
+        block_timestamp: ignored_block_before.timestamp,
+        amount: 123_456_789_012_345_678_901,
+        reward_type: "voter"
+      )
+
+      insert(
+        :celo_election_rewards,
+        account_hash: to_address.hash,
+        associated_account_hash: from_address_hash_voter,
+        block_number: ignored_block_after.number,
+        block_timestamp: ignored_block_after.timestamp,
+        amount: 123_456_789_012_345_678_901,
+        reward_type: "voter"
+      )
+
       validator_reward =
         insert(
           :celo_election_rewards,
           account_hash: to_address.hash,
           associated_account_hash: from_address_hash_validator,
-          block_number: block.number,
-          block_timestamp: block.timestamp,
+          block_number: block_2.number,
+          block_timestamp: block_2.timestamp,
           amount: 456_789_012_345_678_901_234,
           reward_type: "validator"
         )
@@ -72,9 +119,9 @@ defmodule Explorer.CSV.Export.EpochTransactionsCsvExporterTest do
           reward_type: "group"
         )
 
-      {:ok, csv} = Explorer.Export.CSV.export_epoch_transactions(to_address, [])
+      {:ok, csv} = Explorer.Export.CSV.export_epoch_transactions(to_address, "2022-10-12", "2022-10-13", [])
 
-      [result_group, result_validator, result_voter] =
+      [result_validator, result_group, result_voter] =
         csv
         |> Enum.drop(1)
         |> Enum.map(fn [
@@ -116,7 +163,7 @@ defmodule Explorer.CSV.Export.EpochTransactionsCsvExporterTest do
           }
         end)
 
-      assert result_voter.epoch_number == to_string(epoch_number)
+      assert result_voter.epoch_number == "902"
       assert result_voter.block_number == to_string(block.number)
       assert result_voter.timestamp == to_string(voter_reward.block_timestamp)
       assert result_voter.epoch_tx_type == "Voter Rewards"
@@ -128,8 +175,8 @@ defmodule Explorer.CSV.Export.EpochTransactionsCsvExporterTest do
       assert result_voter.value == to_string(voter_reward.amount |> Wei.to(:ether))
       assert result_voter.value_wei == to_string(voter_reward.amount)
 
-      assert result_validator.epoch_number == to_string(epoch_number)
-      assert result_validator.block_number == to_string(block.number)
+      assert result_validator.epoch_number == "903"
+      assert result_validator.block_number == to_string(block_2.number)
       assert result_validator.timestamp == to_string(validator_reward.block_timestamp)
       assert result_validator.epoch_tx_type == "Validator Rewards"
       assert result_validator.from_address == from_address_hash_validator |> normalize_address()
@@ -140,7 +187,7 @@ defmodule Explorer.CSV.Export.EpochTransactionsCsvExporterTest do
       assert result_validator.value == to_string(validator_reward.amount |> Wei.to(:ether))
       assert result_validator.value_wei == to_string(validator_reward.amount)
 
-      assert result_group.epoch_number == to_string(epoch_number)
+      assert result_group.epoch_number == "902"
       assert result_group.block_number == to_string(block.number)
       assert result_group.timestamp == to_string(group_reward.block_timestamp)
       assert result_group.epoch_tx_type == "Validator Group Rewards"

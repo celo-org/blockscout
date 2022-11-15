@@ -72,7 +72,7 @@ defmodule Explorer.Export.CSV do
     export(TokenTransferExporter, address, from, to, destination)
   end
 
-  def export_epoch_transactions(address, destination) do
-    export(EpochTransactionExporter, address, nil, nil, destination)
+  def export_epoch_transactions(address, from, to, destination) do
+    export(EpochTransactionExporter, address, from, to, destination)
   end
 end

@@ -8,6 +8,7 @@ defmodule Explorer.Export.CSV.EpochTransactionExporter do
       from: 2
     ]
 
+  alias Explorer.Chain
   alias Explorer.Chain.{Address, CeloElectionRewards, Wei}
   alias Explorer.Celo.{EpochUtil}
 
@@ -30,21 +31,29 @@ defmodule Explorer.Export.CSV.EpochTransactionExporter do
   ]
 
   @impl true
-  def query(%Address{hash: address_hash}, _from, _to) do
-    from(rewards in CeloElectionRewards,
-      select: %{
-        epoch_number: fragment("? / 17280", rewards.block_number),
-        block_number: rewards.block_number,
-        timestamp: rewards.block_timestamp,
-        epoch_tx_type: rewards.reward_type,
-        from_address: rewards.associated_account_hash,
-        to_address: rewards.account_hash,
-        value_wei: rewards.amount
-      },
-      order_by: [desc: rewards.block_number, asc: rewards.reward_type],
-      where: rewards.account_hash == ^address_hash,
-      where: rewards.amount > ^%Wei{value: Decimal.new(0)}
-    )
+  def query(%Address{hash: address_hash}, from, to) do
+    IO.inspect(address_hash)
+
+    from_block = Chain.convert_date_to_min_block(from)
+    to_block = Chain.convert_date_to_max_block(to)
+
+    query =
+      from(rewards in CeloElectionRewards,
+        select: %{
+          epoch_number: fragment("? / 17280", rewards.block_number),
+          block_number: rewards.block_number,
+          timestamp: rewards.block_timestamp,
+          epoch_tx_type: rewards.reward_type,
+          from_address: rewards.associated_account_hash,
+          to_address: rewards.account_hash,
+          value_wei: rewards.amount
+        },
+        order_by: [desc: rewards.block_number, asc: rewards.reward_type],
+        where: rewards.account_hash == ^address_hash,
+        where: rewards.amount > ^%Wei{value: Decimal.new(0)}
+      )
+
+    query |> Chain.where_block_number_in_period(from_block, to_block)
   end
 
   @impl true
