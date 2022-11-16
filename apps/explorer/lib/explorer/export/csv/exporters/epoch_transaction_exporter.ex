@@ -106,7 +106,7 @@ defmodule Explorer.Export.CSV.EpochTransactionExporter do
   end
 
   # Unlikely case when there's no locked/activated gold data for a particular account
-  defp locked_or_activated_gold_when_applicable(nil = value, "voter"), do: "unknown"
+  defp locked_or_activated_gold_when_applicable(nil = _value, "voter"), do: "unknown"
   defp locked_or_activated_gold_when_applicable(%Wei{} = value, "voter"), do: value |> Wei.to(:ether)
   defp locked_or_activated_gold_when_applicable(%Decimal{} = value, "voter"), do: %Wei{value: value} |> Wei.to(:ether)
 
