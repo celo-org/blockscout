@@ -70,6 +70,27 @@ defmodule Explorer.CSV.Export.EpochTransactionsCsvExporterTest do
           reward_type: "voter"
         )
 
+      insert(
+        :celo_account_epoch,
+        account_hash: to_address.hash,
+        block_hash: block.hash,
+        block_number: block.number,
+        total_locked_gold: 1_000_000_000_000_000_000_123,
+        nonvoting_locked_gold: 122
+      )
+
+      # Handling the case where there is no locked/activated gold information for given account/epoch pair
+      voter_reward_2 =
+        insert(
+          :celo_election_rewards,
+          account_hash: to_address.hash,
+          associated_account_hash: from_address_hash_voter,
+          block_number: block_2.number,
+          block_timestamp: block_2.timestamp,
+          amount: 123_456_789_012_345_678_901,
+          reward_type: "voter"
+        )
+
       # Inserting another voter rewards, but for block that should not be picked up because of the time range
       insert(
         :celo_election_rewards,
@@ -126,7 +147,7 @@ defmodule Explorer.CSV.Export.EpochTransactionsCsvExporterTest do
 
       {:ok, csv} = Explorer.Export.CSV.export_epoch_transactions(to_address, "2022-10-12", "2022-10-13", [])
 
-      [result_validator, result_group, result_voter] =
+      [result_validator, result_voter_2, result_group, result_voter] =
         csv
         |> Enum.drop(1)
         |> Enum.map(fn [
@@ -148,6 +169,10 @@ defmodule Explorer.CSV.Export.EpochTransactionsCsvExporterTest do
                          _,
                          type,
                          _,
+                         locked_gold,
+                         _,
+                         activated_gold,
+                         _,
                          value,
                          _,
                          value_wei,
@@ -163,6 +188,8 @@ defmodule Explorer.CSV.Export.EpochTransactionsCsvExporterTest do
             tx_currency: tx_currency,
             tx_currency_contract_address: tx_currency_contract_address,
             type: type,
+            locked_gold: locked_gold,
+            activated_gold: activated_gold,
             value: value,
             value_wei: value_wei
           }
@@ -177,8 +204,24 @@ defmodule Explorer.CSV.Export.EpochTransactionsCsvExporterTest do
       assert result_voter.tx_currency == "CELO"
       assert result_voter.tx_currency_contract_address == celo_address |> normalize_address()
       assert result_voter.type == "IN"
+      assert result_voter.locked_gold == "1000.000000000000000123"
+      assert result_voter.activated_gold == "1000.000000000000000001"
       assert result_voter.value == to_string(voter_reward.amount |> Wei.to(:ether))
       assert result_voter.value_wei == to_string(voter_reward.amount)
+
+      assert result_voter_2.epoch_number == "903"
+      assert result_voter_2.block_number == to_string(block_2.number)
+      assert result_voter_2.timestamp == to_string(voter_reward_2.block_timestamp)
+      assert result_voter_2.epoch_tx_type == "Voter Rewards"
+      assert result_voter_2.from_address == from_address_hash_voter |> normalize_address()
+      assert result_voter_2.to_address == to_address.hash |> normalize_address()
+      assert result_voter_2.tx_currency == "CELO"
+      assert result_voter_2.tx_currency_contract_address == celo_address |> normalize_address()
+      assert result_voter_2.type == "IN"
+      assert result_voter_2.locked_gold == "unknown"
+      assert result_voter_2.activated_gold == "unknown"
+      assert result_voter_2.value == to_string(voter_reward.amount |> Wei.to(:ether))
+      assert result_voter_2.value_wei == to_string(voter_reward.amount)
 
       assert result_validator.epoch_number == "903"
       assert result_validator.block_number == to_string(block_2.number)
@@ -189,6 +232,8 @@ defmodule Explorer.CSV.Export.EpochTransactionsCsvExporterTest do
       assert result_validator.tx_currency == "cUSD"
       assert result_validator.tx_currency_contract_address == cusd_address |> normalize_address()
       assert result_validator.type == "IN"
+      assert result_validator.locked_gold == "N/A"
+      assert result_validator.activated_gold == "N/A"
       assert result_validator.value == to_string(validator_reward.amount |> Wei.to(:ether))
       assert result_validator.value_wei == to_string(validator_reward.amount)
 
@@ -201,6 +246,8 @@ defmodule Explorer.CSV.Export.EpochTransactionsCsvExporterTest do
       assert result_group.tx_currency == "cUSD"
       assert result_group.tx_currency_contract_address == cusd_address |> normalize_address()
       assert result_group.type == "IN"
+      assert result_validator.locked_gold == "N/A"
+      assert result_validator.activated_gold == "N/A"
       assert result_group.value == to_string(group_reward.amount |> Wei.to(:ether))
       assert result_group.value_wei == to_string(group_reward.amount)
     end

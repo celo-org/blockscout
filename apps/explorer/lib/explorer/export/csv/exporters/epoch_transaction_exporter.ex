@@ -10,7 +10,7 @@ defmodule Explorer.Export.CSV.EpochTransactionExporter do
 
   alias Explorer.Celo.EpochUtil
   alias Explorer.Chain
-  alias Explorer.Chain.{Address, CeloElectionRewards, Wei}
+  alias Explorer.Chain.{Address, CeloAccountEpoch, CeloElectionRewards, Wei}
 
   @behaviour Explorer.Export.CSV.Exporter
 
@@ -26,6 +26,8 @@ defmodule Explorer.Export.CSV.EpochTransactionExporter do
     "TokenSymbol",
     "TokenContractAddress",
     "Type",
+    "LockedGold",
+    "ActivatedGold",
     "Value",
     "ValueInWei"
   ]
@@ -37,6 +39,10 @@ defmodule Explorer.Export.CSV.EpochTransactionExporter do
 
     query =
       from(rewards in CeloElectionRewards,
+        left_join: celo_account_epoch in CeloAccountEpoch,
+        on:
+          rewards.account_hash == celo_account_epoch.account_hash and
+            celo_account_epoch.block_number == rewards.block_number,
         select: %{
           epoch_number: fragment("? / 17280", rewards.block_number),
           block_number: rewards.block_number,
@@ -44,7 +50,14 @@ defmodule Explorer.Export.CSV.EpochTransactionExporter do
           epoch_tx_type: rewards.reward_type,
           from_address: rewards.associated_account_hash,
           to_address: rewards.account_hash,
-          value_wei: rewards.amount
+          value_wei: rewards.amount,
+          locked_gold: celo_account_epoch.total_locked_gold,
+          activated_gold:
+            fragment(
+              "? - ?",
+              celo_account_epoch.total_locked_gold,
+              celo_account_epoch.nonvoting_locked_gold
+            )
         },
         order_by: [desc: rewards.block_number, asc: rewards.reward_type],
         where: rewards.account_hash == ^address_hash,
@@ -81,12 +94,24 @@ defmodule Explorer.Export.CSV.EpochTransactionExporter do
       epoch_transaction.epoch_tx_type |> EpochUtil.get_reward_currency_address_hash(),
       #      "Type",
       "IN",
+      #      "LockedGold",
+      epoch_transaction.locked_gold |> locked_or_activated_gold_when_applicable(epoch_transaction.epoch_tx_type),
+      #      "ActivatedGold",
+      epoch_transaction.activated_gold |> locked_or_activated_gold_when_applicable(epoch_transaction.epoch_tx_type),
       #      "Value",
-      Wei.to(epoch_transaction.value_wei, :ether),
+      epoch_transaction.value_wei |> Wei.to(:ether),
       #      "ValueInWei",
-      Wei.to(epoch_transaction.value_wei, :wei)
+      epoch_transaction.value_wei |> Wei.to(:wei)
     ]
   end
+
+  # Unlikely case when there's no locked/activated gold data for a particular account
+  defp locked_or_activated_gold_when_applicable(nil = value, "voter"), do: "unknown"
+  defp locked_or_activated_gold_when_applicable(%Wei{} = value, "voter"), do: value |> Wei.to(:ether)
+  defp locked_or_activated_gold_when_applicable(%Decimal{} = value, "voter"), do: %Wei{value: value} |> Wei.to(:ether)
+
+  defp locked_or_activated_gold_when_applicable(_value, reward_type) when reward_type in ["validator", "group"],
+    do: "N/A"
 
   defp reward_type_to_human_readable("voter"), do: "Voter Rewards"
   defp reward_type_to_human_readable("validator"), do: "Validator Rewards"
