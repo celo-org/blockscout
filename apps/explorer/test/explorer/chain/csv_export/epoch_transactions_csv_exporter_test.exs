@@ -163,10 +163,6 @@ defmodule Explorer.CSV.Export.EpochTransactionsCsvExporterTest do
                          _,
                          to_address,
                          _,
-                         tx_currency,
-                         _,
-                         tx_currency_contract_address,
-                         _,
                          type,
                          _,
                          locked_gold,
@@ -176,6 +172,10 @@ defmodule Explorer.CSV.Export.EpochTransactionsCsvExporterTest do
                          value,
                          _,
                          value_wei,
+                         _,
+                         tx_currency,
+                         _,
+                         tx_currency_contract_address,
                          _
                        ] ->
           %{

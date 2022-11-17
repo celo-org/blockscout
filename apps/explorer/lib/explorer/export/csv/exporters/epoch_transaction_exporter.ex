@@ -88,10 +88,6 @@ defmodule Explorer.Export.CSV.EpochTransactionExporter do
       to_string(epoch_transaction.from_address),
       #      "ToAddress",
       to_string(epoch_transaction.to_address),
-      #      "TokenSymbol",
-      epoch_transaction.epoch_tx_type |> token_symbol(),
-      #      "TokenContractAddress",
-      epoch_transaction.epoch_tx_type |> EpochUtil.get_reward_currency_address_hash(),
       #      "Type",
       "IN",
       #      "LockedGold",
@@ -101,7 +97,11 @@ defmodule Explorer.Export.CSV.EpochTransactionExporter do
       #      "Value",
       epoch_transaction.value_wei |> Wei.to(:ether),
       #      "ValueInWei",
-      epoch_transaction.value_wei |> Wei.to(:wei)
+      epoch_transaction.value_wei |> Wei.to(:wei),
+      #      "TokenSymbol",
+      epoch_transaction.epoch_tx_type |> token_symbol(),
+      #      "TokenContractAddress",
+      epoch_transaction.epoch_tx_type |> EpochUtil.get_reward_currency_address_hash()
     ]
   end
 
