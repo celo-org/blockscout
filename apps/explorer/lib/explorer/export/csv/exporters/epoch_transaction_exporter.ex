@@ -23,13 +23,13 @@ defmodule Explorer.Export.CSV.EpochTransactionExporter do
     "EpochTxType",
     "FromAddress",
     "ToAddress",
-    "TokenSymbol",
-    "TokenContractAddress",
     "Type",
     "LockedGold",
     "ActivatedGold",
     "Value",
-    "ValueInWei"
+    "ValueInWei",
+    "TokenSymbol",
+    "TokenContractAddress"
   ]
 
   @impl true
