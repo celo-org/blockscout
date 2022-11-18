@@ -152,7 +152,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
 
   def base_api_address_query do
     from(rewards in __MODULE__,
-      join: celo_account_epoch in CeloAccountEpoch,
+      left_join: celo_account_epoch in CeloAccountEpoch,
       on:
         rewards.account_hash == celo_account_epoch.account_hash and
           celo_account_epoch.block_hash == rewards.block_hash,

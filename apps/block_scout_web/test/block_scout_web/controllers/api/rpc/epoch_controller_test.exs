@@ -3,7 +3,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
 
   import Explorer.Factory
 
-  alias Explorer.Chain.{Address, Block, Wei}
+  alias Explorer.Chain.{Address, Block, CeloElectionRewards, Wei}
 
   describe "getvoterrewards" do
     setup [:setup_epoch_data]
@@ -339,6 +339,65 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "module" => "epoch",
           "action" => "getvoterrewards",
           "voterAddress" => "0x0000000000000000000000000000000000000002"
+        })
+        |> json_response(200)
+
+      assert response["result"] == expected_result
+      assert response["status"] == "1"
+      assert response["message"] == "OK"
+
+      assert :ok = ExJsonSchema.Validator.validate(rewards_schema(), response)
+    end
+
+    test "with missing locked/activated gold data", %{conn: conn} do
+      %Address{hash: voter_hash} = insert(:address)
+      %Address{hash: group_hash} = insert(:address)
+
+      %Block{hash: block_hash, number: block_number, timestamp: block_timestamp} =
+        insert(
+          :block,
+          number: 17280 * 902,
+          timestamp: ~U[2022-10-12T18:53:12.162804Z]
+        )
+
+      %CeloElectionRewards{amount: reward_amount} =
+        insert(
+          :celo_election_rewards,
+          account_hash: voter_hash,
+          amount: 8_943_276_509_843_275_698_432_756,
+          associated_account_hash: group_hash,
+          block_number: block_number,
+          block_timestamp: block_timestamp,
+          block_hash: block_hash
+        )
+
+      expected_result = %{
+        "rewards" => [
+          %{
+            "amounts" => %{"celo" => "8943276.509843275698432756", "wei" => "8943276509843275698432756"},
+            "blockHash" => to_string(block_hash),
+            "blockNumber" => to_string(block_number),
+            "blockTimestamp" => block_timestamp |> DateTime.to_iso8601(),
+            "epochNumber" => "902",
+            "meta" => %{"groupAddress" => to_string(group_hash)},
+            "rewardAddress" => to_string(voter_hash),
+            "rewardAddressActivatedGold" => %{"celo" => "unknown", "wei" => "unknown"},
+            "rewardAddressLockedGold" => %{"celo" => "unknown", "wei" => "unknown"}
+          }
+        ],
+        "totalRewardAmounts" => %{
+          "celo" => to_string(reward_amount |> Wei.to(:ether)),
+          "wei" => to_string(reward_amount)
+        },
+        "totalRewardCount" => "1"
+      }
+
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "epoch",
+          "action" => "getvoterrewards",
+          "voterAddress" => to_string(voter_hash)
         })
         |> json_response(200)
 
@@ -790,6 +849,63 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
       assert :ok = ExJsonSchema.Validator.validate(rewards_schema(), response)
     end
 
+    test "with missing locked/activated gold data", %{conn: conn} do
+      %Address{hash: validator_hash} = insert(:address)
+      %Address{hash: group_hash} = insert(:address)
+
+      %Block{hash: block_hash, number: block_number, timestamp: block_timestamp} =
+        insert(
+          :block,
+          number: 17280 * 902,
+          timestamp: ~U[2022-10-12T18:53:12.162804Z]
+        )
+
+      %CeloElectionRewards{amount: reward_amount} =
+        insert(
+          :celo_election_rewards,
+          account_hash: validator_hash,
+          amount: 8_943_276_509_843_275_698_432_756,
+          associated_account_hash: group_hash,
+          block_number: block_number,
+          block_timestamp: block_timestamp,
+          block_hash: block_hash,
+          reward_type: "validator"
+        )
+
+      expected_result = %{
+        "rewards" => [
+          %{
+            "amounts" => %{"cUSD" => "8943276.509843275698432756"},
+            "blockHash" => to_string(block_hash),
+            "blockNumber" => to_string(block_number),
+            "blockTimestamp" => block_timestamp |> DateTime.to_iso8601(),
+            "epochNumber" => "902",
+            "meta" => %{"groupAddress" => to_string(group_hash)},
+            "rewardAddress" => to_string(validator_hash),
+            "rewardAddressActivatedGold" => %{"celo" => "unknown", "wei" => "unknown"},
+            "rewardAddressLockedGold" => %{"celo" => "unknown", "wei" => "unknown"}
+          }
+        ],
+        "totalRewardAmounts" => %{"cUSD" => to_string(reward_amount |> Wei.to(:ether))},
+        "totalRewardCount" => "1"
+      }
+
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "epoch",
+          "action" => "getvalidatorrewards",
+          "validatorAddress" => to_string(validator_hash)
+        })
+        |> json_response(200)
+
+      assert response["result"] == expected_result
+      assert response["status"] == "1"
+      assert response["message"] == "OK"
+
+      assert :ok = ExJsonSchema.Validator.validate(rewards_schema(), response)
+    end
+
     test "with valid validator addresses", %{
       conn: conn,
       validator_rewards_1_2_3: %{amount: reward_amount_1_2_3},
@@ -1212,6 +1328,63 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
           "module" => "epoch",
           "action" => "getgrouprewards",
           "groupAddress" => "0x1000000000000000000000000000000000000002"
+        })
+        |> json_response(200)
+
+      assert response["result"] == expected_result
+      assert response["status"] == "1"
+      assert response["message"] == "OK"
+
+      assert :ok = ExJsonSchema.Validator.validate(rewards_schema(), response)
+    end
+
+    test "with missing locked/activated gold data", %{conn: conn} do
+      %Address{hash: validator_hash} = insert(:address)
+      %Address{hash: group_hash} = insert(:address)
+
+      %Block{hash: block_hash, number: block_number, timestamp: block_timestamp} =
+        insert(
+          :block,
+          number: 17280 * 902,
+          timestamp: ~U[2022-10-12T18:53:12.162804Z]
+        )
+
+      %CeloElectionRewards{amount: reward_amount} =
+        insert(
+          :celo_election_rewards,
+          account_hash: group_hash,
+          amount: 8_943_276_509_843_275_698_432_756,
+          associated_account_hash: validator_hash,
+          block_number: block_number,
+          block_timestamp: block_timestamp,
+          block_hash: block_hash,
+          reward_type: "group"
+        )
+
+      expected_result = %{
+        "rewards" => [
+          %{
+            "amounts" => %{"cUSD" => "8943276.509843275698432756"},
+            "blockHash" => to_string(block_hash),
+            "blockNumber" => to_string(block_number),
+            "blockTimestamp" => block_timestamp |> DateTime.to_iso8601(),
+            "epochNumber" => "902",
+            "meta" => %{"validatorAddress" => to_string(validator_hash)},
+            "rewardAddress" => to_string(group_hash),
+            "rewardAddressActivatedGold" => %{"celo" => "unknown", "wei" => "unknown"},
+            "rewardAddressLockedGold" => %{"celo" => "unknown", "wei" => "unknown"}
+          }
+        ],
+        "totalRewardAmounts" => %{"cUSD" => to_string(reward_amount |> Wei.to(:ether))},
+        "totalRewardCount" => "1"
+      }
+
+      response =
+        conn
+        |> get("/api", %{
+          "module" => "epoch",
+          "action" => "getgrouprewards",
+          "groupAddress" => to_string(group_hash)
         })
         |> json_response(200)
 

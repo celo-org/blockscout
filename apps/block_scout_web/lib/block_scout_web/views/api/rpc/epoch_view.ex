@@ -67,9 +67,17 @@ defmodule BlockScoutWeb.API.RPC.EpochView do
     }
   end
 
-  defp prepare_rewards_response_item(reward, meta, currency) do
+  defp extract_locked_and_activated_gold_wei(%{account_locked_gold: nil, account_activated_gold: nil}), do: {nil, nil}
+
+  defp extract_locked_and_activated_gold_wei(reward) do
     {:ok, reward_address_locked_gold_wei} = Wei.cast(reward.account_locked_gold)
     {:ok, reward_address_activated_gold_wei} = Wei.cast(reward.account_activated_gold)
+
+    {reward_address_locked_gold_wei, reward_address_activated_gold_wei}
+  end
+
+  defp prepare_rewards_response_item(reward, meta, currency) do
+    {reward_address_locked_gold_wei, reward_address_activated_gold_wei} = extract_locked_and_activated_gold_wei(reward)
 
     %{
       amounts: reward.amount |> prepare_amounts(currency),
@@ -87,6 +95,12 @@ defmodule BlockScoutWeb.API.RPC.EpochView do
 
   defp prepare_amounts(amount, :celo), do: amount |> to_celo_wei_amount
   defp prepare_amounts(amount, :cusd), do: amount |> to_currency_amount("cUSD")
+
+  defp to_celo_wei_amount(nil = _wei),
+    do: %{
+      celo: "unknown",
+      wei: "unknown"
+    }
 
   defp to_celo_wei_amount(wei),
     do: %{
