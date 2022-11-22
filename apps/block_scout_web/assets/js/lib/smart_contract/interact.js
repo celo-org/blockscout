@@ -221,8 +221,7 @@ const sanctionedAddresses = [
   '0x0143008e904feea7140c831585025bc174eb2f15'
 ]
 
-
-const sanctionText = "The wallet address has been sanctioned by the U.S. Department of the Treasury. All U.S. persons are prohibited from accessing, receiving, accepting, or facilitating any property and interests in property (including use of any technology, software or software patch(es)) of these designated digital wallet addresses. These prohibitions include the making of any contribution or provision of funds, goods, or services by, to, or for the benefit of any blocked person and the receipt of any contribution or provision of funds, goods, or services from any such person and all designated digital asset wallets."
+const sanctionText = 'The wallet address has been sanctioned by the U.S. Department of the Treasury. All U.S. persons are prohibited from accessing, receiving, accepting, or facilitating any property and interests in property (including use of any technology, software or software patch(es)) of these designated digital wallet addresses. These prohibitions include the making of any contribution or provision of funds, goods, or services by, to, or for the benefit of any blocked person and the receipt of any contribution or provision of funds, goods, or services from any such person and all designated digital asset wallets.'
 
 function isSanctioned (address) {
   return sanctionedAddresses.includes(address.toLowerCase())
