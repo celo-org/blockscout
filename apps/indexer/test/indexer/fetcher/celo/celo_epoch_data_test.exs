@@ -1011,6 +1011,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
 
     %Block{hash: last_block_in_epoch_hash, number: last_block_in_epoch_number} = insert(:block, number: 172_800)
     log = insert(:log, block: second_to_last_block_in_epoch)
+    log_2 = insert(:log, block: last_block_in_epoch_number)
 
     insert(:celo_pending_epoch_operations, block_number: last_block_in_epoch_number)
 
@@ -1019,6 +1020,18 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
         __block_number: second_to_last_block_in_epoch_number,
         __contract_address_hash: contract_hash,
         __log_index: log.index,
+        account: voter_hash,
+        group: group_hash,
+        units: 10000,
+        value: 650
+      }
+    })
+
+    insert(:contract_event, %{
+      event: %ValidatorGroupVoteActivatedEvent{
+        __block_number: last_block_in_epoch_number,
+        __contract_address_hash: contract_hash,
+        __log_index: log_2.index,
         account: voter_hash,
         group: group_hash,
         units: 10000,
