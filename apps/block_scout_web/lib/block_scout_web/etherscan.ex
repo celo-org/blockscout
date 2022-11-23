@@ -888,7 +888,7 @@ defmodule BlockScoutWeb.Etherscan do
           "meta" => %{
             "groupAddress" => "0x000000000000000000000000000000000000000a"
           },
-          "rewardAddressActivatedGold" => %{
+          "rewardAddressVotingGold" => %{
             "celo" => "1154.13989309809164288",
             "wei" => "1154139893098091642880"
           },
@@ -911,7 +911,7 @@ defmodule BlockScoutWeb.Etherscan do
             "groupAddress" => "0x000000000000000000000000000000000000000b"
           },
           "rewardAddress" => "0x0000000000000000000000000000000000000009",
-          "rewardAddressActivatedGold" => %{
+          "rewardAddressVotingGold" => %{
             "celo" => "1154.13989309809164288",
             "wei" => "1154139893098091642880"
           },
@@ -933,7 +933,7 @@ defmodule BlockScoutWeb.Etherscan do
             "groupAddress" => "0x000000000000000000000000000000000000000a"
           },
           "rewardAddress" => "0x0000000000000000000000000000000000000009",
-          "rewardAddressActivatedGold" => %{
+          "rewardAddressVotingGold" => %{
             "celo" => "4105.7763412674379776",
             "wei" => "4105776341267437977600"
           },
@@ -968,7 +968,7 @@ defmodule BlockScoutWeb.Etherscan do
           "meta" => %{
             "groupAddress" => "0x000000000000000000000000000000000000000a"
           },
-          "rewardAddressActivatedGold" => %{
+          "rewardAddressVotingGold" => %{
             "cusd" => "1154.13989309809164288"
           },
           "rewardAddress" => "0x0000000000000000000000000000000000000009",
@@ -989,7 +989,7 @@ defmodule BlockScoutWeb.Etherscan do
             "groupAddress" => "0x000000000000000000000000000000000000000b"
           },
           "rewardAddress" => "0x0000000000000000000000000000000000000009",
-          "rewardAddressActivatedGold" => %{
+          "rewardAddressVotingGold" => %{
             "celo" => "1154.13989309809164288",
             "wei" => "1154139893098091642880"
           },
@@ -1010,7 +1010,7 @@ defmodule BlockScoutWeb.Etherscan do
             "groupAddress" => "0x000000000000000000000000000000000000000a"
           },
           "rewardAddress" => "0x0000000000000000000000000000000000000009",
-          "rewardAddressActivatedGold" => %{
+          "rewardAddressVotingGold" => %{
             "celo" => "4105.7763412674379776",
             "wei" => "4105776341267437977600"
           },
@@ -1044,7 +1044,7 @@ defmodule BlockScoutWeb.Etherscan do
           "meta" => %{
             "validatorAddress" => "0x000000000000000000000000000000000000000a"
           },
-          "rewardAddressActivatedGold" => %{
+          "rewardAddressVotingGold" => %{
             "cusd" => "1154.13989309809164288"
           },
           "rewardAddress" => "0x0000000000000000000000000000000000000009",
@@ -1065,7 +1065,7 @@ defmodule BlockScoutWeb.Etherscan do
             "validatorAddress" => "0x000000000000000000000000000000000000000b"
           },
           "rewardAddress" => "0x0000000000000000000000000000000000000009",
-          "rewardAddressActivatedGold" => %{
+          "rewardAddressVotingGold" => %{
             "celo" => "1154.13989309809164288",
             "wei" => "1154139893098091642880"
           },
@@ -1086,7 +1086,7 @@ defmodule BlockScoutWeb.Etherscan do
             "validatorAddress" => "0x000000000000000000000000000000000000000a"
           },
           "rewardAddress" => "0x0000000000000000000000000000000000000009",
-          "rewardAddressActivatedGold" => %{
+          "rewardAddressVotingGold" => %{
             "celo" => "4105.7763412674379776",
             "wei" => "4105776341267437977600"
           },
@@ -1976,7 +1976,7 @@ defmodule BlockScoutWeb.Etherscan do
         epochNumber: @epoch_number_type,
         rewardAddress: @address_hash_type,
         rewardAddressLockedGold: @amounts_per_currency_type,
-        rewardAddressActivatedGold: @amounts_per_currency_type,
+        rewardAddressVotingGold: @amounts_per_currency_type,
         meta: @epoch_rewards_meta_type,
         amount: @amounts_per_currency_type
       }
@@ -4172,14 +4172,14 @@ defmodule BlockScoutWeb.Etherscan do
         key: "pageNumber",
         placeholder: "pageNumber",
         type: "integer",
-        description: "A nonnegative integer that represents the page number to be used for pagination."
+        description: "A nonnegative integer that represents the page number to be used for pagination. Default: 1"
       },
       %{
         key: "pageSize",
         placeholder: "pageSize",
         type: "integer",
         description:
-          "A nonnegative integer that represents the maximum number of records (per page) to return when paginating."
+          "A nonnegative integer that represents the maximum number of records (per page) to return when paginating. Default: 100"
       }
     ],
     responses: [
@@ -4253,14 +4253,14 @@ defmodule BlockScoutWeb.Etherscan do
         key: "pageNumber",
         placeholder: "pageNumber",
         type: "integer",
-        description: "A nonnegative integer that represents the page number to be used for pagination."
+        description: "A nonnegative integer that represents the page number to be used for pagination. Default: 1"
       },
       %{
         key: "pageSize",
         placeholder: "pageSize",
         type: "integer",
         description:
-          "A nonnegative integer that represents the maximum number of records (per page) to return when paginating."
+          "A nonnegative integer that represents the maximum number of records (per page) to return when paginating. Default: 100"
       }
     ],
     responses: [
@@ -4334,14 +4334,14 @@ defmodule BlockScoutWeb.Etherscan do
         key: "pageNumber",
         placeholder: "pageNumber",
         type: "integer",
-        description: "A nonnegative integer that represents the page number to be used for pagination."
+        description: "A nonnegative integer that represents the page number to be used for pagination. Default: 1"
       },
       %{
         key: "pageSize",
         placeholder: "pageSize",
         type: "integer",
         description:
-          "A nonnegative integer that represents the maximum number of records (per page) to return when paginating."
+          "A nonnegative integer that represents the maximum number of records (per page) to return when paginating. Default: 100"
       }
     ],
     responses: [
