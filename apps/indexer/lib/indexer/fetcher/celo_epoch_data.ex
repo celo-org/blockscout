@@ -130,15 +130,11 @@ defmodule Indexer.Fetcher.CeloEpochData do
         after_rewards_votes = fetch_votes_from_blockchain(Map.put(account_group_pair, :block_number, block_number))
 
         plus_revoked_minus_activated_votes =
-          if before_rewards_votes == after_rewards_votes do
-            0
-          else
-            VoterRewards.subtract_activated_add_revoked(%{
-              account_hash: account_group_pair.account_hash,
-              block_number: block_number - 1,
-              group_hash: account_group_pair.group_hash
-            })
-          end
+          VoterRewards.subtract_activated_add_revoked(%{
+            account_hash: account_group_pair.account_hash,
+            block_number: block_number - 1,
+            group_hash: account_group_pair.group_hash
+          })
 
         reward_value =
           calculate_voter_rewards(after_rewards_votes, before_rewards_votes, plus_revoked_minus_activated_votes)
@@ -155,6 +151,13 @@ defmodule Indexer.Fetcher.CeloEpochData do
 
     Map.merge(block, %{voter_rewards: voter_rewards})
   end
+
+  def calculate_voter_rewards(after_rewards_votes, before_rewards_votes, _plus_revoked_minus_activated_votes)
+      when after_rewards_votes == before_rewards_votes,
+      do: 0
+
+  def calculate_voter_rewards(0 = _after_rewards_votes, _before_rewards_votes, _plus_revoked_minus_activated_votes),
+    do: 0
 
   def calculate_voter_rewards(after_rewards_votes, before_rewards_votes, nil = _votes_plus_revoked_minus_activated),
     do: after_rewards_votes - before_rewards_votes
