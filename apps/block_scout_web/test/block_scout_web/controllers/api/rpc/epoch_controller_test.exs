@@ -381,7 +381,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
             "epochNumber" => "902",
             "meta" => %{"groupAddress" => to_string(group_hash)},
             "rewardAddress" => to_string(voter_hash),
-            "rewardAddressActivatedGold" => %{"celo" => "unknown", "wei" => "unknown"},
+            "rewardAddressVotingGold" => %{"celo" => "unknown", "wei" => "unknown"},
             "rewardAddressLockedGold" => %{"celo" => "unknown", "wei" => "unknown"}
           }
         ],
@@ -882,7 +882,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
             "epochNumber" => "902",
             "meta" => %{"groupAddress" => to_string(group_hash)},
             "rewardAddress" => to_string(validator_hash),
-            "rewardAddressActivatedGold" => %{"celo" => "unknown", "wei" => "unknown"},
+            "rewardAddressVotingGold" => %{"celo" => "unknown", "wei" => "unknown"},
             "rewardAddressLockedGold" => %{"celo" => "unknown", "wei" => "unknown"}
           }
         ],
@@ -1371,7 +1371,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
             "epochNumber" => "902",
             "meta" => %{"validatorAddress" => to_string(validator_hash)},
             "rewardAddress" => to_string(group_hash),
-            "rewardAddressActivatedGold" => %{"celo" => "unknown", "wei" => "unknown"},
+            "rewardAddressVotingGold" => %{"celo" => "unknown", "wei" => "unknown"},
             "rewardAddressLockedGold" => %{"celo" => "unknown", "wei" => "unknown"}
           }
         ],
@@ -2222,7 +2222,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
       "meta" => %{
         "groupAddress" => to_string(group_hash)
       },
-      "rewardAddressActivatedGold" => %{
+      "rewardAddressVotingGold" => %{
         "celo" => to_string(activated_gold |> Wei.to(:ether)),
         "wei" => to_string(activated_gold)
       },
@@ -2249,7 +2249,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
       "meta" => %{
         "groupAddress" => to_string(group_hash)
       },
-      "rewardAddressActivatedGold" => %{
+      "rewardAddressVotingGold" => %{
         "celo" => to_string(activated_gold |> Wei.to(:ether)),
         "wei" => to_string(activated_gold)
       },
@@ -2276,7 +2276,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
       "meta" => %{
         "validatorAddress" => to_string(validator_hash)
       },
-      "rewardAddressActivatedGold" => %{
+      "rewardAddressVotingGold" => %{
         "celo" => to_string(activated_gold |> Wei.to(:ether)),
         "wei" => to_string(activated_gold)
       },
@@ -2371,7 +2371,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
               "epochNumber",
               "rewardAddress",
               "rewardAddressLockedGold",
-              "rewardAddressActivatedGold",
+              "rewardAddressVotingGold",
               "meta",
               "amounts"
             ],
@@ -2388,7 +2388,7 @@ defmodule BlockScoutWeb.API.RPC.EpochControllerTest do
                   "wei" => %{"type" => "string"}
                 }
               },
-              "rewardAddressActivatedGold" => %{
+              "rewardAddressVotingGold" => %{
                 "type" => "object",
                 "properties" => %{
                   "celo" => %{"type" => "string"},

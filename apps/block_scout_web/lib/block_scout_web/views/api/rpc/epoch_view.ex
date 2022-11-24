@@ -88,7 +88,7 @@ defmodule BlockScoutWeb.API.RPC.EpochView do
       meta:
         Map.new(Enum.map(meta, fn {meta_key, reward_key} -> {meta_key, to_string(Map.get(reward, reward_key))} end)),
       rewardAddress: to_string(reward.account_hash),
-      rewardAddressActivatedGold: reward_address_activated_gold_wei |> to_celo_wei_amount,
+      rewardAddressVotingGold: reward_address_activated_gold_wei |> to_celo_wei_amount,
       rewardAddressLockedGold: reward_address_locked_gold_wei |> to_celo_wei_amount
     }
   end
