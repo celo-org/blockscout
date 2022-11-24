@@ -180,6 +180,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
     setup [:setup_voter_rewards_when_revoked_block_before]
 
     test "calculates the rewards", %{
+      block_hash: block_hash,
       block_number: block_number,
       block_timestamp: block_timestamp,
       voter_hash: voter_hash,
