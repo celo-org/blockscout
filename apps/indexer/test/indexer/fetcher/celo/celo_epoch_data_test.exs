@@ -186,9 +186,11 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
       group_hash: group_hash
     } do
       assert CeloEpochDataFetcher.get_voter_rewards(%{
+               block_hash: block_hash,
                block_number: block_number,
                block_timestamp: block_timestamp
              }) == %{
+               block_hash: block_hash,
                block_number: block_number,
                block_timestamp: block_timestamp,
                voter_rewards: [
@@ -196,6 +198,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
                    account_hash: voter_hash,
                    associated_account_hash: group_hash,
                    amount: 0,
+                   block_hash: block_hash,
                    block_number: block_number,
                    block_timestamp: block_timestamp,
                    reward_type: "voter"
@@ -209,15 +212,18 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
     setup [:setup_voter_rewards_when_revoked_at_epoch_block]
 
     test "calculates the rewards", %{
+      block_hash: block_hash,
       block_number: block_number,
       block_timestamp: block_timestamp,
       voter_hash: voter_hash,
       group_hash: group_hash
     } do
       assert CeloEpochDataFetcher.get_voter_rewards(%{
+               block_hash: block_hash,
                block_number: block_number,
                block_timestamp: block_timestamp
              }) == %{
+               block_hash: block_hash,
                block_number: block_number,
                block_timestamp: block_timestamp,
                voter_rewards: [
@@ -225,6 +231,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
                    account_hash: voter_hash,
                    associated_account_hash: group_hash,
                    amount: 0,
+                   block_hash: block_hash,
                    block_number: block_number,
                    block_timestamp: block_timestamp,
                    reward_type: "voter"
@@ -1361,6 +1368,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
     )
 
     Map.merge(context, %{
+      block_hash: epoch_block.hash,
       block_number: epoch_block.number,
       block_timestamp: epoch_block.timestamp,
       voter_hash: voter_address.hash,
@@ -1465,6 +1473,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
     )
 
     Map.merge(context, %{
+      block_hash: epoch_block.hash,
       block_number: epoch_block.number,
       block_timestamp: epoch_block.timestamp,
       voter_hash: voter_address.hash,
