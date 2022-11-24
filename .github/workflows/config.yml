@@ -8,7 +8,6 @@ on:
     branches:
       - master
       - staking
-      - shazarre/Epoch_API
 
 env:
   MIX_ENV: test
