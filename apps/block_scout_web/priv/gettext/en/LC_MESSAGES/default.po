@@ -2804,11 +2804,6 @@ msgstr ""
 msgid "button"
 msgstr ""
 
-#: lib/block_scout_web/templates/stats/index.html.eex:22
-#, elixir-autogen, elixir-format
-msgid "cStables"
-msgstr ""
-
 #: lib/block_scout_web/templates/address/overview.html.eex:231
 #, elixir-autogen, elixir-format
 msgid "cUSD"
@@ -3729,4 +3724,9 @@ msgstr ""
 #: lib/block_scout_web/templates/address/overview.html.eex:119
 #, elixir-autogen, elixir-format
 msgid "Contract was precompiled and created at genesis or contract creation transaction is missing"
+msgstr ""
+
+#: lib/block_scout_web/templates/stats/index.html.eex:22
+#, elixir-autogen, elixir-format
+msgid "Mento"
 msgstr ""
