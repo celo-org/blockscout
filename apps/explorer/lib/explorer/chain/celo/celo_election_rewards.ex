@@ -143,6 +143,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
           reward_type: rewards.reward_type
         },
         order_by: [desc: rewards.block_number, asc: rewards.reward_type],
+        preload: [:address, :associated_address],
         where: rewards.account_hash in ^account_hash_list,
         where: rewards.reward_type in ^reward_type_list
       )
