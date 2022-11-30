@@ -24,3 +24,6 @@ config :logger, :token_instances,
 
 config :explorer, Explorer.Celo.CoreContracts, enabled: true, refresh: :timer.hours(1)
 config :explorer, Explorer.Celo.AddressCache, Explorer.Celo.CoreContracts
+
+config :explorer, Explorer.Chain.Events.Listener, event_source: Explorer.Chain.Events.DBSource
+
