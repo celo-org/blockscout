@@ -15,7 +15,7 @@ defmodule Explorer.Chain.CeloElectionRewards do
     ]
 
   alias Explorer.Celo.EpochUtil
-  alias Explorer.Chain.{Block, CeloAccount, CeloAccountEpoch, Hash, Wei}
+  alias Explorer.Chain.{Block, CeloAccountEpoch, Hash, Wei}
   alias Explorer.Repo
 
   @required_attrs ~w(account_hash amount associated_account_hash block_number block_timestamp block_hash reward_type)a
