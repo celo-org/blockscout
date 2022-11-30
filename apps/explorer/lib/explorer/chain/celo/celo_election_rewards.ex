@@ -130,20 +130,8 @@ defmodule Explorer.Chain.CeloElectionRewards do
   def base_address_query(account_hash_list, reward_type_list) do
     query =
       from(rewards in __MODULE__,
-        join: acc in CeloAccount,
-        on: rewards.associated_account_hash == acc.address,
-        select: %{
-          account_hash: rewards.account_hash,
-          amount: rewards.amount,
-          associated_account_name: acc.name,
-          associated_account_hash: rewards.associated_account_hash,
-          block_number: rewards.block_number,
-          date: rewards.block_timestamp,
-          epoch_number: fragment("? / 17280", rewards.block_number),
-          reward_type: rewards.reward_type
-        },
         order_by: [desc: rewards.block_number, asc: rewards.reward_type],
-        preload: [:address, :associated_address],
+        preload: [:address, [associated_address: :celo_account]],
         where: rewards.account_hash in ^account_hash_list,
         where: rewards.reward_type in ^reward_type_list
       )
