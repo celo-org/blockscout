@@ -59,7 +59,7 @@
   "file_system": {:hex, :file_system, "0.2.10", "fb082005a9cd1711c05b5248710f8826b02d7d1784e7c3451f9c1231d4fc162d", [:mix], [], "hexpm", "41195edbfb562a593726eda3b3e8b103a309b733ad25f3d642ba49696bf715dc"},
   "floki": {:hex, :floki, "0.33.1", "f20f1eb471e726342b45ccb68edb9486729e7df94da403936ea94a794f072781", [:mix], [{:html_entities, "~> 0.5.0", [hex: :html_entities, repo: "hexpm", optional: false]}], "hexpm", "461035fd125f13fdf30f243c85a0b1e50afbec876cbf1ceefe6fddd2e6d712c6"},
   "flow": {:hex, :flow, "1.2.0", "515e03aa3d056cecc3e3f1e80f6ca4bbf5f45b13c88dee5db880b2f3f24f1caa", [:mix], [{:gen_stage, "~> 1.0", [hex: :gen_stage, repo: "hexpm", optional: false]}], "hexpm", "1b45bfc8a9202c5ec80b077c21df133561e56c56189ba4082dddccb6b5762525"},
-  "fly_postgres": {:git, "https://github.com/clabs-co/fly_postgres_elixir.git", "992a77ce7e279675fc9565e681a7409ce8f018ee", [ref: "992a77c"]},
+  "fly_postgres": {:git, "https://github.com/clabs-co/fly_postgres_elixir.git", "a2a1ed13a6e52afd14a85c24750f3b3193cf152f", [ref: "a2a1ed1"]},
   "fly_rpc": {:hex, :fly_rpc, "0.1.6", "6a955b304230056807049473a85385213bd4351d1910f0ab2ff7d73d1e8b2ded", [:mix], [], "hexpm", "9a8a49a2500ac789f46df5a369207a6bafb25736b559bd2086dbb29925dc9e37"},
   "gen_stage": {:hex, :gen_stage, "1.1.2", "b1656cd4ba431ed02c5656fe10cb5423820847113a07218da68eae5d6a260c23", [:mix], [], "hexpm", "9e39af23140f704e2b07a3e29d8f05fd21c2aaf4088ff43cb82be4b9e3148d02"},
   "gettext": {:hex, :gettext, "0.20.0", "75ad71de05f2ef56991dbae224d35c68b098dd0e26918def5bb45591d5c8d429", [:mix], [], "hexpm", "1c03b177435e93a47441d7f681a7040bd2a816ece9e2666d1c9001035121eb3d"},
