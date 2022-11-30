@@ -28,7 +28,7 @@ config :indexer, :telemetry_config, [
     metric_id: "indexer_local_db_query",
     meta: %{
       metric_labels: [:func],
-      help: "DB queries executed against local db",
+      help: "DB queries this app executed against local db",
       function: &Indexer.Celo.Telemetry.Helper.transform_db_call/2
     }
   ],
@@ -38,7 +38,17 @@ config :indexer, :telemetry_config, [
     metric_id: "indexer_remote_db_query",
     meta: %{
       metric_labels: [:func],
-      help: "DB queries rpc'd to primary",
+      help: "DB queries this app rpc'd to primary",
+      function: &Indexer.Celo.Telemetry.Helper.transform_db_call/2
+    }
+  ],
+  [
+    name: [:fly_postgres, :remote_exec],
+    type: :summary,
+    metric_id: "indexer_handled_rpc_query",
+    meta: %{
+      metric_labels: [:func],
+      help: "DB queries this app has received via rpc for execution",
       function: &Indexer.Celo.Telemetry.Helper.transform_db_call/2
     }
   ]
