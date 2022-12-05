@@ -37,7 +37,7 @@ screenshots/
 # Sobelow
 .sobelow
 
-# osx 
+# osx
 .DS_Store
 
 *.iml
@@ -53,3 +53,7 @@ node_modules
 .elixir_ls
 /docker-compose/postgres-data
 /docker-compose/tmp
+**/*/junit.xml
+
+.idea/
+*.iml

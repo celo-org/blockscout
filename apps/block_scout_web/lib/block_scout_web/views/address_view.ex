@@ -4,7 +4,7 @@ defmodule BlockScoutWeb.AddressView do
   require Logger
 
   alias BlockScoutWeb.{AccessHelpers, LayoutView}
-  alias Explorer.{Chain, CustomContractsHelpers}
+  alias Explorer.{Chain, CustomContractsHelpers, Repo}
 
   alias Explorer.Chain.{
     Address,
@@ -190,7 +190,7 @@ defmodule BlockScoutWeb.AddressView do
       do: ""
 
   def balance_percentage(%Address{fetched_coin_balance: balance}, total_supply) do
-    if Decimal.cmp(total_supply, 0) == :gt do
+    if Decimal.compare(total_supply, 0) == :gt do
       balance
       |> Wei.to(:ether)
       |> Decimal.div(Decimal.new(total_supply))
@@ -240,9 +240,11 @@ defmodule BlockScoutWeb.AddressView do
   end
 
   @doc """
-  Returns the primary name of an address if available.
+  Returns the primary name of an address if available. If there is no names on address function performs preload of names association.
   """
-  def primary_name(%Address{names: [_ | _] = address_names}) do
+  def primary_name(_, second_time? \\ false)
+
+  def primary_name(%Address{names: [_ | _] = address_names}, _second_time?) do
     case Enum.find(address_names, &(&1.primary == true)) do
       nil ->
         %Address.Name{name: name} = Enum.at(address_names, 0)
@@ -253,9 +255,11 @@ defmodule BlockScoutWeb.AddressView do
     end
   end
 
-  def primary_name(%Address{names: _} = _address) do
-    nil
+  def primary_name(%Address{names: _} = address, false) do
+    primary_name(Repo.preload(address, [:names]), true)
   end
+
+  def primary_name(%Address{names: _}, true), do: nil
 
   def implementation_name(%Address{smart_contract: %{implementation_name: implementation_name}}),
     do: implementation_name
@@ -509,22 +513,6 @@ defmodule BlockScoutWeb.AddressView do
   end
 
   def smart_contract_is_gnosis_safe_proxy?(_address), do: false
-
-  def is_omni_bridge?(nil), do: false
-
-  def is_omni_bridge?(address_hash) do
-    address_hash_str = "0x" <> Base.encode16(address_hash.bytes, case: :lower)
-
-    address_hash_str == String.downcase(System.get_env("ETH_OMNI_BRIDGE_MEDIATOR", "")) ||
-      address_hash_str == String.downcase(System.get_env("BSC_OMNI_BRIDGE_MEDIATOR", ""))
-  end
-
-  def is_amb_bridge?(nil), do: false
-
-  def is_amb_bridge?(address_hash) do
-    address_hash_str = "0x" <> Base.encode16(address_hash.bytes, case: :lower)
-    String.downcase(System.get_env("AMB_BRIDGE_MEDIATORS", "")) =~ address_hash_str
-  end
 
   def wei_to_ether_rounded(amount), do: amount |> Wei.to(:ether) |> then(&Decimal.round(&1, 2))
 end

@@ -4,22 +4,23 @@ import { compareChainIDs, formatError, formatTitleAndError, getContractABI, getC
 import { fullPath } from '../utils'
 
 export const queryMethod = (isWalletEnabled, url, $methodId, args, type, functionName, $responseContainer) => {
-  let data = {
+  const data = {
     function_name: functionName,
     method_id: $methodId.val(),
-    type,
-    args
+    type
   }
+
+  data.args_count = args.length
+  let i = args.length
+
+  while (i--) {
+    data['arg_' + i] = args[i]
+  }
+
   if (isWalletEnabled) {
     getCurrentAccountPromise(window.web3 && window.web3.currentProvider)
       .then((currentAccount) => {
-        data = {
-          function_name: functionName,
-          method_id: $methodId.val(),
-          type,
-          from: currentAccount,
-          args
-        }
+        data.from = currentAccount
         $.get(url, data, response => $responseContainer.html(response))
       }
       )
@@ -51,7 +52,7 @@ export const callMethod = (isWalletEnabled, $functionInputs, explorerChainId, $f
         })
         .then((currentAccount) => {
           if (isSanctioned(currentAccount)) {
-            openErrorModal('Error in sending transaction', 'Address is sanctioned', false)
+            openErrorModal('Error in sending transaction', sanctionText, false)
             return
           }
 
@@ -219,6 +220,8 @@ const sanctionedAddresses = [
   // address for testing
   '0x0143008e904feea7140c831585025bc174eb2f15'
 ]
+
+const sanctionText = 'The wallet address has been sanctioned by the U.S. Department of the Treasury. All U.S. persons are prohibited from accessing, receiving, accepting, or facilitating any property and interests in property (including use of any technology, software or software patch(es)) of these designated digital wallet addresses. These prohibitions include the making of any contribution or provision of funds, goods, or services by, to, or for the benefit of any blocked person and the receipt of any contribution or provision of funds, goods, or services from any such person and all designated digital asset wallets.'
 
 function isSanctioned (address) {
   return sanctionedAddresses.includes(address.toLowerCase())

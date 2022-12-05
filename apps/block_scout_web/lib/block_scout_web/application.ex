@@ -10,7 +10,7 @@ defmodule BlockScoutWeb.Application do
   alias BlockScoutWeb.{CampaignBannerCache, LoggerBackend}
   alias BlockScoutWeb.Counters.BlocksIndexedCounter
   alias BlockScoutWeb.{Endpoint, Prometheus}
-  alias BlockScoutWeb.{RealtimeEventHandler, StakingEventHandler}
+  alias BlockScoutWeb.RealtimeEventHandler
   alias Prometheus.{Exporter, GenericInstrumenter}
 
   def start(_type, _args) do
@@ -29,13 +29,12 @@ defmodule BlockScoutWeb.Application do
         child_spec(Endpoint, []),
         {Absinthe.Subscription, Endpoint},
         {RealtimeEventHandler, name: RealtimeEventHandler},
-        {StakingEventHandler, name: StakingEventHandler},
         {BlocksIndexedCounter, name: BlocksIndexedCounter},
         {CampaignBannerCache, name: CampaignBannerCache}
       ]
       |> cluster_process(Application.get_env(:block_scout_web, :environment))
 
-    opts = [strategy: :one_for_one, name: BlockScoutWeb.Supervisor]
+    opts = [strategy: :one_for_one, name: BlockScoutWeb.Supervisor, max_restarts: 1_000]
     Supervisor.start_link(children, opts)
   end
 

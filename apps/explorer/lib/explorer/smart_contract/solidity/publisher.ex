@@ -7,7 +7,7 @@ defmodule Explorer.SmartContract.Solidity.Publisher do
   alias Explorer.Celo.PubSub
   alias Explorer.Chain
   alias Explorer.Chain.SmartContract
-  alias Explorer.SmartContract.CompilerVersion
+  alias Explorer.SmartContract.{CompilerVersion, Helper}
   alias Explorer.SmartContract.Solidity.Verifier
 
   @doc """
@@ -44,6 +44,9 @@ defmodule Explorer.SmartContract.Solidity.Publisher do
 
       {:error, error, error_message} ->
         {:error, unverified_smart_contract(address_hash, params_with_external_libaries, error, error_message)}
+
+      _ ->
+        {:error, unverified_smart_contract(address_hash, params_with_external_libaries, "Unexpected error", nil)}
     end
   end
 
@@ -106,7 +109,10 @@ defmodule Explorer.SmartContract.Solidity.Publisher do
   end
 
   defp unverified_smart_contract(address_hash, params, error, error_message, json_verification \\ false) do
-    attrs = attributes(address_hash, params)
+    attrs =
+      address_hash
+      |> attributes(params)
+      |> Helper.add_contract_code_md5()
 
     changeset =
       SmartContract.invalid_contract_changeset(
@@ -154,7 +160,8 @@ defmodule Explorer.SmartContract.Solidity.Publisher do
       abi: abi,
       verified_via_sourcify: params["verified_via_sourcify"],
       partially_verified: params["partially_verified"],
-      is_vyper_contract: false
+      is_vyper_contract: false,
+      autodetect_constructor_args: params["autodetect_constructor_args"]
     }
   end
 
