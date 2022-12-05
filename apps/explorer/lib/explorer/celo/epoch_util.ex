@@ -19,7 +19,7 @@ defmodule Explorer.Celo.EpochUtil do
   def calculate_epoch_transaction_count_for_block(bn, epoch_rewards) do
     if is_epoch_block?(bn) do
       additional_transactions_count =
-        if Decimal.cmp(epoch_rewards.reserve_bolster.value, 0) == :gt do
+        if Decimal.compare(epoch_rewards.reserve_bolster.value, 0) == :gt do
           3
         else
           2
@@ -30,6 +30,11 @@ defmodule Explorer.Celo.EpochUtil do
       0
     end
   end
+
+  def round_to_closest_epoch_block_number(nil = _block_number, _), do: nil
+  def round_to_closest_epoch_block_number(block_number, :up), do: ceil(block_number / 17_280) * 17_280
+  def round_to_closest_epoch_block_number(block_number, :down) when block_number < 17_280, do: 17_280
+  def round_to_closest_epoch_block_number(block_number, :down), do: floor(block_number / 17_280) * 17_280
 
   def get_reward_currency_address_hash(reward_type) do
     with {:ok, address_string} <-

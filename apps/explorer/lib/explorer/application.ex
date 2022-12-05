@@ -13,9 +13,10 @@ defmodule Explorer.Application do
     Accounts,
     AddressSum,
     AddressSumMinusBurnt,
-    BlockCount,
+    Block,
     BlockNumber,
     Blocks,
+    GasPriceOracle,
     MinMissingBlockNumber,
     NetVersion,
     Transactions,
@@ -54,8 +55,9 @@ defmodule Explorer.Application do
       {Admin.Recovery, [[], [name: Admin.Recovery]]},
       AddressSum,
       AddressSumMinusBurnt,
-      BlockCount,
+      Block,
       Blocks,
+      GasPriceOracle,
       NetVersion,
       BlockNumber,
       con_cache_child_spec(MarketHistoryCache.cache_name()),
@@ -69,7 +71,7 @@ defmodule Explorer.Application do
 
     children = base_children ++ configurable_children()
 
-    opts = [strategy: :one_for_one, name: Explorer.Supervisor]
+    opts = [strategy: :one_for_one, name: Explorer.Supervisor, max_restarts: 1_000]
 
     Supervisor.start_link(children, opts)
   end
@@ -99,7 +101,6 @@ defmodule Explorer.Application do
       configure(Explorer.Celo.SignerCache),
       configure(Explorer.Counters.Bridge),
       configure(Explorer.Validator.MetadataProcessor),
-      configure(Explorer.Staking.ContractState),
       configure(MinMissingBlockNumber),
       configure(ContractEventStream)
     ]

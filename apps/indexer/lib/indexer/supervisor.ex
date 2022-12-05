@@ -7,15 +7,10 @@ defmodule Indexer.Supervisor do
 
   alias Explorer.Celo.InternalTransactionCache
 
-  alias Explorer.Chain
-
   alias Indexer.{
     Block,
-    CalcLpTokensTotalLiqudity,
     PendingOpsCleaner,
-    PendingTransactionsSanitizer,
-    SetAmbBridgedMetadataForTokens,
-    SetOmniBridgedMetadataForTokens
+    PendingTransactionsSanitizer
   }
 
   alias Indexer.Block.{Catchup, Realtime}
@@ -112,14 +107,21 @@ defmodule Indexer.Supervisor do
 
     realtime_subscribe_named_arguments = realtime_overrides[:subscribe_named_arguments] || subscribe_named_arguments
 
+    realtime_fetcher =
+      if Application.get_env(:indexer, Realtime.Supervisor)[:enabled] do
+        [
+          {Realtime.Supervisor,
+           [
+             %{block_fetcher: realtime_block_fetcher, subscribe_named_arguments: realtime_subscribe_named_arguments},
+             [name: Realtime.Supervisor]
+           ]}
+        ]
+      else
+        []
+      end
+
     basic_fetchers = [
       # Root fetchers
-      {PendingTransaction.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments]]},
-      {Realtime.Supervisor,
-       [
-         %{block_fetcher: realtime_block_fetcher, subscribe_named_arguments: realtime_subscribe_named_arguments},
-         [name: Realtime.Supervisor]
-       ]},
       {Catchup.Supervisor,
        [
          %{block_fetcher: block_fetcher, block_interval: block_interval, memory_monitor: memory_monitor},
@@ -175,23 +177,6 @@ defmodule Indexer.Supervisor do
       {CeloEpochData.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments, memory_monitor: memory_monitor]]}
     ]
 
-    fetchers_with_bridged_tokens =
-      if Chain.bridged_tokens_enabled?() do
-        fetchers_with_omni_status = [{SetOmniBridgedMetadataForTokens, [[], []]} | basic_fetchers]
-        [{CalcLpTokensTotalLiqudity, [[], []]} | fetchers_with_omni_status]
-      else
-        basic_fetchers
-      end
-
-    amb_bridge_mediators = Application.get_env(:block_scout_web, :amb_bridge_mediators)
-
-    fetchers_with_amb_bridge_mediators =
-      if amb_bridge_mediators && amb_bridge_mediators !== "" do
-        [{SetAmbBridgedMetadataForTokens, [[], []]} | fetchers_with_bridged_tokens]
-      else
-        fetchers_with_bridged_tokens
-      end
-
     metrics_enabled = Application.get_env(:indexer, :metrics_enabled)
 
     fetchers_with_metrics =
@@ -201,13 +186,20 @@ defmodule Indexer.Supervisor do
           {Task.Supervisor, name: Indexer.Prometheus.MetricsCron.TaskSupervisor}
         ]
 
-        metrics_processes ++ fetchers_with_amb_bridge_mediators
+        metrics_processes ++ basic_fetchers
       else
-        fetchers_with_amb_bridge_mediators
+        basic_fetchers
       end
 
+    all_fetchers =
+      [
+        {PendingTransaction.Supervisor, [[json_rpc_named_arguments: json_rpc_named_arguments]]}
+      ] ++
+        realtime_fetcher ++
+        fetchers_with_metrics
+
     Supervisor.init(
-      fetchers_with_metrics,
+      all_fetchers,
       strategy: :one_for_one
     )
   end
