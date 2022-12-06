@@ -244,7 +244,7 @@ const elements = {
     render ($el, state, oldState) {
       if (oldState.blocks === state.blocks) return
 
-      //celo: returning here to disable live update of block tiles to allow for replication lag
+      // celo: returning here to disable live update of block tiles to allow for replication lag
       if (oldState.blocks.length >= BLOCKS_PER_PAGE) return
 
       const container = $el[0]
