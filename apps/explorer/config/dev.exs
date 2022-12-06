@@ -27,5 +27,4 @@ config :explorer, Explorer.Celo.AddressCache, Explorer.Celo.CoreContracts
 
 # send chain activity notifications through db
 config :explorer, Explorer.Chain.Events.Listener, event_source: Explorer.Chain.Events.DBSource
-config :explorer, realtime_events_sender:  Explorer.Chain.Events.DBSender
-
+config :explorer, realtime_events_sender: Explorer.Chain.Events.DBSender

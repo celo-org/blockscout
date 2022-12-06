@@ -39,7 +39,7 @@ export function reducer (state, action) {
         return state
       }
 
-      //celo: deactivating new transaction on address page
+      // celo: deactivating new transaction on address page
       if (state.items && state.items.length > 0) return state
 
       return Object.assign({}, state, { items: [action.msg.transactionHtml, ...state.items] })
@@ -50,8 +50,7 @@ export function reducer (state, action) {
       const transactionCount = state.transactionCount + action.msgs.length
 
       if (!state.transactionsBatch.length && action.msgs.length < BATCH_THRESHOLD) {
-
-        //celo: deactivating new transaction on address page
+        // celo: deactivating new transaction on address page
         if (state.items && state.items.length > 0) return state
 
         return Object.assign({}, state, {
@@ -62,7 +61,7 @@ export function reducer (state, action) {
           transactionCount
         })
       } else {
-        //celo: deactivating new transaction on address page
+        // celo: deactivating new transaction on address page
         if (state.transactionsBatch.length > 0) return state
 
         return Object.assign({}, state, {

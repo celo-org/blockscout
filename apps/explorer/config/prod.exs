@@ -33,4 +33,3 @@ config :explorer, Explorer.Celo.CoreContracts, enabled: true, refresh: :timer.ho
 config :explorer, Explorer.Celo.AddressCache, Explorer.Celo.CoreContracts
 
 config :explorer, Explorer.Chain.Events.Listener, event_source: Explorer.Chain.Events.PubSubSource
-

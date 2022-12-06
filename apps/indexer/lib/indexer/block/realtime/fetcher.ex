@@ -92,7 +92,6 @@ defmodule Indexer.Block.Realtime.Fetcher do
       when is_binary(quantity) do
     number = quantity_to_integer(quantity)
 
-
     if number > 0 do
       Publisher.broadcast([{:last_block_number, number}], :realtime)
       Logger.info("WS announced new block #{number}")
