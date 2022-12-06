@@ -630,6 +630,7 @@ jobs:
       - test_parity_mox_explorer
       - test_parity_mox_indexer
       - test_parity_mox_block_scout_web
+      - jest
     if: success() || failure()
     steps:
       - name: Download Artifacts
