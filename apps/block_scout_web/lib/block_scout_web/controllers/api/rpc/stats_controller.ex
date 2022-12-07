@@ -14,6 +14,7 @@ defmodule BlockScoutWeb.API.RPC.StatsController do
       case Map.get(params, "cmc", nil) do
         nil ->
           render(conn, "tokensupply.json", total_supply: Decimal.to_string(token.total_supply))
+
         _ ->
           conn
           |> put_resp_content_type("text/plain")

@@ -84,7 +84,6 @@ defmodule BlockScoutWeb.API.RPC.StatsControllerTest do
       assert :ok = ExJsonSchema.Validator.validate(tokensupply_schema(), response)
     end
 
-
     test "with coinmarketcap param", %{conn: conn} do
       token = insert(:token, %{total_supply: 777.777})
 
