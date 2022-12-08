@@ -162,9 +162,11 @@ defmodule BlockScoutWeb.ViewingBlocksTest do
     end
   end
 
-  defp setup_mock_address do
+  defp setup_mock_address(context) do
     CacheHelper.set_test_addresses(%{
       "Governance" => "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"
     })
+
+    context
   end
 end
