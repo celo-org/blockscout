@@ -33,10 +33,10 @@ defmodule BlockScoutWeb.BlockChannel do
     {:noreply, socket}
   end
 
-  if System.get_env("DISABLE_LIVE_UPDATES") == "true" do
-    def render_block_views(_), do: {nil, nil}
-  else
-    def render_block_views(block) do
+  def render_block_views(block) do
+    if System.get_env("DISABLE_LIVE_UPDATES") == "true" do
+      {nil, nil}
+    else
       rendered_block =
         View.render_to_string(
           BlockView,
