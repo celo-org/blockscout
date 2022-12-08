@@ -5,6 +5,10 @@ defmodule BlockScoutWeb.ViewingBlocksTest do
   alias Explorer.Chain.Block
 
   setup do
+    set_test_addresses(%{
+      "Governance" => "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"
+    })
+
     timestamp = Timex.now() |> Timex.shift(hours: -1)
     [oldest_block | _] = Enum.map(308..310, &insert(:block, number: &1, timestamp: timestamp, gas_used: 10))
 
