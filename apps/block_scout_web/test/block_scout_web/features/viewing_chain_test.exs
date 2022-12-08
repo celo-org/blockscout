@@ -11,6 +11,8 @@ defmodule BlockScoutWeb.ViewingChainTest do
   alias Explorer.Chain.Block
   alias Explorer.Counters.AddressesCounter
 
+  import Mox
+
   setup :set_mox_global
 
   setup do

@@ -6,6 +6,8 @@ defmodule BlockScoutWeb.ViewingBlocksTest do
   alias Explorer.Celo.CacheHelper
   alias Explorer.Chain.Block
 
+  import Mox
+
   setup :set_mox_global
 
   setup do
