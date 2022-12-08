@@ -117,7 +117,7 @@ defmodule BlockScoutWeb.BlockView do
     |> format_wei_value(:ether)
   end
 
-  def community_fund_address() do
+  def community_fund_address do
     case(Util.get_address("Governance")) do
       {:ok, address_string} ->
         address_string
