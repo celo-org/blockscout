@@ -6,7 +6,11 @@ defmodule BlockScoutWeb.ViewingBlocksTest do
   alias Explorer.Celo.CacheHelper
   alias Explorer.Chain.Block
 
+  setup :set_mox_global
+
   setup do
+    setup_mock_address()
+
     timestamp = Timex.now() |> Timex.shift(hours: -1)
     [oldest_block | _] = Enum.map(308..310, &insert(:block, number: &1, timestamp: timestamp, gas_used: 10))
 
@@ -24,8 +28,6 @@ defmodule BlockScoutWeb.ViewingBlocksTest do
   end
 
   describe "block details page" do
-    setup [:setup_mock_address]
-
     test "show block detail page", %{session: session} do
       block = insert(:block, number: 42)
 
@@ -144,8 +146,6 @@ defmodule BlockScoutWeb.ViewingBlocksTest do
   end
 
   describe "viewing blocks list" do
-    setup [:setup_mock_address]
-
     test "viewing the blocks index page", %{first_shown_block: block, session: session} do
       session
       |> BlockListPage.visit_page()
