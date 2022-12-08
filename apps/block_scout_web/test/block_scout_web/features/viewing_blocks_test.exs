@@ -11,7 +11,9 @@ defmodule BlockScoutWeb.ViewingBlocksTest do
   setup :set_mox_global
 
   setup do
-    setup_mock_address()
+    CacheHelper.set_test_addresses(%{
+      "Governance" => "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"
+    })
 
     timestamp = Timex.now() |> Timex.shift(hours: -1)
     [oldest_block | _] = Enum.map(308..310, &insert(:block, number: &1, timestamp: timestamp, gas_used: 10))
@@ -162,13 +164,5 @@ defmodule BlockScoutWeb.ViewingBlocksTest do
       |> assert_has(BlockListPage.block(%Block{number: 314}))
       |> assert_has(BlockListPage.place_holder_blocks(3))
     end
-  end
-
-  defp setup_mock_address(context) do
-    CacheHelper.set_test_addresses(%{
-      "Governance" => "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"
-    })
-
-    context
   end
 end

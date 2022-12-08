@@ -16,7 +16,9 @@ defmodule BlockScoutWeb.ViewingChainTest do
   setup :set_mox_global
 
   setup do
-    setup_mock_address()
+    CacheHelper.set_test_addresses(%{
+      "Governance" => "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"
+    })
 
     Supervisor.terminate_child(Explorer.Supervisor, Explorer.Chain.Cache.Blocks.child_id())
     Supervisor.restart_child(Explorer.Supervisor, Explorer.Chain.Cache.Blocks.child_id())
@@ -165,13 +167,5 @@ defmodule BlockScoutWeb.ViewingChainTest do
       |> click(ChainPage.token_transfers_expansion(transaction))
       |> assert_has(ChainPage.token_transfers(transaction, count: 3))
     end
-  end
-
-  defp setup_mock_address(context) do
-    CacheHelper.set_test_addresses(%{
-      "Governance" => "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"
-    })
-
-    context
   end
 end
