@@ -2,10 +2,12 @@ defmodule BlockScoutWeb.ViewingBlocksTest do
   use BlockScoutWeb.FeatureCase, async: false
 
   alias BlockScoutWeb.{BlockListPage, BlockPage}
+
+  alias Explorer.Celo.CacheHelper
   alias Explorer.Chain.Block
 
   setup do
-    set_test_addresses(%{
+    CacheHelper.set_test_addresses(%{
       "Governance" => "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"
     })
 
