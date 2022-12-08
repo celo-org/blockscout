@@ -12,10 +12,6 @@ defmodule BlockScoutWeb.ViewingChainTest do
   alias Explorer.Counters.AddressesCounter
 
   setup do
-    CacheHelper.set_test_addresses(%{
-      "Governance" => "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"
-    })
-
     Supervisor.terminate_child(Explorer.Supervisor, Explorer.Chain.Cache.Blocks.child_id())
     Supervisor.restart_child(Explorer.Supervisor, Explorer.Chain.Cache.Blocks.child_id())
 
@@ -38,6 +34,8 @@ defmodule BlockScoutWeb.ViewingChainTest do
   end
 
   describe "viewing addresses" do
+    setup [:setup_mock_address]
+
     test "search for address", %{session: session} do
       address = insert(:address)
 
@@ -52,6 +50,8 @@ defmodule BlockScoutWeb.ViewingChainTest do
   end
 
   describe "viewing blocks" do
+    setup [:setup_mock_address]
+
     test "search for blocks from chain page", %{session: session} do
       block = insert(:block, number: 6)
 
@@ -87,6 +87,8 @@ defmodule BlockScoutWeb.ViewingChainTest do
   end
 
   describe "viewing transactions" do
+    setup [:setup_mock_address]
+
     test "search for transactions", %{session: session} do
       block = insert(:block)
 
@@ -163,5 +165,11 @@ defmodule BlockScoutWeb.ViewingChainTest do
       |> click(ChainPage.token_transfers_expansion(transaction))
       |> assert_has(ChainPage.token_transfers(transaction, count: 3))
     end
+  end
+
+  defp setup_mock_address do
+    CacheHelper.set_test_addresses(%{
+      "Governance" => "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"
+    })
   end
 end

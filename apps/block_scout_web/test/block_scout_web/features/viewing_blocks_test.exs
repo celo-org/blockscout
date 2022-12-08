@@ -7,10 +7,6 @@ defmodule BlockScoutWeb.ViewingBlocksTest do
   alias Explorer.Chain.Block
 
   setup do
-    CacheHelper.set_test_addresses(%{
-      "Governance" => "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"
-    })
-
     timestamp = Timex.now() |> Timex.shift(hours: -1)
     [oldest_block | _] = Enum.map(308..310, &insert(:block, number: &1, timestamp: timestamp, gas_used: 10))
 
@@ -28,6 +24,8 @@ defmodule BlockScoutWeb.ViewingBlocksTest do
   end
 
   describe "block details page" do
+    setup [:setup_mock_address]
+
     test "show block detail page", %{session: session} do
       block = insert(:block, number: 42)
 
@@ -146,6 +144,8 @@ defmodule BlockScoutWeb.ViewingBlocksTest do
   end
 
   describe "viewing blocks list" do
+    setup [:setup_mock_address]
+
     test "viewing the blocks index page", %{first_shown_block: block, session: session} do
       session
       |> BlockListPage.visit_page()
@@ -160,5 +160,11 @@ defmodule BlockScoutWeb.ViewingBlocksTest do
       |> assert_has(BlockListPage.block(%Block{number: 314}))
       |> assert_has(BlockListPage.place_holder_blocks(3))
     end
+  end
+
+  defp setup_mock_address do
+    CacheHelper.set_test_addresses(%{
+      "Governance" => "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"
+    })
   end
 end
