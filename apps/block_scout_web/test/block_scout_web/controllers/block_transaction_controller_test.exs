@@ -12,6 +12,8 @@ defmodule BlockScoutWeb.BlockTransactionControllerTest do
     CacheHelper.set_test_addresses(%{
       "Governance" => "0xD533Ca259b330c7A88f74E000a3FaEa2d63B7972"
     })
+
+    :ok
   end
 
   describe "GET index/2" do
