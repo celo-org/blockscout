@@ -7,6 +7,8 @@ import Config
 
 alias BlockScoutWeb.LoggerBackend
 
+config :phoenix, :json_library, Jason
+
 # General application configuration
 config :block_scout_web,
   namespace: BlockScoutWeb,
