@@ -38,7 +38,8 @@ ARG COIN
 
 # Cache elixir deps
 ADD mix.exs mix.lock ./
-ADD apps/block_scout_web/mix.exs ./apps/block_scout_web/
+ADD config ./
+ADD apps/block_scout_web/mix.exs apps/block_scout_web/config ./apps/block_scout_web/
 ADD apps/explorer/mix.exs ./apps/explorer/
 ADD apps/ethereum_jsonrpc/mix.exs ./apps/ethereum_jsonrpc/
 ADD apps/indexer/mix.exs ./apps/indexer/
