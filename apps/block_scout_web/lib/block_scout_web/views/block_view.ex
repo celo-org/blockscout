@@ -136,7 +136,7 @@ defmodule BlockScoutWeb.BlockView do
     do: (EpochUtil.epoch_by_block_number(block_number) - 1) * EpochUtil.blocks_per_epoch()
 
   def calculate_next_epoch_block_number_if_exists(block_number) when rem(block_number, 17_280) > 0,
-    do: EpochUtil.round_to_closest_epoch_block_number(block_number, :up) |> only_if_exists
+    do: only_if_exists(EpochUtil.round_to_closest_epoch_block_number(block_number, :up))
 
   def calculate_next_epoch_block_number_if_exists(block_number) do
     next_block_number = (EpochUtil.epoch_by_block_number(block_number) + 1) * EpochUtil.blocks_per_epoch()
