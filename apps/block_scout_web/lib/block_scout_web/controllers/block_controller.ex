@@ -16,7 +16,14 @@ defmodule BlockScoutWeb.BlockController do
         [celo_delegator: :celo_account] => :optional,
         :rewards => :optional
       },
-      block_type: "Block"
+      block_type:
+        case params["block_type"] do
+          "Epoch" ->
+            "Epoch"
+
+          _ ->
+            "Block"
+        end
     ]
     |> handle_render(conn, params)
   end

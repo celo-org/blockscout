@@ -20,6 +20,7 @@ defmodule Explorer.Chain.Block do
   }
 
   alias Explorer.Chain.Block.{Reward, SecondDegreeRelation}
+  alias Explorer.Repo
 
   @optional_attrs ~w(size refetch_needed total_difficulty difficulty extra_data round base_fee_per_gas)a
 
@@ -175,4 +176,19 @@ defmodule Explorer.Chain.Block do
   end
 
   def block_type_filter(query, "Uncle"), do: where(query, [block], block.consensus == false)
+
+  def block_type_filter(query, "Epoch"), do: where(query, [block], fragment("? % 17280 == 0", block.number))
+
+  def block_exists?(number) do
+    block =
+      Repo.one(
+        from(
+          b in __MODULE__,
+          where: b.number == ^number,
+          where: b.consensus == true
+        )
+      )
+
+    not is_nil(block)
+  end
 end
