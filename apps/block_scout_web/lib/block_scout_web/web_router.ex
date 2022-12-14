@@ -43,6 +43,8 @@ defmodule BlockScoutWeb.WebRouter do
 
     resources("/blocks", BlockController, as: :blocks, only: [:index])
 
+    get("/epochs", BlockController, :epochs, as: :epochs)
+
     resources "/blocks", BlockController, only: [:show], param: "hash_or_number" do
       resources("/transactions", BlockTransactionController, only: [:index], as: :transaction)
     end

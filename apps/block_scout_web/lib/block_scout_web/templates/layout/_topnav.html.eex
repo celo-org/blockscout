@@ -30,8 +30,8 @@
               <%= link to: blocks_path(@conn, :index), class: "dropdown-item #{tab_status("blocks", @conn.request_path)}" do %>
                 <%= gettext("Blocks") %>
               <% end %>
-              <%= link to: blocks_path(@conn, :index, block_type: "Epoch"), class: "dropdown-item #{tab_status("blocks", @conn.request_path)}" do %>
-                <%= gettext("Epochs") %>
+              <%= link to: epochs_path(@conn, :epochs), class: "dropdown-item #{tab_status("epochs", @conn.request_path)}" do %>
+                <%= gettext("Epoch blocks") %>
               <% end %>
               <%= link(
                     gettext("Validated Txs"),

@@ -8,23 +8,14 @@ defmodule BlockScoutWeb.BlockController do
   alias Phoenix.View
 
   def index(conn, params) do
-    [
-      necessity_by_association: %{
-        :transactions => :optional,
-        [miner: :names] => :optional,
-        :celo_delegator => :optional,
-        [celo_delegator: :celo_account] => :optional,
-        :rewards => :optional
-      },
-      block_type:
-        case params["block_type"] do
-          "Epoch" ->
-            "Epoch"
+    "Block"
+    |> build_options_for_block_type()
+    |> handle_render(conn, params)
+  end
 
-          _ ->
-            "Block"
-        end
-    ]
+  def epochs(conn, params) do
+    "Epoch"
+    |> build_options_for_block_type()
     |> handle_render(conn, params)
   end
 
@@ -36,6 +27,18 @@ defmodule BlockScoutWeb.BlockController do
 
     redirect(conn, to: block_transaction_path)
   end
+
+  defp build_options_for_block_type(block_type),
+    do: [
+      necessity_by_association: %{
+        :transactions => :optional,
+        [miner: :names] => :optional,
+        :celo_delegator => :optional,
+        [celo_delegator: :celo_account] => :optional,
+        :rewards => :optional
+      },
+      block_type: block_type
+    ]
 
   defp handle_render(full_options, conn, %{"type" => "JSON"} = params) do
     blocks_plus_one =

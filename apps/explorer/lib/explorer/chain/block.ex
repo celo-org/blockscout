@@ -7,6 +7,8 @@ defmodule Explorer.Chain.Block do
 
   use Explorer.Schema
 
+  alias Explorer.Celo.EpochUtil
+
   alias Explorer.Chain.{
     Address,
     CeloSigners,
@@ -177,7 +179,18 @@ defmodule Explorer.Chain.Block do
 
   def block_type_filter(query, "Uncle"), do: where(query, [block], block.consensus == false)
 
-  def block_type_filter(query, "Epoch"), do: where(query, [block], fragment("? % 17280 == 0", block.number))
+  def block_type_filter(query, "Epoch"),
+    do:
+      where(
+        query,
+        [block],
+        fragment(
+          "(? % ?)::integer = ?",
+          block.number,
+          ^EpochUtil.blocks_per_epoch(),
+          0
+        )
+      )
 
   def block_exists?(number) do
     block =
