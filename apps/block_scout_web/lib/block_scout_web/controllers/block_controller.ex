@@ -61,11 +61,21 @@ defmodule BlockScoutWeb.BlockController do
             |> Map.delete("type")
             |> Map.put("block_type", block_type)
 
-          blocks_path(
-            conn,
-            :index,
-            params_with_block_type
-          )
+          case block_type do
+            "Epoch" ->
+              epochs_path(
+                conn,
+                :epochs,
+                params_with_block_type
+              )
+
+            _ ->
+              blocks_path(
+                conn,
+                :index,
+                params_with_block_type
+              )
+          end
       end
 
     json(
