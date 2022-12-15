@@ -6,9 +6,8 @@ defmodule Explorer.Celo.EpochUtil do
   alias Explorer.Chain
   alias Explorer.Chain.CeloElectionRewards
 
-  def epoch_by_block_number(bn) do
-    div(bn, blocks_per_epoch())
-  end
+  def epoch_by_block_number(bn) when rem(bn, 17_280) == 0, do: div(bn, blocks_per_epoch())
+  def epoch_by_block_number(bn), do: div(bn, blocks_per_epoch()) + 1
 
   def is_epoch_block?(bn) do
     rem(bn, blocks_per_epoch()) == 0
