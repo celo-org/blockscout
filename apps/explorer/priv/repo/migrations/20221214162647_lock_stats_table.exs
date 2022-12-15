@@ -31,7 +31,6 @@ defmodule Explorer.Repo.Local.Migrations.LockStatsTable do
     END IF;
     END;$$;
     """)
-
   end
 
   def down do
