@@ -11,6 +11,7 @@ defmodule Explorer.Chain.Block do
 
   alias Explorer.Chain.{
     Address,
+    CeloEpochRewards,
     CeloSigners,
     CeloValidatorHistory,
     Data,
@@ -184,11 +185,11 @@ defmodule Explorer.Chain.Block do
       where(
         query,
         [block],
-        fragment(
-          "(? % ?)::integer = ?",
-          block.number,
-          ^EpochUtil.blocks_per_epoch(),
-          0
+        block.number in subquery(
+          from(
+            r in CeloEpochRewards,
+            select: r.block_number
+          )
         )
       )
 
