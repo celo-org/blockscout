@@ -54,11 +54,6 @@ msgstr ""
 msgid "%{block_type} Height"
 msgstr ""
 
-#: lib/block_scout_web/templates/block/index.html.eex:6
-#, elixir-autogen, elixir-format
-msgid "%{block_type}s"
-msgstr ""
-
 #: lib/block_scout_web/templates/block/overview.html.eex:142
 #, elixir-autogen, elixir-format
 msgid "%{count} Epoch Transactions"
@@ -346,7 +341,6 @@ msgid "Blockchain"
 msgstr ""
 
 #: lib/block_scout_web/templates/chain/show.html.eex:152
-#: lib/block_scout_web/templates/layout/_topnav.html.eex:31
 #, elixir-autogen, elixir-format
 msgid "Blocks"
 msgstr ""
@@ -2065,7 +2059,7 @@ msgstr ""
 msgid "There are no blocks validated by this address."
 msgstr ""
 
-#: lib/block_scout_web/templates/block/index.html.eex:16
+#: lib/block_scout_web/templates/block/index.html.eex:23
 #, elixir-autogen, elixir-format
 msgid "There are no blocks."
 msgstr ""
@@ -3304,11 +3298,6 @@ msgstr ""
 msgid "Epoch"
 msgstr ""
 
-#: lib/block_scout_web/templates/layout/_topnav.html.eex:34
-#, elixir-autogen, elixir-format
-msgid "Epochs"
-msgstr ""
-
 #: lib/block_scout_web/templates/block/overview.html.eex:74
 #, elixir-autogen, elixir-format
 msgid "View next epoch"
@@ -3317,4 +3306,16 @@ msgstr ""
 #: lib/block_scout_web/templates/block/overview.html.eex:27
 #, elixir-autogen, elixir-format
 msgid "View previous epoch"
+msgstr ""
+
+#: lib/block_scout_web/templates/block/index.html.eex:11
+#: lib/block_scout_web/templates/layout/_topnav.html.eex:31
+#, elixir-autogen, elixir-format
+msgid "All Blocks"
+msgstr ""
+
+#: lib/block_scout_web/templates/block/index.html.eex:9
+#: lib/block_scout_web/templates/layout/_topnav.html.eex:34
+#, elixir-autogen, elixir-format
+msgid "Epoch Blocks"
 msgstr ""
