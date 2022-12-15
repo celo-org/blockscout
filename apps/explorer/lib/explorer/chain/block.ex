@@ -7,8 +7,6 @@ defmodule Explorer.Chain.Block do
 
   use Explorer.Schema
 
-  alias Explorer.Celo.EpochUtil
-
   alias Explorer.Chain.{
     Address,
     CeloEpochRewards,
