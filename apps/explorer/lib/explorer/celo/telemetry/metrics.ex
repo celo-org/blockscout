@@ -1,10 +1,27 @@
 defmodule Explorer.Celo.Telemetry.Metrics do
+  use Supervisor
+  import Telemetry.Metrics
 
-  def summary(event_id, opts \\ []) do
-    id = get_id(event_id)
+  require Logger
+
+  def start_link(arg) do
+    Supervisor.start_link(__MODULE__, arg, name: __MODULE__)
   end
 
+  def init(_arg) do
+    children = [
+      {TelemetryMetricsPrometheus, metrics: metrics(), port: 4001}
+    ]
 
-  defp get_id(id) when is_list(id), do: id
-  defp get_id(id) when is_binary(id), do: String.split(".") |> Enum.map(&String.to_atom/1)
+    Supervisor.init(children, strategy: :one_for_one)
+  end
+
+  defp metrics do
+    Logger.info("Metrics")
+    [
+      counter("blockscout.chain_event_send.payload_size", description: "chain events sent"),
+                                                          counter("http.request.count")
+
+    ]
+  end
 end

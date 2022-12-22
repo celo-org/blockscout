@@ -98,12 +98,10 @@ defmodule Explorer.Mixfile do
       {:postgrex, ">= 0.0.0"},
 
       # Celo: Telemetry + Prometheus implementation
-      {:telemetry, "~> 0.4.3"},
-      {:telemetry_metrics, "~> 0.6"},
-      {:telemetry_metrics_prometheus, "~> 1.1.0"},
+      #{:prom_ex, "~> 1.7.1"},
 
       # bypass optional dependency
-      {:plug_cowboy, "~> 2.1"},
+      {:plug_cowboy, "~> 2.2"},
       {:que, "~> 0.10.1"},
       {:sobelow, ">= 0.11.1", only: [:dev, :test], runtime: false},
       # Tracing
