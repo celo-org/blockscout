@@ -16,7 +16,7 @@ defmodule Explorer.Celo.Telemetry do
   @doc false
   def stop(name, start_time, meta \\ %{}, measurements \\ %{}) do
     end_time = System.monotonic_time()
-    measurements = Map.merge(measurements, %{duration: end_time - start_time})
+    measurements = Map.merge(measurements, %{duration: end_time - start_time, end_time: end_time})
 
     :telemetry.execute(
       [:blockscout, name, :stop],
@@ -41,9 +41,11 @@ defmodule Explorer.Celo.Telemetry do
     :telemetry.execute([:blockscout, event, :exception], measurements, meta)
   end
 
-  @doc false
-  def event(name, metrics, meta \\ %{}) do
-    :telemetry.execute([:blockscout, name], metrics, meta)
+  @doc """
+  Emits a telemetry event with id [:blockscout, `name`] + included measurements + metadata
+  """
+  def event(name, measurements, meta \\ %{}) do
+    :telemetry.execute([:blockscout, name], measurements, meta)
   end
 
   @doc """

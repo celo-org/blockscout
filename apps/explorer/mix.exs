@@ -48,12 +48,12 @@ defmodule Explorer.Mixfile do
   defp elixirc_paths, do: ["lib"]
 
   defp extra_applications,
-    do: [
-      :logger,
-      :mix,
-      :runtime_tools,
-      :tesla
-    ]
+       do: [
+         :logger,
+         :mix,
+         :runtime_tools,
+         :tesla
+       ]
 
   # Specifies your project dependencies.
   #
@@ -96,13 +96,14 @@ defmodule Explorer.Mixfile do
       {:poison, "~> 4.0.1"},
       {:nimble_csv, "~> 1.1"},
       {:postgrex, ">= 0.0.0"},
-      # For compatibility with `prometheus_process_collector`, which hasn't been updated yet
-      {:prometheus, "~> 4.0", override: true},
-      # Prometheus metrics for query duration
-      {:prometheus_ecto, "~> 1.4.3"},
-      {:prometheus_ex, git: "https://github.com/lanodan/prometheus.ex", branch: "fix/elixir-1.14", override: true},
+
+      # Celo: Telemetry + Prometheus implementation
+      {:telemetry, "~> 0.4.3"},
+      {:telemetry_metrics, "~> 0.6"},
+      {:telemetry_metrics_prometheus, "~> 1.1.0"},
+
       # bypass optional dependency
-      {:plug_cowboy, "~> 2.2", only: [:dev, :test]},
+      {:plug_cowboy, "~> 2.1"},
       {:que, "~> 0.10.1"},
       {:sobelow, ">= 0.11.1", only: [:dev, :test], runtime: false},
       # Tracing
@@ -111,8 +112,6 @@ defmodule Explorer.Mixfile do
       {:spandex_datadog, "~> 1.0"},
       # `:spandex` tracing of `:ecto`
       {:spandex_ecto, "~> 0.7.0"},
-      # Attach `:prometheus_ecto` to `:ecto`
-      {:telemetry, "~> 0.4.3"},
       # `Timex.Duration` for `Explorer.Counters.AverageBlockTime.average_block_time/0`
       {:timex, "~> 3.7.1"},
       {:con_cache, "~> 1.0"},
