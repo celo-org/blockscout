@@ -99,6 +99,8 @@ defmodule Explorer.Mixfile do
 
       # Celo: Telemetry + Prometheus implementation
       #{:prom_ex, "~> 1.7.1"},
+      {:telemetry_metrics, "~> 0.6.1"},
+      {:telemetry_metrics_prometheus, "~> 1.1.0"},
 
       # bypass optional dependency
       {:plug_cowboy, "~> 2.2"},

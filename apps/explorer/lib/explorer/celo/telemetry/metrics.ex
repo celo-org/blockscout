@@ -20,7 +20,13 @@ defmodule Explorer.Celo.Telemetry.Metrics do
     Logger.info("Metrics")
     [
       counter("blockscout.chain_event_send.payload_size", description: "chain events sent"),
-                                                          counter("http.request.count")
+      counter("http.request.count"),
+      counter("cool.test.event", description: "test description")
+    ]
+  end
+
+  defp child_processes() do
+    [
 
     ]
   end

@@ -2,5 +2,5 @@ defmodule Indexer.Prometheus.Instrumenter do
   @moduledoc """
   Instrument prometheus metrics
   """
-  use Prometheus.PlugPipelineInstrumenter
+#  use Prometheus.PlugPipelineInstrumenter
 end

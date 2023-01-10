@@ -29,8 +29,7 @@ defmodule Indexer.MixProject do
         :jason,
         :logger_json,
         :cowboy,
-        :plug,
-        :prometheus
+        :plug
       ],
       mod: {Indexer.Application, []}
     ]
@@ -75,7 +74,7 @@ defmodule Indexer.MixProject do
 #      {:prometheus_ex, git: "https://github.com/lanodan/prometheus.ex", branch: "fix/elixir-1.14", override: true},
 #      {:prometheus_plugs, "~> 1.1"},
 #      {:prometheus_process_collector, "~> 1.1"},
-      {:telemetry, "~> 1.0.0"},
+      {:telemetry, "~> 1.0", override: true},
       # Erlang cluster formation
       {:libcluster, "~> 3.3"}
     ]

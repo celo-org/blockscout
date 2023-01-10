@@ -427,7 +427,7 @@ config :indexer,
   ecto_repos: [Explorer.Repo.Local],
   metadata_updater_seconds_interval:
     String.to_integer(System.get_env("TOKEN_METADATA_UPDATE_INTERVAL") || "#{2 * 24 * 60 * 60}"),
-  health_check_port: port || 4001,
+  health_check_port: port || 4002,
   block_ranges: System.get_env("BLOCK_RANGES") || "",
   first_block: System.get_env("FIRST_BLOCK") || "",
   last_block: System.get_env("LAST_BLOCK") || "",

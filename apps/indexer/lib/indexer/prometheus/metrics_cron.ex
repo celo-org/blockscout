@@ -7,7 +7,7 @@ defmodule Indexer.Prometheus.MetricsCron do
   alias Explorer.Celo.Metrics.{BlockchainMetrics, DatabaseMetrics}
   alias Explorer.Chain
   alias Explorer.Counters.AverageBlockTime
-  alias Indexer.Prometheus.RPCInstrumenter
+#  alias Indexer.Prometheus.RPCInstrumenter
   alias Timex.Duration
 
   require DateTime
@@ -151,14 +151,14 @@ defmodule Indexer.Prometheus.MetricsCron do
     :telemetry.execute([:indexer, :blocks, :last_block_number], %{value: last_block_number})
   end
 
-  defp calculate_and_add_rpc_response_metrics(id, [start, finish]) do
-    RPCInstrumenter.instrument(%{
-      time: Map.get(finish, :finish) - Map.get(start, :start),
-      method: Map.get(start, :method),
-      status_code: Map.get(finish, :status_code)
-    })
-
-    RpcResponseEts.delete(id)
+  defp calculate_and_add_rpc_response_metrics(_id, [_start, _finish]) do
+#    RPCInstrumenter.instrument(%{
+#      time: Map.get(finish, :finish) - Map.get(start, :start),
+#      method: Map.get(start, :method),
+#      status_code: Map.get(finish, :status_code)
+#    })
+#
+#    RpcResponseEts.delete(id)
   end
 
   defp repeat do
