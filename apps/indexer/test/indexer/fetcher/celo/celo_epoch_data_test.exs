@@ -224,11 +224,17 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
     setup [:save_validator_and_group_contract_events]
 
     test "it fetches them from the db for a block", context do
-      assert CeloEpochDataFetcher.get_validator_and_group_rewards(%{
-               block_number: context.block_number,
-               block_timestamp: context.block_timestamp,
-               block_hash: context.block_hash
-             }) == %{
+      validator_and_group_rewards =
+        ValidatorEpochPaymentDistributedEvent.get_validator_and_group_rewards_for_block(context.block_number)
+
+      assert CeloEpochDataFetcher.get_validator_and_group_rewards(
+               %{
+                 block_number: context.block_number,
+                 block_timestamp: context.block_timestamp,
+                 block_hash: context.block_hash
+               },
+               validator_and_group_rewards
+             ) == %{
                block_number: context.block_number,
                block_timestamp: context.block_timestamp,
                block_hash: context.block_hash,
