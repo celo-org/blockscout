@@ -15,16 +15,14 @@ defmodule Explorer.Celo.Telemetry.Metrics do
 
   defp metrics do
     [
-      counter("blockscout.chain_event_send.payload_size", description: "chain events sent"),
-      counter("blockscout.metrics.scrape.count"),
-
+      counter("blockscout.metrics.scrape.count")
     ]
   end
 
   defp child_processes(metrics) do
     all_metrics =
       metrics ++ metrics()
-    |> List.flatten()
+      |> List.flatten()
 
     [
       {TelemetryMetricsPrometheus.Core, metrics: all_metrics}
