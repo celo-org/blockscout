@@ -724,6 +724,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
              ) == %{
                block_number: block_number,
                block_hash: block_hash,
+               block_timestamp: block_timestamp,
                error: "mock_reason"
              }
     end
