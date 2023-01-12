@@ -286,31 +286,37 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
     setup [:save_validator_and_group_contract_events]
 
     test "it fetches them from the db for a block", context do
-      assert CeloEpochDataFetcher.get_validator_and_group_rewards(%{
-               block_number: context.block_number,
-               block_timestamp: context.block_timestamp,
-               block_hash: context.block_hash,
-               validator_rewards: [
-                 %{
-                   account_hash: context.validator_1_hash,
-                   amount: 100_000,
-                   associated_account_hash: context.group_hash,
-                   block_number: context.block_number,
-                   block_timestamp: context.block_timestamp,
-                   block_hash: context.block_hash,
-                   reward_type: "validator"
-                 },
-                 %{
-                   account_hash: context.validator_2_hash,
-                   amount: 200_000,
-                   associated_account_hash: context.group_hash,
-                   block_number: context.block_number,
-                   block_timestamp: context.block_timestamp,
-                   block_hash: context.block_hash,
-                   reward_type: "validator"
-                 }
-               ]
-             }) == %{
+      validator_and_group_rewards =
+        ValidatorEpochPaymentDistributedEvent.get_validator_and_group_rewards_for_block(context.block_number)
+
+      assert CeloEpochDataFetcher.get_validator_and_group_rewards(
+               %{
+                 block_number: context.block_number,
+                 block_timestamp: context.block_timestamp,
+                 block_hash: context.block_hash,
+                 validator_rewards: [
+                   %{
+                     account_hash: context.validator_1_hash,
+                     amount: 100_000,
+                     associated_account_hash: context.group_hash,
+                     block_number: context.block_number,
+                     block_timestamp: context.block_timestamp,
+                     block_hash: context.block_hash,
+                     reward_type: "validator"
+                   },
+                   %{
+                     account_hash: context.validator_2_hash,
+                     amount: 200_000,
+                     associated_account_hash: context.group_hash,
+                     block_number: context.block_number,
+                     block_timestamp: context.block_timestamp,
+                     block_hash: context.block_hash,
+                     reward_type: "validator"
+                   }
+                 ]
+               },
+               validator_and_group_rewards
+             ) == %{
                block_number: context.block_number,
                block_timestamp: context.block_timestamp,
                block_hash: context.block_hash,
