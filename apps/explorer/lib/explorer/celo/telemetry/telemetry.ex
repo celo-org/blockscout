@@ -42,16 +42,14 @@ defmodule Explorer.Celo.Telemetry do
   end
 
   @doc """
-  Emits a telemetry event with id [:blockscout, `name`] + included measurements + metadata
+  Emits a telemetry event with given name + included measurements + metadata
   """
-  def event(name, measurements, meta \\ %{})
-  def event(name, measurements, meta) when is_list(name) do
-    :telemetry.execute([:blockscout | name], measurements, meta)
-  end
-  def event(name, measurements, meta) when is_atom(name) do
-    :telemetry.execute([:blockscout, name], measurements, meta)
-  end
+  def event(name, measurements \\ %{}, meta \\ %{}), do: :telemetry.execute(normalise_name(name), measurements, meta)
 
+  #ensuring that blockscout is tagged at the start of the metric name in both list and string formats
+  defp normalise_name(name) when is_atom(name), do: [:blockscout, name]
+  defp normalise_name(name = [:blockscout | _ ]) when is_list(name), do: name
+  defp normalise_name(name) when is_list(name), do: [:blockscout | name]
   @doc """
   Wraps a function call with telemetry timing events and an error handler. Errors will be sent with a telemetry event including stack trace before being reraised.
 

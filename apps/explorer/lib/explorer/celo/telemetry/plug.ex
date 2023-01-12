@@ -7,6 +7,8 @@ defmodule Explorer.Celo.Telemetry.Plug do
   import Plug.Conn
   require Logger
 
+  alias Explorer.Celo.Telemetry, as: Telemetry
+
   #nop
   def init(_opts) do
   end
@@ -14,9 +16,10 @@ defmodule Explorer.Celo.Telemetry.Plug do
   @metrics_path "/metrics"
 
   def call(conn, _opts) do
-    Explorer.Celo.Telemetry.event(:test, %{})
     case conn.request_path do
       @metrics_path ->
+        Telemetry.event([:metrics, :scrape])
+
         metrics = TelemetryMetricsPrometheus.Core.scrape()
 
         conn
