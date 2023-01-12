@@ -103,6 +103,10 @@ defmodule BlockScoutWeb.AddressEpochTransactionController do
   defp calculate_locked_and_vote_activated_gold(account_epoch),
     do: {account_epoch.total_locked_gold, Wei.sub(account_epoch.total_locked_gold, account_epoch.nonvoting_locked_gold)}
 
+  defp get_rewards(%Chain.Address{celo_account: nil, hash: address_hash}, params) do
+    CeloElectionRewards.get_paginated_rewards_for_address([address_hash], ["delegated_payment"], params)
+  end
+
   defp get_rewards(address, params) do
     case address.celo_account.account_type do
       "normal" ->
@@ -115,6 +119,10 @@ defmodule BlockScoutWeb.AddressEpochTransactionController do
           params
         )
     end
+  end
+
+  defp get_sums(%Chain.Address{celo_account: nil, hash: address_hash}) do
+    {nil, CeloElectionRewards.get_rewards_sum_for_account(address_hash)}
   end
 
   defp get_sums(address) do
