@@ -148,7 +148,13 @@ defmodule Explorer.Chain.Import do
       _, acc ->
         acc
     end)
-    |> then(&Telemetry.event(:ingested, &1))
+    |> Explorer.Celo.Telemetry.Helper.filter_imports()
+    |> then(fn imports ->
+      imports
+      |> Enum.each(fn {primitive, import_count} ->
+        Telemetry.event(:ingested, %{count: import_count}, %{type: primitive})
+      end)
+    end)
   end
 
   defp runner_to_changes_list(runner_options_pairs) when is_list(runner_options_pairs) do

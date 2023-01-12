@@ -16,7 +16,11 @@ defmodule Explorer.Celo.Telemetry.Metrics do
     [
       counter("blockscout.chain_event_send.payload_size", description: "chain events sent"),
       counter("blockscout.metrics.scrape.count"),
-      counter("indexer.import.ingested", event_name: [:blockscout, :ingested], measurement: :none),
+      counter("indexer.import.ingested",
+        event_name: [:blockscout, :ingested],
+        measurement: :count,
+        tags: [:type]
+      ),
     ]
   end
 
