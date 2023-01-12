@@ -7,18 +7,23 @@ defmodule Explorer.Celo.Telemetry.Plug do
   import Plug.Conn
   require Logger
 
+  #nop
   def init(_opts) do
-    Logger.info("!!! Initialized metrics plug")
   end
 
+  @metrics_path "/metrics"
+
   def call(conn, _opts) do
-    Logger.info("hello #{inspect(conn)}")
+    Explorer.Celo.Telemetry.event(:test, %{})
     case conn.request_path do
-      "/metrics" ->
-        Logger.info("double #{inspect(conn)}")
+      @metrics_path ->
+        metrics = TelemetryMetricsPrometheus.Core.scrape()
+
         conn
+        |> put_private(:prometheus_metrics_name, :prometheus_metrics)
         |> put_resp_content_type("text/plain")
-        |> send_resp(200, "hello i am metrics")
+        |> send_resp(200, metrics)
+        |> halt()
 
       _ -> conn
     end

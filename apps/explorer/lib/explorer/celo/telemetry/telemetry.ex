@@ -44,7 +44,11 @@ defmodule Explorer.Celo.Telemetry do
   @doc """
   Emits a telemetry event with id [:blockscout, `name`] + included measurements + metadata
   """
-  def event(name, measurements, meta \\ %{}) do
+  def event(name, measurements, meta \\ %{})
+  def event(name, measurements, meta) when is_list(name) do
+    :telemetry.execute([:blockscout | name], measurements, meta)
+  end
+  def event(name, measurements, meta) when is_atom(name) do
     :telemetry.execute([:blockscout, name], measurements, meta)
   end
 

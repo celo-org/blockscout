@@ -9,25 +9,19 @@ defmodule Explorer.Celo.Telemetry.Metrics do
   end
 
   def init(_arg) do
-    children = [
-      {TelemetryMetricsPrometheus.Core, metrics: metrics()}
-    ]
-
-    Supervisor.init(children, strategy: :one_for_one)
+    Supervisor.init(child_processes(), strategy: :one_for_one)
   end
 
   defp metrics do
-    Logger.info("Metrics")
     [
       counter("blockscout.chain_event_send.payload_size", description: "chain events sent"),
-      counter("http.request.count"),
-      counter("cool.test.event", description: "test description")
+      counter("blockscout.test.count", description: "test description")
     ]
   end
 
   defp child_processes() do
     [
-
+      {TelemetryMetricsPrometheus.Core, metrics: metrics()}
     ]
   end
 end
