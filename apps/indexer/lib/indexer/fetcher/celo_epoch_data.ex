@@ -101,7 +101,6 @@ defmodule Indexer.Fetcher.CeloEpochData do
       {:ok, delegations} ->
         delegated_payments =
           delegations
-          |> IO.inspect()
           |> Map.filter(fn {_, {:ok, [_, fraction]}} -> fraction > 0 end)
           |> Enum.map(fn {validator_address, {:ok, [beneficiary_address, _]}} ->
             {:ok, validator_hash} = Chain.string_to_address_hash(validator_address)

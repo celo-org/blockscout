@@ -434,11 +434,11 @@ defmodule Explorer.Celo.AccountReader do
           true
       end)
 
-    if not is_nil(error_result) do
+    if is_nil(error_result) do
+      {:ok, payment_delegations}
+    else
       {_, {:error, error_message}} = error_result
       {:error, error_message}
-    else
-      {:ok, payment_delegations}
     end
   end
 
