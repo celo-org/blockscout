@@ -4,6 +4,6 @@ defmodule Indexer.Stack do
   """
   use Plug.Builder
 
-#  plug(Indexer.Prometheus.Exporter)
+  plug(Explorer.Celo.Telemetry.Plug)
   plug(Indexer.Health.Plug, [])
 end

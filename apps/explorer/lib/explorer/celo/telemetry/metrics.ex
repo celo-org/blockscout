@@ -10,7 +10,7 @@ defmodule Explorer.Celo.Telemetry.Metrics do
 
   def init(_arg) do
     children = [
-      {TelemetryMetricsPrometheus, metrics: metrics(), port: 4001}
+      {TelemetryMetricsPrometheus.Core, metrics: metrics()}
     ]
 
     Supervisor.init(children, strategy: :one_for_one)
