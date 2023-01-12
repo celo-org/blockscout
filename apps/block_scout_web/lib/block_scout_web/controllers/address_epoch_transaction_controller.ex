@@ -105,8 +105,15 @@ defmodule BlockScoutWeb.AddressEpochTransactionController do
 
   defp get_rewards(address, params) do
     case address.celo_account.account_type do
-      "normal" -> CeloElectionRewards.get_paginated_rewards_for_address([address.hash], ["voter", "delegated_payment"], params)
-      type -> CeloElectionRewards.get_paginated_rewards_for_address([address.hash], [type, "voter", "delegated_payment"], params)
+      "normal" ->
+        CeloElectionRewards.get_paginated_rewards_for_address([address.hash], ["voter", "delegated_payment"], params)
+
+      type ->
+        CeloElectionRewards.get_paginated_rewards_for_address(
+          [address.hash],
+          [type, "voter", "delegated_payment"],
+          params
+        )
     end
   end
 
