@@ -8,25 +8,26 @@ defmodule Explorer.Celo.Telemetry.Metrics do
     Supervisor.start_link(__MODULE__, arg, name: __MODULE__)
   end
 
-  def init(_arg) do
-    Supervisor.init(child_processes(), strategy: :one_for_one)
+  def init(arg) do
+    metrics = Keyword.get(arg, :metrics, [])
+    Supervisor.init(child_processes(metrics), strategy: :one_for_one)
   end
 
   defp metrics do
     [
       counter("blockscout.chain_event_send.payload_size", description: "chain events sent"),
       counter("blockscout.metrics.scrape.count"),
-      counter("indexer.import.ingested",
-        event_name: [:blockscout, :ingested],
-        measurement: :count,
-        tags: [:type]
-      ),
+
     ]
   end
 
-  defp child_processes() do
+  defp child_processes(metrics) do
+    all_metrics =
+      metrics ++ metrics()
+    |> List.flatten()
+
     [
-      {TelemetryMetricsPrometheus.Core, metrics: metrics()}
+      {TelemetryMetricsPrometheus.Core, metrics: all_metrics}
     ]
   end
 end

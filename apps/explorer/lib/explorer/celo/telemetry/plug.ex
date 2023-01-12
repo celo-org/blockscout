@@ -1,12 +1,14 @@
 defmodule Explorer.Celo.Telemetry.Plug do
   @moduledoc """
    A plug to expose defined metrics to prometheus at endpoint /metrics
+
+  Add this to an existing endpoint in order to expose prometheus metrics. Configuration of the endpoint (port, adaptor etc)
+    is to be handled elsewhere. This approach is intended to work alongside an existing http endpoint, i.e. this will add a
+  "/metrics" route to an endpoint which already serves content (like a health check service).
   """
 
   @behaviour Plug
   import Plug.Conn
-  require Logger
-
   alias Explorer.Celo.Telemetry, as: Telemetry
 
   #nop

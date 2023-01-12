@@ -7,6 +7,8 @@ defmodule Indexer.Application do
 
   alias Indexer.{LoggerBackend, Memory}
   alias Indexer.Prometheus.Setup, as: CeloTelemetry
+  alias Indexer.Celo.Telemetry.Instrumentation, as: IndexerMetrics
+  alias Explorer.Celo.Telemetry.Metrics, as: CeloPrometheusCollector
 
   @impl Application
   def start(_type, _args) do
@@ -22,6 +24,7 @@ defmodule Indexer.Application do
     base_children =
       [
         {Memory.Monitor, [memory_monitor_options, [name: memory_monitor_name]]},
+        {CeloPrometheusCollector, metrics: [IndexerMetrics.metrics()]},
         {Plug.Cowboy,
          scheme: :http, plug: Indexer.Stack, options: [port: Application.get_env(:indexer, :health_check_port)]}
       ]
