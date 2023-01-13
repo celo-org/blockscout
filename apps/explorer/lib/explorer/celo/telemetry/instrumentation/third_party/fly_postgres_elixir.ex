@@ -21,7 +21,7 @@ defmodule Explorer.Celo.Telemetry.Instrumentation.FlyPostgres do
         measurement: :count,
         description: "DB queries this app has received via rpc for execution",
         tags: [:func]
-      ),
+      )
     ]
   end
 end
