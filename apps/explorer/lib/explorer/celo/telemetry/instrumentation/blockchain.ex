@@ -21,6 +21,16 @@ defmodule Explorer.Celo.Telemetry.Instrumentation.Blockchain do
       event_name: [:indexer, :blocks, :average_time],
       measurement: :value,
       description: "Average block time over past 100 blocks"),
+    last_value(
+      "indexer_transactions_total_current",
+      event_name: [:indexer, :transactions, :total],
+      measurement: :value,
+      description: "Count of transactions in the transactions table"),
+    last_value(
+      "indexer_transactions_pending_current",
+      event_name: [:indexer, :transactions, :pending],
+      measurement: :value,
+      description: "Count of pending transactions in the transactions table"),
   ]
   end
 end
