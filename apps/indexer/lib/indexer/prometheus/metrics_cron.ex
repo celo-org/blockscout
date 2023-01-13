@@ -3,11 +3,9 @@ defmodule Indexer.Prometheus.MetricsCron do
   Periodically retrieves and updates prometheus metrics
   """
   use GenServer
-  alias EthereumJSONRPC.HTTP.RpcResponseEts
   alias Explorer.Celo.Metrics.{BlockchainMetrics, DatabaseMetrics}
   alias Explorer.Chain
   alias Explorer.Counters.AverageBlockTime
-#  alias Indexer.Prometheus.RPCInstrumenter
   alias Timex.Duration
 
   require DateTime
@@ -35,7 +33,6 @@ defmodule Indexer.Prometheus.MetricsCron do
     :number_of_locks,
     :number_of_deadlocks,
     :longest_query_duration,
-    :rpc_response_times,
     :transaction_count,
     :address_count,
     :total_token_supply
@@ -108,15 +105,6 @@ defmodule Indexer.Prometheus.MetricsCron do
     :telemetry.execute([:indexer, :db, :longest_query_duration], %{value: longest_query_duration})
   end
 
-  def rpc_response_times do
-    response_times = RpcResponseEts.get_all()
-
-    response_times
-    |> Enum.filter(&Map.has_key?(elem(&1, 1), :finish))
-    |> Enum.map(&elem(&1, 0))
-    |> Enum.each(&calculate_and_add_rpc_response_metrics(&1, :proplists.get_all_values(&1, response_times)))
-  end
-
   def transaction_count do
     total_transaction_count = Chain.transaction_estimated_count()
     :telemetry.execute([:indexer, :transactions, :total], %{value: total_transaction_count})
@@ -149,16 +137,6 @@ defmodule Indexer.Prometheus.MetricsCron do
     :telemetry.execute([:indexer, :blocks, :last_block_age], %{value: last_block_age})
 
     :telemetry.execute([:indexer, :blocks, :last_block_number], %{value: last_block_number})
-  end
-
-  defp calculate_and_add_rpc_response_metrics(_id, [_start, _finish]) do
-#    RPCInstrumenter.instrument(%{
-#      time: Map.get(finish, :finish) - Map.get(start, :start),
-#      method: Map.get(start, :method),
-#      status_code: Map.get(finish, :status_code)
-#    })
-#
-#    RpcResponseEts.delete(id)
   end
 
   defp repeat do

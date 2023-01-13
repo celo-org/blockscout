@@ -1,4 +1,4 @@
-defmodule Explorer.Celo.Telemetry.Metrics do
+defmodule Explorer.Celo.Telemetry.MetricsCollector do
   use Supervisor
   import Telemetry.Metrics
 

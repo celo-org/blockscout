@@ -4,20 +4,14 @@ defmodule Indexer.Prometheus.Setup do
   """
 
 #  alias Indexer.Prometheus.{
-#    DBInstrumenter,
-#    Exporter,
 #    GenericInstrumenter,
 #    RPCInstrumenter,
 #    TokenInstrumenter,
-#    TransactionInstrumenter
 #  }
 
   def setup do
-#    DBInstrumenter.setup()
 #    GenericInstrumenter.setup()
 #    RPCInstrumenter.setup()
 #    TokenInstrumenter.setup()
-#    TransactionInstrumenter.setup()
-#    Exporter.setup()
   end
 end
