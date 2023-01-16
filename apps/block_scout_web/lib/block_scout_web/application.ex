@@ -10,16 +10,16 @@ defmodule BlockScoutWeb.Application do
   alias BlockScoutWeb.API.APILogger
   alias BlockScoutWeb.{CampaignBannerCache, LoggerBackend}
   alias BlockScoutWeb.Counters.BlocksIndexedCounter
-  alias BlockScoutWeb.{Endpoint, Prometheus}
+  alias BlockScoutWeb.Endpoint
   alias BlockScoutWeb.RealtimeEventHandler
-  alias Prometheus.{Exporter, GenericInstrumenter}
+
+  alias EthereumJSONRPC.Celo.Instrumentation, as: EthRPC
+  alias Explorer.Celo.Telemetry.Instrumentation.FlyPostgres
+  alias Explorer.Celo.Telemetry.MetricsCollector, as: CeloPrometheusCollector
 
   def start(_type, _args) do
     import Supervisor
 
-    Exporter.setup()
-    GenericInstrumenter.setup()
-    PrometheusPhx.setup()
     Logger.add_backend(LoggerBackend, level: :error)
 
     APILogger.message(
@@ -41,6 +41,9 @@ defmodule BlockScoutWeb.Application do
         {Phoenix.PubSub, name: BlockScoutWeb.PubSub},
         child_spec(Endpoint, []),
         {Absinthe.Subscription, Endpoint},
+        {CeloPrometheusCollector, metrics: [EthRPC.metrics(), FlyPostgres.metrics()]},
+        {Plug.Cowboy,
+          scheme: :http, plug: Indexer.Celo.MonitorStack, options: [port: Application.get_env(:indexer, :health_check_port)]},
         {RealtimeEventHandler, name: RealtimeEventHandler},
         {BlocksIndexedCounter, name: BlocksIndexedCounter},
         {CampaignBannerCache, name: CampaignBannerCache}
