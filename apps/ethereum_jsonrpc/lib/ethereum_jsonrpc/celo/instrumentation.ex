@@ -2,10 +2,8 @@ defmodule EthereumJSONRPC.Celo.Instrumentation do
   # not using Explorer.Celo.Telemetry.Instrumentation to prevent circular dependency
 
   import Telemetry.Metrics
-  require Logger
 
   def metrics() do
-    Logger.info("hello jsonrpc  metrics")
     [
       counter("ethereum_jsonrpc.http_request.start.count", description: "Count of HTTP requests attempted"),
       distribution("http_request_duration_milliseconds",

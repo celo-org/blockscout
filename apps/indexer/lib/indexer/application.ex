@@ -9,7 +9,7 @@ defmodule Indexer.Application do
   alias Explorer.Celo.Telemetry.Instrumentation.{Blockchain,FlyPostgres}
   alias Explorer.Celo.Telemetry.MetricsCollector, as: CeloPrometheusCollector
 
-  alias Indexer.{LoggerBackend, Memory}
+  alias Indexer.Memory
   alias Indexer.Celo.Telemetry.Instrumentation, as: IndexerMetrics
   alias Indexer.Prometheus.Setup, as: CeloTelemetry
 
@@ -45,8 +45,6 @@ defmodule Indexer.Application do
       strategy: :rest_for_one,
       name: Indexer.Application
     ]
-
-    Logger.add_backend(LoggerBackend)
 
     Supervisor.start_link(children, opts)
   end
