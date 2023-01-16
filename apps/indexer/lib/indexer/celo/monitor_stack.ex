@@ -1,4 +1,4 @@
-defmodule Indexer.Stack do
+defmodule Indexer.Celo.MonitorStack do
   @moduledoc """
   Combine prometheus exporter with the health plug
   """

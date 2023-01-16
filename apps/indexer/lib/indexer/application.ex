@@ -9,9 +9,8 @@ defmodule Indexer.Application do
   alias Explorer.Celo.Telemetry.Instrumentation.{Blockchain,FlyPostgres}
   alias Explorer.Celo.Telemetry.MetricsCollector, as: CeloPrometheusCollector
 
-  alias Indexer.Memory
   alias Indexer.Celo.Telemetry.Instrumentation, as: IndexerMetrics
-  alias Indexer.Prometheus.Setup, as: CeloTelemetry
+  alias Indexer.Memory
 
   @impl Application
   def start(_type, _args) do
@@ -22,14 +21,13 @@ defmodule Indexer.Application do
       end
 
     memory_monitor_name = Memory.Monitor
-    CeloTelemetry.setup()
 
     base_children =
       [
         {Memory.Monitor, [memory_monitor_options, [name: memory_monitor_name]]},
         {CeloPrometheusCollector, metrics: [IndexerMetrics.metrics(), FlyPostgres.metrics(), Blockchain.metrics(), EthRPC.metrics()]},
         {Plug.Cowboy,
-          scheme: :http, plug: Indexer.Stack, options: [port: Application.get_env(:indexer, :health_check_port)]}
+          scheme: :http, plug: Indexer.Celo.MonitorStack, options: [port: Application.get_env(:indexer, :health_check_port)]}
       ]
       |> cluster_process(Application.get_env(:indexer, :environment))
 

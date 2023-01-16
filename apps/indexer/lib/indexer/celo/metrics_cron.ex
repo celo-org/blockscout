@@ -1,4 +1,4 @@
-defmodule Indexer.Prometheus.MetricsCron do
+defmodule Indexer.Celo.MetricsCron do
   @moduledoc """
   Periodically retrieves and updates prometheus metrics
   """
@@ -6,7 +6,9 @@ defmodule Indexer.Prometheus.MetricsCron do
   alias Explorer.Celo.Metrics.{BlockchainMetrics, DatabaseMetrics}
   alias Explorer.Chain
   alias Explorer.Counters.AverageBlockTime
+  alias Indexer.Celo.MetricsCron.TaskSupervisor, as: TaskSupervisor
   alias Timex.Duration
+
 
   require DateTime
   require Logger
@@ -48,7 +50,7 @@ defmodule Indexer.Prometheus.MetricsCron do
       @metric_operations
       |> Enum.filter(&(!Enum.member?(running, &1)))
       |> Enum.map(fn operation ->
-        Task.Supervisor.async_nolink(Indexer.Prometheus.MetricsCron.TaskSupervisor, fn ->
+        Task.Supervisor.async_nolink(TaskSupervisor, fn ->
           apply(__MODULE__, operation, [])
           {:completed, operation}
         end)

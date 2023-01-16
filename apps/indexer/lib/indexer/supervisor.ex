@@ -49,7 +49,7 @@ defmodule Indexer.Supervisor do
     UnclesWithoutIndex
   }
 
-  alias Indexer.Prometheus.MetricsCron
+  alias Indexer.Celo.MetricsCron
 
   def child_spec([]) do
     child_spec([[]])
@@ -183,7 +183,7 @@ defmodule Indexer.Supervisor do
       if metrics_enabled do
         metrics_processes = [
           {MetricsCron, [[]]},
-          {Task.Supervisor, name: Indexer.Prometheus.MetricsCron.TaskSupervisor}
+          {Task.Supervisor, name: Indexer.Celo.MetricsCron.TaskSupervisor}
         ]
 
         metrics_processes ++ basic_fetchers
