@@ -98,6 +98,7 @@ defmodule Explorer.Mixfile do
       {:postgrex, ">= 0.0.0"},
 
       # Celo: Telemetry + Prometheus implementation
+      {:telemetry, "~> 1.0", override: true},
       {:telemetry_metrics, "~> 0.6.1"},
       {:telemetry_metrics_prometheus_core, "~> 1.1.0"},
 
