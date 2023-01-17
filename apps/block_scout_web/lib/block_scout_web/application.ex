@@ -41,10 +41,6 @@ defmodule BlockScoutWeb.Application do
         child_spec(Endpoint, []),
         {Absinthe.Subscription, Endpoint},
         {CeloPrometheusCollector, metrics: [EthRPC.metrics(), FlyPostgres.metrics()]},
-        {Plug.Cowboy,
-         scheme: :http,
-         plug: Indexer.Celo.MonitorStack,
-         options: [port: Application.get_env(:indexer, :health_check_port)]},
         {RealtimeEventHandler, name: RealtimeEventHandler},
         {BlocksIndexedCounter, name: BlocksIndexedCounter},
         {CampaignBannerCache, name: CampaignBannerCache}
