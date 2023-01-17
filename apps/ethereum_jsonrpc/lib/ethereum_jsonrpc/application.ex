@@ -5,7 +5,7 @@ defmodule EthereumJSONRPC.Application do
 
   use Application
 
-  alias EthereumJSONRPC.{HTTP, IPC, RequestCoordinator, RollingWindow}
+  alias EthereumJSONRPC.{IPC, RequestCoordinator, RollingWindow}
 
   @impl Application
   def start(_type, _args) do
