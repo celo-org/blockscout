@@ -10,7 +10,6 @@ defmodule Indexer.Celo.MetricsCron do
   alias Indexer.Celo.MetricsCron.TaskSupervisor, as: TaskSupervisor
   alias Timex.Duration
 
-
   require DateTime
   require Logger
 

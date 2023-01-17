@@ -1,4 +1,6 @@
 defmodule Explorer.Celo.Telemetry.MetricsCollector do
+  @moduledoc "A process to collect metrics for later exposure on a prometheus endpoint"
+
   use Supervisor
   import Telemetry.Metrics
 
@@ -8,6 +10,7 @@ defmodule Explorer.Celo.Telemetry.MetricsCollector do
     Supervisor.start_link(__MODULE__, arg, name: __MODULE__)
   end
 
+  # Accepts a list of metrics, either directly in the form of a list of Telemetry.Metrics or a module with a `metrics()` function
   def init(arg) do
     metrics = Keyword.get(arg, :metrics, [])
     Supervisor.init(child_processes(metrics), strategy: :one_for_one)
@@ -27,7 +30,7 @@ defmodule Explorer.Celo.Telemetry.MetricsCollector do
 
   defp get_metrics(metrics) do
     [collector_metrics() | metrics]
-    |> Enum.map( fn
+    |> Enum.map(fn
       m when is_list(m) -> m
       module when is_atom(module) -> module.metrics()
     end)

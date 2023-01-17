@@ -10,8 +10,7 @@ defmodule BlockScoutWeb.Application do
   alias BlockScoutWeb.API.APILogger
   alias BlockScoutWeb.{CampaignBannerCache, LoggerBackend}
   alias BlockScoutWeb.Counters.BlocksIndexedCounter
-  alias BlockScoutWeb.Endpoint
-  alias BlockScoutWeb.RealtimeEventHandler
+  alias BlockScoutWeb.{Endpoint, RealtimeEventHandler}
 
   alias EthereumJSONRPC.Celo.Instrumentation, as: EthRPC
   alias Explorer.Celo.Telemetry.Instrumentation.FlyPostgres
@@ -43,7 +42,9 @@ defmodule BlockScoutWeb.Application do
         {Absinthe.Subscription, Endpoint},
         {CeloPrometheusCollector, metrics: [EthRPC.metrics(), FlyPostgres.metrics()]},
         {Plug.Cowboy,
-          scheme: :http, plug: Indexer.Celo.MonitorStack, options: [port: Application.get_env(:indexer, :health_check_port)]},
+         scheme: :http,
+         plug: Indexer.Celo.MonitorStack,
+         options: [port: Application.get_env(:indexer, :health_check_port)]},
         {RealtimeEventHandler, name: RealtimeEventHandler},
         {BlocksIndexedCounter, name: BlocksIndexedCounter},
         {CampaignBannerCache, name: CampaignBannerCache}

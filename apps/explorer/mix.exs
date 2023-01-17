@@ -48,12 +48,12 @@ defmodule Explorer.Mixfile do
   defp elixirc_paths, do: ["lib"]
 
   defp extra_applications,
-       do: [
-         :logger,
-         :mix,
-         :runtime_tools,
-         :tesla
-       ]
+    do: [
+      :logger,
+      :mix,
+      :runtime_tools,
+      :tesla
+    ]
 
   # Specifies your project dependencies.
   #

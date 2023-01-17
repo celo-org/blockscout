@@ -6,6 +6,7 @@ defmodule Explorer.Chain.Import do
   alias Ecto.Changeset
   alias Explorer.Account.Notify
   alias Explorer.Celo.Telemetry
+  alias Explorer.Celo.Telemetry.Helper, as: TelemetryHelper
   alias Explorer.Chain.Events.Publisher
   alias Explorer.Chain.Import
   alias Explorer.Repo
@@ -148,7 +149,7 @@ defmodule Explorer.Chain.Import do
       _, acc ->
         acc
     end)
-    |> Explorer.Celo.Telemetry.Helper.filter_imports()
+    |> TelemetryHelper.filter_imports()
     |> then(fn imports ->
       imports
       |> Enum.each(fn {primitive, import_count} ->

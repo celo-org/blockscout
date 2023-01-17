@@ -4,13 +4,13 @@ defmodule Explorer.Celo.Telemetry.Instrumentation.Database do
   alias Explorer.Celo.Telemetry.Instrumentation
   use Instrumentation
 
-  def metrics() do
+  def metrics do
     # referencing indexer + `_current` suffix for backwards compatibility
     [
       last_value("indexer_db_deadlocks_current",
-      event_name: [:indexer, :db, :deadlocks],
-      measurement: :value,
-      description: "Number of deadlocks on the db as reported by pg_stat_database (cumulative)"
+        event_name: [:indexer, :db, :deadlocks],
+        measurement: :value,
+        description: "Number of deadlocks on the db as reported by pg_stat_database (cumulative)"
       ),
       last_value("indexer_db_locks_current",
         event_name: [:indexer, :db, :locks],
@@ -27,7 +27,7 @@ defmodule Explorer.Celo.Telemetry.Instrumentation.Database do
         measurement: :count,
         tags: [:app],
         description: "Connections to the current database by app name"
-      ),
+      )
     ]
   end
 end

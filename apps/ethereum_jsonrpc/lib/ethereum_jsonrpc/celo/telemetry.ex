@@ -46,10 +46,11 @@ defmodule EthereumJSONRPC.Celo.Telemetry do
   """
   def event(name, measurements \\ %{}, meta \\ %{}), do: :telemetry.execute(normalise_name(name), measurements, meta)
 
-  #ensuring that ethereum_jsonrpc is tagged at the start of the metric name in both list and string formats
+  # ensuring that ethereum_jsonrpc is tagged at the start of the metric name in both list and string formats
   defp normalise_name(name) when is_atom(name), do: [:ethereum_jsonrpc, name]
-  defp normalise_name(name = [:ethereum_jsonrpc | _ ]) when is_list(name), do: name
+  defp normalise_name(name = [:ethereum_jsonrpc | _]) when is_list(name), do: name
   defp normalise_name(name) when is_list(name), do: [:ethereum_jsonrpc | name]
+
   @doc """
   Wraps a function call with telemetry timing events and an error handler. Errors will be sent with a telemetry event including stack trace before being reraised.
 

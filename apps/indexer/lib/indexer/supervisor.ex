@@ -15,7 +15,7 @@ defmodule Indexer.Supervisor do
 
   alias Indexer.Block.{Catchup, Realtime}
 
-  alias Indexer.Celo.TrackedEventCache
+  alias Indexer.Celo.{MetricsCron, TrackedEventCache}
 
   alias Indexer.Fetcher.{
     BlockReward,
@@ -48,8 +48,6 @@ defmodule Indexer.Supervisor do
     BlocksTransactionsMismatch,
     UnclesWithoutIndex
   }
-
-  alias Indexer.Celo.MetricsCron
 
   def child_spec([]) do
     child_spec([[]])

@@ -99,7 +99,7 @@ defmodule EthereumJsonrpc.MixProject do
       {:uuid, "~> 1.1"},
       # metrics
       {:telemetry, "~> 1.0", override: true},
-      {:telemetry_metrics, "~> 0.6.1"},
+      {:telemetry_metrics, "~> 0.6.1"}
     ]
   end
 end

@@ -10,8 +10,9 @@ defmodule Explorer.Celo.Telemetry.Plug do
   @behaviour Plug
   import Plug.Conn
   alias Explorer.Celo.Telemetry, as: Telemetry
+  alias TelemetryMetricsPrometheus.Core, as: PrometheusCore
 
-  #nop
+  # nop
   def init(_opts) do
   end
 
@@ -22,7 +23,7 @@ defmodule Explorer.Celo.Telemetry.Plug do
       @metrics_path ->
         Telemetry.event([:metrics, :scrape])
 
-        metrics = TelemetryMetricsPrometheus.Core.scrape()
+        metrics = PrometheusCore.scrape()
 
         conn
         |> put_private(:prometheus_metrics_name, :prometheus_metrics)
@@ -30,7 +31,8 @@ defmodule Explorer.Celo.Telemetry.Plug do
         |> send_resp(200, metrics)
         |> halt()
 
-      _ -> conn
+      _ ->
+        conn
     end
   end
 end

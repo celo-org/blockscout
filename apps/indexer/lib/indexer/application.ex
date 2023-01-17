@@ -6,7 +6,7 @@ defmodule Indexer.Application do
   use Application
 
   alias EthereumJSONRPC.Celo.Instrumentation, as: EthRPC
-  alias Explorer.Celo.Telemetry.Instrumentation.{Blockchain,FlyPostgres, Database}
+  alias Explorer.Celo.Telemetry.Instrumentation.{Blockchain, Database, FlyPostgres}
   alias Explorer.Celo.Telemetry.MetricsCollector, as: CeloPrometheusCollector
 
   alias Indexer.Celo.Telemetry.Instrumentation, as: IndexerMetrics
@@ -27,7 +27,9 @@ defmodule Indexer.Application do
         {Memory.Monitor, [memory_monitor_options, [name: memory_monitor_name]]},
         {CeloPrometheusCollector, metrics: [IndexerMetrics, FlyPostgres, Blockchain, EthRPC, Database]},
         {Plug.Cowboy,
-          scheme: :http, plug: Indexer.Celo.MonitorStack, options: [port: Application.get_env(:indexer, :health_check_port)]}
+         scheme: :http,
+         plug: Indexer.Celo.MonitorStack,
+         options: [port: Application.get_env(:indexer, :health_check_port)]}
       ]
       |> cluster_process(Application.get_env(:indexer, :environment))
 
