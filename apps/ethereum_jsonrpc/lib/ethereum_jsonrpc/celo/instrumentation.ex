@@ -7,10 +7,18 @@ defmodule EthereumJSONRPC.Celo.Instrumentation do
     [
       counter("ethereum_jsonrpc.http_request.start.count", description: "Count of HTTP requests attempted"),
       distribution("http_request_duration_milliseconds",
-        reporter_options: [buckets: [50, 100, 500, 1000, 10_000, :timer.minutes(1), :timer.minutes(3), :timer.minutes(5), :timer.minutes(10)]],
+        reporter_options: [buckets: [100,
+                             500,
+                             :timer.seconds(1),
+                             :timer.seconds(10),
+                             :timer.minutes(1),
+                             :timer.minutes(2),
+                             :timer.minutes(3),
+                             :timer.minutes(5),
+                             :timer.minutes(10)]],
         event_name: [:ethereum_jsonrpc, :http_request, :stop],
         measurement: :duration,
-        description: "Reponse times of requests sent via http to blockchain node",
+        description: "Response times of requests sent via http to blockchain node",
         tags: [:method, :status_code],
         unit: {:native, :millisecond}
       )
