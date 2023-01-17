@@ -4,6 +4,7 @@ defmodule Explorer.Celo.Telemetry do
   """
 
   alias __MODULE__
+  require Logger
 
   @doc false
   def start(name, meta \\ %{}, measurements \\ %{}) do
@@ -44,7 +45,10 @@ defmodule Explorer.Celo.Telemetry do
   @doc """
   Emits a telemetry event with given name + included measurements + metadata
   """
-  def event(name, measurements \\ %{}, meta \\ %{}), do: :telemetry.execute(normalise_name(name), measurements, meta)
+  def event(name, measurements \\ %{}, meta \\ %{}) do
+    Logger.debug("name=#{normalise_name(name) |> inspect()} measurements=#{inspect(measurements)} meta=#{inspect(meta)}")
+    :telemetry.execute(normalise_name(name), measurements, meta)
+  end
 
   #ensuring that blockscout is tagged at the start of the metric name in both list and string formats
   defp normalise_name(name) when is_atom(name), do: [:blockscout, name]

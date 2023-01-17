@@ -4,6 +4,7 @@ defmodule Indexer.Celo.MetricsCron do
   """
   use GenServer
   alias Explorer.Celo.Metrics.{BlockchainMetrics, DatabaseMetrics}
+  alias Explorer.Celo.Telemetry
   alias Explorer.Chain
   alias Explorer.Counters.AverageBlockTime
   alias Indexer.Celo.MetricsCron.TaskSupervisor, as: TaskSupervisor
@@ -37,7 +38,8 @@ defmodule Indexer.Celo.MetricsCron do
     :longest_query_duration,
     :transaction_count,
     :address_count,
-    :total_token_supply
+    :total_token_supply,
+    :db_connections_by_app
   ]
 
   @impl true
@@ -144,5 +146,14 @@ defmodule Indexer.Celo.MetricsCron do
   defp repeat do
     {interval, _} = Integer.parse(config(:metrics_cron_interval))
     Process.send_after(self(), :import_and_reschedule, :timer.seconds(interval))
+  end
+
+  def db_connections_by_app do
+    connection_map = DatabaseMetrics.fetch_connections_by_app()
+
+    connection_map
+    |> Enum.each(fn {app, count} ->
+      Telemetry.event([:db, :connections], %{count: count}, %{app: app})
+    end)
   end
 end

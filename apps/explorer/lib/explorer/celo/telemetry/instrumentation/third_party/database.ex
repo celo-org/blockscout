@@ -20,6 +20,12 @@ defmodule Explorer.Celo.Telemetry.Instrumentation.Database do
         measurement: :value,
         description: "Number of locks held on relations in the current database"
       ),
+      last_value("indexer_db_connections_count",
+        event_name: [:blockscout, :db, :connections],
+        measurement: :count,
+        tags: [:app],
+        description: "Connections to the current database by app name"
+      ),
     ]
   end
 end
