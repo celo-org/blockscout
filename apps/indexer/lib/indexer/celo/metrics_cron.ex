@@ -144,7 +144,7 @@ defmodule Indexer.Celo.MetricsCron do
   end
 
   defp repeat do
-    {interval, _} = Integer.parse(config(:metrics_cron_interval))
+    {interval, _} = Integer.parse(config(:metrics_cron_interval_seconds))
     Process.send_after(self(), :import_and_reschedule, :timer.seconds(interval))
   end
 

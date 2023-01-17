@@ -1,4 +1,6 @@
 defmodule Explorer.Celo.Telemetry.Instrumentation.Database do
+  @moduledoc "Metrics for non app specific database stats"
+
   alias Explorer.Celo.Telemetry.Instrumentation
   use Instrumentation
 
@@ -18,7 +20,7 @@ defmodule Explorer.Celo.Telemetry.Instrumentation.Database do
       last_value("indexer_db_longest_query_duration_current",
         event_name: [:indexer, :db, :longest_query_duration],
         measurement: :value,
-        description: "Number of locks held on relations in the current database"
+        description: "Age of longest running query"
       ),
       last_value("indexer_db_connections_count",
         event_name: [:blockscout, :db, :connections],

@@ -33,7 +33,7 @@ config :logger, :logger_backend, level: :error
 
 config :indexer, Indexer.Celo.MetricsCron,
        metrics_fetcher_blocks_count: 1000,
-       metrics_cron_interval: System.get_env("METRICS_CRON_INTERVAL") || "2"
+       metrics_cron_interval_seconds: System.get_env("METRICS_CRON_INTERVAL") || "5"
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.

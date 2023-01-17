@@ -29,7 +29,7 @@ defmodule Explorer.Celo.Telemetry.MetricsCollector do
     [collector_metrics() | metrics]
     |> Enum.map( fn
       m when is_list(m) -> m
-      module when is_atom(module) -> apply(module, :metrics, [])
+      module when is_atom(module) -> module.metrics()
     end)
     |> List.flatten()
   end
