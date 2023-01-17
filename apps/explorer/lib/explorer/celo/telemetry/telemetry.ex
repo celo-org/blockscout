@@ -52,7 +52,7 @@ defmodule Explorer.Celo.Telemetry do
   end
 
   # ensuring that blockscout is tagged at the start of the metric name in both list and string formats
-  defp normalise_name(name) when is_atom(name), do: []
+  defp normalise_name(name) when is_atom(name), do: [:blockscout, name]
   defp normalise_name(name = [:blockscout | _]) when is_list(name), do: name
   defp normalise_name(name) when is_list(name), do: [:blockscout | name]
 
