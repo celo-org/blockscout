@@ -25,7 +25,17 @@ defmodule BlockScoutWeb.API.RPC.RPCTranslator do
   alias Plug.Conn
 
   def init(opts) do
+    ensure_rpc_modules_loaded()
     opts
+  end
+
+  defp ensure_rpc_modules_loaded() do
+    modules = Application.get_env(:block_scout_web, :rpc_module_map)
+
+    modules
+    |> Enum.each(fn {_key, {module, _params}} ->
+      Code.ensure_loaded!(module)
+    end)
   end
 
   def call(%Conn{params: %{"module" => module, "action" => action}} = conn, translations) do
@@ -88,7 +98,10 @@ defmodule BlockScoutWeb.API.RPC.RPCTranslator do
 
     case Map.fetch(translations, module_lowercase) do
       {:ok, module} -> {:ok, module}
-      _ -> {:error, :no_action}
+      _ ->
+      IO.puts("translate_module")
+
+        {:error, :no_action}
     end
   end
 
@@ -98,17 +111,21 @@ defmodule BlockScoutWeb.API.RPC.RPCTranslator do
     action_lowercase = String.downcase(action)
     {:ok, String.to_existing_atom(action_lowercase)}
   rescue
-    ArgumentError -> {:error, :no_action}
+    e ->
+      IO.puts(inspect(action))
+      IO.puts(inspect(e))
+      {:error, :no_action}
   end
 
-  defp action_accessed?(action, write_actions) do
+  defp action_accessed?(_action, _write_actions) do
     conf = Application.get_env(:block_scout_web, BlockScoutWeb.ApiRouter)
 
-    if action in write_actions do
-      conf[:writing_enabled] || {:error, :no_action}
-    else
-      conf[:reading_enabled] || {:error, :no_action}
-    end
+      if conf[:writing_enabled] do
+        true
+      else
+        IO.puts("accessed")
+        {:error, :no_action}
+      end
   end
 
   @doc false
@@ -117,6 +134,7 @@ defmodule BlockScoutWeb.API.RPC.RPCTranslator do
     if :erlang.function_exported(controller, action, 2) do
       {:ok, controller.call(conn, action)}
     else
+      IO.puts("call_controller")
       {:error, :no_action}
     end
   rescue
