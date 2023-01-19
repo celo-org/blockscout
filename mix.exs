@@ -25,6 +25,7 @@ defmodule BlockScout.Mixfile do
           applications: [
             block_scout_web: :permanent,
             ethereum_jsonrpc: :permanent,
+            event_stream: :permanent,
             explorer: :permanent,
             indexer: :permanent
           ],

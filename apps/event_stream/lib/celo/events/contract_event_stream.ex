@@ -1,10 +1,11 @@
-defmodule Explorer.Celo.Events.ContractEventStream do
+defmodule EventStream.Celo.Events.ContractEventStream do
   @moduledoc """
      Accepts events and pushes them to an external queue (beanstalkd)
   """
 
   use GenServer
   require Logger
+
   alias Explorer.Celo.ContractEvents.{EventMap, EventTransformer}
 
   @doc "Accept a list of events and buffer for sending"
@@ -40,10 +41,10 @@ defmodule Explorer.Celo.Events.ContractEventStream do
   @impl true
   def handle_continue(:connect_to_beanstalk, state) do
     # charlist type required for erlang library
-    host = "BEANSTALKD_HOST" |> System.get_env() |> to_charlist()
+    host = Application.get_env(:event_stream, EventStream.Celo.Events.ContractEventStream, :host)
 
-    {port, _} = "BEANSTALKD_PORT" |> System.get_env() |> Integer.parse()
-    tube = "BEANSTALKD_TUBE" |> System.get_env("default")
+    {port, _} = Application.get_env(:event_stream, EventStream.Celo.Events.ContractEventStream, :port)
+    tube = Application.get_env(:event_stream, EventStream.Celo.Events.ContractEventStream, :tube)
 
     pid = connect_beanstalkd(host, port)
     {:using, ^tube} = ElixirTalk.use(pid, tube)

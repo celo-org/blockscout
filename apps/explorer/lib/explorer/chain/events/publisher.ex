@@ -3,7 +3,7 @@ defmodule Explorer.Chain.Events.Publisher do
   Publishes events related to the Chain context.
   """
 
-  alias Explorer.Celo.Events.ContractEventStream
+  alias EventStream.Celo.Events.ContractEventStream
 
   # Tags from import runner phase
   @allowed_events ~w(addresses address_coin_balances address_token_balances blocks block_rewards internal_transactions celo_contract_event last_block_number token_transfers transactions contract_verification_result)a
