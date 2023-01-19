@@ -29,7 +29,7 @@ defmodule BlockScoutWeb.API.RPC.RPCTranslator do
     opts
   end
 
-  defp ensure_rpc_modules_loaded() do
+  defp ensure_rpc_modules_loaded do
     modules = Application.get_env(:block_scout_web, :rpc_module_map)
 
     modules
@@ -97,9 +97,11 @@ defmodule BlockScoutWeb.API.RPC.RPCTranslator do
     module_lowercase = String.downcase(module)
 
     case Map.fetch(translations, module_lowercase) do
-      {:ok, module} -> {:ok, module}
+      {:ok, module} ->
+        {:ok, module}
+
       _ ->
-      IO.puts("translate_module")
+        IO.puts("translate_module")
 
         {:error, :no_action}
     end
@@ -120,12 +122,12 @@ defmodule BlockScoutWeb.API.RPC.RPCTranslator do
   defp action_accessed?(_action, _write_actions) do
     conf = Application.get_env(:block_scout_web, BlockScoutWeb.ApiRouter)
 
-      if conf[:writing_enabled] do
-        true
-      else
-        IO.puts("accessed")
-        {:error, :no_action}
-      end
+    if conf[:writing_enabled] do
+      true
+    else
+      IO.puts("accessed")
+      {:error, :no_action}
+    end
   end
 
   @doc false
