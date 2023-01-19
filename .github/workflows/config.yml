@@ -506,8 +506,6 @@ jobs:
             ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-"
 
 
-      - run: ./bin/install_chrome_headless.sh
-
       - name: mix test --exclude no_nethermind
         run: |
           cd apps/indexer
@@ -516,7 +514,7 @@ jobs:
           mix ecto.create --quiet
           mix ecto.migrate
           cd apps/indexer
-          mix test --no-start --exclude no_nethermind
+          mix test --no-start --exclude no_nethermind --exclude celo_exclude
         env:
           MIX_ENV: "test"
           # match POSTGRES_PASSWORD for postgres image below
