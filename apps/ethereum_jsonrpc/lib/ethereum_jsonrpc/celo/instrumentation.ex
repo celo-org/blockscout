@@ -7,7 +7,7 @@ defmodule EthereumJSONRPC.Celo.Instrumentation do
 
   def metrics do
     [
-      counter("ethereum_jsonrpc.http_request.start.count", description: "Count of HTTP requests attempted"),
+      counter("ethereum_jsonrpc_http_request_start_count", description: "Count of HTTP requests attempted"),
       distribution("http_request_duration_milliseconds",
         reporter_options: [
           buckets: [

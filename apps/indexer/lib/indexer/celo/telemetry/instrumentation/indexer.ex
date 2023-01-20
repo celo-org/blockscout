@@ -7,7 +7,7 @@ defmodule Indexer.Celo.Telemetry.Instrumentation do
 
   def metrics do
     [
-      counter("indexer.import.ingested",
+      counter("indexer_import_ingested",
         event_name: [:blockscout, :ingested],
         measurement: :count,
         description: "Blockchain primitives ingested via `Import.all` by type",
