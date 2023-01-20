@@ -111,7 +111,7 @@ defmodule BlockScoutWeb.API.RPC.RPCTranslator do
     action_lowercase = String.downcase(action)
     {:ok, String.to_existing_atom(action_lowercase)}
   rescue
-    e ->
+    _error ->
       {:error, :no_action}
   end
 
