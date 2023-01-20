@@ -2,7 +2,7 @@ defmodule BlockScoutWeb.Endpoint do
   use Phoenix.Endpoint, otp_app: :block_scout_web
   use Absinthe.Phoenix.Endpoint
 
-  # alias Explorer.Celo.Telemetry.Plug, as: CeloTelemetry
+  alias Explorer.Celo.Telemetry.Plug, as: CeloTelemetry
 
   if Application.compile_env(:block_scout_web, :sql_sandbox) do
     plug(Phoenix.Ecto.SQL.Sandbox, repo: Explorer.Repo)
@@ -57,7 +57,7 @@ defmodule BlockScoutWeb.Endpoint do
 
   plug(Plug.MethodOverride)
   plug(Plug.Head)
-  # plug(CeloTelemetry)
+  plug(CeloTelemetry)
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.

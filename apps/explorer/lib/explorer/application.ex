@@ -29,15 +29,6 @@ defmodule Explorer.Application do
 
   @impl Application
   def start(_type, _args) do
-    #    PrometheusLogger.setup()
-    #
-    #    :telemetry.attach(
-    #      "prometheus-ecto",
-    #      [:explorer, :repo, :query],
-    #      &PrometheusLogger.handle_event/4,
-    #      %{}
-    #    )
-
     # Children to start in all environments
     base_children = [
       {Fly.RPC, []},

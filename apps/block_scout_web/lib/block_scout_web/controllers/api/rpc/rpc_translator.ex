@@ -101,8 +101,6 @@ defmodule BlockScoutWeb.API.RPC.RPCTranslator do
         {:ok, module}
 
       _ ->
-        IO.puts("translate_module")
-
         {:error, :no_action}
     end
   end
@@ -114,8 +112,6 @@ defmodule BlockScoutWeb.API.RPC.RPCTranslator do
     {:ok, String.to_existing_atom(action_lowercase)}
   rescue
     e ->
-      IO.puts(inspect(action))
-      IO.puts(inspect(e))
       {:error, :no_action}
   end
 
@@ -125,7 +121,6 @@ defmodule BlockScoutWeb.API.RPC.RPCTranslator do
     if conf[:writing_enabled] do
       true
     else
-      IO.puts("accessed")
       {:error, :no_action}
     end
   end
@@ -136,7 +131,6 @@ defmodule BlockScoutWeb.API.RPC.RPCTranslator do
     if :erlang.function_exported(controller, action, 2) do
       {:ok, controller.call(conn, action)}
     else
-      IO.puts("call_controller")
       {:error, :no_action}
     end
   rescue
