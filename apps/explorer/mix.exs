@@ -123,8 +123,6 @@ defmodule Explorer.Mixfile do
       {:logger_json, "~> 3.2"},
       {:observer_cli, "~> 1.6"},
       {:phoenix_pubsub, "~> 2.0"},
-
-      #{:fly_postgres, path: "../../../fly_postgres_elixir"},
       {:fly_postgres, github: "clabs-co/fly_postgres_elixir", ref: "062a3f1"},
       # event publishing
       {:elixir_talk, "~> 1.2"}

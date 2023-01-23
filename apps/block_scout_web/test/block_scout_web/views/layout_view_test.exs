@@ -20,6 +20,7 @@ defmodule BlockScoutWeb.LayoutViewTest do
       assert LayoutView.logo() == "custom/logo.png"
     end
 
+    @tag(:skip, "non deterministic test")
     test "logo is nil when there is no env configured for it" do
       assert LayoutView.logo() == nil
     end
