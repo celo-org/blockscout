@@ -37,7 +37,7 @@ defmodule EventStream.Router do
 
     scope "/" do
       pipe_through :browser
-      live_dashboard "/dashboard", metrics: EventStream.Telemetry
+      live_dashboard "/dashboard", metrics: EventStream.Metrics
     end
   end
 end

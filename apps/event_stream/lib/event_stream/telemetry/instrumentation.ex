@@ -3,6 +3,8 @@ defmodule EventStream.Metrics do
   use Instrumentation
 
   def metrics do
-    []
+    [
+      counter("lol.party.count")
+    ]
   end
 end

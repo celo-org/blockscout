@@ -10,9 +10,13 @@ defmodule EventStream.Application do
     children = [
       EventStream.Endpoint,
       {CeloPrometheusCollector, metrics: [EventStream.Metrics.metrics()]},
+      Supervisor.child_spec({Phoenix.PubSub, name: :chain_pubsub}, id: :chain_pubsub),
+      Supervisor.child_spec({Phoenix.PubSub, name: EventStream.PubSub}, id: EventStream.PubSub),
+      {Registry, keys: :duplicate, name: Registry.ChainEvents, id: Registry.ChainEvents},
+      # listen for chain events and publish through registry
+      {Explorer.Chain.Events.Listener, %{event_source: Explorer.Chain.Events.PubSubSource}},
       # Start a worker by calling: EventStream.Worker.start_link(arg)
       # {EventStream.Worker, arg}
-      {Phoenix.PubSub, name: EventStream.PubSub}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html

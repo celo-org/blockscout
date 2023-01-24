@@ -1,10 +1,11 @@
-defmodule Explorer.Celo.Events.ContractEventStream do
+defmodule EventStream.ContractEventStream do
   @moduledoc """
      Accepts events and pushes them to an external queue (beanstalkd)
   """
 
   use GenServer
   require Logger
+  alias Explorer.Chain.Events.Subscriber
   alias Explorer.Celo.ContractEvents.{EventMap, EventTransformer}
 
   @doc "Accept a list of events and buffer for sending"
@@ -27,34 +28,41 @@ defmodule Explorer.Celo.Events.ContractEventStream do
   end
 
   @flush_interval_ms 5_000
+  @subscribed_event_types [:celo_contract_event, :tracked_contract_event]
 
   @impl true
   def init(buffer) do
     Process.flag(:trap_exit, true)
     timer = Process.send_after(self(), :tick, @flush_interval_ms)
-    Logger.info("Init event stream")
 
-    {:ok, %{buffer: buffer, timer: timer}, {:continue, :connect_to_beanstalk}}
+    # subscribe to receive messages from pubsub
+    @subscribed_event_types |> Enum.each(&( Subscriber.to(&1)))
+
+    refresh_time = System.get_env("EVENT_STREAM_REFRESH")
+
+    {:ok, %{buffer: buffer, timer: timer}}
   end
 
-  @impl true
-  def handle_continue(:connect_to_beanstalk, state) do
-    # charlist type required for erlang library
-    host = "BEANSTALKD_HOST" |> System.get_env() |> to_charlist()
 
-    {port, _} = "BEANSTALKD_PORT" |> System.get_env() |> Integer.parse()
-    tube = "BEANSTALKD_TUBE" |> System.get_env("default")
+#
+#  @impl true
+#  def handle_continue(:connect_to_beanstalk, state) do
+#    # charlist type required for erlang library
+#    host = "BEANSTALKD_HOST" |> System.get_env() |> to_charlist()
+#
+#    {port, _} = "BEANSTALKD_PORT" |> System.get_env() |> Integer.parse()
+#    tube = "BEANSTALKD_TUBE" |> System.get_env("default")
+#
+#    pid = connect_beanstalkd(host, port)
+#    {:using, ^tube} = ElixirTalk.use(pid, tube)
+#
+#    {:noreply, Map.put(state, :beanstalkd_pid, pid)}
+#  end
 
-    pid = connect_beanstalkd(host, port)
-    {:using, ^tube} = ElixirTalk.use(pid, tube)
-
-    {:noreply, Map.put(state, :beanstalkd_pid, pid)}
-  end
-
-  defp connect_beanstalkd(host, port) do
-    {:ok, pid} = ElixirTalk.connect(host, port)
-    pid
-  end
+#  defp connect_beanstalkd(host, port) do
+#    {:ok, pid} = ElixirTalk.connect(host, port)
+#    pid
+#  end
 
   @impl true
   def handle_cast({:enqueue, event}, %{buffer: buffer} = state) do
