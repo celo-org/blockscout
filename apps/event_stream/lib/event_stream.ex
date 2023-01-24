@@ -30,7 +30,7 @@ defmodule EventStream do
   def view do
     quote do
       use Phoenix.View,
-        root: "lib/event_stream/templates",
+        root: "lib/event_stream_web/templates",
         namespace: EventStream
 
       # Import convenience functions from controllers

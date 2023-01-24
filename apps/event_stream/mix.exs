@@ -37,7 +37,7 @@ defmodule EventStream.MixProject do
   # Type `mix help deps` for examples and options.
   defp deps do
     [
-      {:explorer, in_umbrella: true},
+      {:explorer, in_umbrella: true, runtime: false},
       {:phoenix, "~> 1.5.13"},
       {:phoenix_html, "== 3.0.4"},
       {:phoenix_live_dashboard, "~> 0.4"},
