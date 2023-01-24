@@ -1,5 +1,6 @@
 defmodule EventStream.Endpoint do
   use Phoenix.Endpoint, otp_app: :event_stream
+  alias Explorer.Celo.Telemetry.Plug, as: CeloTelemetry
 
   # The session will be stored in the cookie and signed,
   # this means its contents can be read but not tampered with.
@@ -48,6 +49,7 @@ defmodule EventStream.Endpoint do
 
   plug Plug.MethodOverride
   plug Plug.Head
+  plug CeloTelemetry
   plug Plug.Session, @session_options
   plug EventStream.Router
 end

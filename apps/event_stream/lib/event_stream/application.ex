@@ -4,16 +4,15 @@ defmodule EventStream.Application do
   @moduledoc false
 
   use Application
+  alias Explorer.Celo.Telemetry.MetricsCollector, as: CeloPrometheusCollector
 
   def start(_type, _args) do
     children = [
-      # Start the Telemetry supervisor
-      EventStream.Telemetry,
-      # Start the Endpoint (http/https)
       EventStream.Endpoint,
-      {Phoenix.PubSub, name: EventStream.PubSub}
+      {CeloPrometheusCollector, metrics: [EventStream.Metrics.metrics()]},
       # Start a worker by calling: EventStream.Worker.start_link(arg)
       # {EventStream.Worker, arg}
+      {Phoenix.PubSub, name: EventStream.PubSub}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
