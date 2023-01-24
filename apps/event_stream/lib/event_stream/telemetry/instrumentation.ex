@@ -4,7 +4,7 @@ defmodule EventStream.Metrics do
 
   def metrics do
     [
-      counter("lol.party.count")
+      counter("blockscout.event_stream.flush")
     ]
   end
 end

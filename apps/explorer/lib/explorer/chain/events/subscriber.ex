@@ -7,7 +7,7 @@ defmodule Explorer.Chain.Events.Subscriber do
 
   @allowed_broadcast_types ~w(catchup realtime on_demand contract_verification_result)a
 
-  @allowed_events ~w(exchange_rate transaction_stats)a
+  @allowed_events ~w(exchange_rate transaction_stats celo_contract_event tracked_contract_event)a
 
   @type broadcast_type :: :realtime | :catchup | :on_demand
 

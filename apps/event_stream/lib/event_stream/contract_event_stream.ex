@@ -7,6 +7,7 @@ defmodule EventStream.ContractEventStream do
   require Logger
   alias Explorer.Chain.Events.Subscriber
   alias Explorer.Celo.ContractEvents.{EventMap, EventTransformer}
+  alias Explorer.Celo.Telemetry
 
   @doc "Accept a list of events and buffer for sending"
   def enqueue(events) do
@@ -70,9 +71,9 @@ defmodule EventStream.ContractEventStream do
   end
 
   @impl true
-  def handle_info(:tick, %{buffer: buffer, beanstalkd_pid: pid, timer: timer} = state) do
+  def handle_info(:tick, %{buffer: buffer, timer: timer} = state) do
     Process.cancel_timer(timer)
-    failed_events = run(buffer, pid)
+    failed_events = run(buffer)
 
     new_timer = Process.send_after(self(), :tick, @flush_interval_ms)
 
@@ -82,7 +83,7 @@ defmodule EventStream.ContractEventStream do
   @impl true
   def terminate(_reason, %{buffer: buffer, beanstalkd_pid: pid} = _state) do
     Logger.info("Flushing event buffer before shutdown...")
-    run(buffer, pid)
+    run(buffer)
   end
 
   def terminate(reason, _state) do
@@ -90,27 +91,30 @@ defmodule EventStream.ContractEventStream do
   end
 
   # attempts to send everything, failed events will be returned to the buffer
-  defp run(events, beanstalk_pid) do
+  defp run(events) do
+    Telemetry.event([:event_stream, :flush], %{}, %{event_count: length(events)})
+
     events
     |> List.flatten()
     |> Enum.map(fn event ->
       to_send = event |> transform_event()
 
-      # put event in pipe, if failed then log + return the event for retry
-      case ElixirTalk.put(beanstalk_pid, to_send) do
-        {:inserted, _insertion_count} ->
-          :telemetry.execute(
-            [:explorer, :contract_event_stream, :inserted],
-            %{topic: event.topic, contract_address: event.contract_address_hash |> to_string()},
-            %{}
-          )
-
-          nil
-
-        error ->
-          Logger.error("Error sending event to beanstalkd - #{inspect(error)}")
-          event
-      end
+      Logger.info("Send event lol")
+#      # put event in pipe, if failed then log + return the event for retry
+#      case ElixirTalk.put(beanstalk_pid, to_send) do
+#        {:inserted, _insertion_count} ->
+#          :telemetry.execute(
+#            [:explorer, :contract_event_stream, :inserted],
+#            %{topic: event.topic, contract_address: event.contract_address_hash |> to_string()},
+#            %{}
+#          )
+#
+#          nil
+#
+#        error ->
+#          Logger.error("Error sending event to beanstalkd - #{inspect(error)}")
+#          event
+#      end
     end)
     |> Enum.filter(&(!is_nil(&1)))
   end
