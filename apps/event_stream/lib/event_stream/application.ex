@@ -19,6 +19,8 @@ defmodule EventStream.Application do
       # Start a worker by calling: EventStream.Worker.start_link(arg)
       # {EventStream.Worker, arg}
     ]
+    |> cluster_process(Application.get_env(:blockscout, :environment))
+
 
     # See https://hexdocs.pm/elixir/Supervisor.html
     # for other strategies and supported options
@@ -32,4 +34,13 @@ defmodule EventStream.Application do
     EventStream.Endpoint.config_change(changed, removed)
     :ok
   end
+
+
+  def cluster_process(acc, :prod) do
+    topologies = Application.get_env(:libcluster, :topologies)
+
+    [{Cluster.Supervisor, [topologies, [name: EventStream.ClusterSupervisor]]} | acc]
+  end
+
+  def cluster_process(acc, _environment), do: acc
 end

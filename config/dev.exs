@@ -1,5 +1,7 @@
 import Config
 
+config :blockscout, :environment, :dev
+
 # For development, we disable any cache and enable
 # debugging and code reloading.
 #
