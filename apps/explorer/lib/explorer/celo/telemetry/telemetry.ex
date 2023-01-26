@@ -47,7 +47,7 @@ defmodule Explorer.Celo.Telemetry do
   """
   def event(name, measurements \\ %{}, meta \\ %{}) do
     metric_name = normalise_name(name)
-    Logger.info("name=#{inspect(metric_name)} measurements=#{inspect(measurements)} meta=#{inspect(meta)}")
+    Logger.debug("name=#{inspect(metric_name)} measurements=#{inspect(measurements)} meta=#{inspect(meta)}")
     :telemetry.execute(metric_name, measurements, meta)
   end
 
