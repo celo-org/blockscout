@@ -34,12 +34,12 @@ defmodule EventStream.ContractEventStream do
   @impl true
   def init(buffer) do
     Process.flag(:trap_exit, true)
-    timer = Process.send_after(self(), :tick, @flush_interval_ms)
+
+    flush_time = Application.get_env(:event_stream, :buffer_flush_interval, @flush_interval_ms)
+    timer = Process.send_after(self(), :tick, flush_time)
 
     # subscribe to receive messages from pubsub
     @subscribed_event_types |> Enum.each(&( Subscriber.to(&1)))
-
-    refresh_time = System.get_env("EVENT_STREAM_REFRESH")
 
     {:ok, %{buffer: buffer, timer: timer}}
   end
@@ -75,13 +75,14 @@ defmodule EventStream.ContractEventStream do
     Process.cancel_timer(timer)
     failed_events = run(buffer)
 
-    new_timer = Process.send_after(self(), :tick, @flush_interval_ms)
+    flush_time = Application.get_env(:event_stream, :buffer_flush_interval, @flush_interval_ms)
+    new_timer = Process.send_after(self(), :tick, flush_time)
 
     {:noreply, %{state | buffer: failed_events, timer: new_timer}}
   end
 
   @impl true
-  def terminate(_reason, %{buffer: buffer, beanstalkd_pid: pid} = _state) do
+  def terminate(_reason, %{buffer: buffer} = _state) do
     Logger.info("Flushing event buffer before shutdown...")
     run(buffer)
   end
@@ -99,7 +100,7 @@ defmodule EventStream.ContractEventStream do
     |> Enum.map(fn event ->
       to_send = event |> transform_event()
 
-      Logger.info("Send event lol")
+      Logger.info("Send event #{inspect(event)}")
 #      # put event in pipe, if failed then log + return the event for retry
 #      case ElixirTalk.put(beanstalk_pid, to_send) do
 #        {:inserted, _insertion_count} ->
