@@ -5,7 +5,7 @@ defmodule EventStream.ContractEventStream do
 
   use GenServer
   require Logger
-  alias EventStream.Subscriptions
+  alias EventStream.{Publisher, Subscriptions}
   alias Explorer.Celo.ContractEvents.{EventMap, EventTransformer}
   alias Explorer.Celo.Telemetry
 
@@ -100,11 +100,15 @@ defmodule EventStream.ContractEventStream do
     events
     |> List.flatten()
     |> Enum.map(fn event ->
-      to_send = event |> transform_event()
+      publish_result = event
+      |> transform_event()
+      |> Publisher.publish()
 
-      Logger.info("Send event #{inspect(to_send)}")
-
+      case publish_result do
+        {:failed, event} -> event
+        :ok -> nil
+      end
     end)
-    |> Enum.filter(&(!is_nil(&1) && !(&1 == :ok)))
+    |> Enum.filter(&(!is_nil(&1)))
   end
 end
