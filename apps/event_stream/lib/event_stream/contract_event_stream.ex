@@ -79,7 +79,7 @@ defmodule EventStream.ContractEventStream do
   end
 
   @impl true
-  def handle_info({:chain_event, type, :realtime, data}, state = %{buffer: buffer})  when is_list(data) do
+  def handle_info({:chain_event, _type, :realtime, data}, state = %{buffer: buffer})  when is_list(data) do
     {:noreply, %{state | buffer: data ++ buffer}}
   end
 
@@ -102,7 +102,7 @@ defmodule EventStream.ContractEventStream do
     |> Enum.map(fn event ->
       to_send = event |> transform_event()
 
-      Logger.info("Send event #{inspect(event)}")
+      Logger.info("Send event #{inspect(to_send)}")
 #      # put event in pipe, if failed then log + return the event for retry
 #      case ElixirTalk.put(beanstalk_pid, to_send) do
 #        {:inserted, _insertion_count} ->
