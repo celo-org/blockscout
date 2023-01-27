@@ -5,7 +5,7 @@ defmodule EventStream.ContractEventStream do
 
   use GenServer
   require Logger
-  alias Explorer.Chain.Events.Subscriber
+  alias EventStream.Subscriptions
   alias Explorer.Celo.ContractEvents.{EventMap, EventTransformer}
   alias Explorer.Celo.Telemetry
 
@@ -15,8 +15,8 @@ defmodule EventStream.ContractEventStream do
     {:ok, events}
   end
 
-  @doc "Transform celo contract event to expected json format"
-  def transform_event(event) do
+  # Transform celo contract event to expected json format
+  defp transform_event(event) do
     event
     |> EventMap.celo_contract_event_to_concrete_event()
     |> EventTransformer.to_event_stream_format()
@@ -29,7 +29,6 @@ defmodule EventStream.ContractEventStream do
   end
 
   @flush_interval_ms 5_000
-  @subscribed_event_types [:celo_contract_event, :tracked_contract_event]
 
   @impl true
   def init(buffer) do
@@ -38,12 +37,10 @@ defmodule EventStream.ContractEventStream do
     flush_time = Application.get_env(:event_stream, :buffer_flush_interval, @flush_interval_ms)
     timer = Process.send_after(self(), :tick, flush_time)
 
-    # subscribe to receive messages from pubsub
-    @subscribed_event_types |> Enum.each(&( Subscriber.to(&1)))
+    Subscriptions.subscribe()
 
     {:ok, %{buffer: buffer, timer: timer}}
   end
-
 
 #
 #  @impl true
@@ -79,6 +76,11 @@ defmodule EventStream.ContractEventStream do
     new_timer = Process.send_after(self(), :tick, flush_time)
 
     {:noreply, %{state | buffer: failed_events, timer: new_timer}}
+  end
+
+  @impl true
+  def handle_info({:chain_event, type, :realtime, data}, state = %{buffer: buffer})  when is_list(data) do
+    {:noreply, %{state | buffer: data ++ buffer}}
   end
 
   @impl true

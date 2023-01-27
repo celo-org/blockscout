@@ -14,10 +14,11 @@ defmodule Explorer.Chain.Events.PubSubSource do
   end
 
   def handle_source_msg({:chain_event, payload}) do
-    Telemetry.event(:chain_event_receive, %{payload_size: byte_size(payload)})
-
     payload
     |> decode_payload!()
+    |> tap(fn {:chain_event, type, _broadcast_type, _event_data} ->
+      Telemetry.event(:chain_event_receive, %{type: type, payload_size: byte_size(payload)})
+    end)
   end
 
   # sobelow_skip ["Misc.BinToTerm"]
