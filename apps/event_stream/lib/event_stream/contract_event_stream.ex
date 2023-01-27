@@ -103,22 +103,8 @@ defmodule EventStream.ContractEventStream do
       to_send = event |> transform_event()
 
       Logger.info("Send event #{inspect(to_send)}")
-#      # put event in pipe, if failed then log + return the event for retry
-#      case ElixirTalk.put(beanstalk_pid, to_send) do
-#        {:inserted, _insertion_count} ->
-#          :telemetry.execute(
-#            [:explorer, :contract_event_stream, :inserted],
-#            %{topic: event.topic, contract_address: event.contract_address_hash |> to_string()},
-#            %{}
-#          )
-#
-#          nil
-#
-#        error ->
-#          Logger.error("Error sending event to beanstalkd - #{inspect(error)}")
-#          event
-#      end
+
     end)
-    |> Enum.filter(&(!is_nil(&1)))
+    |> Enum.filter(&(!is_nil(&1) && !(&1 == :ok)))
   end
 end
