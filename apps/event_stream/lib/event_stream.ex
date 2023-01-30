@@ -1,3 +1,4 @@
+# credo:disable-for-this-file
 defmodule EventStream do
   @moduledoc """
   The entrypoint for defining your web interface, such
@@ -87,8 +88,7 @@ defmodule EventStream do
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
 
-      import EventStream.ErrorHelpers
-      import EventStream.Gettext
+      import EventStream.{ErrorHelpers, Gettext}
       alias EventStream.Router.Helpers, as: Routes
     end
   end

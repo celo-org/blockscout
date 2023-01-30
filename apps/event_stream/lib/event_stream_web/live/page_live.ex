@@ -1,6 +1,8 @@
 defmodule EventStream.PageLive do
   use EventStream, :live_view
 
+  alias EventStream.Endpoint
+
   @impl true
   def mount(_params, _session, socket) do
     {:ok, assign(socket, query: "", results: %{})}
@@ -26,7 +28,7 @@ defmodule EventStream.PageLive do
   end
 
   defp search(query) do
-    if not EventStream.Endpoint.config(:code_reloader) do
+    if not Endpoint.config(:code_reloader) do
       raise "action disabled when not in development"
     end
 

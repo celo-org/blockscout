@@ -42,25 +42,25 @@ defmodule EventStream.ContractEventStream do
     {:ok, %{buffer: buffer, timer: timer}}
   end
 
-#
-#  @impl true
-#  def handle_continue(:connect_to_beanstalk, state) do
-#    # charlist type required for erlang library
-#    host = "BEANSTALKD_HOST" |> System.get_env() |> to_charlist()
-#
-#    {port, _} = "BEANSTALKD_PORT" |> System.get_env() |> Integer.parse()
-#    tube = "BEANSTALKD_TUBE" |> System.get_env("default")
-#
-#    pid = connect_beanstalkd(host, port)
-#    {:using, ^tube} = ElixirTalk.use(pid, tube)
-#
-#    {:noreply, Map.put(state, :beanstalkd_pid, pid)}
-#  end
+  #
+  #  @impl true
+  #  def handle_continue(:connect_to_beanstalk, state) do
+  #    # charlist type required for erlang library
+  #    host = "BEANSTALKD_HOST" |> System.get_env() |> to_charlist()
+  #
+  #    {port, _} = "BEANSTALKD_PORT" |> System.get_env() |> Integer.parse()
+  #    tube = "BEANSTALKD_TUBE" |> System.get_env("default")
+  #
+  #    pid = connect_beanstalkd(host, port)
+  #    {:using, ^tube} = ElixirTalk.use(pid, tube)
+  #
+  #    {:noreply, Map.put(state, :beanstalkd_pid, pid)}
+  #  end
 
-#  defp connect_beanstalkd(host, port) do
-#    {:ok, pid} = ElixirTalk.connect(host, port)
-#    pid
-#  end
+  #  defp connect_beanstalkd(host, port) do
+  #    {:ok, pid} = ElixirTalk.connect(host, port)
+  #    pid
+  #  end
 
   @impl true
   def handle_cast({:enqueue, event}, %{buffer: buffer} = state) do
@@ -79,7 +79,7 @@ defmodule EventStream.ContractEventStream do
   end
 
   @impl true
-  def handle_info({:chain_event, _type, :realtime, data}, state = %{buffer: buffer})  when is_list(data) do
+  def handle_info({:chain_event, _type, :realtime, data}, state = %{buffer: buffer}) when is_list(data) do
     {:noreply, %{state | buffer: data ++ buffer}}
   end
 
@@ -100,9 +100,10 @@ defmodule EventStream.ContractEventStream do
     events
     |> List.flatten()
     |> Enum.map(fn event ->
-      publish_result = event
-      |> transform_event()
-      |> Publisher.publish()
+      publish_result =
+        event
+        |> transform_event()
+        |> Publisher.publish()
 
       case publish_result do
         {:failed, event} -> event

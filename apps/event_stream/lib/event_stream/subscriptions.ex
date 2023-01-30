@@ -11,7 +11,8 @@ defmodule EventStream.Subscriptions do
 
   @doc "Register current process to receive message for given events"
   def subscribe(events) do
-    events |> Enum.each(fn event ->
+    events
+    |> Enum.each(fn event ->
       Subscriber.to(event)
       Subscriber.to(event, :realtime)
     end)

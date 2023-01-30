@@ -68,14 +68,13 @@ config :logger, :account,
   rotate: %{max_bytes: 52_428_800, keep: 19},
   metadata_filter: [fetcher: :account]
 
-
 config :libcluster,
-       topologies: [
-         blockscout: [
-           strategy: Cluster.Strategy.Kubernetes.DNS,
-           config: [
-             service: System.get_env("EPMD_SERVICE_NAME"),
-             application_name: "blockscout"
-           ]
-         ]
-       ]
+  topologies: [
+    blockscout: [
+      strategy: Cluster.Strategy.Kubernetes.DNS,
+      config: [
+        service: System.get_env("EPMD_SERVICE_NAME"),
+        application_name: "blockscout"
+      ]
+    ]
+  ]
