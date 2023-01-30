@@ -113,8 +113,4 @@ defmodule EventStream.ContractEventStream do
     # return failed events to buffer
     failed_events
   end
-
-  #
-  #  defp handle_publish_result(:ok), do: nil
-  #  defp handle_publish_result({:failed, event}), do: event
 end
