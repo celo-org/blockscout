@@ -16,6 +16,8 @@ defmodule EventStream.ContractEventStream do
   end
 
   # Transform celo contract event to expected json format
+  defp transform_event(event) when is_binary(event), do: event
+
   defp transform_event(event) do
     event
     |> EventMap.celo_contract_event_to_concrete_event()
@@ -97,19 +99,22 @@ defmodule EventStream.ContractEventStream do
   defp run(events) do
     Telemetry.event([:event_stream, :flush], %{}, %{event_count: length(events)})
 
-    events
-    |> List.flatten()
-    |> Enum.map(fn event ->
-      publish_result =
+    failed_events =
+      events
+      |> List.flatten()
+      |> Enum.map(fn event ->
         event
         |> transform_event()
         |> Publisher.publish()
+      end)
+      |> Enum.filter(&(&1 != :ok))
+      |> Enum.map(fn {:failed, event} -> event end)
 
-      case publish_result do
-        {:failed, event} -> event
-        :ok -> nil
-      end
-    end)
-    |> Enum.filter(&(!is_nil(&1)))
+    # return failed events to buffer
+    failed_events
   end
+
+  #
+  #  defp handle_publish_result(:ok), do: nil
+  #  defp handle_publish_result({:failed, event}), do: event
 end
