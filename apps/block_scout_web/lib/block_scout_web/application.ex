@@ -9,6 +9,7 @@ defmodule BlockScoutWeb.Application do
 
   alias BlockScoutWeb.API.APILogger
   alias BlockScoutWeb.{CampaignBannerCache, LoggerBackend}
+  alias BlockScoutWeb.Celo.MetricsCron
   alias BlockScoutWeb.Counters.BlocksIndexedCounter
   alias BlockScoutWeb.{Endpoint, RealtimeEventHandler}
 
@@ -46,6 +47,7 @@ defmodule BlockScoutWeb.Application do
         {CampaignBannerCache, name: CampaignBannerCache}
       ]
       |> cluster_process(Application.get_env(:block_scout_web, :environment))
+      |> metrics_processes()
 
     opts = [strategy: :one_for_one, name: BlockScoutWeb.Supervisor, max_restarts: 1_000]
     Supervisor.start_link(children, opts)
@@ -58,6 +60,12 @@ defmodule BlockScoutWeb.Application do
     :ok
   end
 
+  def metrics_processes(sibling_processes) do
+    sibling_processes ++ [
+      {MetricsCron, [[]]},
+      {Task.Supervisor, name: BlockScoutWeb.Celo.MetricsCron.TaskSupervisor}
+    ]
+  end
   def cluster_process(acc, :prod) do
     topologies = Application.get_env(:libcluster, :topologies)
 

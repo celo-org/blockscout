@@ -12,6 +12,7 @@ defmodule Indexer.PendingTransactionsSanitizer do
   import EthereumJSONRPC.Receipt, only: [to_elixir: 1]
 
   alias Ecto.Changeset
+  alias Explorer.Celo.Telemetry
   alias Explorer.{Chain, Repo}
   alias Explorer.Chain.Hash.Full, as: Hash
   alias Explorer.Chain.Import.Runner.Blocks
