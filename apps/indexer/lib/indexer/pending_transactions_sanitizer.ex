@@ -66,6 +66,8 @@ defmodule Indexer.PendingTransactionsSanitizer do
   end
 
   defp sanitize_pending_transactions(json_rpc_named_arguments) do
+    Telemetry.event(:pending_transactions_sanitize)
+
     pending_transactions_list_from_db = Chain.pending_transactions_list()
 
     pending_transactions_list_from_db

@@ -18,6 +18,16 @@ defmodule Indexer.Celo.Telemetry.Instrumentation do
         measurement: :count,
         description: "Pubsub notifications sent via erlang cluster"
       ),
+      counter("indexer_pending_transactions_sanitizer_count",
+        event_name: [:blockscout, :pending_transactions_sanitize],
+        measurement: :count,
+        description: "Invocations of pending transaction sanitizer"
+      ),
+      counter("indexer_empty_block_sanitizer_count",
+        event_name: [:blockscout, :empty_block_sanitize],
+        measurement: :count,
+        description: "Invocations of empty block sanitizer"
+      ),
       last_value(
         "indexer_blocks_pending_blockcount_current",
         event_name: [:indexer, :blocks, :pending_blockcount],
