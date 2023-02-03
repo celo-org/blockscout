@@ -29,7 +29,6 @@ defmodule Explorer.Celo.Telemetry.Instrumentation.Database do
         tags: [:app],
         description: "Connections to the current database by app name"
       ),
-
       last_value("db_deadlocks_current",
         event_name: [:blockscout, :db, :deadlocks],
         measurement: :value,
@@ -51,13 +50,12 @@ defmodule Explorer.Celo.Telemetry.Instrumentation.Database do
         tags: [:app],
         description: "Connections to the current database by app name"
       ),
-
       last_value("db_table_size_current",
         event_name: [:blockscout, :db, :table_size],
         measurement: :size,
         tags: [:name],
-        description: "Largest tables by size"
-      ),
+        description: "Largest tables by size in bytes"
+      )
     ]
   end
 end

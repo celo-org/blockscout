@@ -61,11 +61,13 @@ defmodule BlockScoutWeb.Application do
   end
 
   def metrics_processes(sibling_processes) do
-    sibling_processes ++ [
-      {MetricsCron, [[]]},
-      {Task.Supervisor, name: BlockScoutWeb.Celo.MetricsCron.TaskSupervisor}
-    ]
+    sibling_processes ++
+      [
+        {MetricsCron, [[]]},
+        {Task.Supervisor, name: BlockScoutWeb.Celo.MetricsCron.TaskSupervisor}
+      ]
   end
+
   def cluster_process(acc, :prod) do
     topologies = Application.get_env(:libcluster, :topologies)
 

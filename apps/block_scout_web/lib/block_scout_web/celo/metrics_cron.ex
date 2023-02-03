@@ -5,8 +5,8 @@ defmodule BlockScoutWeb.Celo.MetricsCron do
   use GenServer
 
   alias BlockScoutWeb.Celo.MetricsCron.TaskSupervisor
+  alias Explorer.Celo.Metrics.DatabaseMetrics
   alias Explorer.Celo.Telemetry
-  alias Explorer.Celo.Telemetry.Instrumentation.Database
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
@@ -70,17 +70,17 @@ defmodule BlockScoutWeb.Celo.MetricsCron do
 
   def database_stats do
     number_of_locks = DatabaseMetrics.fetch_number_of_locks()
-    Telemetry.event([:db, :locks],  %{value: number_of_locks})
+    Telemetry.event([:db, :locks], %{value: number_of_locks})
 
     number_of_dead_locks = DatabaseMetrics.fetch_number_of_dead_locks()
-    Telemetry.event([:db, :deadlocks],  %{value: number_of_dead_locks})
+    Telemetry.event([:db, :deadlocks], %{value: number_of_dead_locks})
 
     longest_query_duration = DatabaseMetrics.fetch_name_and_duration_of_longest_query()
-    Telemetry.event([:db, :longest_query_duration],  %{value: longest_query_duration})
+    Telemetry.event([:db, :longest_query_duration], %{value: longest_query_duration})
 
     tables_by_size = DatabaseMetrics.fetch_top_10_tables_by_size()
 
     tables_by_size
-    |> Enum.each(fn {name, size} -> Telemetry.event([:db, :table_size], %{size: size}, %{name: name})  end)
+    |> Enum.each(fn {name, size} -> Telemetry.event([:db, :table_size], %{size: size}, %{name: name}) end)
   end
 end

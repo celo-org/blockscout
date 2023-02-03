@@ -53,7 +53,7 @@ defmodule Indexer.Celo.Telemetry.Instrumentation do
         measurement: :batch_size,
         description: "Max batch size for fetcher (number of items each fetcher process will work upon)",
         tags: [:fetcher]
-      ),
+      )
     ]
   end
 end

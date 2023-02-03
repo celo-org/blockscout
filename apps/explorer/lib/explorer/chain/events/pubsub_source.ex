@@ -19,6 +19,7 @@ defmodule Explorer.Chain.Events.PubSubSource do
     |> tap(fn
       {:chain_event, type, _broadcast_type, _event_data} ->
         Telemetry.event(:chain_event_receive, %{type: type, payload_size: byte_size(payload)})
+
       {:chain_event, type} ->
         Telemetry.event(:chain_event_receive, %{type: type})
     end)
