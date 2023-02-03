@@ -29,7 +29,21 @@ defmodule Indexer.Celo.Telemetry.Instrumentation do
         event_name: [:indexer, :blocks, :pending],
         measurement: :value,
         description: "Number of blocks still to be fetched in past range"
-      )
+      ),
+      last_value(
+        "indexer_fetcher_config_concurrency_current",
+        event_name: [:blockscout, :fetcher, :config],
+        measurement: :concurrency,
+        description: "Max concurrent fetcher processes",
+        tags: [:fetcher]
+      ),
+      last_value(
+        "indexer_fetcher_config_batch_size_current",
+        event_name: [:blockscout, :fetcher, :config],
+        measurement: :batch_size,
+        description: "Max batch size for fetcher (number of items each fetcher process will work upon)",
+        tags: [:fetcher]
+      ),
     ]
   end
 end
