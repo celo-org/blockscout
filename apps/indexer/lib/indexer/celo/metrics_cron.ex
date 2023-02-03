@@ -40,7 +40,7 @@ defmodule Indexer.Celo.MetricsCron do
     :address_count,
     :total_token_supply,
     :db_connections_by_app,
-    :itx_fetcher_config
+    :fetcher_config
   ]
 
   @impl true
