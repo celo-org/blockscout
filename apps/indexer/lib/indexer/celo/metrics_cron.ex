@@ -96,17 +96,17 @@ defmodule Indexer.Celo.MetricsCron do
 
   def number_of_locks do
     number_of_locks = DatabaseMetrics.fetch_number_of_locks()
-    :telemetry.execute([:indexer, :db, :locks], %{value: number_of_locks})
+    Telemetry.event([:db, :locks],  %{value: number_of_locks})
   end
 
   def number_of_deadlocks do
     number_of_dead_locks = DatabaseMetrics.fetch_number_of_dead_locks()
-    :telemetry.execute([:indexer, :db, :deadlocks], %{value: number_of_dead_locks})
+    Telemetry.event([:db, :deadlocks],  %{value: number_of_dead_locks})
   end
 
   def longest_query_duration do
     longest_query_duration = DatabaseMetrics.fetch_name_and_duration_of_longest_query()
-    :telemetry.execute([:indexer, :db, :longest_query_duration], %{value: longest_query_duration})
+    Telemetry.event([:db, :longest_query_duration],  %{value: longest_query_duration})
   end
 
   def transaction_count do

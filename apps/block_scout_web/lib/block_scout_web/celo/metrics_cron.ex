@@ -5,6 +5,8 @@ defmodule BlockScoutWeb.Celo.MetricsCron do
   use GenServer
 
   alias BlockScoutWeb.Celo.MetricsCron.TaskSupervisor
+  alias Explorer.Celo.Telemetry
+  alias Explorer.Celo.Telemetry.Instrumentation.Database
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
@@ -26,7 +28,7 @@ defmodule BlockScoutWeb.Celo.MetricsCron do
   end
 
   @metric_operations [
-    :dummy_log
+    :database_stats
   ]
 
   @impl true
@@ -66,7 +68,14 @@ defmodule BlockScoutWeb.Celo.MetricsCron do
     {:noreply, state}
   end
 
-  def dummy_log do
-    Logger.info("Hello I have been invoked")
+  def database_stats do
+    number_of_locks = DatabaseMetrics.fetch_number_of_locks()
+    Telemetry.event([:db, :locks],  %{value: number_of_locks})
+
+    number_of_dead_locks = DatabaseMetrics.fetch_number_of_dead_locks()
+    Telemetry.event([:db, :deadlocks],  %{value: number_of_dead_locks})
+
+    longest_query_duration = DatabaseMetrics.fetch_name_and_duration_of_longest_query()
+    Telemetry.event([:db, :longest_query_duration],  %{value: longest_query_duration})
   end
 end
