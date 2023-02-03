@@ -3,6 +3,7 @@ defmodule Indexer.Celo.MetricsCron do
   Periodically retrieves and updates prometheus metrics
   """
   use GenServer
+  alias Indexer.BufferedTask
   alias Explorer.Celo.Metrics.{BlockchainMetrics, DatabaseMetrics}
   alias Explorer.Celo.Telemetry
   alias Explorer.Chain
@@ -166,8 +167,8 @@ defmodule Indexer.Celo.MetricsCron do
         Logger.error("Couldn't get config values for fetcher #{fetcher_module} - no pid")
 
       {fetcher_module, fetcher_process_id} ->
-        max_concurrency = fetcher_process_id |> Indexer.BufferedTask.get_state(:max_concurrency)
-        batch_size = fetcher_process_id |> Indexer.BufferedTask.get_state(:max_batch_size)
+        max_concurrency = fetcher_process_id |> BufferedTask.get_state(:max_concurrency)
+        batch_size = fetcher_process_id |> BufferedTask.get_state(:max_batch_size)
 
         Telemetry.event([:fetcher, :config], %{concurrency: max_concurrency, batch_size: batch_size}, %{
           fetcher: fetcher_module

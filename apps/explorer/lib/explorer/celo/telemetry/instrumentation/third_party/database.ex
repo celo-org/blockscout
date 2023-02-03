@@ -5,8 +5,8 @@ defmodule Explorer.Celo.Telemetry.Instrumentation.Database do
   use Instrumentation
 
   def metrics do
-    # todo: currently referencing indexer + `_current` suffix for backwards compatibility, this should be removed after
-    # new dashboards are made
+    # currently referencing indexer + `_current` suffix for backwards compatibility, this should be removed after
+    # new dashboards are made that reference the new metric names
     [
       last_value("indexer_db_deadlocks_current",
         event_name: [:blockscout, :db, :deadlocks],
