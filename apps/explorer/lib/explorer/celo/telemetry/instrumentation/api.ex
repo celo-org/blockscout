@@ -27,9 +27,7 @@ defmodule Explorer.Celo.Telemetry.Instrumentation.Api do
         tags: [:label],
         tag_values: fn metadata ->
           if Keyword.has_key?(metadata.options, :document) and is_binary(metadata.options[:document]) do
-            document_hash =
-              :crypto.hash(:sha256, metadata.options[:document])
-              |> Base.encode16(case: :lower)
+            document_hash = Base.encode16(:crypto.hash(:sha256, metadata.options[:document]), case: :lower)
 
             %{
               label:
