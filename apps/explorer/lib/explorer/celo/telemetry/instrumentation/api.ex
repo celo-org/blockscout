@@ -24,10 +24,20 @@ defmodule Explorer.Celo.Telemetry.Instrumentation.Api do
         event_name: [:absinthe, :execute, :operation, :stop],
         measurement: :duration,
         description: "Operation times for requests send to Blockscout API",
-        tags: [:name],
+        tags: [:label],
         tag_values: fn metadata ->
-          if Keyword.has_key?(metadata.options, :operation_name) and is_binary(metadata.options[:operation_name]) do
-            Map.put(%{}, :name, metadata.options[:operation_name])
+          if Keyword.has_key?(metadata.options, :document) and is_binary(metadata.options[:document]) do
+            document_hash =
+              :crypto.hash(:sha256, metadata.options[:document])
+              |> Base.encode16(case: :lower)
+
+            %{
+              label:
+                case document_hash do
+                  "246e2a78320c905309513371f93cf7d2ae04e6a652828c845a6095ea4b6327be" -> "transfers"
+                  _ -> "unlabelled"
+                end
+            }
           else
             %{}
           end
