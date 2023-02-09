@@ -32,7 +32,7 @@ defmodule Explorer.Celo.Telemetry.Instrumentation.Api do
             %{
               label:
                 case document_hash do
-                  "56c1c866ec3cde643e2d930226f99f6e02d951c12db459898f2d6abf057d23ea" -> "transfers"
+                  "d545db1eaf240b6ebefe95eb095db8bf572eddd382b3b4b695b6eb31dbcdabe1" -> "transfers"
                   _ -> "unlabelled"
                 end
             }
