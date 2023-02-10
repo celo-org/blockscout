@@ -21,7 +21,7 @@ config :block_scout_web, BlockScoutWeb.Endpoint,
   ]
 
 config :block_scout_web, BlockScoutWeb.CsvExportController,
-       itx_export_enabled: System.get_env("ITX_CSV_EXPORT_ENABLED", "") == "true"
+  itx_export_enabled: System.get_env("ITX_CSV_EXPORT_ENABLED", "") == "true"
 
 ########################
 ### Ethereum JSONRPC ###
