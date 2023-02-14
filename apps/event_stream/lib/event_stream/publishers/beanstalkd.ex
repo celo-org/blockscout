@@ -13,15 +13,38 @@ defmodule EventStream.Publisher.Beanstalkd do
 
   @impl true
   def init(opts) do
-    state = %{}
+    # charlist required instead of string due to erlang lib quirk
+    host = Keyword.fetch!(opts, :host) |> to_charlist()
+    tube = Keyword.get(opts, :tube, "default")
+    port = Keyword.get(opts, :port, 11300)
 
-    {:ok, state}
+    # assert and extract options
+    state = %{beanstalk: %{
+      host: host,
+      tube: tube,
+      port: port
+    }}
+
+    {:ok, state, {:continue, :connect_beanstalk}}
+  end
+
+  @impl true
+  def handle_continue(:connect_beanstalk, state = %{beanstalk: %{host: host, port: port, tube: tube}}) do
+    Logger.info("Connecting to beanstalkd on #{host |> to_string()}:#{port |> to_string()}...")
+    {:ok, pid} = ElixirTalk.connect(host, port)
+
+    Logger.info("Connected, using tube #{tube}")
+    {:using, ^tube} = ElixirTalk.use(pid, tube)
+
+    {:noreply, put_in(state, [:beanstalk, :pid], pid)}
   end
 
   @impl Publisher
   def publish(event) do
-    event
-    |> inspect()
-    |> then(&Logger.info("Event to send: #{&1}"))
+    GenServer.call(__MODULE__, {:publish, event})
+  end
+
+  def handle_call({:publish, event}, _sender, state) do
+
   end
 end
