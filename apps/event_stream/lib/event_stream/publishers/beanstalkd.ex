@@ -18,7 +18,6 @@ defmodule EventStream.Publisher.Beanstalkd do
     tube = Keyword.get(opts, :tube, "default")
     port = Keyword.get(opts, :port, 11300)
 
-    # assert and extract options
     state = %{beanstalk: %{
       host: host,
       tube: tube,
@@ -41,10 +40,31 @@ defmodule EventStream.Publisher.Beanstalkd do
 
   @impl Publisher
   def publish(event) do
-    GenServer.call(__MODULE__, {:publish, event})
+    try do
+      GenServer.call(__MODULE__, {:publish, event})
+      :ok
+    rescue
+      error ->
+        Logger.error("Error sending event:#{inspect(event)} error:#{inspect(error)}")
+        {:failed, event}
+    end
   end
 
-  def handle_call({:publish, event}, _sender, state) do
+  def handle_call({:publish, event}, _sender, state = %{beanstalk: %{pid: pid}}) do
+    :ok = beanstalk_publish(pid, event)
 
+    {:reply, :ok, state}
+  end
+
+  defp beanstalk_publish(beanstalk_pid, event) do
+    transformed = transform_event(event)
+    {:inserted, _insertion_count} = ElixirTalk.put(beanstalk_pid, transformed)
+  end
+
+  @doc "Transform celo contract event to expected json format"
+  def transform_event(event) do
+    event
+    |> EventMap.celo_contract_event_to_concrete_event()
+    |> EventTransformer.to_event_stream_format()
   end
 end
