@@ -1,6 +1,7 @@
 defmodule EventStream.Publisher.Beanstalkd do
   @moduledoc "Publisher implementation for beanstalkd messaging queue."
 
+  alias Explorer.Celo.ContractEvents.{EventMap, EventTransformer}
   alias EventStream.Publisher
   @behaviour Publisher
   require Logger
@@ -50,6 +51,7 @@ defmodule EventStream.Publisher.Beanstalkd do
     end
   end
 
+  @impl true
   def handle_call({:publish, event}, _sender, state = %{beanstalk: %{pid: pid}}) do
     :ok = beanstalk_publish(pid, event)
 
