@@ -8,9 +8,13 @@ defmodule EventStream.EventStreamTest do
   alias Explorer.Chain.Log
   import Mox
 
-  #  setup do
-  #    start_supervised!({ContractEventStream, []})
-  #  end
+  setup do
+    on_exit(fn ->
+      ContractEventStream.clear()
+    end)
+  end
+  setup :verify_on_exit!
+
 
   test "Enqueue pushes events into the buffer" do
     test_events = [1,2,3] |> Enum.map(&(generate_event(&1)))
@@ -22,6 +26,14 @@ defmodule EventStream.EventStreamTest do
     assert length(event_buffer |> List.flatten()) == 3
   end
 
+
+  test "Publishes events on tick" do
+    test_events = [1,2,3] |> Enum.map(&(generate_event(&1)))
+    ContractEventStream.enqueue(test_events)
+
+    EventStream.Publisher.Mock |> expect(:publish, 3, fn _event -> :ok end)
+
+  end
   #random event taken from staging eventstream
   def generate_event(id) do
     %Explorer.Chain.CeloContractEvent{
