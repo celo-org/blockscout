@@ -1,5 +1,5 @@
 defmodule EventStream.EventStreamTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case
   alias EventStream.ContractEventStream
 
   alias Explorer.Celo.ContractEvents.EventTransformer
@@ -13,6 +13,7 @@ defmodule EventStream.EventStreamTest do
       ContractEventStream.clear()
     end)
   end
+  setup :set_mox_global
   setup :verify_on_exit!
 
 
@@ -33,7 +34,17 @@ defmodule EventStream.EventStreamTest do
 
     EventStream.Publisher.Mock |> expect(:publish, 3, fn _event -> :ok end)
 
+    send(ContractEventStream, :tick)
+
+    #wait for above message to be processed
+    Process.sleep(50)
+
+    event_buffer = ContractEventStream.clear()
+
+    # all events should be published, nothing in buffer
+    assert event_buffer == []
   end
+
   #random event taken from staging eventstream
   def generate_event(id) do
     %Explorer.Chain.CeloContractEvent{

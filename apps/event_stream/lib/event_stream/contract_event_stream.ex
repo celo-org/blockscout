@@ -74,7 +74,6 @@ defmodule EventStream.ContractEventStream do
   defp run(events) do
     Telemetry.event([:event_stream, :flush], %{}, %{event_count: length(events)})
 
-    Logger.info("flush!!!")
     failed_events =
       events
       |> List.flatten()
