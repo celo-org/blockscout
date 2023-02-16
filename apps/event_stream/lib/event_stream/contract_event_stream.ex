@@ -44,26 +44,6 @@ defmodule EventStream.ContractEventStream do
     {:ok, %{buffer: buffer, timer: timer}}
   end
 
-  #
-  #  @impl true
-  #  def handle_continue(:connect_to_beanstalk, state) do
-  #    # charlist type required for erlang library
-  #    host = "BEANSTALKD_HOST" |> System.get_env() |> to_charlist()
-  #
-  #    {port, _} = "BEANSTALKD_PORT" |> System.get_env() |> Integer.parse()
-  #    tube = "BEANSTALKD_TUBE" |> System.get_env("default")
-  #
-  #    pid = connect_beanstalkd(host, port)
-  #    {:using, ^tube} = ElixirTalk.use(pid, tube)
-  #
-  #    {:noreply, Map.put(state, :beanstalkd_pid, pid)}
-  #  end
-
-  #  defp connect_beanstalkd(host, port) do
-  #    {:ok, pid} = ElixirTalk.connect(host, port)
-  #    pid
-  #  end
-
   @impl true
   def handle_cast({:enqueue, event}, %{buffer: buffer} = state) do
     {:noreply, %{state | buffer: [event | buffer]}}
@@ -86,19 +66,15 @@ defmodule EventStream.ContractEventStream do
   end
 
   @impl true
-  def terminate(_reason, %{buffer: buffer} = _state) do
-    Logger.info("Flushing event buffer before shutdown...")
-    run(buffer)
-  end
-
-  def terminate(reason, _state) do
-    Logger.error("Unknown termination - #{inspect(reason)}")
+  def handle_call(:clear, _sender, state = %{buffer: buffer}) do
+    {:reply, buffer, %{state | buffer: []}}
   end
 
   # attempts to send everything, failed events will be returned to the buffer
   defp run(events) do
     Telemetry.event([:event_stream, :flush], %{}, %{event_count: length(events)})
 
+    Logger.info("flush!!!")
     failed_events =
       events
       |> List.flatten()
@@ -112,5 +88,12 @@ defmodule EventStream.ContractEventStream do
 
     # return failed events to buffer
     failed_events
+  end
+
+  #return current buffer contents and set to empty
+  #primarily for testing purposes
+  @doc false
+  def clear() do
+    GenServer.call(__MODULE__, :clear)
   end
 end

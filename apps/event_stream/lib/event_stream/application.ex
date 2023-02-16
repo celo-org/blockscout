@@ -18,7 +18,7 @@ defmodule EventStream.Application do
         {Registry, keys: :duplicate, name: Registry.ChainEvents, id: Registry.ChainEvents},
         # listen for chain events and publish through registry
         {Explorer.Chain.Events.Listener, %{event_source: Explorer.Chain.Events.PubSubSource}},
-        {ContractEventStream, []}
+        {ContractEventStream, %{}}
         # Start a worker by calling: EventStream.Worker.start_link(arg)
         # {EventStream.Worker, arg}
       ]
