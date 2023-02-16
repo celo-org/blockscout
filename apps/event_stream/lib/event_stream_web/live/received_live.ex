@@ -1,7 +1,7 @@
 defmodule EventStream.ReceivedLive do
   use EventStream, :live_view
 
-  alias EventStream.{Endpoint, Subscriptions}
+  alias EventStream.Subscriptions
 
   @impl true
   def mount(_params, _session, socket) do
