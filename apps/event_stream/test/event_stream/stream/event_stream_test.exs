@@ -2,10 +2,6 @@ defmodule EventStream.EventStreamTest do
   use ExUnit.Case
   alias EventStream.ContractEventStream
 
-  alias Explorer.Celo.ContractEvents.EventTransformer
-  alias Explorer.Celo.ContractEvents.EventMap
-  alias Explorer.Celo.ContractEvents.Election.ValidatorGroupVoteActivatedEvent
-  alias Explorer.Chain.Log
   import Mox
 
   setup do
@@ -27,7 +23,6 @@ defmodule EventStream.EventStreamTest do
     assert length(event_buffer |> List.flatten()) == 3
   end
 
-
   test "Publishes events on tick" do
     test_events = [1,2,3] |> Enum.map(&(generate_event(&1)))
     ContractEventStream.enqueue(test_events)
@@ -43,6 +38,30 @@ defmodule EventStream.EventStreamTest do
 
     # all events should be published, nothing in buffer
     assert event_buffer == []
+  end
+
+  test "Buffers failed event send" do
+    test_events = [1,2,3] |> Enum.map(&(generate_event(&1)))
+    ContractEventStream.enqueue(test_events)
+
+    EventStream.Publisher.Mock
+    |> expect(:publish, fn _event -> :ok end)
+    |> expect(:publish, fn event -> {:failed, event} end)
+    |> expect(:publish, fn _event -> :ok end)
+
+    send(ContractEventStream, :tick)
+
+    #wait for above message to be processed
+    Process.sleep(50)
+
+    EventStream.Publisher.Mock |> expect(:publish, fn _event -> :ok end)
+    send(ContractEventStream, :tick)
+
+    #wait for above message to be processed
+    Process.sleep(50)
+
+    #buffer should be empty after successful republish
+    [] = ContractEventStream.clear()
   end
 
   #random event taken from staging eventstream

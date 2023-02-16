@@ -8,6 +8,7 @@ defmodule EventStream.ContractEventStream do
   alias EventStream.{Publisher, Subscriptions}
   alias Explorer.Celo.ContractEvents.{EventMap, EventTransformer}
   alias Explorer.Celo.Telemetry
+  alias Phoenix.PubSub
 
   @doc "Accept a list of events and buffer for sending"
   def enqueue(events) do
@@ -80,6 +81,9 @@ defmodule EventStream.ContractEventStream do
       |> Enum.map(fn event ->
         event
         |> transform_event()
+        |> tap(fn event ->
+          emit_event_send(event)
+        end)
         |> Publisher.publish()
       end)
       |> Enum.filter(&(&1 != :ok))
@@ -87,6 +91,10 @@ defmodule EventStream.ContractEventStream do
 
     # return failed events to buffer
     failed_events
+  end
+
+  defp emit_event_send(event) do
+    PubSub.broadcast(EventStream.PubSub, "event_publish_attempt", {event})
   end
 
   #return current buffer contents and set to empty
