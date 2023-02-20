@@ -5,13 +5,29 @@
 </section>
 
 <section class="row">
-  <table>
+  <table class="zui-table">
     <tr>
-      <th>Data</th>
+      <th>Name</th>
+      <th>Topic</th>
+      <th>Block Number</th>
+      <th>Log Index</th>
+      <th>Contract Address </th>
+      <th>Tx</th>
+      <th>Updated At</th>
+      <th>Inserted At</th>
+      <th>Params</th>
     </tr>
     <%= for event <- @events do%>
     <tr>
-      <td><%= event |> inspect() %></td>
+      <td><%= event.name  %></td>
+      <td><%= event.topic  %></td>
+      <td><%= event.block_number  %></td>
+      <td><%= event.log_index  %></td>
+      <td><%= event.contract_address_hash  %></td>
+      <td><%= event.transaction_hash  %></td>
+      <td><%= event.updated_at  %></td>
+      <td><%= event.inserted_at  %></td>
+      <td><%= event.params |> inspect()  %></td>
     </tr>
     <% end %>
   </table>
