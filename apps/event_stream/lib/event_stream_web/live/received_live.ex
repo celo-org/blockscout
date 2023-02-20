@@ -13,7 +13,7 @@ defmodule EventStream.ReceivedLive do
       socket
       |> assign(query: "", results: %{})
       |> assign(events: events)
-      |> assign(since: Time.now())
+      |> assign(since: DateTime.utc_now())
     {:ok,  assigns}
   end
 
