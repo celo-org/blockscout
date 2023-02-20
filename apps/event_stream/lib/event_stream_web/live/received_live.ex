@@ -13,15 +13,23 @@ defmodule EventStream.ReceivedLive do
       socket
       |> assign(query: "", results: %{})
       |> assign(events: events)
+      |> assign(since: Time.now())
     {:ok,  assigns}
   end
 
   @impl true
   def handle_info({:chain_event, _type, :realtime, data}, socket = %{assigns: %{events: events}}) do
-    socket = socket |> assign(events: events ++ data)
+    all_events = events ++ data
+    socket = socket
+             |> assign(events: all_events)
+             |> assign(max_block: max_block_number(all_events))
 
     {:noreply, socket}
   end
 
+  def max_block_number(events)  do
+    max_event = events |> Enum.max_by(&(&1.block_number))
+    max_event.block_number
+  end
 
 end
