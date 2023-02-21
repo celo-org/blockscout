@@ -111,3 +111,7 @@
   padding: 10px;
   text-shadow: 1px 1px 1px #fff;
 }
+
+.row div {
+  margin: 1em;
+}

@@ -11,8 +11,8 @@ defmodule EventStream.ReceivedLive do
 
     assigns =
       socket
-      |> assign(query: "", results: %{})
       |> assign(events: events)
+      |> assign(max_block: "n/a")
       |> assign(since: DateTime.utc_now())
     {:ok,  assigns}
   end

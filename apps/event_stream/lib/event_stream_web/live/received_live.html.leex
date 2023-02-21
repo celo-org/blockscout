@@ -1,9 +1,14 @@
 <section class="phx-hero">
   <h1><%= gettext "Welcome to %{name}!", name: "EventStream" %></h1>
-  <p>Peace of mind from prototype to production</p>
+  <p>Events received via cluster pubsub (from indexer)</p>
 
 </section>
 
+<section class="row">
+  <div>Events: <%= length(@events) %></div>
+  <div>Max Block: <%= @max_block %></div>
+  <div>Started: <%= @since %></div>
+</section>
 <section class="row">
   <table class="zui-table">
     <tr>
