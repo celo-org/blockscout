@@ -3,6 +3,7 @@ defmodule EventStream.ContractEventStream do
      Accepts events and pushes them to an external queue (beanstalkd)
   """
 
+  use EventStream.Debug.Constants
   use GenServer
   require Logger
   alias EventStream.{Publisher, Subscriptions}
@@ -18,6 +19,11 @@ defmodule EventStream.ContractEventStream do
 
   # Transform celo contract event to expected json format
   defp transform_event(event) when is_binary(event), do: event
+
+  # don't send debug event to event transformer
+  defp transform_event(event = %{name: @debug_event_name}) do
+    event |> inspect()
+  end
 
   defp transform_event(event) do
     event
@@ -81,16 +87,18 @@ defmodule EventStream.ContractEventStream do
       |> Enum.map(fn event ->
         event
         |> transform_event()
-        |> tap(fn event ->
-          emit_event_send(event)
-        end)
-        |> Publisher.publish()
+        |> send_event()
       end)
       |> Enum.filter(&(&1 != :ok))
       |> Enum.map(fn {:failed, event} -> event end)
 
     # return failed events to buffer
     failed_events
+  end
+
+  defp send_event(event) do
+    :ok = emit_event_send(event)
+    Publisher.publish(event)
   end
 
   defp emit_event_send(event) do
