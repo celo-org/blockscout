@@ -7,7 +7,7 @@ defmodule EventStream.PublisherController do
     render(conn, "stats.html", get_stats())
   end
 
-  defp get_stats() do
+  defp get_stats do
     publisher = Application.get_env(:event_stream, EventStream.Publisher)
 
     %{

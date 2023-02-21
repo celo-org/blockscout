@@ -1,4 +1,5 @@
 defmodule EventStream.Debug.Constants do
+  @moduledoc "Constant values for debug use in the EventStream app"
   defmacro __using__(_opts \\ []) do
     quote do
       @debug_event_name "EventStream.Debug.EventName"
@@ -15,7 +16,7 @@ defmodule EventStream.Debug do
   use EventStream.Debug.Constants
 
   @doc "Creates and publishes an event to the stream via the same mechanism as cluster pubsub"
-  def publish_debug_event(id \\ 88888888) do
+  def publish_debug_event(id \\ 88_888_888) do
     event_data = generate_debug_event(%{id: id})
     publish_debug_events([event_data])
   end
@@ -30,15 +31,15 @@ defmodule EventStream.Debug do
   @doc "Generates an event with optional values"
   def generate_debug_event(overrides \\ %{}) do
     %CeloContractEvent{
-      block_number: 777777777,
+      block_number: 777_777_777,
       contract_address_hash: "0x7777777777777777777777777777777777777777",
       inserted_at: DateTime.utc_now(),
-      log_index: 77777777,
+      log_index: 77_777_777,
       name: @debug_event_name,
       params: %{
         "from" => "\\x7777777777777777777777777777777777777777",
         "to" => "\\x7777777777777777777777777777777777777777",
-        "value" => 7777777777777777
+        "value" => 7_777_777_777_777_777
       },
       topic: "0x7777777777777777777777777777777777777777777777777777777777777777",
       transaction_hash: "0x7777777777777777777777777777777777777777777777777777777777777777",
@@ -46,7 +47,6 @@ defmodule EventStream.Debug do
     }
     |> Map.merge(overrides)
   end
-
 
   def debug_event_name, do: "EventStream.Debug.Event"
 end

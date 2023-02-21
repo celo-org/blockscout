@@ -105,10 +105,10 @@ defmodule EventStream.ContractEventStream do
     PubSub.broadcast(EventStream.PubSub, "event_publish_attempt", {event})
   end
 
-  #return current buffer contents and set to empty
-  #primarily for testing purposes
+  # return current buffer contents and set to empty
+  # primarily for testing purposes
   @doc false
-  def clear() do
+  def clear do
     GenServer.call(__MODULE__, :clear)
   end
 end

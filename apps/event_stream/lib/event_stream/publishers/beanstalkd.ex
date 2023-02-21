@@ -1,8 +1,8 @@
 defmodule EventStream.Publisher.Beanstalkd do
   @moduledoc "Publisher implementation for beanstalkd messaging queue."
 
-  alias Explorer.Celo.Telemetry
   alias EventStream.Publisher
+  alias Explorer.Celo.Telemetry
   alias Phoenix.PubSub
   @behaviour Publisher
   require Logger
@@ -16,15 +16,17 @@ defmodule EventStream.Publisher.Beanstalkd do
   @impl true
   def init(opts) do
     # charlist required instead of string due to erlang lib quirk
-    host = Keyword.fetch!(opts, :host) |> to_charlist()
+    host = opts |> Keyword.fetch!(:host) |> to_charlist()
     tube = Keyword.get(opts, :tube, "default")
     port = Keyword.get(opts, :port, 11300)
 
-    state = %{beanstalk: %{
-      host: host,
-      tube: tube,
-      port: port
-    }}
+    state = %{
+      beanstalk: %{
+        host: host,
+        tube: tube,
+        port: port
+      }
+    }
 
     {:ok, state, {:continue, :connect_beanstalk}}
   end
@@ -40,6 +42,8 @@ defmodule EventStream.Publisher.Beanstalkd do
     {:noreply, put_in(state, [:beanstalk, :pid], pid)}
   end
 
+  # disable "explicit try" check
+  # credo:disable-for-lines:4
   @impl Publisher
   def publish(event) do
     try do
@@ -53,7 +57,7 @@ defmodule EventStream.Publisher.Beanstalkd do
   end
 
   def stats do
-     GenServer.call(__MODULE__, :stats)
+    GenServer.call(__MODULE__, :stats)
   end
 
   @impl true

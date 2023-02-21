@@ -11,15 +11,15 @@ defmodule EventStream.PublishedLive do
       socket
       |> assign(events: events)
       |> assign(since: DateTime.utc_now())
-    {:ok,  assigns}
+
+    {:ok, assigns}
   end
 
   @impl true
   def handle_info({event}, socket = %{assigns: %{events: events}}) do
-    all_events = events ++ [event]
+    all_events = [event | events] |> Enum.reverse()
     socket = socket |> assign(events: all_events)
 
     {:noreply, socket}
   end
-
 end
