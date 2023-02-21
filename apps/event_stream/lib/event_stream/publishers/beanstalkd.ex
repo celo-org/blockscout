@@ -1,7 +1,9 @@
 defmodule EventStream.Publisher.Beanstalkd do
   @moduledoc "Publisher implementation for beanstalkd messaging queue."
 
+  alias Explorer.Celo.Telemetry
   alias EventStream.Publisher
+  alias Phoenix.PubSub
   @behaviour Publisher
   require Logger
 
@@ -50,11 +52,24 @@ defmodule EventStream.Publisher.Beanstalkd do
     end
   end
 
+  def stats do
+     GenServer.call(__MODULE__, :stats)
+  end
+
   @impl true
   def handle_call({:publish, event}, _sender, state = %{beanstalk: %{pid: pid}}) do
-    {:inserted, 1} = beanstalk_publish(pid, event)
+    {:inserted, count} = beanstalk_publish(pid, event)
+    PubSub.broadcast(EventStream.PubSub, "beanstalkd:published", {event})
+    Telemetry.event([:event_stream, :beanstalkd, :publish], %{event_count: count})
 
     {:reply, :ok, state}
+  end
+
+  @impl true
+  def handle_call(:stats, _sender, state = %{beanstalk: %{pid: pid}}) do
+    beanstalk_stats = ElixirTalk.stats(pid)
+    stats_info = Map.put(state, :remote_info, beanstalk_stats)
+    {:reply, stats_info, state}
   end
 
   defp beanstalk_publish(beanstalk_pid, event) do
