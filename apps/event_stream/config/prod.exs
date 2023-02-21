@@ -1,6 +1,5 @@
 import Config
 
-config :event_stream, :beanstalkd, enabled: false
 config :event_stream, EventStream.Endpoint,
        url: [host: "example.com", port: 80],
        check_origin: ["//localhost"],
@@ -16,3 +15,4 @@ config :event_stream, EventStream.Endpoint,
        server: true,
        # this is not a secret this is for csrf + cookie encryption - we don't use any of these in this app
        secret_key_base: "RMgI4C1HSkxsEjdhtGMfwAHfyT6CKWXOgzCboJflfSm4jeAlic52io05KB6mqzc5"
+
