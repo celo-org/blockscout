@@ -1,7 +1,6 @@
 defmodule EventStream.Publisher.Beanstalkd do
   @moduledoc "Publisher implementation for beanstalkd messaging queue."
 
-  alias Explorer.Celo.ContractEvents.{EventMap, EventTransformer}
   alias EventStream.Publisher
   @behaviour Publisher
   require Logger
@@ -53,20 +52,12 @@ defmodule EventStream.Publisher.Beanstalkd do
 
   @impl true
   def handle_call({:publish, event}, _sender, state = %{beanstalk: %{pid: pid}}) do
-    :ok = beanstalk_publish(pid, event)
+    {:inserted, 1} = beanstalk_publish(pid, event)
 
     {:reply, :ok, state}
   end
 
   defp beanstalk_publish(beanstalk_pid, event) do
-    transformed = transform_event(event)
-    {:inserted, _insertion_count} = ElixirTalk.put(beanstalk_pid, transformed)
-  end
-
-  @doc "Transform celo contract event to expected json format"
-  def transform_event(event) do
-    event
-    |> EventMap.celo_contract_event_to_concrete_event()
-    |> EventTransformer.to_event_stream_format()
+    ElixirTalk.put(beanstalk_pid, event)
   end
 end
