@@ -19,7 +19,7 @@ defmodule EventStream.ReceivedLive do
   end
 
   @impl true
-  def handle_info({:chain_event, _type, :realtime, data}, socket = %{assigns: %{events: events}}) do
+  def handle_info({:chain_event, _type, :realtime, data}, %{assigns: %{events: events}} = socket) do
     all_events = events ++ data
 
     socket =

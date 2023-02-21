@@ -21,7 +21,7 @@ defmodule EventStream.ContractEventStream do
   defp transform_event(event) when is_binary(event), do: event
 
   # don't send debug event to event transformer
-  defp transform_event(event = %{name: @debug_event_name}) do
+  defp transform_event(%{name: @debug_event_name} = event) do
     event |> inspect()
   end
 
@@ -68,12 +68,12 @@ defmodule EventStream.ContractEventStream do
   end
 
   @impl true
-  def handle_info({:chain_event, _type, :realtime, data}, state = %{buffer: buffer}) when is_list(data) do
+  def handle_info({:chain_event, _type, :realtime, data}, %{buffer: buffer} = state) when is_list(data) do
     {:noreply, %{state | buffer: data ++ buffer}}
   end
 
   @impl true
-  def handle_call(:clear, _sender, state = %{buffer: buffer}) do
+  def handle_call(:clear, _sender, %{buffer: buffer} = state) do
     {:reply, buffer, %{state | buffer: []}}
   end
 

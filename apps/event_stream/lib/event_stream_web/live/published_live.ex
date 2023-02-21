@@ -16,7 +16,7 @@ defmodule EventStream.PublishedLive do
   end
 
   @impl true
-  def handle_info({event}, socket = %{assigns: %{events: events}}) do
+  def handle_info({event}, %{assigns: %{events: events}} = socket) do
     all_events = [event | events] |> Enum.reverse()
     socket = socket |> assign(events: all_events)
 

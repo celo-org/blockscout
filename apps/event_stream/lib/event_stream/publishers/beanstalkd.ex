@@ -32,7 +32,7 @@ defmodule EventStream.Publisher.Beanstalkd do
   end
 
   @impl true
-  def handle_continue(:connect_beanstalk, state = %{beanstalk: %{host: host, port: port, tube: tube}}) do
+  def handle_continue(:connect_beanstalk, %{beanstalk: %{host: host, port: port, tube: tube}} = state) do
     Logger.info("Connecting to beanstalkd on #{host |> to_string()}:#{port |> to_string()}...")
     {:ok, pid} = ElixirTalk.connect(host, port)
 
@@ -61,7 +61,7 @@ defmodule EventStream.Publisher.Beanstalkd do
   end
 
   @impl true
-  def handle_call({:publish, event}, _sender, state = %{beanstalk: %{pid: pid}}) do
+  def handle_call({:publish, event}, _sender, %{beanstalk: %{pid: pid}} = state) do
     {:inserted, count} = beanstalk_publish(pid, event)
     PubSub.broadcast(EventStream.PubSub, "beanstalkd:published", {event})
     Telemetry.event([:event_stream, :beanstalkd, :publish], %{event_count: count})
@@ -70,7 +70,7 @@ defmodule EventStream.Publisher.Beanstalkd do
   end
 
   @impl true
-  def handle_call(:stats, _sender, state = %{beanstalk: %{pid: pid}}) do
+  def handle_call(:stats, _sender, %{beanstalk: %{pid: pid}} = state) do
     beanstalk_stats = ElixirTalk.stats(pid)
     stats_info = Map.put(state, :remote_info, beanstalk_stats)
     {:reply, stats_info, state}
