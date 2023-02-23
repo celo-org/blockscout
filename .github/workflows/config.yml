@@ -672,11 +672,11 @@ jobs:
             ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-deps-"
 
 
-      - name: Restore Explorer NPM Cache
+      - name: Restore Event Stream NPM Cache
         uses: actions/cache@v2
         id: eventstream-npm-cache
         with:
-          path: apps/event_stream/event_stream/node_modules
+          path: apps/event_stream/assets/node_modules
           key: ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-eventstream-npm-${{ hashFiles('apps/explorer/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-eventstream-npm-
