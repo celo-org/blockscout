@@ -691,7 +691,7 @@ jobs:
         run: |
           cd apps/event_stream
           mix compile --warnings-as-errors
-          mix test --no-start
+          mix test
         env:
           MIX_ENV: "test"
       - name: Upload Unit Test Results
