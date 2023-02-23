@@ -682,6 +682,8 @@ jobs:
             ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-eventstream-npm-
 
       - name: Build assets
+        env:
+          NODE_OPTIONS: --openssl-legacy-provider
         run: node node_modules/webpack/bin/webpack.js --mode development
         working-directory: "apps/event_stream/assets"
 
