@@ -32,7 +32,10 @@ defmodule EventStream.Publisher.Beanstalkd do
   end
 
   @impl true
-  def handle_continue(:connect_beanstalk, %{beanstalk: %{host: host, port: port, tube: tube}} = state) do
+  def handle_continue(
+        :connect_beanstalk,
+        %{beanstalk: %{host: host, port: port, tube: tube}} = state
+      ) do
     Logger.info("Connecting to beanstalkd on #{host |> to_string()}:#{port |> to_string()}...")
     {:ok, pid} = ElixirTalk.connect(host, port)
 
@@ -56,6 +59,16 @@ defmodule EventStream.Publisher.Beanstalkd do
     end
   end
 
+  @impl Publisher
+  def live do
+    with instance <- Process.whereis(__MODULE__),
+         result <- GenServer.call(instance, :connected) do
+      result
+    else
+      _error -> false
+    end
+  end
+
   def stats do
     GenServer.call(__MODULE__, :stats)
   end
@@ -74,6 +87,11 @@ defmodule EventStream.Publisher.Beanstalkd do
     beanstalk_stats = ElixirTalk.stats(pid)
     stats_info = Map.put(state, :remote_info, beanstalk_stats)
     {:reply, stats_info, state}
+  end
+
+  @impl true
+  def handle_call(:connected, _sender, %{beanstalk: beanstalkd} = state) do
+    {:reply, Map.has_key?(beanstalkd, :pid), state}
   end
 
   defp beanstalk_publish(beanstalk_pid, event) do

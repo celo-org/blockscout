@@ -23,7 +23,9 @@ defmodule EventStream.Debug do
 
   @doc "Publishes a predefined list of events to the stream"
   def publish_debug_events(events) when is_list(events) do
-    payload = {:chain_event, :celo_contract_event, :realtime, events} |> :erlang.term_to_binary([:compressed])
+    payload =
+      {:chain_event, :celo_contract_event, :realtime, events}
+      |> :erlang.term_to_binary([:compressed])
 
     PubSub.broadcast(:chain_pubsub, "chain_event", {:chain_event, payload})
   end

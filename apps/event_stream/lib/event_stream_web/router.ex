@@ -21,6 +21,9 @@ defmodule EventStream.Router do
     live("/received", ReceivedLive, :index)
     live("/published", PublishedLive, :index)
     get("/publisher", PublisherController, :stats)
+
+    get("/ready", HealthController, :ready)
+    get("/live", HealthController, :live)
   end
 
   # Other scopes may use custom stacks.
