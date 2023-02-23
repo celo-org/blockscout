@@ -707,6 +707,7 @@ jobs:
       - test_nethermind_mox_explorer
       - test_nethermind_mox_indexer
       - test_nethermind_mox_block_scout_web
+      - test_event_stream
       - jest
     if: success() || failure()
     steps:
