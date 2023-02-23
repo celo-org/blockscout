@@ -77,6 +77,23 @@ defmodule EventStream.ContractEventStream do
     {:reply, buffer, %{state | buffer: []}}
   end
 
+  # Don't flush buffer when explicitly disabled
+  @impl true
+  def terminate(_reason, %{terminate_flush: false} = _state), do: :ok
+
+  # Flush on terminate when buffer is not empty
+  @impl true
+  def terminate(_reason, %{buffer: buffer} = _state) when buffer != [] do
+    Logger.info("Flushing event buffer before shutdown...")
+    run(buffer)
+  end
+
+  # Unknown termination
+  @impl true
+  def terminate(reason, _state) do
+    Logger.error("Unknown termination - #{inspect(reason)}")
+  end
+
   # attempts to send everything, failed events will be returned to the buffer
   defp run(events) do
     Telemetry.event([:event_stream, :flush], %{}, %{event_count: length(events)})
