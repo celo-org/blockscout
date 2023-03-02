@@ -4859,6 +4859,7 @@ defmodule Explorer.Chain do
         q in subquery(query),
         distinct: [q.contract_address_hash, q.token_id, q.token_ids]
       )
+      |> limit(1000)
 
     Repo.stream_reduce(distinct_query, initial, reducer)
   end
