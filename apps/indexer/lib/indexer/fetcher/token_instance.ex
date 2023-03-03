@@ -17,7 +17,7 @@ defmodule Indexer.Fetcher.TokenInstance do
 
   @defaults [
     flush_interval: 300,
-    poll_interval: :timer.minutes(20),
+    poll_interval: :timer.minutes(30),
     poll: true,
     max_batch_size: 1,
     max_concurrency: 10,
@@ -45,7 +45,7 @@ defmodule Indexer.Fetcher.TokenInstance do
   @impl BufferedTask
   def init(initial_acc, reducer, _) do
     {:ok, acc} =
-      Chain.stream_unfetched_token_instances(initial_acc, fn data, acc ->
+      Chain.stream_unfetched_token_instances_tmp(initial_acc, fn data, acc ->
         reducer.(data, acc)
       end)
 
