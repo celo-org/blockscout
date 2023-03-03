@@ -13,7 +13,7 @@ defmodule Explorer.Chain.TmpNftToken do
   * `contract_address_hash` - NFT contract address hash
   """
 
-  @type t :: %TmpNftToken{
+  @type t :: %__MODULE__{
           contract_address_hash: Hash.Address.t()
         }
 

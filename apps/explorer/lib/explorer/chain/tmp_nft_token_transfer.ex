@@ -15,7 +15,7 @@ defmodule Explorer.Chain.TmpNftTokenTransfer do
   * `:token_ids` - IDs of the tokens (applicable to ERC-1155 tokens)
   """
 
-  @type t :: %Explorer.Chain.TmpNftTokenTransfer{
+  @type t :: %__MODULE__{
           token_contract_address_hash: Hash.Address.t(),
           token_id: non_neg_integer() | nil,
           token_ids: [non_neg_integer()] | nil
