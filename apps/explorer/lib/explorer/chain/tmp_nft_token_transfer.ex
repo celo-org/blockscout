@@ -7,6 +7,8 @@ defmodule Explorer.Chain.TmpNftTokenTransfer do
 
   use Explorer.Schema
 
+  alias Explorer.Chain.{Address, Hash}
+
   @typedoc """
   * `:token_contract_address_hash` - Address hash foreign key
   * `:token_id` - ID of the token (applicable to ERC-721 tokens)
