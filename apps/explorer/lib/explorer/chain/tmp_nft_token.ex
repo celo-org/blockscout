@@ -7,6 +7,8 @@ defmodule Explorer.Chain.TmpNftToken do
 
   use Explorer.Schema
 
+  alias Explorer.Chain.{Address, Hash}
+
   @typedoc """
   * `contract_address_hash` - NFT contract address hash
   """
