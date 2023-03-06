@@ -4862,7 +4862,7 @@ defmodule Explorer.Chain do
 
     distinct_query
     |> limit(1000)
-    |> Repo.all(distinct_query, timeout: :infinity)
+    |> Repo.all(timeout: :infinity)
     |> Enum.reduce(initial, reducer)
   end
 
