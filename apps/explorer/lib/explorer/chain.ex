@@ -4860,9 +4860,10 @@ defmodule Explorer.Chain do
         distinct: [q.contract_address_hash, q.token_id, q.token_ids]
       )
 
-    unfetched_token_instances = Repo.all(distinct_query, timeout: :infinity)
-
-    Enum.reduce(unfetched_token_instances, initial, reducer)
+    distinct_query
+    |> limit(1000)
+    |> Repo.all(distinct_query, timeout: :infinity)
+    |> Enum.reduce(initial, reducer)
   end
 
   def stream_unfetched_token_instances_tmp(initial, reducer) when is_function(reducer, 2) do
