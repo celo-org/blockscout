@@ -45,7 +45,7 @@ defmodule Indexer.Fetcher.TokenInstance do
   @impl BufferedTask
   def init(initial_acc, reducer, _) do
     {:ok, acc} =
-      Chain.stream_unfetched_token_instances_tmp(initial_acc, fn data, acc ->
+      Chain.stream_unfetched_token_instances(initial_acc, fn data, acc ->
         reducer.(data, acc)
       end)
 
