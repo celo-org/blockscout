@@ -5,6 +5,7 @@ defmodule BlockScoutWeb.AddressTokenTransferController do
   import BlockScoutWeb.Models.GetAddressTags, only: [get_address_tags: 2]
 
   alias BlockScoutWeb.{AccessHelpers, Controller, TransactionView}
+  alias Explorer.Celo.EpochUtil
   alias Explorer.ExchangeRates.Token
   alias Explorer.{Chain, Market}
   alias Explorer.Chain.Address
@@ -104,6 +105,9 @@ defmodule BlockScoutWeb.AddressTokenTransferController do
          {:ok, address} <- Chain.hash_to_address(address_hash),
          {:ok, token} <- Chain.token_from_address_hash(token_hash),
          {:ok, false} <- AccessHelpers.restricted_access?(address_hash_string, params) do
+      {validator_or_group_sum, voting_sum, locked_gold, vote_activated_gold, pending_gold} =
+        EpochUtil.get_address_summary(address)
+
       render(
         conn,
         "index.html",
@@ -113,7 +117,12 @@ defmodule BlockScoutWeb.AddressTokenTransferController do
         current_path: Controller.current_full_path(conn),
         token: token,
         counters_path: address_path(conn, :address_counters, %{"id" => Address.checksum(address_hash)}),
-        tags: get_address_tags(address_hash, current_user(conn))
+        tags: get_address_tags(address_hash, current_user(conn)),
+        validator_or_group_sum: validator_or_group_sum,
+        voting_sum: voting_sum,
+        locked_gold: locked_gold,
+        vote_activated_gold: vote_activated_gold,
+        pending_gold: pending_gold
       )
     else
       {:restricted_access, _} ->
@@ -196,6 +205,9 @@ defmodule BlockScoutWeb.AddressTokenTransferController do
     with {:ok, address_hash} <- Chain.string_to_address_hash(address_hash_string),
          {:ok, address} <- Chain.hash_to_address(address_hash),
          {:ok, false} <- AccessHelpers.restricted_access?(address_hash_string, params) do
+      {validator_or_group_sum, voting_sum, locked_gold, vote_activated_gold, pending_gold} =
+        EpochUtil.get_address_summary(address)
+
       render(
         conn,
         "index.html",
@@ -205,7 +217,12 @@ defmodule BlockScoutWeb.AddressTokenTransferController do
         filter: params["filter"],
         current_path: Controller.current_full_path(conn),
         counters_path: address_path(conn, :address_counters, %{"id" => Address.checksum(address_hash)}),
-        tags: get_address_tags(address_hash, current_user(conn))
+        tags: get_address_tags(address_hash, current_user(conn)),
+        validator_or_group_sum: validator_or_group_sum,
+        voting_sum: voting_sum,
+        locked_gold: locked_gold,
+        vote_activated_gold: vote_activated_gold,
+        pending_gold: pending_gold
       )
     else
       {:restricted_access, _} ->

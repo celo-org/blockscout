@@ -13,6 +13,7 @@ defmodule BlockScoutWeb.AddressReadContractController do
 
   alias BlockScoutWeb.AccessHelpers
   alias BlockScoutWeb.AddressView
+  alias Explorer.Celo.EpochUtil
   alias Explorer.{Chain, Market}
   alias Explorer.Chain.Address
   alias Explorer.ExchangeRates.Token
@@ -50,6 +51,9 @@ defmodule BlockScoutWeb.AddressReadContractController do
          false <- is_nil(address.smart_contract),
          need_wallet? <- Reader.read_functions_required_wallet_from_abi(address.smart_contract.abi) != [],
          {:ok, false} <- AccessHelpers.restricted_access?(address_hash_string, params) do
+      {validator_or_group_sum, voting_sum, locked_gold, vote_activated_gold, pending_gold} =
+        EpochUtil.get_address_summary(address)
+
       render(
         conn,
         "index.html",
@@ -60,7 +64,12 @@ defmodule BlockScoutWeb.AddressReadContractController do
             need_wallet: need_wallet? || need_wallet_custom_abi?,
             coin_balance_status: CoinBalanceOnDemand.trigger_fetch(address),
             counters_path: address_path(conn, :address_counters, %{"id" => Address.checksum(address_hash)}),
-            tags: get_address_tags(address_hash, current_user(conn))
+            tags: get_address_tags(address_hash, current_user(conn)),
+            validator_or_group_sum: validator_or_group_sum,
+            voting_sum: voting_sum,
+            locked_gold: locked_gold,
+            vote_activated_gold: vote_activated_gold,
+            pending_gold: pending_gold
           ]
       )
     else
@@ -69,6 +78,9 @@ defmodule BlockScoutWeb.AddressReadContractController do
           with {:ok, address_hash} <- Chain.string_to_address_hash(address_hash_string),
                {:ok, address} <- Chain.find_contract_address(address_hash, address_options, false),
                {:ok, false} <- AccessHelpers.restricted_access?(address_hash_string, params) do
+            {validator_or_group_sum, voting_sum, locked_gold, vote_activated_gold, pending_gold} =
+              EpochUtil.get_address_summary(address)
+
             render(
               conn,
               "index.html",
@@ -79,7 +91,12 @@ defmodule BlockScoutWeb.AddressReadContractController do
                   need_wallet: need_wallet_custom_abi?,
                   coin_balance_status: CoinBalanceOnDemand.trigger_fetch(address),
                   counters_path: address_path(conn, :address_counters, %{"id" => Address.checksum(address_hash)}),
-                  tags: get_address_tags(address_hash, current_user(conn))
+                  tags: get_address_tags(address_hash, current_user(conn)),
+                  validator_or_group_sum: validator_or_group_sum,
+                  voting_sum: voting_sum,
+                  locked_gold: locked_gold,
+                  vote_activated_gold: vote_activated_gold,
+                  pending_gold: pending_gold
                 ]
             )
           else
