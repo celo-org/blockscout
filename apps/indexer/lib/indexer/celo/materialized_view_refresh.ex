@@ -61,7 +61,6 @@ defmodule Indexer.Fetcher.CeloMaterializedViewRefresh do
   defp refresh_views(timeout) do
     Repo.query!("refresh materialized view celo_wallet_accounts;", [], timeout: timeout)
     Repo.query!("refresh materialized view celo_accumulated_rewards;", [], timeout: timeout)
-    Repo.query!("refresh materialized view tmp_nft_tokens;", [], timeout: timeout)
 
     Logger.info(fn ->
       ["Refreshed material views."]
@@ -70,7 +69,6 @@ defmodule Indexer.Fetcher.CeloMaterializedViewRefresh do
 
   defp daily_refresh_views(timeout) do
     Repo.query!("refresh materialized view smart_contracts_transaction_counts;", [], timeout: timeout)
-    Repo.query!("refresh materialized view tmp_nft_token_transfers;", [], timeout: timeout)
 
     Logger.info(fn ->
       ["Refreshed daily materialized views."]
