@@ -277,14 +277,6 @@ jobs:
         with:
           name: ESLint Test Results
           path: apps/block_scout_web/assets/test/eslint/*.xml
-
-      - name: Upload Wallaby screenshots
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: Wallaby screenshots
-          path: screenshots/*.*
-
   jest:
     name: JS Tests
     runs-on: ubuntu-latest
@@ -638,6 +630,12 @@ jobs:
         with:
           name: Blockscout Web Test Results
           path: _build/test/junit/block_scout_web/*.xml
+      - name: Upload Wallaby screenshots
+        if: always()
+        uses: actions/upload-artifact@v2
+        with:
+          name: Wallaby screenshots
+          path: screenshots/
   publish-test-results:
     name: "Publish Unit Tests Results"
     runs-on: ubuntu-latest
