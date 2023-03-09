@@ -6,6 +6,10 @@ defmodule BlockScoutWeb.AddressPage do
   alias Explorer.Chain.{Address, InternalTransaction, Hash, Transaction, Token}
 
   def apply_filter(session, direction) do
+    IO.inspect("======= text() ========")
+    session |> Wallaby.Browser.text() |> IO.inspect(printable_limit: :infinity)
+
+    IO.inspect("======= page_source() ========")
     session |> Wallaby.Browser.page_source() |> IO.inspect(printable_limit: :infinity)
 
     session
