@@ -25,7 +25,10 @@ config :logger, :block_scout_web,
   path: Path.absname("logs/test/block_scout_web.log")
 
 # Configure wallaby
-config :wallaby, screenshot_on_failure: true, driver: Wallaby.Chrome, js_errors: false
+config :wallaby,
+       screenshot_on_failure: true,
+       driver: Wallaby.Chrome,
+       js_errors: true
 
 config :block_scout_web, BlockScoutWeb.Counters.BlocksIndexedCounter, enabled: false
 
