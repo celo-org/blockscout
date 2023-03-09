@@ -15,6 +15,7 @@ defmodule BlockScoutWeb.AddressPage do
     session |> take_screenshot([{:log, true}])
 
     session
+    |> touch_scroll(css("[data-test='filter_dropdown']"), 0, 1)
     |> click(css("[data-test='filter_dropdown']", text: "Filter: All"))
     |> click(css("[data-test='filter_option']", text: direction))
   end
