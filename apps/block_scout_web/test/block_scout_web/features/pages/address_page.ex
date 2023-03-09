@@ -6,6 +6,8 @@ defmodule BlockScoutWeb.AddressPage do
   alias Explorer.Chain.{Address, InternalTransaction, Hash, Transaction, Token}
 
   def apply_filter(session, direction) do
+    session |> Wallaby.Browser.page_source() |> IO.inspect()
+
     session
     |> click(css("[data-test='filter_dropdown']", text: "Filter: All"))
     |> click(css("[data-test='filter_option']", text: direction))
