@@ -12,6 +12,8 @@ defmodule BlockScoutWeb.AddressPage do
     IO.inspect("======= page_source() ========")
     session |> Wallaby.Browser.page_source() |> IO.inspect(printable_limit: :infinity)
 
+    session |> take_screenshot([{:log, true}])
+
     session
     |> click(css("[data-test='filter_dropdown']", text: "Filter: All"))
     |> click(css("[data-test='filter_option']", text: direction))
