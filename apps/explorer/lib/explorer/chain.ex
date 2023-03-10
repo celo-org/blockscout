@@ -4866,7 +4866,7 @@ defmodule Explorer.Chain do
      |> Enum.reduce(initial, reducer)}
   end
 
-  def unfetched_erc_721_token_instances_count() do
+  def unfetched_erc_721_token_instances_count do
     nft_tokens =
       from(
         token in Token,
