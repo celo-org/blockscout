@@ -40,7 +40,8 @@ defmodule Indexer.Celo.MetricsCron do
     :address_count,
     :total_token_supply,
     :db_connections_by_app,
-    :fetcher_config
+    :fetcher_config,
+    :nft_token_instances_metrics
   ]
 
   @impl true
@@ -142,6 +143,14 @@ defmodule Indexer.Celo.MetricsCron do
     :telemetry.execute([:indexer, :blocks, :last_block_age], %{value: last_block_age})
 
     :telemetry.execute([:indexer, :blocks, :last_block_number], %{value: last_block_number})
+  end
+
+  def nft_token_instances_metrics do
+    unfetched_erc_721_token_instances_count = Chain.unfetched_erc_721_token_instances_count()
+
+    :telemetry.execute([:indexer, :nft, :unfetched_erc_721_token_instances], %{
+      value: unfetched_erc_721_token_instances_count
+    })
   end
 
   defp repeat do
