@@ -13,7 +13,8 @@ defmodule BlockScoutWeb.AddressPage do
     session |> Wallaby.Browser.page_source() |> IO.inspect(printable_limit: :infinity)
 
     session
-    |> click(css(".accept-cookies", text: "Yes"))
+    |> take_screenshot([{:log, true}])
+    |> click(css("[data-selector='accept-cookies']", text: "Yes"))
     |> take_screenshot([{:log, true}])
     |> touch_scroll(css(".address-tabs"), 0, 100)
     |> take_screenshot([{:log, true}])
