@@ -277,6 +277,7 @@ jobs:
         with:
           name: ESLint Test Results
           path: apps/block_scout_web/assets/test/eslint/*.xml
+
   jest:
     name: JS Tests
     runs-on: ubuntu-latest
