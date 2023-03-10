@@ -6,24 +6,10 @@ defmodule BlockScoutWeb.AddressPage do
   alias Explorer.Chain.{Address, InternalTransaction, Hash, Transaction, Token}
 
   def apply_filter(session, direction) do
-    IO.inspect("======= text() ========")
-    session |> Wallaby.Browser.text() |> IO.inspect(printable_limit: :infinity)
-
-    IO.inspect("======= page_source() ========")
-    session |> Wallaby.Browser.page_source() |> IO.inspect(printable_limit: :infinity)
-
     session
-    |> take_screenshot([{:log, true}])
-    |> click(css("[data-selector='accept-cookies']", text: "Yes"))
-    |> take_screenshot([{:log, true}])
-    |> touch_scroll(css("#address-tabs"), 0, 100)
-    |> take_screenshot([{:log, true}])
-    |> touch_scroll(css("#address-tabs"), 100, 100)
-    |> take_screenshot([{:log, true}])
-    |> touch_scroll(css("#address-tabs"), 200, 200)
-    |> take_screenshot([{:log, true}])
-    |> move_window(0, 300)
-    |> take_screenshot([{:log, true}])
+    # We need to scroll to the element first, if it's not visible it won't be clicked
+    # and the test will fail
+    |> touch_scroll(css("#address-tabs"), 0, 200)
     |> click(css("[data-test='filter_dropdown']", text: "Filter: All"))
     |> take_screenshot([{:log, true}])
     |> click(css("[data-test='filter_option']", text: direction))
