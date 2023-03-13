@@ -149,9 +149,6 @@ defmodule BlockScoutWeb.AddressTransactionController do
 
         case Chain.Hash.Address.validate(address_hash_string) do
           {:ok, _} ->
-            {validator_or_group_sum, voting_sum, locked_gold, vote_activated_gold, pending_gold} =
-              EpochUtil.get_address_summary(address)
-
             render(
               conn,
               "index.html",
@@ -162,11 +159,7 @@ defmodule BlockScoutWeb.AddressTransactionController do
               counters_path: address_path(conn, :address_counters, %{"id" => address_hash_string}),
               current_path: Controller.current_full_path(conn),
               tags: get_address_tags(address_hash, current_user(conn)),
-              validator_or_group_sum: validator_or_group_sum,
-              voting_sum: voting_sum,
-              locked_gold: locked_gold,
-              vote_activated_gold: vote_activated_gold,
-              pending_gold: pending_gold
+              celo_epoch: EpochUtil.get_address_summary(address)
             )
 
           _ ->
