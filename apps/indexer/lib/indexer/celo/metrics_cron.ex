@@ -146,9 +146,9 @@ defmodule Indexer.Celo.MetricsCron do
   end
 
   def nft_token_instances_metrics do
-    unfetched_erc_721_token_instances_count = Chain.unfetched_erc_721_token_instances_count()
+    unfetched_erc_721_token_instances_count = Chain.Token.Instance.unfetched_erc_721_token_instances_count()
 
-    :telemetry.execute([:indexer, :nft, :unfetched_erc_721_token_instances], %{
+    Telemetry.event([:indexer, :nft, :unfetched_erc_721_token_instances], %{
       value: unfetched_erc_721_token_instances_count
     })
   end
