@@ -30,9 +30,6 @@ defmodule BlockScoutWeb.AddressContractController do
          {:ok, false} <- AccessHelpers.restricted_access?(address_hash_string, params),
          _ <- VerificationController.check_and_verify(address_hash_string),
          {:ok, address} <- Chain.find_contract_address(address_hash, address_options, true) do
-      {validator_or_group_sum, voting_sum, locked_gold, vote_activated_gold, pending_gold} =
-        EpochUtil.get_address_summary(address)
-
       with {:ok, implementation_address} <- Contracts.get_proxied_address(address_hash),
            {:ok, implementation_contract} <- Chain.find_contract_address(implementation_address, address_options, true) do
         Logger.debug("Implementation address FOUND in proxy table #{implementation_address}")
@@ -48,11 +45,7 @@ defmodule BlockScoutWeb.AddressContractController do
           exchange_rate: Market.get_exchange_rate(Explorer.coin()) || Token.null(),
           counters_path: address_path(conn, :address_counters, %{"id" => address_hash_string}),
           tags: get_address_tags(address_hash, current_user(conn)),
-          validator_or_group_sum: validator_or_group_sum,
-          voting_sum: voting_sum,
-          locked_gold: locked_gold,
-          vote_activated_gold: vote_activated_gold,
-          pending_gold: pending_gold
+          celo_epoch: EpochUtil.get_address_summary(address)
         )
       else
         {:error, :not_found} ->
@@ -68,11 +61,7 @@ defmodule BlockScoutWeb.AddressContractController do
             exchange_rate: Market.get_exchange_rate(Explorer.coin()) || Token.null(),
             counters_path: address_path(conn, :address_counters, %{"id" => address_hash_string}),
             tags: get_address_tags(address_hash, current_user(conn)),
-            validator_or_group_sum: validator_or_group_sum,
-            voting_sum: voting_sum,
-            locked_gold: locked_gold,
-            vote_activated_gold: vote_activated_gold,
-            pending_gold: pending_gold
+            celo_epoch: EpochUtil.get_address_summary(address)
           )
       end
     else

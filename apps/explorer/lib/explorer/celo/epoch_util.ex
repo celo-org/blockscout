@@ -63,7 +63,13 @@ defmodule Explorer.Celo.EpochUtil do
 
     pending_gold = Chain.fetch_sum_available_celo_unlocked_for_address(address.hash)
 
-    {validator_or_group_sum, voting_sum, locked_gold, vote_activated_gold, pending_gold}
+    %{
+      validator_or_group_sum: validator_or_group_sum,
+      voting_sum: voting_sum,
+      locked_gold: locked_gold,
+      vote_activated_gold: vote_activated_gold,
+      pending_gold: pending_gold
+    }
   end
 
   defp get_sums(%Chain.Address{celo_account: %Ecto.Association.NotLoaded{}, hash: address_hash}) do

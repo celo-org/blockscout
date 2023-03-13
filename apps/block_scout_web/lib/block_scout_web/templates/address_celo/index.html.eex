@@ -8,10 +8,7 @@
     coin_balance_status: @coin_balance_status,
     counters_path: @counters_path,
     tags: @tags,
-    validator_or_group_sum: @validator_or_group_sum,
-    voting_sum: @voting_sum,
-    locked_gold: @locked_gold,
-    vote_activated_gold: @vote_activated_gold
+    celo_epoch: @celo_epoch
   %>
 
   <div class="card">

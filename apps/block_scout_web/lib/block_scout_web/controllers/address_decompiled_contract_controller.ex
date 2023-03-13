@@ -14,9 +14,6 @@ defmodule BlockScoutWeb.AddressDecompiledContractController do
     with {:ok, address_hash} <- Chain.string_to_address_hash(address_hash_string),
          {:ok, address} <- Chain.find_decompiled_contract_address(address_hash),
          {:ok, false} <- AccessHelpers.restricted_access?(address_hash_string, params) do
-      {validator_or_group_sum, voting_sum, locked_gold, vote_activated_gold, pending_gold} =
-        EpochUtil.get_address_summary(address)
-
       render(
         conn,
         "index.html",
@@ -25,11 +22,7 @@ defmodule BlockScoutWeb.AddressDecompiledContractController do
         exchange_rate: Market.get_exchange_rate(Explorer.coin()) || Token.null(),
         counters_path: address_path(conn, :address_counters, %{"id" => address_hash_string}),
         tags: get_address_tags(address_hash, current_user(conn)),
-        validator_or_group_sum: validator_or_group_sum,
-        voting_sum: voting_sum,
-        locked_gold: locked_gold,
-        vote_activated_gold: vote_activated_gold,
-        pending_gold: pending_gold
+        celo_epoch: EpochUtil.get_address_summary(address)
       )
     else
       {:restricted_access, _} ->
