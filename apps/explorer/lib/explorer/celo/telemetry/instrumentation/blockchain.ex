@@ -59,24 +59,6 @@ defmodule Explorer.Celo.Telemetry.Instrumentation.Blockchain do
         event_name: [:indexer, :tokens, :average_gas],
         measurement: :value,
         description: "Average gas used over last n blocks"
-      ),
-
-      # NFT
-      last_value(
-        "indexer_nft_unfetched_erc_721_token_instances_current",
-        event_name: [:indexer, :nft, :unfetched_erc_721_token_instances],
-        measurement: :value,
-        description: "Number of unfetched ERC-721 token instances"
-      ),
-      counter("indexer_nft_ingested",
-        event_name: [:indexer, :nft, :ingested],
-        measurement: :count,
-        description: "NFT tokens ingested"
-      ),
-      counter("indexer_nft_ingestion_errors",
-        event_name: [:indexer, :nft, :ingestion_errors],
-        measurement: :count,
-        description: "NFT ingestion errors"
       )
     ]
   end

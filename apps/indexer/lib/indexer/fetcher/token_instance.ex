@@ -8,6 +8,7 @@ defmodule Indexer.Fetcher.TokenInstance do
 
   require Logger
 
+  alias Explorer.Celo.Telemetry
   alias Explorer.{Chain, Repo}
   alias Explorer.Chain.{Address, Cache.BlockNumber, Token}
   alias Explorer.Token.{InstanceMetadataRetriever, InstanceOwnerReader}
@@ -77,7 +78,7 @@ defmodule Indexer.Fetcher.TokenInstance do
 
         {:ok, _result} = Chain.upsert_token_instance(params)
 
-        :telemetry.execute([:indexer, :nft, :ingested], %{count: 1})
+        Telemetry.event([:indexer, :nft, :ingested], %{count: 1})
 
       {:ok, %{error: error}} ->
         params = %{
@@ -88,10 +89,10 @@ defmodule Indexer.Fetcher.TokenInstance do
 
         {:ok, _result} = Chain.upsert_token_instance(params)
 
-        :telemetry.execute([:indexer, :nft, :ingestion_error], %{count: 1})
+        Telemetry.event([:indexer, :nft, :ingestion_error], %{count: 1})
 
       result ->
-        :telemetry.execute([:indexer, :nft, :ingestion_error], %{count: 1})
+        Telemetry.event([:indexer, :nft, :ingestion_error], %{count: 1})
 
         Logger.debug(
           [
