@@ -28,7 +28,7 @@ defmodule BlockScoutWeb.AddressCeloController do
         exchange_rate: Market.get_exchange_rate(Explorer.coin()) || Token.null(),
         counters_path: address_path(conn, :address_counters, %{"id" => address_hash_string}),
         tags: get_address_tags(address_hash, current_user(conn)),
-         celo_epoch: EpochUtil.get_address_summary(address)
+        celo_epoch: EpochUtil.get_address_summary(address)
       )
     else
       _ ->
