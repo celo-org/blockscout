@@ -7,6 +7,7 @@ defmodule Indexer.Celo.MetricsCron do
   alias Explorer.Celo.Metrics.{BlockchainMetrics, DatabaseMetrics}
   alias Explorer.Celo.Telemetry
   alias Explorer.Chain
+  alias Explorer.Chain.Token.Instance
   alias Explorer.Counters.AverageBlockTime
   alias Indexer.Celo.MetricsCron.TaskSupervisor, as: TaskSupervisor
   alias Timex.Duration
@@ -146,7 +147,7 @@ defmodule Indexer.Celo.MetricsCron do
   end
 
   def nft_token_instances_metrics do
-    unfetched_erc_721_token_instances_count = Chain.Token.Instance.unfetched_erc_721_token_instances_count()
+    unfetched_erc_721_token_instances_count = Instance.unfetched_erc_721_token_instances_count()
 
     Telemetry.event([:indexer, :nft, :unfetched_erc_721_token_instances], %{
       value: unfetched_erc_721_token_instances_count
