@@ -645,6 +645,7 @@ jobs:
         with:
           name: Blockscout Web Test Results
           path: _build/test/junit/block_scout_web/*.xml
+
       - name: Upload Wallaby screenshots
         if: always()
         uses: actions/upload-artifact@v2
