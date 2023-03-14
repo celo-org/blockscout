@@ -174,7 +174,7 @@ defmodule BlockScoutWeb.AddressPage do
     |> visit("/address/#{address_hash}")
     # We need to scroll to the element first, if it's not visible it won't be clicked
     # and the test will fail
-    |> touch_scroll(css("#address-tabs"), 0, 300)
+    |> touch_scroll(css("[data-test='address_gas_used']"), 0, 300)
   end
 
   def visit_page(session) do
