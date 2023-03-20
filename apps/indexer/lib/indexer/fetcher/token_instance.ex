@@ -18,8 +18,6 @@ defmodule Indexer.Fetcher.TokenInstance do
 
   @defaults [
     flush_interval: 300,
-    poll: true,
-    poll_interval: :timer.hours(24),
     max_batch_size: 1,
     max_concurrency: 10,
     task_supervisor: Indexer.Fetcher.TokenInstance.TaskSupervisor
@@ -91,12 +89,12 @@ defmodule Indexer.Fetcher.TokenInstance do
 
         {:ok, _result} = Chain.upsert_token_instance(params)
 
-        Telemetry.event([:indexer, :nft, :ingestion_error], %{count: 1})
+        Telemetry.event([:indexer, :nft, :ingestion_errors], %{count: 1})
 
       result ->
-        Telemetry.event([:indexer, :nft, :ingestion_error], %{count: 1})
+        Telemetry.event([:indexer, :nft, :ingestion_errors], %{count: 1})
 
-        Logger.debug(
+        Logger.error(
           [
             "failed to fetch token instance metadata for #{inspect({to_string(token_contract_address_hash), Decimal.to_integer(token_id)})}: ",
             inspect(result)
