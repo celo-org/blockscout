@@ -87,7 +87,6 @@ verification_max_libraries =
 config :block_scout_web,
   link_to_other_explorers: System.get_env("LINK_TO_OTHER_EXPLORERS") == "true",
   other_explorers: System.get_env("OTHER_EXPLORERS"),
-  other_networks: System.get_env("SUPPORTED_CHAINS"),
   webapp_url: System.get_env("WEBAPP_URL"),
   api_url: System.get_env("API_URL"),
   apps_menu: if(System.get_env("APPS_MENU", "false") == "true", do: true, else: false),

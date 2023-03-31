@@ -131,7 +131,9 @@ defmodule BlockScoutWeb.Mixfile do
       {:ueberauth_auth0, "~> 2.0"},
       {:bureaucrat, "~> 0.2.9", only: :test},
       # Log json format
-      {:logger_json, "~> 3.2"}
+      {:logger_json, "~> 3.2"},
+      # yaml config
+      {:yaml_elixir, "~> 2.9"}
     ]
   end
 

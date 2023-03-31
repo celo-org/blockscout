@@ -31,6 +31,7 @@ config :block_scout_web,
   ecto_repos: [Explorer.Repo.Local, Explorer.Repo.Account]
 
 config :block_scout_web,
+       other_networks: System.get_env("SUPPORTED_CHAINS"),
        swap: System.get_env("SWAP_MENU_LIST"),
        defi: System.get_env("DEFI_MENU_LIST"),
        wallet_list: System.get_env("WALLET_MENU_LIST"),

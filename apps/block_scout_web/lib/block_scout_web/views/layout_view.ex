@@ -6,29 +6,6 @@ defmodule BlockScoutWeb.LayoutView do
   alias Poison.Parser
   import BlockScoutWeb.AddressView, only: [from_address_hash: 1]
 
-  @default_other_networks [
-    %{
-      title: "Celo Mainnet",
-      url: "https://explorer.celo.org/mainnet",
-      test_net?: false
-    },
-    %{
-      title: "Celo Alfajores",
-      url: "https://explorer.celo.org/alfajores",
-      test_net?: true
-    },
-    %{
-      title: "Celo Baklava",
-      url: "https://explorer.celo.org/baklava",
-      test_net?: true
-    },
-    %{
-      title: "Celo Cannoli",
-      url: "https://explorer.celo.org/cannoli",
-      test_net?: true
-    }
-  ]
-
   alias BlockScoutWeb.SocialMedia
 
   def logo do
@@ -141,19 +118,7 @@ defmodule BlockScoutWeb.LayoutView do
   def ignore_version?(_), do: false
 
   def other_networks do
-    get_other_networks =
-      if Application.get_env(:block_scout_web, :other_networks) do
-        try do
-          :block_scout_web
-          |> Application.get_env(:other_networks)
-          |> Parser.parse!(%{keys: :atoms!})
-        rescue
-          _ ->
-            []
-        end
-      else
-        @default_other_networks
-      end
+    get_other_networks = list(:other_networks)
 
     get_other_networks
     |> Enum.reject(fn %{title: title} ->
