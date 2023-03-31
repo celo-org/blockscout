@@ -21,6 +21,11 @@ defmodule BlockScoutWeb.LayoutView do
       title: "Celo Baklava",
       url: "https://explorer.celo.org/baklava",
       test_net?: true
+    },
+    %{
+      title: "Celo Cannoli",
+      url: "https://explorer.celo.org/cannoli",
+      test_net?: true
     }
   ]
 
