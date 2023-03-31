@@ -90,13 +90,13 @@ jobs:
       - name: Setup helmfile
         uses: mamezou-tech/setup-helmfile@v1.2.0
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        with:
-          limit-access-to-actor: true
-        env:
-          CHANGE_CAUSE: ${{ inputs.change-cause }}
-          BLOCKSCOUT_IMAGE_TAG: ${{ inputs.image-commit }}
+      # - name: Setup tmate session
+      #   uses: mxschmitt/action-tmate@v3
+      #   with:
+      #     limit-access-to-actor: true
+      #   env:
+      #     CHANGE_CAUSE: ${{ inputs.change-cause }}
+      #     BLOCKSCOUT_IMAGE_TAG: ${{ inputs.image-commit }}
 
       - name: Run helmfile
         run: helmfile --color --file ${{ inputs.helmfile }} ${{ inputs.action }} --context 10
