@@ -7,7 +7,7 @@ releases:
     namespace: alfajores
     missingFileHandler: Error
     values:
-      - ../values/values-alfajores-blockscout2.yaml
+      - ../values/values-alfajores-blockscout3.yaml
       - changeCause: {{ env "CHANGE_CAUSE" }}
 {{ $imageTag := env "BLOCKSCOUT_IMAGE_TAG" | default "" }}
 {{ if ne $imageTag "" }}
