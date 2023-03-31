@@ -90,6 +90,11 @@ jobs:
       - name: Setup helmfile
         uses: mamezou-tech/setup-helmfile@v1.2.0
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        with:
+          limit-access-to-actor: true
+
       - name: Run helmfile
         run: helmfile --color --file ${{ inputs.helmfile }} ${{ inputs.action }} --context 10
         env:
