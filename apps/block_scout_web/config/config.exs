@@ -30,17 +30,18 @@ config :block_scout_web,
   namespace: BlockScoutWeb,
   ecto_repos: [Explorer.Repo.Local, Explorer.Repo.Account]
 
-config :block_scout_web,
-       other_networks: System.get_env("SUPPORTED_CHAINS"),
-       swap: System.get_env("SWAP_MENU_LIST"),
-       defi: System.get_env("DEFI_MENU_LIST"),
-       wallet_list: System.get_env("WALLET_MENU_LIST"),
-       nft_list: System.get_env("NFT_MENU_LIST"),
-       connect_list: System.get_env("CONNECT_MENU_LIST"),
-       spend_list: System.get_env("SPEND_MENU_LIST"),
-       finance_tools_list: System.get_env("FINANCE_TOOLS_MENU_LIST"),
-       resources: System.get_env("RESOURCES_MENU_LIST"),
-       learning: System.get_env("LEARNING_MENU_LIST")
+import_config("navigation.exs")
+#config :block_scout_web,
+#       other_networks: System.get_env("SUPPORTED_CHAINS"),
+#       swap: System.get_env("SWAP_MENU_LIST"),
+#       defi: System.get_env("DEFI_MENU_LIST"),
+#       wallet_list: System.get_env("WALLET_MENU_LIST"),
+#       nft_list: System.get_env("NFT_MENU_LIST"),
+#       connect_list: System.get_env("CONNECT_MENU_LIST"),
+#       spend_list: System.get_env("SPEND_MENU_LIST"),
+#       finance_tools_list: System.get_env("FINANCE_TOOLS_MENU_LIST"),
+#       resources: System.get_env("RESOURCES_MENU_LIST"),
+#       learning: System.get_env("LEARNING_MENU_LIST")
 
 config :block_scout_web,
   admin_panel_enabled: System.get_env("ADMIN_PANEL_ENABLED", "") == "true"

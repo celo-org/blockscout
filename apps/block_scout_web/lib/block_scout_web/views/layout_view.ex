@@ -177,7 +177,6 @@ defmodule BlockScoutWeb.LayoutView do
       try do
         :block_scout_web
         |> Application.get_env(component)
-        |> Parser.parse!(%{keys: :atoms!})
       rescue
         _ ->
           []
