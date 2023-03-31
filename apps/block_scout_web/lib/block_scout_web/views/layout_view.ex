@@ -179,7 +179,7 @@ defmodule BlockScoutWeb.LayoutView do
         |> Application.get_env(component)
         |> then(fn
           n when is_list(n) -> n
-          str -> Parser.parse!(str)
+          str -> Parser.parse!(str, %{keys: :atoms!})
         end)
       rescue
         _ ->
