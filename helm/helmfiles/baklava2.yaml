@@ -2,7 +2,7 @@
 releases:
   - name: baklava-blockscout2
     chart: oci://us-west1-docker.pkg.dev/devopsre/clabs-public-oci/blockscout
-    version: 1.2.0
+    version: ~1
     createNamespace: false
     namespace: baklava
     missingFileHandler: Error
