@@ -84,7 +84,7 @@ jobs:
     uses: ./.github/workflows/helm_deploy_call.yml
     needs: set-config
     with:
-      helmfile: helmfiles-deployments/blockscout/${{ github.event.inputs.deployment }}.yaml
+      helmfile: helm/helmfiles/${{ github.event.inputs.deployment }}.yaml
       action: ${{ github.event.inputs.action }}
       image-commit: ${{ needs.set-config.outputs.image-commit }}
       change-cause: ${{ needs.set-config.outputs.change-cause }}
