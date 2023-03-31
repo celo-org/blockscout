@@ -39,7 +39,7 @@ blockscout:
         memory: 500M
         cpu: 200m
   web:
-    host: explorer.celo.org
+    envHostname: explorer.celo.org
     suffix:
       enabled: true
       path: "baklava"
@@ -63,11 +63,15 @@ blockscout:
       limits:
         memory: 1G
         cpu: 1
+  eventStream:
+    replicas: 0
   metadataCrawler:
     enabled: true
     schedule: "*/30 * * * *"  # every 30 minutes
     discordClusterName: Baklava
   shared:
+    image:
+      tag: 40c6ac9493b0985e7889a084e367ad55ad4dbdc5
     secrets:
       segmentKey: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout-segmentKey
       dbUser: gcp:secretmanager:projects/365081401101/secrets/baklava-blockscout3-dbUser
@@ -90,3 +94,6 @@ network:
 infrastructure:
   metrics:
     enabled: true
+  gcp:
+    serviceAccount: baklava-blockscout3@celo-testnet-production.iam.gserviceaccount.com
+    project: celo-testnet-production

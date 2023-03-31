@@ -76,7 +76,7 @@ blockscout:
                       - blockscout-api
               topologyKey: kubernetes.io/hostname
   web:
-    host: explorer.celo.org
+    envHostname: explorer.celo.org
     suffix:
       enabled: true
       path: "alfajores"
@@ -129,6 +129,8 @@ blockscout:
     enabled: true
     schedule: "*/30 * * * *"  # every 30 minutes
   shared:
+    image:
+      tag: 40c6ac9493b0985e7889a084e367ad55ad4dbdc5
     secrets:
       segmentKey: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout-segmentKey
       dbUser: gcp:secretmanager:projects/365081401101/secrets/alfajores-blockscout3-dbUser
@@ -151,3 +153,7 @@ network:
 infrastructure:
   metrics:
     enabled: true
+  gcp:
+    serviceAccount: alfajores-blockscout3@celo-testnet-production.iam.gserviceaccount.com
+    project: celo-testnet-production
+

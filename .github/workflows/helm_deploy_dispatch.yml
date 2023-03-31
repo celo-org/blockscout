@@ -1,5 +1,6 @@
 ---
 name: 'Deploy Helm Chart'
+run-name: 'Helm ${{ github.event.inputs.action }} on ${{ github.event.inputs.deployment }} triggered by @${{ github.actor }}'
 
 on:
   workflow_dispatch:
