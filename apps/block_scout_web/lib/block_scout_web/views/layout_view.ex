@@ -177,6 +177,10 @@ defmodule BlockScoutWeb.LayoutView do
       try do
         :block_scout_web
         |> Application.get_env(component)
+        |> then(fn
+          n when is_list(n) -> n
+          str -> Parser.parse!(str)
+        end)
       rescue
         _ ->
           []
