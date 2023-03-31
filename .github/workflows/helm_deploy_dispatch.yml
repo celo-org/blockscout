@@ -72,12 +72,12 @@ jobs:
           if [ -z "${{ github.event.inputs.change-cause }}" ]; then
             echo "change-cause=\"Deployment triggered by ${{ github.triggering_actor }} on ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"" >> "$GITHUB_OUTPUT"
           else
-            echo "change-cause=\"${{ github.event.inputs.change-cause }}\"" >> "$GITHUB_OUTPUT"
+            echo "change-cause='${{ github.event.inputs.change-cause }}'" >> "$GITHUB_OUTPUT"
           fi
           if [ "${{ github.event.inputs.use-branch-commit }}" == "true" ]; then
-            echo "image-commit=\"${{ github.sha }}\"" >> "$GITHUB_OUTPUT"
+            echo "image-commit='${{ github.sha }}'" >> "$GITHUB_OUTPUT"
           else
-            echo "image-commit=\"\"" >> "$GITHUB_OUTPUT"
+            echo "image-commit=''" >> "$GITHUB_OUTPUT"
           fi
 
   helm-deploy:
