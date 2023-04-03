@@ -92,6 +92,5 @@ infrastructure:
   metrics:
     enabled: true
   gcp:
-    serviceAccount: rc1-blockscout3@celo-testnet-production.iam.gserviceaccount.com
+    serviceAccount: rc1-blockscout1@celo-testnet-production.iam.gserviceaccount.com
     project: celo-testnet-production
-
