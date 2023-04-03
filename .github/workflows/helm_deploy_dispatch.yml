@@ -47,8 +47,8 @@ jobs:
     steps:
       - id: set-config
         run: |
-          # SERVICE_ACCOUNT_SUFFIX="-ro"
-          SERVICE_ACCOUNT_SUFFIX=""
+          SERVICE_ACCOUNT_SUFFIX="-ro"
+          # SERVICE_ACCOUNT_SUFFIX=""
           [ "${{ github.ref_name }}" == master ] && SERVICE_ACCOUNT_SUFFIX=""
           if [ "${{ github.event.inputs.deployment }}" == "cannoli" ]; then
             echo "cluster=cannoli" >> "$GITHUB_OUTPUT"
