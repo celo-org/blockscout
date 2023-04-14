@@ -51,7 +51,7 @@ jobs:
           # SERVICE_ACCOUNT_SUFFIX="-ro"
           SERVICE_ACCOUNT_SUFFIX=""
           [ "${{ github.ref_name }}" == master ] && SERVICE_ACCOUNT_SUFFIX=""
-          if [ "${{ github.event.inputs.action }}" == apply ] && [ "${{ github.event.inputs.deployment }}" != rc1staging ] && [ "${{ github.ref_name }}" != "master" ]; then
+          if [ "${{ github.event.inputs.action }}" == apply ] && [ "${{ github.event.inputs.deployment }}" != rc1staging ] && [ "${{ github.ref_name }}" != master ]; then
             echo "ERROR: Only the master branch can be deployed to non-rc1staging environments"
             exit 1
           fi
