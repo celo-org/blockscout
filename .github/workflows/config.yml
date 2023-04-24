@@ -17,6 +17,10 @@ env:
   ACCOUNT_AUTH0_LOGOUT_RETURN_URL: 'https://blockscout.com/auth/logout'
   CACHE_VERSION: 20
 
+concurrency: 
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
   build-and-cache:
     name: Build and Cache deps
@@ -691,8 +695,6 @@ jobs:
             ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-eventstream-npm-
 
       - name: Build assets
-        env:
-          NODE_OPTIONS: --openssl-legacy-provider
         run: node node_modules/webpack/bin/webpack.js --mode development
         working-directory: "apps/event_stream/assets"
 
