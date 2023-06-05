@@ -21,7 +21,7 @@ defmodule Explorer.Application do
     Transactions,
     TransactionsApiV2,
     Uncles
-    }
+  }
 
   alias Explorer.Chain.Supply.RSK
 
@@ -92,8 +92,8 @@ defmodule Explorer.Application do
 
   # child processes which write to the db after being added to the supervision tree (e.g. periodic caches, counters, etc)
   # these cause noisy failures when connected to replica db
-  defp children_with_write_access() do
-    if Application.get_env(:explorer, :write_api_enabled) do
+  defp children_with_write_access do
+    if System.get_env("DISABLE_DB_WRITE", nil) == nil do
       [
         configure(Explorer.Market.History.Cataloger),
         configure(Explorer.Chain.Cache.TokenExchangeRate),
