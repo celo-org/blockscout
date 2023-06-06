@@ -260,7 +260,9 @@ defmodule Explorer.GraphQL do
 
     from(
       tt in subquery(tokens),
+      as: :token_transfer,
       inner_join: tx in Transaction,
+      as: :transaction,
       on: tx.hash == tt.transaction_hash,
       inner_join: b in Block,
       on: tx.block_hash == b.hash,
@@ -282,6 +284,13 @@ defmodule Explorer.GraphQL do
         block_number: tt.block_number
       },
       limit: ^first
+    )
+    |> order_by([transaction: t],
+      desc: t.block_number,
+      desc: t.hash,
+      asc: t.nonce,
+      desc: t.from_address_hash,
+      desc: t.to_address_hash
     )
   end
 
