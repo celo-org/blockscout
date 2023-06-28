@@ -3,7 +3,6 @@ import { connectElements, createStore } from './redux_helpers.js'
 import $ from 'jquery'
 import Analytics from 'analytics'
 import omit from 'lodash/omit'
-import googlePlugin from '@analytics/google-analytics'
 import uniqid from 'uniqid'
 import { fullPath } from './utils'
 
@@ -289,9 +288,6 @@ function trackEvents () {
 
 // initiate analytics and store
 function initAnalytics () {
-  // temporarily disable analytics
-  return;
-
   const gaMeasurementId = window.ANALYTICS_KEY
 
   if (typeof gaMeasurementId === 'undefined' || gaMeasurementId === '') {
@@ -301,11 +297,7 @@ function initAnalytics () {
   // instantiate analytics
   analytics = Analytics({
     app: 'Blockscout',
-    plugins: [
-      googlePlugin({
-        measurementIds: [gaMeasurementId]
-      })
-    ]
+    plugins: []
   })
 
   // initial analytics
