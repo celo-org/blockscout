@@ -289,6 +289,9 @@ function trackEvents () {
 
 // initiate analytics and store
 function initAnalytics () {
+  // temporarily disable analytics
+  return;
+
   const gaMeasurementId = window.ANALYTICS_KEY
 
   if (typeof gaMeasurementId === 'undefined' || gaMeasurementId === '') {
