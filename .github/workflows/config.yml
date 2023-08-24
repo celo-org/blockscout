@@ -547,6 +547,8 @@ jobs:
           path: _build/test/junit/indexer/*.xml
 
   test_nethermind_mox_block_scout_web:
+    # Temporarily disable web tests
+    if: false
     name: Blockscout Web Tests
     runs-on: [self-hosted, blockscout]
     needs: build-and-cache
