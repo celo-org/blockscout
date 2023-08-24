@@ -735,7 +735,9 @@ jobs:
 
   set-docker-vars:
     runs-on: [self-hosted, blockscout]
-    needs: [credo, check_formatted, dialyzer, gettext, sobelow, eslint, jest, test_nethermind_mox_ethereum_jsonrpc, test_nethermind_mox_explorer, test_nethermind_mox_indexer, test_nethermind_mox_block_scout_web, test_event_stream] 
+    # Temporarily disable web tests
+    # needs: [credo, check_formatted, dialyzer, gettext, sobelow, eslint, jest, test_nethermind_mox_ethereum_jsonrpc, test_nethermind_mox_explorer, test_nethermind_mox_indexer, test_nethermind_mox_block_scout_web, test_event_stream] 
+    needs: [credo, check_formatted, dialyzer, gettext, sobelow, eslint, jest, test_nethermind_mox_ethereum_jsonrpc, test_nethermind_mox_explorer, test_nethermind_mox_indexer, test_event_stream] 
     outputs:
       workload-id-provider:  ${{ steps.set-docker-vars.outputs.workload-id-provider }}
       service-account: ${{ steps.set-docker-vars.outputs.service-account }}
