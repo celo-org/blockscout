@@ -547,8 +547,6 @@ jobs:
           path: _build/test/junit/indexer/*.xml
 
   test_nethermind_mox_block_scout_web:
-    # Temporarily disable web tests
-    if: false
     name: Blockscout Web Tests
     runs-on: [self-hosted, blockscout]
     needs: build-and-cache
@@ -735,9 +733,7 @@ jobs:
 
   set-docker-vars:
     runs-on: [self-hosted, blockscout]
-    # Temporarily disable web tests
-    # needs: [credo, check_formatted, dialyzer, gettext, sobelow, eslint, jest, test_nethermind_mox_ethereum_jsonrpc, test_nethermind_mox_explorer, test_nethermind_mox_indexer, test_nethermind_mox_block_scout_web, test_event_stream] 
-    needs: [credo, check_formatted, dialyzer, gettext, sobelow, eslint, jest, test_nethermind_mox_ethereum_jsonrpc, test_nethermind_mox_explorer, test_nethermind_mox_indexer, test_event_stream] 
+    needs: [credo, check_formatted, dialyzer, gettext, sobelow, eslint, jest, test_nethermind_mox_ethereum_jsonrpc, test_nethermind_mox_explorer, test_nethermind_mox_indexer, test_nethermind_mox_block_scout_web, test_event_stream] 
     outputs:
       workload-id-provider:  ${{ steps.set-docker-vars.outputs.workload-id-provider }}
       service-account: ${{ steps.set-docker-vars.outputs.service-account }}
