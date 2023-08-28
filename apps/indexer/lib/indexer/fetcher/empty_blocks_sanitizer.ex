@@ -80,7 +80,6 @@ defmodule Indexer.Fetcher.EmptyBlocksSanitizer do
       ),
       set: [is_empty: false, updated_at: Timex.now()]
     )
-    end
 
     unprocessed_empty_blocks_from_db = unprocessed_empty_blocks_query_list(limit())
 
