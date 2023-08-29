@@ -125,6 +125,8 @@ defmodule BlockScoutWeb.API.RPC.AddressControllerTest do
              ] = response["result"]
     end
 
+    # celo - deactivating event broadcast
+    @tag :skip
     test "with a stale balance", %{conn: conn, params: params} do
       now = Timex.now()
 
