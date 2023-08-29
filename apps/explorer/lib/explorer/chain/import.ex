@@ -134,7 +134,7 @@ defmodule Explorer.Chain.Import do
       emit_ingestion_metrics(data)
       Notify.async(data[:transactions])
 
-      #elo - deactivating real time notifications of indexed + imported data
+      # elo - deactivating real time notifications of indexed + imported data
       Publisher.broadcast(data, false)
 
       {:ok, data}

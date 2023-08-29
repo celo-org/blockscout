@@ -225,7 +225,8 @@ defmodule BlockScoutWeb.API.RPC.AddressControllerTest do
 
       {:ok, expected_wei} = Wei.cast(2)
 
-      assert_receive({:chain_event, :addresses, :on_demand, [received_address]}, 1000)
+      # celo - deactivating event broadcast
+      # assert_receive({:chain_event, :addresses, :on_demand, [received_address]}, 1000)
 
       assert received_address.hash == address.hash
       assert received_address.fetched_coin_balance == expected_wei
