@@ -37,6 +37,8 @@ defmodule Explorer.Chain.Import.Runner.Addresses do
     }
   end
 
+  @lock_timeout "4s"
+
   @impl Import.Runner
   def run(multi, changes_list, %{timestamps: timestamps} = options) do
     insert_options =
@@ -58,6 +60,11 @@ defmodule Explorer.Chain.Import.Runner.Addresses do
       end)
 
     multi
+    |> Multi.run(:set_address_lock_timeout, fn repo, _ ->
+      # celo - max lock_timeout for address insertion to mitigate lock contention
+      repo.query!("SET LOCAL lock_timeout = '#{@lock_timeout}'")
+      {:ok, nil}
+    end)
     |> Multi.run(:addresses, fn repo, _ ->
       insert(repo, changes_list_with_defaults, insert_options)
     end)
