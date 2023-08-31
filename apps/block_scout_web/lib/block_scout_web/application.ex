@@ -70,8 +70,7 @@ defmodule BlockScoutWeb.Application do
 
   def setup_opentelemetry() do
     :ok = :opentelemetry_cowboy.setup()
-    :ok = OpentelemetryPhoenix.setup()
-    :ok = OpentelemetryLiveView.setup()
+    :ok = OpentelemetryPhoenix.setup(adapter: :cowboy2)
     :ok = Explorer.Repo.config()
           |> Keyword.fetch!(:telemetry_prefix)
           |> OpentelemetryEcto.setup()
