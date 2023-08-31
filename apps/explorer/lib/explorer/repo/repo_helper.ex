@@ -33,7 +33,7 @@ defmodule Explorer.Repo.RepoHelper do
       def safe_insert_all(kind, elements, opts) do
         returning = opts[:returning]
 
-        chunk_size = Map.get(opts, :chunk_size, @chunk_size)
+        chunk_size = Keyword.get(opts, :chunk_size, @chunk_size)
 
         elements
         |> Enum.chunk_every(chunk_size)

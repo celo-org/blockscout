@@ -67,7 +67,7 @@ defmodule BlockScoutWeb.Application do
 
   def cluster_process(acc, _environment), do: acc
 
-  def setup_opentelemetry() do
+  def setup_opentelemetry do
     # celo - initalize otel if an endpoint is configured
     if System.get_env("OTLP_ENDPOINT", nil) do
       :ok = :opentelemetry_cowboy.setup()
