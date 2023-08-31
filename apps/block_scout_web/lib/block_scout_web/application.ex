@@ -21,7 +21,6 @@ defmodule BlockScoutWeb.Application do
 
     Logger.add_backend(LoggerBackend, level: :error)
 
-
     setup_opentelemetry()
 
     # Define workers and child supervisors to be supervised
@@ -69,10 +68,15 @@ defmodule BlockScoutWeb.Application do
   def cluster_process(acc, _environment), do: acc
 
   def setup_opentelemetry() do
-    :ok = :opentelemetry_cowboy.setup()
-    :ok = OpentelemetryPhoenix.setup(adapter: :cowboy2)
-    :ok = Explorer.Repo.config()
-          |> Keyword.fetch!(:telemetry_prefix)
-          |> OpentelemetryEcto.setup()
+    # celo - initalize otel if an endpoint is configured
+    if System.get_env("OTLP_ENDPOINT", nil) do
+      :ok = :opentelemetry_cowboy.setup()
+      :ok = OpentelemetryPhoenix.setup(adapter: :cowboy2)
+
+      :ok =
+        Explorer.Repo.config()
+        |> Keyword.fetch!(:telemetry_prefix)
+        |> OpentelemetryEcto.setup()
+    end
   end
 end

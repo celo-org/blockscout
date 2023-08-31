@@ -1,7 +1,11 @@
 import Config
 
 # Configure your database
-config :explorer, Explorer.Repo.Local, timeout: :timer.seconds(80), migration_lock: nil, telemetry_prefix: [:explorer, :repo]
+config :explorer, Explorer.Repo.Local,
+  timeout: :timer.seconds(80),
+  migration_lock: nil,
+  telemetry_prefix: [:explorer, :repo]
+
 # Configure API database
 config :explorer, Explorer.Repo.Replica1, timeout: :timer.seconds(80), telemetry_prefix: [:explorer, :repo]
 

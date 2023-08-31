@@ -64,8 +64,3 @@ config :logger, :api,
 config :phoenix, :stacktrace_depth, 20
 
 config :block_scout_web, :captcha_helper, BlockScoutWeb.CaptchaHelper
-
-
-config :opentelemetry_exporter,
-       otlp_protocol: :http_protobuf,
-       otlp_endpoint: System.fetch_env!("OTLP_ENDPOINT")
