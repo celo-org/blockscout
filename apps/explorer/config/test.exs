@@ -47,8 +47,11 @@ config :explorer, Explorer.Chain.Cache.MinMissingBlockNumber, enabled: false
 
 # Configure API database
 config :explorer, Explorer.Repo.Replica1,
-  database: "explorer_test",
-  hostname: "localhost",
+  url: System.get_env("DATABASE_URL") || "postgresql://postgres:postgres@localhost:5432/explorer_test",
+  database: System.get_env("DATABASE_DB") || "explorer_test",
+  hostname: System.get_env("DATABASE_HOSTNAME") || "localhost",
+  username: System.get_env("DATABASE_USER") || "postgres",
+  password: System.get_env("DATABASE_PASSWORD") || "postgres",
   pool: Ecto.Adapters.SQL.Sandbox,
   # Default of `5_000` was too low for `BlockFetcher` test
   ownership_timeout: :timer.minutes(1),
@@ -61,9 +64,11 @@ config :explorer, Explorer.Repo.Replica1,
 
 # Configure API database
 config :explorer, Explorer.Repo.Account,
-  database: "explorer_test_account",
-  hostname: "localhost",
-  username: "postgres",
+  url: System.get_env("DATABASE_URL") || "postgresql://postgres:postgres@localhost:5432/explorer_test",
+  database: System.get_env("DATABASE_DB") || "explorer_test_account",
+  hostname: System.get_env("DATABASE_HOSTNAME") || "localhost",
+  username: System.get_env("DATABASE_USER") || "postgres",
+  password: System.get_env("DATABASE_PASSWORD") || "postgres",
   pool: Ecto.Adapters.SQL.Sandbox,
   # Default of `5_000` was too low for `BlockFetcher` test
   ownership_timeout: :timer.minutes(1),
