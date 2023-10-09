@@ -375,6 +375,7 @@ jobs:
     needs: build-and-cache
     env:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/explorer_test
+      DATABASE_HOSTNAME: postgres
     services:
       postgres:
         image: postgres
@@ -443,6 +444,7 @@ jobs:
     needs: build-and-cache
     env:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/explorer_test
+      DATABASE_HOSTNAME: postgres
     services:
       postgres:
         image: postgres
@@ -532,6 +534,7 @@ jobs:
     needs: build-and-cache
     env:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/explorer_test
+      DATABASE_HOSTNAME: postgres
     services:
       postgres:
         image: postgres
@@ -605,6 +608,7 @@ jobs:
     needs: build-and-cache
     env:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/explorer_test
+      DATABASE_HOSTNAME: postgres
     services:
       redis_db:
         image: 'redis:alpine'
