@@ -29,6 +29,7 @@ jobs:
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
+      options: --user root
     steps:
       - uses: actions/checkout@v3
       - uses: erlef/setup-beam@v1
@@ -110,6 +111,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -136,6 +138,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -161,6 +164,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -203,6 +207,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -231,6 +236,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -261,6 +267,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -317,6 +324,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -364,6 +372,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     services:
       postgres:
@@ -429,6 +438,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     services:
       postgres:
@@ -507,6 +517,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     services:
       postgres:
@@ -577,6 +588,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     services:
       redis_db:
@@ -689,6 +701,7 @@ jobs:
     runs-on: ['self-hosted', 'org', '8-cpu']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -818,5 +831,3 @@ jobs:
         "DISABLE_WEBAPP=true",
       trivy: true
       trivy-timeout: 20m
-
-#
