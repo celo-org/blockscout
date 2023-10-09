@@ -440,7 +440,7 @@ jobs:
       options: --user root
     needs: build-and-cache
     env:
-      DATABASE_USER: postgres
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/explorer_test
     services:
       postgres:
         image: postgres
@@ -521,7 +521,7 @@ jobs:
       options: --user root
     needs: build-and-cache
     env:
-      DATABASE_USER: postgres
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/explorer_test
     services:
       postgres:
         image: postgres
@@ -594,7 +594,7 @@ jobs:
       options: --user root
     needs: build-and-cache
     env:
-      DATABASE_USER: postgres
+      DATABASE_URL: postgres://postgres:postgres@localhost:5432/explorer_test
     services:
       redis_db:
         image: 'redis:alpine'
