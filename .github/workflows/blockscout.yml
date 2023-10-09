@@ -490,6 +490,14 @@ jobs:
             ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-explorer-npm
 
       - run: echo 'export PATH=/usr/local/bin:$PATH' >> $GITHUB_ENV
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 20
+        if: true
+        with:
+          limit-access-to-actor: true
+
       - name: mix test --exclude no_nethermind --exclude smart_contract_compiler
         run: |
           cd apps/explorer
