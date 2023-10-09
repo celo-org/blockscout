@@ -29,7 +29,6 @@ jobs:
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
-      options: --user root
     steps:
       - uses: actions/checkout@v3
       - uses: erlef/setup-beam@v1
