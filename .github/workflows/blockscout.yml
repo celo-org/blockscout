@@ -373,6 +373,8 @@ jobs:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
     needs: build-and-cache
+    env:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/explorer_test
     services:
       postgres:
         image: postgres
@@ -440,7 +442,7 @@ jobs:
       options: --user root
     needs: build-and-cache
     env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/explorer_test
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/explorer_test
     services:
       postgres:
         image: postgres
@@ -494,7 +496,7 @@ jobs:
       - name: Setup tmate session
         uses: mxschmitt/action-tmate@v3
         timeout-minutes: 20
-        if: true
+        if: false
         with:
           limit-access-to-actor: true
 
@@ -529,7 +531,7 @@ jobs:
       options: --user root
     needs: build-and-cache
     env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/explorer_test
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/explorer_test
     services:
       postgres:
         image: postgres
@@ -602,7 +604,7 @@ jobs:
       options: --user root
     needs: build-and-cache
     env:
-      DATABASE_URL: postgres://postgres:postgres@localhost:5432/explorer_test
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/explorer_test
     services:
       redis_db:
         image: 'redis:alpine'
