@@ -11,6 +11,10 @@
 #
 name: "CodeQL"
 
+concurrency: 
+  group: codeql-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: [ "master" ]
