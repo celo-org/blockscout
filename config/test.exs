@@ -26,7 +26,7 @@ config :explorer, Explorer.KnownTokens, store: :none
 
 config :explorer, Explorer.Repo,
   adapter: Ecto.Adapters.Postgres,
-  url: System.get_env("DATABASE_URL") || "postgresql://postgres:postgres@localhost:5432/explorer_test"
+  url: System.get_env("DATABASE_URL") || "postgresql://postgres:postgres@localhost:5432/explorer_test",
   username: "postgres",
   password: "1234",
   database: "explorer_test",
