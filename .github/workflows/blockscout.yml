@@ -439,6 +439,8 @@ jobs:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
     needs: build-and-cache
+    env:
+      DATABASE_USER: postgres
     services:
       postgres:
         image: postgres
@@ -518,6 +520,8 @@ jobs:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
     needs: build-and-cache
+    env:
+      DATABASE_USER: postgres
     services:
       postgres:
         image: postgres
@@ -589,6 +593,8 @@ jobs:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
     needs: build-and-cache
+    env:
+      DATABASE_USER: postgres
     services:
       redis_db:
         image: 'redis:alpine'
