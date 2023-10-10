@@ -20,4 +20,13 @@ defmodule Explorer.Celo.SanctionCache do
     new_state = Map.put(state, :list, ["0xtestaddresspleaseblockme"])
     {:noreply, new_state}
   end
+
+  @impl true
+  def handle_call(:get_sanction_list, _from, %{list: list} = state) do
+    {:reply, list, state}
+  end
+
+  def get_sanction_list() do
+    GenServer.call(__MODULE__, :get_sanction_list)
+  end
 end
