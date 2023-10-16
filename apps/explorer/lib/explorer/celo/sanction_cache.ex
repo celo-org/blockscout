@@ -20,7 +20,7 @@ defmodule Explorer.Celo.SanctionCache do
   def handle_continue(:update_with_public_list, %{refresh: refresh_time} = state) do
     sanction_list = fetch_list()
 
-    Process.send_after(self, :refresh, refresh_time)
+    Process.send_after(self(), :refresh, refresh_time)
 
     {:noreply, %{state | list: sanction_list}}
   end
