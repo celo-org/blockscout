@@ -25,20 +25,22 @@ defmodule Explorer.Celo.SanctionCache do
     {:noreply, %{state | list: sanction_list}}
   end
 
-  def fetch_list() do
-    sanctions_url = :explorer
-                    |> Application.get_env(:celo_sanctions)
-                    |> Keyword.get(:url, "https://celo-org.github.io/compliance/ofac.sanctions.json")
+  def fetch_list do
+    sanctions_url =
+      :explorer
+      |> Application.get_env(:celo_sanctions)
+      |> Keyword.get(:url, "https://celo-org.github.io/compliance/ofac.sanctions.json")
 
     Logger.info("Fetching sanctioned address list from #{sanctions_url}")
 
-    {:ok, response} = case HTTPoison.get(sanctions_url, [], follow_redirect: true, timeout: 5_000) do
-      {:ok, %HTTPoison.Response{body: body, status_code: 200}} ->
-        {:ok, body}
+    {:ok, response} =
+      case HTTPoison.get(sanctions_url, [], follow_redirect: true, timeout: 5_000) do
+        {:ok, %HTTPoison.Response{body: body, status_code: 200}} ->
+          {:ok, body}
 
-      e ->
-        {:error, inspect(e)}
-    end
+        e ->
+          {:error, inspect(e)}
+      end
 
     sanction_list = response |> Jason.decode!()
 
@@ -46,6 +48,7 @@ defmodule Explorer.Celo.SanctionCache do
 
     sanction_list
   end
+
   @doc "printable md5 hash of list contents to assert changed values"
   def hash_list(list) do
     :crypto.hash(:md5, :erlang.term_to_binary(list)) |> Base.encode16()
@@ -66,7 +69,7 @@ defmodule Explorer.Celo.SanctionCache do
     {:noreply, state, {:continue, :update_with_public_list}}
   end
 
-  def get_sanction_list() do
+  def get_sanction_list do
     GenServer.call(__MODULE__, :get_sanction_list)
   end
 

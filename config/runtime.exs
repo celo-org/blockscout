@@ -403,9 +403,8 @@ config :explorer, :token_id_migration,
   concurrency: token_id_migration_concurrency,
   batch_size: token_id_migration_batch_size
 
-
 config :explorer, :celo_sanctions,
-       url: System.get_env("CELO_SANCTIONS_URL", "https://celo-org.github.io/compliance/ofac.sanctions.json")
+  url: System.get_env("CELO_SANCTIONS_URL", "https://celo-org.github.io/compliance/ofac.sanctions.json")
 
 ###############
 ### Indexer ###

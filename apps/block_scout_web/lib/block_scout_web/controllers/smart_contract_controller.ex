@@ -2,7 +2,7 @@ defmodule BlockScoutWeb.SmartContractController do
   use BlockScoutWeb, :controller
 
   alias BlockScoutWeb.AddressView
-  #alias Explorer.Celo.SanctionCache
+  # alias Explorer.Celo.SanctionCache
   alias Explorer.Chain
   alias Explorer.Chain.SmartContract
   alias Explorer.SmartContract.{Reader, Writer}
@@ -86,7 +86,7 @@ defmodule BlockScoutWeb.SmartContractController do
         implementation_address: implementation_address_hash_string,
         implementation_abi: implementation_abi,
         contract_type: contract_type,
-        sanctions: ["smart_contract_controller.ex","index"],
+        sanctions: ["smart_contract_controller.ex", "index"],
         action: action
       )
     else
@@ -140,9 +140,8 @@ defmodule BlockScoutWeb.SmartContractController do
         implementation_address: @burn_address,
         implementation_abi: [],
         contract_type: contract_type,
-         sanctions: ["smart_contract_controller.ex","index"],
-
-           action: action
+        sanctions: ["smart_contract_controller.ex", "index"],
+        action: action
       )
     else
       :error ->
