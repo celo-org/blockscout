@@ -3468,8 +3468,6 @@ msgstr ""
 msgid "Domain"
 msgstr ""
 
-#: lib/block_scout_web/templates/address/_tabs.html.eex:41
-#: lib/block_scout_web/templates/address_signed/index.html.eex:23
 #: lib/block_scout_web/templates/block_signers/index.html.eex:27
 #, elixir-autogen, elixir-format
 msgid "Downtime"
@@ -3722,11 +3720,6 @@ msgstr ""
 msgid "The requested path was not found on BlockScout."
 msgstr ""
 
-#: lib/block_scout_web/templates/address_signed/index.html.eex:28
-#, elixir-autogen, elixir-format, fuzzy
-msgid "There are no downtime blocks for this address."
-msgstr ""
-
 #: lib/block_scout_web/templates/address_epoch_transaction/index.html.eex:40
 #, elixir-autogen, elixir-format, fuzzy
 msgid "There are no epoch transactions for this address."
@@ -3884,4 +3877,15 @@ msgstr ""
 #: lib/block_scout_web/templates/transaction/overview.html.eex:414
 #, elixir-autogen, elixir-format
 msgid "sent to Community Fund for this transaction. Equals Block Base Fee per Gas * Gas Used."
+msgstr ""
+
+#: lib/block_scout_web/templates/address/_tabs.html.eex:41
+#: lib/block_scout_web/templates/address_signed/index.html.eex:23
+#, elixir-autogen, elixir-format
+msgid "Unsigned Blocks"
+msgstr ""
+
+#: lib/block_scout_web/templates/address_signed/index.html.eex:28
+#, elixir-autogen, elixir-format, fuzzy
+msgid "There are no unsigned blocks for this address."
 msgstr ""
