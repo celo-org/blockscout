@@ -919,7 +919,7 @@ msgid "Current transaction state: Success, Failed (Error), or Pending (In Proces
 msgstr ""
 
 #: lib/block_scout_web/templates/address_read_contract/index.html.eex:29
-#: lib/block_scout_web/templates/address_write_contract/index.html.eex:27
+#: lib/block_scout_web/templates/address_write_contract/index.html.eex:32
 #, elixir-autogen, elixir-format
 msgid "Custom"
 msgstr ""
@@ -933,7 +933,7 @@ msgid "Custom ABI"
 msgstr ""
 
 #: lib/block_scout_web/templates/address_read_contract/index.html.eex:34
-#: lib/block_scout_web/templates/address_write_contract/index.html.eex:32
+#: lib/block_scout_web/templates/address_write_contract/index.html.eex:37
 #, elixir-autogen, elixir-format
 msgid "Custom ABI from account"
 msgstr ""
@@ -1569,9 +1569,9 @@ msgstr ""
 #: lib/block_scout_web/templates/address_read_contract/index.html.eex:50
 #: lib/block_scout_web/templates/address_read_contract/index.html.eex:58
 #: lib/block_scout_web/templates/address_read_proxy/index.html.eex:21
-#: lib/block_scout_web/templates/address_write_contract/index.html.eex:48
-#: lib/block_scout_web/templates/address_write_contract/index.html.eex:56
-#: lib/block_scout_web/templates/address_write_proxy/index.html.eex:21
+#: lib/block_scout_web/templates/address_write_contract/index.html.eex:53
+#: lib/block_scout_web/templates/address_write_contract/index.html.eex:61
+#: lib/block_scout_web/templates/address_write_proxy/index.html.eex:26
 #: lib/block_scout_web/templates/tokens/contract/index.html.eex:17
 #, elixir-autogen, elixir-format
 msgid "Loading..."
@@ -2987,7 +2987,7 @@ msgid "Value"
 msgstr ""
 
 #: lib/block_scout_web/templates/address_read_contract/index.html.eex:26
-#: lib/block_scout_web/templates/address_write_contract/index.html.eex:24
+#: lib/block_scout_web/templates/address_write_contract/index.html.eex:29
 #: lib/block_scout_web/templates/verified_contracts/_tile.html.eex:49
 #: lib/block_scout_web/templates/verified_contracts/index.html.eex:74
 #, elixir-autogen, elixir-format
