@@ -38,7 +38,7 @@
       ) %>
   <%= if BlockScoutWeb.AddressView.is_validator_signer?(@address) do %>
     <%= link(
-      gettext("Downtime"),
+      gettext("Unsigned Blocks"),
       class: "card-tab #{tab_status("signed", @conn.request_path)}",
       "data-test": "signed_tab_link",
       to: AccessHelpers.get_path(@conn, :address_signed_path, :index, @address.hash)
