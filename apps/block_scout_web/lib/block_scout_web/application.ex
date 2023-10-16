@@ -9,6 +9,7 @@ defmodule BlockScoutWeb.Application do
 
   alias BlockScoutWeb.{CampaignBannerCache, LoggerBackend}
   alias BlockScoutWeb.Celo.MetricsCron
+  alias BlockScoutWeb.Celo.Telemetry.Instrumentation.Web
   alias BlockScoutWeb.Counters.{BlocksIndexedCounter, InternalTransactionsIndexedCounter}
   alias BlockScoutWeb.{Endpoint, RealtimeEventHandler}
 
@@ -32,7 +33,7 @@ defmodule BlockScoutWeb.Application do
         child_spec(Endpoint, []),
         {Absinthe.Subscription, Endpoint},
         {CeloPrometheusCollector,
-         metrics: [EthRPC.metrics(), Database.metrics(), FlyPostgres.metrics(), Api.metrics()]},
+         metrics: [EthRPC.metrics(), Database.metrics(), FlyPostgres.metrics(), Api.metrics(), Web.metrics()]},
         {RealtimeEventHandler, name: RealtimeEventHandler},
         {BlocksIndexedCounter, name: BlocksIndexedCounter},
         {CampaignBannerCache, name: CampaignBannerCache},

@@ -6,7 +6,7 @@ defmodule BlockScoutWeb.Celo.MetricsCron do
 
   alias BlockScoutWeb.Celo.MetricsCron.TaskSupervisor
   alias Explorer.Celo.Metrics.DatabaseMetrics
-  alias Explorer.Celo.Telemetry
+  alias Explorer.Celo.{SanctionCache, Telemetry}
 
   def start_link(_) do
     GenServer.start_link(__MODULE__, :ok, name: __MODULE__)
@@ -28,7 +28,8 @@ defmodule BlockScoutWeb.Celo.MetricsCron do
   end
 
   @metric_operations [
-    :database_stats
+    :database_stats,
+    :sanction_stats
   ]
 
   @impl true
@@ -82,5 +83,10 @@ defmodule BlockScoutWeb.Celo.MetricsCron do
 
     tables_by_size
     |> Enum.each(fn {name, size} -> Telemetry.event([:db, :table_size], %{size: size}, %{name: name}) end)
+  end
+
+  def sanction_stats do
+    num_sanctions = SanctionCache.get_sanction_list() |> length()
+    Telemetry.event([:web, :sanctioned_addresses], %{value: num_sanctions})
   end
 end
