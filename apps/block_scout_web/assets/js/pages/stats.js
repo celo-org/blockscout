@@ -1,6 +1,10 @@
 import $ from 'jquery'
 
 $('.stats-link').on('click', function () {
+  if ($(this).hasClass('stats-link-no-selection')) {
+    return
+  }
+
   $('ul#topnav .selected').removeClass('selected')
   $(this).addClass('selected')
 })

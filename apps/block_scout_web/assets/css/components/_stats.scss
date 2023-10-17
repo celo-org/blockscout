@@ -69,6 +69,10 @@ ul.topnav li a {
     box-shadow: 5px 5px 5px rgb(180, 175, 175);
 }
 
+ul.topnav li.stats-link-no-selection a {
+    cursor: default;
+}
+
 ul.topnav li.selected a {
     color: #26ba6c; 
     font-weight: normal; 
