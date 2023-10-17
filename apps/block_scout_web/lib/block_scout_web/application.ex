@@ -9,10 +9,12 @@ defmodule BlockScoutWeb.Application do
 
   alias BlockScoutWeb.{CampaignBannerCache, LoggerBackend}
   alias BlockScoutWeb.Celo.MetricsCron
+  alias BlockScoutWeb.Celo.Telemetry.Instrumentation.Web
   alias BlockScoutWeb.Counters.{BlocksIndexedCounter, InternalTransactionsIndexedCounter}
   alias BlockScoutWeb.{Endpoint, RealtimeEventHandler}
 
   alias EthereumJSONRPC.Celo.Instrumentation, as: EthRPC
+  alias Explorer.Celo.SanctionCache
   alias Explorer.Celo.Telemetry.Instrumentation.{Api, Database, FlyPostgres}
   alias Explorer.Celo.Telemetry.MetricsCollector, as: CeloPrometheusCollector
 
@@ -31,10 +33,11 @@ defmodule BlockScoutWeb.Application do
         child_spec(Endpoint, []),
         {Absinthe.Subscription, Endpoint},
         {CeloPrometheusCollector,
-         metrics: [EthRPC.metrics(), Database.metrics(), FlyPostgres.metrics(), Api.metrics()]},
+         metrics: [EthRPC.metrics(), Database.metrics(), FlyPostgres.metrics(), Api.metrics(), Web.metrics()]},
         {RealtimeEventHandler, name: RealtimeEventHandler},
         {BlocksIndexedCounter, name: BlocksIndexedCounter},
         {CampaignBannerCache, name: CampaignBannerCache},
+        {SanctionCache, %{}},
         {InternalTransactionsIndexedCounter, name: InternalTransactionsIndexedCounter}
       ]
       |> cluster_process(Application.get_env(:block_scout_web, :environment))
