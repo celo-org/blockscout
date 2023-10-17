@@ -27,7 +27,7 @@ on:
 jobs:
   analyze:
     name: Analyze
-    runs-on: [self-hosted, blockscout]
+    runs-on: ['self-hosted', 'org', '8-cpu']
     permissions:
       actions: read
       contents: read
