@@ -1,4 +1,5 @@
-name: Blockscout
+name: Blockscout CI/CD
+run-name: Blockscout CI/CD for ${{ github.head_ref || github.ref_name }}
 
 on:
   push:
@@ -7,6 +8,10 @@ on:
   pull_request:
     branches:
       - master
+
+concurrency: 
+  group: blockscout-${{ github.ref }}
+  cancel-in-progress: true
 
 env:
   MIX_ENV: test
@@ -20,7 +25,10 @@ env:
 jobs:
   build-and-cache:
     name: Build and Cache deps
-    runs-on: [self-hosted, blockscout]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     steps:
       - uses: actions/checkout@v3
       - uses: erlef/setup-beam@v1
@@ -99,7 +107,10 @@ jobs:
 
   credo:
     name: Credo
-    runs-on: [self-hosted, blockscout]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -123,7 +134,10 @@ jobs:
 
   check_formatted:
     name: Code formatting checks
-    runs-on: [self-hosted, blockscout]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -146,11 +160,14 @@ jobs:
       - run: mix format --check-formatted
   dialyzer:
     name: Dialyzer static analysis
-    runs-on: [self-hosted, blockscout]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
-      - uses: erlef/setup-beam@v1.15.4
+      - uses: erlef/setup-beam@v1
         with:
           otp-version: ${{ env.OTP_VERSION }}
           elixir-version: ${{ env.ELIXIR_VERSION }}
@@ -176,7 +193,7 @@ jobs:
             ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-dialyzer-"
 
       - name: Conditionally build Dialyzer Cache
-        if: steps.dialyzer-cache.output.cache-hit != 'true'
+        if: steps.dialyzer-cache.outputs.cache-hit != 'true'
         run: |
           mkdir -p priv/plts
           mix dialyzer --plt
@@ -186,7 +203,10 @@ jobs:
 
   gettext:
     name: Missing translation keys check
-    runs-on: [self-hosted, blockscout]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -212,7 +232,10 @@ jobs:
         working-directory: "apps/block_scout_web"
   sobelow:
     name: Sobelow security analysis
-    runs-on: [self-hosted, blockscout]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -240,7 +263,10 @@ jobs:
         working-directory: "apps/block_scout_web"
   eslint:
     name: ESLint
-    runs-on: [self-hosted, blockscout]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -294,7 +320,10 @@ jobs:
 
   jest:
     name: JS Tests
-    runs-on: [self-hosted, blockscout]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -339,7 +368,10 @@ jobs:
 
   test_nethermind_mox_ethereum_jsonrpc:
     name: EthereumJSONRPC Tests
-    runs-on: [self-hosted, blockscout]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     services:
       postgres:
@@ -392,6 +424,8 @@ jobs:
           PGPASSWORD: postgres
           # match POSTGRES_USER for postgres image below
           PGUSER: postgres
+          DATABASE_URL: postgres://postgres:postgres@postgres:5432/explorer_test
+          DATABASE_HOSTNAME: postgres
           ETHEREUM_JSONRPC_CASE: "EthereumJSONRPC.Case.Nethermind.Mox"
           ETHEREUM_JSONRPC_WEB_SOCKET_CASE: "EthereumJSONRPC.WebSocket.Case.Mox"
       - name: Upload Unit Test Results
@@ -402,7 +436,10 @@ jobs:
           path: _build/test/junit/ethereum_jsonrpc/*.xml
   test_nethermind_mox_explorer:
     name: Explorer Tests
-    runs-on: [self-hosted, blockscout]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     services:
       postgres:
@@ -453,6 +490,14 @@ jobs:
             ${{ runner.os }}-${{ env.ELIXIR_VERSION }}-${{ env.OTP_VERSION }}-${{ env.MIX_ENV }}-explorer-npm
 
       - run: echo 'export PATH=/usr/local/bin:$PATH' >> $GITHUB_ENV
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        timeout-minutes: 20
+        if: false
+        with:
+          limit-access-to-actor: true
+
       - name: mix test --exclude no_nethermind --exclude smart_contract_compiler
         run: |
           cd apps/explorer
@@ -468,6 +513,8 @@ jobs:
           PGPASSWORD: postgres
           # match POSTGRES_USER for postgres image below
           PGUSER: postgres
+          DATABASE_URL: postgres://postgres:postgres@postgres:5432/explorer_test
+          DATABASE_HOSTNAME: postgres
           ETHEREUM_JSONRPC_CASE: "EthereumJSONRPC.Case.Nethermind.Mox"
           ETHEREUM_JSONRPC_WEB_SOCKET_CASE: "EthereumJSONRPC.WebSocket.Case.Mox"
       - name: Upload Unit Test Results
@@ -478,7 +525,10 @@ jobs:
           path: _build/test/junit/explorer/*.xml
   test_nethermind_mox_indexer:
     name: Indexer Tests
-    runs-on: [self-hosted, blockscout]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     services:
       postgres:
@@ -535,6 +585,8 @@ jobs:
           PGPASSWORD: postgres
           # match POSTGRES_USER for postgres image below
           PGUSER: postgres
+          DATABASE_URL: postgres://postgres:postgres@postgres:5432/explorer_test
+          DATABASE_HOSTNAME: postgres
           ETHEREUM_JSONRPC_CASE: "EthereumJSONRPC.Case.Nethermind.Mox"
           ETHEREUM_JSONRPC_WEB_SOCKET_CASE: "EthereumJSONRPC.WebSocket.Case.Mox"
       - name: Upload Unit Test Results
@@ -546,8 +598,14 @@ jobs:
 
   test_nethermind_mox_block_scout_web:
     name: Blockscout Web Tests
-    runs-on: [self-hosted, blockscout]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
+    env:
+      DATABASE_URL: postgres://postgres:postgres@postgres:5432/explorer_test
+      DATABASE_HOSTNAME: postgres
     services:
       redis_db:
         image: 'redis:alpine'
@@ -638,7 +696,7 @@ jobs:
           COIN: "CELO"
           ADMIN_PANEL_ENABLED: "true"
           ACCOUNT_ENABLED: "true"
-          ACCOUNT_REDIS_URL: "redis://localhost:6379"
+          ACCOUNT_REDIS_URL: "redis://redis_db:6379"
           API_V2_ENABLED: "true"
       - name: Upload Unit Test Results
         if: always()
@@ -656,7 +714,10 @@ jobs:
 
   test_event_stream:
     name: Event Stream Tests
-    runs-on: [self-hosted, blockscout]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -708,7 +769,9 @@ jobs:
 
   publish-test-results:
     name: "Publish Unit Tests Results"
-    runs-on: [self-hosted, blockscout]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
     needs:
       - test_nethermind_mox_ethereum_jsonrpc
       - test_nethermind_mox_explorer
@@ -729,7 +792,9 @@ jobs:
           files: artifacts/**/*.xml
 
   set-docker-vars:
-    runs-on: [self-hosted, blockscout]
+    runs-on: ['self-hosted', 'org', '8-cpu']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
     needs: [credo, check_formatted, dialyzer, gettext, sobelow, eslint, jest, test_nethermind_mox_ethereum_jsonrpc, test_nethermind_mox_explorer, test_nethermind_mox_indexer, test_nethermind_mox_block_scout_web, test_event_stream] 
     outputs:
       workload-id-provider:  ${{ steps.set-docker-vars.outputs.workload-id-provider }}
@@ -782,5 +847,3 @@ jobs:
         "DISABLE_WEBAPP=true",
       trivy: true
       trivy-timeout: 20m
-
-#
