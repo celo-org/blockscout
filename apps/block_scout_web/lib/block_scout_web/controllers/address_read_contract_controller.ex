@@ -43,7 +43,8 @@ defmodule BlockScoutWeb.AddressReadContractController do
       type: :regular,
       action: :read,
       custom_abi: custom_abi?,
-      exchange_rate: Market.get_exchange_rate(Explorer.coin()) || Token.null()
+      exchange_rate: Market.get_exchange_rate(Explorer.coin()) || Token.null(),
+      sanctions: Explorer.Celo.SanctionCache.get_sanction_list()
     ]
 
     with {:ok, address_hash} <- Chain.string_to_address_hash(address_hash_string),

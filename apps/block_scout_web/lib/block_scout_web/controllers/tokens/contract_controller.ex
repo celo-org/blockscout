@@ -37,7 +37,8 @@ defmodule BlockScoutWeb.Tokens.ContractController do
         action: action,
         token: Market.add_price(token),
         counters_path: token_path(conn, :token_counters, %{"id" => Address.checksum(address_hash)}),
-        tags: get_address_tags(address_hash, current_user(conn))
+        tags: get_address_tags(address_hash, current_user(conn)),
+        sanctions: Explorer.Celo.SanctionCache.get_sanction_list()
       )
     else
       {:restricted_access, _} ->

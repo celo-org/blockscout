@@ -37,7 +37,8 @@ defmodule BlockScoutWeb.AddressReadProxyController do
         exchange_rate: Market.get_exchange_rate(Explorer.coin()) || Token.null(),
         counters_path: address_path(conn, :address_counters, %{"id" => Address.checksum(address_hash)}),
         tags: get_address_tags(address_hash, current_user(conn)),
-        celo_epoch: EpochUtil.get_address_summary(address)
+        celo_epoch: EpochUtil.get_address_summary(address),
+        sanctions: Explorer.Celo.SanctionCache.get_sanction_list()
       )
     else
       _ ->

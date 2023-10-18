@@ -12,9 +12,13 @@
     tags: @tags,
     celo_epoch: @celo_epoch
   %>
+  <%
+    {:ok, sanctions} = Jason.encode(@sanctions)
+  %>
 
   <div class="card">
-    <%= render BlockScoutWeb.AddressView, "_tabs.html", address: @address, is_proxy: is_proxy, conn: @conn %>
+      <div id="sanctions" data-sanctions=<%= sanctions %> hidden ></div>
+      <%= render BlockScoutWeb.AddressView, "_tabs.html", address: @address, is_proxy: is_proxy, conn: @conn %>
     <%= if @need_wallet do %>
       <div class="card-misc-container">
         <%= render BlockScoutWeb.SmartContractView, "_connect_container.html" %>
