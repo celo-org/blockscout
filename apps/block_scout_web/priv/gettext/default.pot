@@ -918,7 +918,7 @@ msgstr ""
 msgid "Current transaction state: Success, Failed (Error), or Pending (In Process)"
 msgstr ""
 
-#: lib/block_scout_web/templates/address_read_contract/index.html.eex:29
+#: lib/block_scout_web/templates/address_read_contract/index.html.eex:33
 #: lib/block_scout_web/templates/address_write_contract/index.html.eex:32
 #, elixir-autogen, elixir-format
 msgid "Custom"
@@ -932,7 +932,7 @@ msgstr ""
 msgid "Custom ABI"
 msgstr ""
 
-#: lib/block_scout_web/templates/address_read_contract/index.html.eex:34
+#: lib/block_scout_web/templates/address_read_contract/index.html.eex:38
 #: lib/block_scout_web/templates/address_write_contract/index.html.eex:37
 #, elixir-autogen, elixir-format
 msgid "Custom ABI from account"
@@ -1566,13 +1566,13 @@ msgstr ""
 #: lib/block_scout_web/templates/address_contract_verification_via_multi_part_files/new.html.eex:99
 #: lib/block_scout_web/templates/address_contract_verification_via_standard_json_input/new.html.eex:49
 #: lib/block_scout_web/templates/address_contract_verification_vyper/new.html.eex:45
-#: lib/block_scout_web/templates/address_read_contract/index.html.eex:50
-#: lib/block_scout_web/templates/address_read_contract/index.html.eex:58
-#: lib/block_scout_web/templates/address_read_proxy/index.html.eex:21
+#: lib/block_scout_web/templates/address_read_contract/index.html.eex:54
+#: lib/block_scout_web/templates/address_read_contract/index.html.eex:62
+#: lib/block_scout_web/templates/address_read_proxy/index.html.eex:25
 #: lib/block_scout_web/templates/address_write_contract/index.html.eex:53
 #: lib/block_scout_web/templates/address_write_contract/index.html.eex:61
 #: lib/block_scout_web/templates/address_write_proxy/index.html.eex:26
-#: lib/block_scout_web/templates/tokens/contract/index.html.eex:17
+#: lib/block_scout_web/templates/tokens/contract/index.html.eex:22
 #, elixir-autogen, elixir-format
 msgid "Loading..."
 msgstr ""
@@ -2986,7 +2986,7 @@ msgstr ""
 msgid "Value"
 msgstr ""
 
-#: lib/block_scout_web/templates/address_read_contract/index.html.eex:26
+#: lib/block_scout_web/templates/address_read_contract/index.html.eex:30
 #: lib/block_scout_web/templates/address_write_contract/index.html.eex:29
 #: lib/block_scout_web/templates/verified_contracts/_tile.html.eex:49
 #: lib/block_scout_web/templates/verified_contracts/index.html.eex:74

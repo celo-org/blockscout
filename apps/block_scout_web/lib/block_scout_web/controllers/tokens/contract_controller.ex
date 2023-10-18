@@ -5,6 +5,7 @@ defmodule BlockScoutWeb.Tokens.ContractController do
   import BlockScoutWeb.Models.GetAddressTags, only: [get_address_tags: 2]
 
   alias BlockScoutWeb.{AccessHelpers, TabHelpers}
+  alias Explorer.Celo.SanctionCache
   alias Explorer.{Chain, Market}
   alias Explorer.Chain.Address
 
@@ -38,7 +39,7 @@ defmodule BlockScoutWeb.Tokens.ContractController do
         token: Market.add_price(token),
         counters_path: token_path(conn, :token_counters, %{"id" => Address.checksum(address_hash)}),
         tags: get_address_tags(address_hash, current_user(conn)),
-        sanctions: Explorer.Celo.SanctionCache.get_sanction_list()
+        sanctions: SanctionCache.get_sanction_list()
       )
     else
       {:restricted_access, _} ->
