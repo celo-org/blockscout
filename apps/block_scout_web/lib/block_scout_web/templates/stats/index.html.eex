@@ -2,7 +2,7 @@
 <% stats_report_url = Application.get_env(:block_scout_web, :stats_report_url) %>
 <%
 {:ok, urls} = stats_report_url |> Jason.decode()
-%{"overview" => overview_url, "addresses" => addresses_url, "cStables" => cstables_url, "transactions" => transactions_url, "reserve" => reserve_url, "epoch" => epoch_url} = urls
+%{"overview" => overview_url, "addresses" => addresses_url, "cStables" => cstables_url, "transactions" => transactions_url, "epoch" => epoch_url} = urls
 %>
 
 <nav class="menu-wrap" data-selector="stats-nabvar">
@@ -22,8 +22,13 @@
           <%=  gettext("Mento") %>
         </a>
       </li>
-      <li class="stats-link" data-tab-id="4">
-        <a href="<%= reserve_url %>" target="myiframe">
+      <li class="stats-link stats-link-no-selection tooltip-with-link-container">
+        <a href="#"
+          data-tab-id="4"
+          data-toggle="tooltip-with-link"
+          data-placement="bottom"
+          data-title="<%= gettext "Looking for Mento reserve stats? You can find them at " %><a target='_blank' href='https://reserve.mento.org/'><%= gettext "reserve.mento.org" %></a>."
+        >
           <%=  gettext("Mento Reserve") %>
         </a>
       </li>
