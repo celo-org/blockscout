@@ -41,7 +41,6 @@ ADD apps/block_scout_web/mix.exs ./apps/block_scout_web/
 ADD apps/explorer/mix.exs ./apps/explorer/
 ADD apps/ethereum_jsonrpc/mix.exs ./apps/ethereum_jsonrpc/
 ADD apps/indexer/mix.exs ./apps/indexer/
-ADD apps/event_stream/mix.exs ./apps/event_stream/
 ADD config/ ./config/
 
 RUN mix do deps.get, local.rebar --force, deps.compile
@@ -52,18 +51,12 @@ RUN npm install -g npm@7.24.1
 # Cache npm deps before application code
 
 ADD apps/block_scout_web/assets/ ./apps/block_scout_web/assets/
-ADD apps/event_stream/assets/ ./apps/event_stream/assets/
 ADD apps/explorer/package*.json ./apps/explorer/
 
 # Add blockscout npm deps
 RUN cd apps/block_scout_web/assets/ && \
     npm install && \
-    npm run deploy && \
-    cd - && \
-    cd apps/event_stream/assets/ && \
-    npm install && \
-    npm run deploy && \
-    cd -
+    npm run deploy
 
 RUN cd apps/explorer/ && \
     npm install && \
