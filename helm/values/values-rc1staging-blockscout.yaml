@@ -1,8 +1,8 @@
 ---
 blockscout:
   eventStream:
-    replicas: 1
-    enabled: true
+    replicas: 0
+    enabled: false
     beanstalkdPort: "11300"
     beanstalkdHost: "rc1staging-webhooks-beanstalkd.webhooks.svc.cluster.local"
     beanstalkdTube: "incoming"
