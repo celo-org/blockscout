@@ -102,10 +102,14 @@ defmodule BlockScoutWeb.Tokens.Instance.OverviewView do
 
   def external_url(nil), do: nil
 
+  def external_url("http" <> _rest = external_url), do: external_url
+
+  def external_url(string) when is_binary(string), do: external_url(nil)
+
   def external_url(instance) do
     result =
       if instance.metadata && instance.metadata["external_url"] do
-        instance.metadata["external_url"]
+        instance.metadata["external_url"] |> external_url()
       else
         external_url(nil)
       end

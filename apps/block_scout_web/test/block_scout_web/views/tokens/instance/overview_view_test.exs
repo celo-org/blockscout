@@ -127,7 +127,7 @@ defmodule BlockScoutWeb.Tokens.Instance.OverviewViewTest do
           "name": "CELO XSS",
           "image": "https://0-a.nl/nft/nft.jpg",
           "description": "CELO XSS",
-          "external_url": "javascript:eval(atob('YWxlcnQoZG9jdW1lbnQuZG9tYW'))"
+          "external_url": "javascript:eval(atob('YWxlcnQoIndoYXRzdXAgaXQncyB5YSBib3l5Iik'))"
         }
       """
 
@@ -135,7 +135,24 @@ defmodule BlockScoutWeb.Tokens.Instance.OverviewViewTest do
 
       result = OverviewView.external_url(%{metadata: data})
 
-      refute String.starts_with?(result, "javascript"), "non http url schemes should be stripped from external_url"
+      assert result == nil, "non http url schemes should be stripped from external_url and treated as missing"
+    end
+
+    test "Returns valid uri scheme" do
+      json = """
+        {
+          "name": "CELO NFT test",
+          "image": "https://0-a.nl/nft/nft.jpg",
+          "description": "CELO NFT test",
+          "external_url": "https://happyland.nft"
+        }
+      """
+
+      data = Jason.decode!(json)
+
+      result = OverviewView.external_url(%{metadata: data})
+
+      assert String.starts_with?(result, "http"), "Valid url should be returned"
     end
   end
 end
