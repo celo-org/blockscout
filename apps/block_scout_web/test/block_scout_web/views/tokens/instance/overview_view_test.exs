@@ -119,4 +119,23 @@ defmodule BlockScoutWeb.Tokens.Instance.OverviewViewTest do
                "https://assets.cargo.build/611a883b0d039100261bfe79/b89cf189-13e9-47ed-b801-a1f6aa15a7bf/a0784ea0-45be-41cd-9cdd-cc40ad20f20d-zombiepngpng.png"
     end
   end
+
+  describe "external_url/1" do
+    test "does not return invalid url scheme" do
+      json = """
+        {
+          "name": "CELO XSS",
+          "image": "https://0-a.nl/nft/nft.jpg",
+          "description": "CELO XSS",
+          "external_url": "javascript:eval(atob('YWxlcnQoZG9jdW1lbnQuZG9tYW'))"
+        }
+      """
+
+      data = Jason.decode!(json)
+
+      result = OverviewView.external_url(%{metadata: data})
+
+      refute String.starts_with?(result, "javascript"), "non http url schemes should be stripped from external_url"
+    end
+  end
 end
