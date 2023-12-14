@@ -37,7 +37,7 @@ on:
 
 jobs:
   set-config:
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'org', 'helm']
     outputs:
       change-cause: ${{ steps.set-config.outputs.change-cause }}
       cluster: ${{ steps.set-config.outputs.cluster }}
