@@ -93,7 +93,6 @@ jobs:
           fi
 
   helmfile-run:
-    runs-on: [ 'self-hosted', 'org', '8-cpu' ]
     uses: ./.github/workflows/helm_deploy_call.yml
     needs: set-config
     name: "helmfile ${{ github.event.inputs.action }}"
