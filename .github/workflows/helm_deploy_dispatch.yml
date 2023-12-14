@@ -37,7 +37,7 @@ on:
 
 jobs:
   set-config:
-    runs-on: ubuntu-latest
+    runs-on: ['self-hosted', 'org', '8-cpu']
     outputs:
       change-cause: ${{ steps.set-config.outputs.change-cause }}
       cluster: ${{ steps.set-config.outputs.cluster }}
@@ -93,6 +93,7 @@ jobs:
           fi
 
   helmfile-run:
+    runs-on: [ 'self-hosted', 'org', '8-cpu' ]
     uses: ./.github/workflows/helm_deploy_call.yml
     needs: set-config
     name: "helmfile ${{ github.event.inputs.action }}"

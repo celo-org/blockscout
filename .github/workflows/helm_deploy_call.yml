@@ -42,7 +42,7 @@ env:
 jobs:
   helmfile:
     name: Auth, Setup + Run helmfile ${{ inputs.action }}
-    runs-on: ubuntu-latest
+    runs-on: ['self-hosted', 'org', '8-cpu']
     permissions:
       id-token: write
       contents: read
