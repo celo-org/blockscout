@@ -1,14 +1,5 @@
 import $ from 'jquery'
 
-$('.stats-link').on('click', function () {
-  if ($(this).hasClass('stats-link-no-selection')) {
-    return
-  }
-
-  $('ul#topnav .selected').removeClass('selected')
-  $(this).addClass('selected')
-})
-
 $(window).on('load resize', function () {
   const width = $(window).width()
   if (width < 768) {

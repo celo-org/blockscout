@@ -1,0 +1,22 @@
+<nav class="menu-wrap container" data-selector="stats-nabvar">
+  <ul class="topnav" id="topnav">
+    <li class="stats-link<%= if @active == "overview" do %> selected <% end %>">
+      <%= link gettext("Overview"), to: stats_overview_path(@conn, :overview) %>
+    </li>
+    <li class="stats-link<%= if @active == "addresses" do %> selected <% end %>">
+      <%= link gettext("Addresses"), to: stats_addresses_path(@conn, :addresses) %>
+    </li>
+    <li class="stats-link<%= if @active == "mento" do %> selected <% end %>">
+      <%= link gettext("Mento"), to: stats_mento_path(@conn, :mento) %>
+    </li>
+    <li class="stats-link<%= if @active == "mento-reserve" do %> selected <% end %>">
+      <%= link gettext("Mento Reserve"), to: stats_mento_reserve_path(@conn, :mento_reserve) %>
+    </li>
+    <li class="stats-link<%= if @active == "transactions" do %> selected <% end %>">
+      <%= link gettext("Transactions"), to: stats_transactions_path(@conn, :transactions) %>
+    </li>
+    <li class="stats-link<%= if @active == "epoch" do %> selected <% end %>">
+      <%= link gettext("Epoch Rewards"), to: stats_epoch_rewards_path(@conn, :epochs) %>
+    </li>
+  </ul>
+</nav>

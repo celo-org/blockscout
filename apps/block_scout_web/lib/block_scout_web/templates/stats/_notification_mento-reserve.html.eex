@@ -1,0 +1,5 @@
+<h2 class="card-title">
+    <%= gettext "Looking for Mento reserve stats?" %>
+</h2>
+<%= gettext "You can find them at" %>
+<a target='_blank' href='https://reserve.mento.org/'><%= gettext "reserve.mento.org" %></a>.
