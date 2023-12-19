@@ -525,7 +525,6 @@ defmodule BlockScoutWeb.WebRouter do
 
     get("/token-counters", Tokens.TokenController, :token_counters)
 
-
     scope "/stats" do
       get("/", StatsController, :index, as: :stats_index)
       get("/overview", StatsController, :overview, as: :stats_overview)
