@@ -3,7 +3,7 @@ import Config
 # Configures the database
 config :explorer, Explorer.Repo.Local,
   prepare: :unnamed,
-  timeout: :timer.seconds(60),
+  timeout: :timer.minutes(3),
   migration_lock: nil,
   telemetry_prefix: [:explorer, :repo]
 
