@@ -35,32 +35,16 @@ defmodule Explorer.Repo.RepoHelper do
 
         chunk_size = Keyword.get(opts, :chunk_size, @chunk_size)
 
-        chunks = ceil(length(elements) / chunk_size)
-        if chunks > 1 do
-          Logger.info("!!!! safe_insert_all #{kind |> to_string()} chunks #{chunks}")
-        end
-
-        global_insert_start = System.monotonic_time()
-
         elements
         |> Enum.chunk_every(chunk_size)
         |> Enum.reduce({0, []}, fn chunk, {total_count, acc} ->
-          local_insert_start = System.monotonic_time()
-
           {count, inserted} =
             try do
-              result = __MODULE__.insert_all(kind, chunk, opts)
-              if chunks > 1  do
-                local_insert_end = System.monotonic_time()
-                Logger.info("!!!! inserted #{kind |> to_string()} in #{local_insert_end - local_insert_start} (global #{local_insert_end - global_insert_start})")
-              end
-              result
+              __MODULE__.insert_all(kind, chunk, opts)
             rescue
               exception ->
                 old_truncate = Application.get_env(:logger, :truncate)
                 Logger.configure(truncate: :infinity)
-                failed = System.monotonic_time()
-                Logger.info("!!!! failed #{kind |> to_string()} in #{failed - local_insert_start} (global #{failed - global_insert_start})")
 
                 Logger.error(fn ->
                   [
