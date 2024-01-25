@@ -1,0 +1,18 @@
+<% stats_enabled = Application.get_env(:block_scout_web, :stats_enabled) %>
+<% stats_report_url = Application.get_env(:block_scout_web, :stats_report_url) %>
+<%= render BlockScoutWeb.StatsView, "_tabs.html", active: assigns[:active], conn: @conn %>
+
+<section class="container" data-page="stats-list" id="stats-container">
+  <section class="fs-14" data-page="stats-details">
+    <div class="row">
+      <div class="col-md-12">
+        <%= if stats_enabled do %>
+        <div class="google-data-studio">
+          <iframe width=100%  src="<%= get_url(stats_report_url, assigns[:active]) %>" name="myiframe" id="myiframe" frameborder="0" style="border:0;height:100vh;width:100%;" allowfullscreen></iframe>
+        </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+  <script defer data-cfasync="false" src="<%= static_path(@conn, "/js/stats.js") %>"></script>
+</section>

@@ -59,6 +59,5 @@ config :block_scout_web,
   other_networks: [
     %{title: "Celo Mainnet", url: "https://explorer.celo.org/mainnet", test_net?: false},
     %{title: "Celo Alfajores", url: "https://explorer.celo.org/alfajores", test_net?: true},
-    %{title: "Celo Baklava", url: "https://explorer.celo.org/baklava", test_net?: true},
-    %{title: "Celo Cannoli", url: "https://explorer.celo.org/cannoli", test_net?: true}
+    %{title: "Celo Baklava", url: "https://explorer.celo.org/baklava", test_net?: true}
   ]

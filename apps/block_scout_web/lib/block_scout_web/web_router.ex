@@ -525,7 +525,15 @@ defmodule BlockScoutWeb.WebRouter do
 
     get("/token-counters", Tokens.TokenController, :token_counters)
 
-    get("/stats", StatsController, :index)
+    scope "/stats" do
+      get("/", StatsController, :index, as: :stats_index)
+      get("/overview", StatsController, :overview, as: :stats_overview)
+      get("/addresses", StatsController, :addresses, as: :stats_addresses)
+      get("/mento", StatsController, :mento, as: :stats_mento)
+      get("/mento-reserve", StatsController, :mento_reserve, as: :stats_mento_reserve)
+      get("/transactions", StatsController, :transactions, as: :stats_transactions)
+      get("/epoch-rewards", StatsController, :epochs, as: :stats_epoch_rewards)
+    end
 
     get("/visualize/sol2uml", VisualizeSol2umlController, :index)
 
