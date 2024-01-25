@@ -25,7 +25,7 @@ env:
 jobs:
   build-and-cache:
     name: Build and Cache deps
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'org', 'blockscout']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
@@ -94,7 +94,7 @@ jobs:
 
   credo:
     name: Credo
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'org', 'blockscout']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
@@ -121,7 +121,7 @@ jobs:
 
   check_formatted:
     name: Code formatting checks
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'org', 'blockscout']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
@@ -147,7 +147,7 @@ jobs:
       - run: mix format --check-formatted
   dialyzer:
     name: Dialyzer static analysis
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'org', 'blockscout']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
@@ -190,7 +190,7 @@ jobs:
 
   gettext:
     name: Missing translation keys check
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'org', 'blockscout']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
@@ -219,7 +219,7 @@ jobs:
         working-directory: "apps/block_scout_web"
   sobelow:
     name: Sobelow security analysis
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'org', 'blockscout']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
@@ -250,7 +250,7 @@ jobs:
         working-directory: "apps/block_scout_web"
   eslint:
     name: ESLint
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'org', 'blockscout']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
@@ -307,7 +307,7 @@ jobs:
 
   jest:
     name: JS Tests
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'org', 'blockscout']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
@@ -355,7 +355,7 @@ jobs:
 
   test_nethermind_mox_ethereum_jsonrpc:
     name: EthereumJSONRPC Tests
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'org', 'blockscout']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
@@ -423,7 +423,7 @@ jobs:
           path: _build/test/junit/ethereum_jsonrpc/*.xml
   test_nethermind_mox_explorer:
     name: Explorer Tests
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'org', 'blockscout']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
@@ -512,7 +512,7 @@ jobs:
           path: _build/test/junit/explorer/*.xml
   test_nethermind_mox_indexer:
     name: Indexer Tests
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'org', 'blockscout']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
@@ -585,7 +585,7 @@ jobs:
 
   test_nethermind_mox_block_scout_web:
     name: Blockscout Web Tests
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'org', 'blockscout']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
@@ -702,7 +702,7 @@ jobs:
 
   publish-test-results:
     name: "Publish Unit Tests Results"
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'org', 'blockscout']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
     needs:
@@ -724,7 +724,7 @@ jobs:
           files: artifacts/**/*.xml
 
   set-docker-vars:
-    runs-on: ['self-hosted', 'org', '8-cpu']
+    runs-on: ['self-hosted', 'org', 'blockscout']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
     needs: [credo, check_formatted, dialyzer, gettext, sobelow, eslint, jest, test_nethermind_mox_ethereum_jsonrpc, test_nethermind_mox_explorer, test_nethermind_mox_indexer, test_nethermind_mox_block_scout_web]
