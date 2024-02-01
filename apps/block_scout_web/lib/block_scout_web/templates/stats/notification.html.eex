@@ -1,0 +1,16 @@
+<%= render BlockScoutWeb.StatsView, "_tabs.html", active: assigns[:active], conn: @conn %>
+
+<section class="container" data-page="stats-list" id="stats-container">
+  <section class="fs-14" data-page="stats-details">
+    <div class="row">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-body">
+            <%= render BlockScoutWeb.StatsView, "_notification_#{assigns[:active]}.html", active: assigns[:active] %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <script defer data-cfasync="false" src="<%= static_path(@conn, "/js/stats.js") %>"></script>
+</section>
