@@ -747,29 +747,28 @@ jobs:
 
 
   Build-Blockscout:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.0
     needs: [set-docker-vars]
     with:
       workload-id-provider: ${{  needs.set-docker-vars.outputs.workload-id-provider }}
       service-account: ${{ needs.set-docker-vars.outputs.service-account }}
       artifact-registry: "${{ needs.set-docker-vars.outputs.artifact-registry }}/blockscout"
-      tag: ${{ needs.set-docker-vars.outputs.tag }}
+      tags: ${{ needs.set-docker-vars.outputs.tag }}
       context: .
       file: docker/Dockerfile
       build-args: |
         "FORCE_MIX_COMPILE_CACHE_MISS=${{ needs.set-docker-vars.outputs.sha }}"
       trivy: true
-      trivy-timeout: 20m
 
 
   Build-Blockscout-api:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v1.8
+    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.0
     needs: [set-docker-vars]
     with:
       workload-id-provider: ${{  needs.set-docker-vars.outputs.workload-id-provider }}
       service-account: ${{ needs.set-docker-vars.outputs.service-account }}
       artifact-registry: "${{ needs.set-docker-vars.outputs.artifact-registry }}/blockscout-api"
-      tag: ${{ needs.set-docker-vars.outputs.tag }}
+      tags: ${{ needs.set-docker-vars.outputs.tag }}
       context: .
       file: docker/Dockerfile
       build-args: |
@@ -778,4 +777,3 @@ jobs:
         "DISABLE_INDEXER=true",
         "DISABLE_WEBAPP=true",
       trivy: true
-      trivy-timeout: 20m
