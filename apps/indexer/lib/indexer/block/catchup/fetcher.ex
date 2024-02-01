@@ -72,7 +72,7 @@ defmodule Indexer.Block.Catchup.Fetcher do
             |> Stream.map(&Enum.count/1)
             |> Enum.sum()
 
-          Logger.debug(fn -> "Missed blocks in ranges." end,
+          Logger.info(fn -> "Missed blocks in ranges." end,
             missing_block_range_count: range_count,
             missing_block_count: missing_block_count
           )
