@@ -25,7 +25,7 @@ env:
 jobs:
   build-and-cache:
     name: Build and Cache deps
-    runs-on: ['self-hosted', '8-cpu', 'blockscout']
+    runs-on: [ '8-cpu','self-hosted', 'blockscout']
     container:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
