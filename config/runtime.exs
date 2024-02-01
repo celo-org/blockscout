@@ -512,8 +512,8 @@ config :indexer, Indexer.Block.Realtime.Supervisor, enabled: System.get_env("DIS
 config :indexer, Indexer.Fetcher.TokenInstance.Supervisor,
   disabled?: System.get_env("DISABLE_TOKEN_INSTANCE_FETCHER", "false") == "true"
 
-blocks_catchup_fetcher_batch_size_default_str = "10"
-blocks_catchup_fetcher_concurrency_default_str = "10"
+blocks_catchup_fetcher_batch_size_default_str = "5"
+blocks_catchup_fetcher_concurrency_default_str = "5"
 
 {blocks_catchup_fetcher_batch_size, _} =
   Integer.parse(System.get_env("INDEXER_CATCHUP_BLOCKS_BATCH_SIZE", blocks_catchup_fetcher_batch_size_default_str))
