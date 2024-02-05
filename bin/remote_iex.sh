@@ -89,7 +89,7 @@ main() {
     echo "Got cookie"
 
     echo "Connecting to $pod_name in $namespace..."
-    exec kubectl exec -i -t -n "$namespace" "$pod_name" -c "blockscout-$pod" -- sh -c "iex --name dh3@0.0.0.0 --cookie $cookie --remsh blockscout@$blockscout_ip"
+    exec kubectl exec -i -t -n "$namespace" "$pod_name" -c "blockscout-$pod" -- sh -c "iex --name $USER@0.0.0.0 --cookie $cookie --remsh blockscout@$blockscout_ip"
 }
 
 main "$@"
