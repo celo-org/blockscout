@@ -14,7 +14,7 @@ defmodule Explorer.Chain.Import.Runner.ExchangeRate do
   @behaviour Import.Runner
 
   # milliseconds
-  @timeout 60_000
+  @timeout 30_000
 
   @type imported :: [ExchangeRate.t()]
 
