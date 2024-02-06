@@ -24,6 +24,7 @@ defmodule Explorer.Chain.Token do
 
   alias Ecto.Changeset
   alias Explorer.Chain.{Address, Hash, Token}
+  alias Explorer.Repo
   alias Explorer.SmartContract.Helper
 
   @typedoc """
@@ -139,5 +140,12 @@ defmodule Explorer.Chain.Token do
       select: token.contract_address_hash,
       where: token.cataloged == true and token.updated_at <= ^some_time_ago_date
     )
+  end
+
+  def set_uncatalogued_token(%{gas_currency_hash: nil}), do: :ok
+  def set_uncatalogued_token(%{gas_currency_hash: address}) do
+    %Token{}
+    |> changeset(%{contract_address_hash: address, type: "ERC-20"})
+    |> Repo.insert()
   end
 end

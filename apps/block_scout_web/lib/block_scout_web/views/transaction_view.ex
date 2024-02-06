@@ -1,6 +1,8 @@
 defmodule BlockScoutWeb.TransactionView do
   use BlockScoutWeb, :view
 
+  require Logger
+
   alias BlockScoutWeb.{AccessHelpers, AddressView, BlockView, TabHelpers}
   alias BlockScoutWeb.Account.AuthController
   alias BlockScoutWeb.Cldr.Number
@@ -8,6 +10,7 @@ defmodule BlockScoutWeb.TransactionView do
   alias Explorer.{Chain, CustomContractsHelpers, Repo}
   alias Explorer.Chain.Block.Reward
   alias Explorer.Chain.{Address, Block, InternalTransaction, Transaction, Wei}
+  alias Explorer.Chain.Token, as: ChainToken
   alias Explorer.Counters.AverageBlockTime
   alias Explorer.ExchangeRates.Token
   alias Timex.Duration
@@ -498,12 +501,16 @@ defmodule BlockScoutWeb.TransactionView do
      format_wei_value(Wei.from(fee, :wei), denomination, include_unit_label: include_label?, currency: currency)}
   end
 
-  def get_fee_token_name(transaction) do
+  def get_fee_token_name(transaction = %{gas_currency_hash: gch}) do
     token = Transaction.get_fee_token_name(transaction)
 
     case token do
       {:ok, address} -> address
-      {:error, :not_found} -> %{name: "", symbol: "#{gettext("CELO")}"}
+      {:error, :not_found} ->
+        Logger.info("Found unknown gas token at #{inspect(gch)}")
+        ChainToken.set_uncatalogued_token(transaction)
+
+        %{name: "", symbol: "#{gettext("CELO")}"}
     end
   end
 
