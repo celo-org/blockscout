@@ -342,7 +342,9 @@ defmodule Indexer.Block.Realtime.Fetcher do
         end
 
       {:error, {:import = step, reason}} ->
-        Logger.error(fn -> " Error #{inspect(block_number_to_fetch)} #{inspect(step)} - #{inspect(reason)}" end, step: step)
+        Logger.error(fn -> " Error #{inspect(block_number_to_fetch)} #{inspect(step)} - #{inspect(reason)}" end,
+          step: step
+        )
 
       {:error, {step, reason}} ->
         Logger.error(
