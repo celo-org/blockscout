@@ -381,7 +381,9 @@ defmodule Indexer.Block.Fetcher do
   defp update_block_cache(_), do: :ok
 
   defp update_transactions_cache(transactions) do
-    Transactions.update(transactions)
+    # Celo - Indexer and Web are not using the same cache instance, no need to update here
+    # Transactions.update(transactions)
+    :ok
   end
 
   defp update_addresses_cache(addresses), do: Accounts.drop(addresses)
