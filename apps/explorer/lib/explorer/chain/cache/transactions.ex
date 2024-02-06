@@ -17,6 +17,7 @@ defmodule Explorer.Chain.Cache.Transactions do
       token_transfers: :from_address,
       token_transfers: :to_address
     ],
+    acquire_lock_timeout: :timer.seconds(30),
     ttl_check_interval: Application.get_env(:explorer, __MODULE__)[:ttl_check_interval],
     global_ttl: Application.get_env(:explorer, __MODULE__)[:global_ttl]
 
