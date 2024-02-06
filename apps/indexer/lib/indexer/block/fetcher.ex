@@ -17,7 +17,7 @@ defmodule Indexer.Block.Fetcher do
   alias Explorer.Chain.{Address, Block, Hash, Import, Transaction, Wei}
   alias Explorer.Chain.Block.Reward
   alias Explorer.Chain.Cache.Blocks, as: BlocksCache
-  alias Explorer.Chain.Cache.{Accounts, BlockNumber, Transactions, Uncles}
+  alias Explorer.Chain.Cache.{Accounts, BlockNumber, Uncles}
   alias Indexer.Block.Fetcher.Receipts
 
   alias Explorer.Celo.Util
@@ -380,7 +380,7 @@ defmodule Indexer.Block.Fetcher do
 
   defp update_block_cache(_), do: :ok
 
-  defp update_transactions_cache(transactions) do
+  defp update_transactions_cache(_transactions) do
     # Celo - Indexer and Web are not using the same cache instance, no need to update here
     # Transactions.update(transactions)
     :ok
