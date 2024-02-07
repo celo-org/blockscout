@@ -501,7 +501,7 @@ defmodule BlockScoutWeb.TransactionView do
      format_wei_value(Wei.from(fee, :wei), denomination, include_unit_label: include_label?, currency: currency)}
   end
 
-  def get_fee_token_name(transaction = %{gas_currency_hash: gch}) do
+  def get_fee_token_name(%{gas_currency_hash: gch} = transaction) do
     token = Transaction.get_fee_token_name(transaction)
 
     case token do
