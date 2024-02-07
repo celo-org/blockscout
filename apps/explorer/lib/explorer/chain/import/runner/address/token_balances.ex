@@ -86,7 +86,7 @@ defmodule Explorer.Chain.Import.Runner.Address.TokenBalances do
       end)
       |> Enum.sort_by(&{&1.token_contract_address_hash, &1.token_id, &1.address_hash, &1.block_number})
 
-    {:ok, _inserted_changes_list} =
+    {:ok, inserted_changes_list} =
       if Enum.count(ordered_changes_list) > 0 do
         Import.insert_changes_list(
           repo,
@@ -95,7 +95,7 @@ defmodule Explorer.Chain.Import.Runner.Address.TokenBalances do
             {:unsafe_fragment, ~s<(address_hash, token_contract_address_hash, COALESCE(token_id, -1), block_number)>},
           on_conflict: on_conflict,
           for: TokenBalance,
-          returning: false,
+          returning: true,
           timeout: timeout,
           timestamps: timestamps
         )
@@ -103,7 +103,7 @@ defmodule Explorer.Chain.Import.Runner.Address.TokenBalances do
         {:ok, []}
       end
 
-    {:ok, []}
+    {:ok, inserted_changes_list}
   end
 
   defp default_on_conflict do
