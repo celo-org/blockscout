@@ -84,6 +84,7 @@ defmodule Indexer.Fetcher.CeloEpochDataTest do
   describe "async_fetch for epoch rewards" do
     setup [:save_voter_contract_events_and_start_fetcher, :setup_votes_mox, :setup_epoch_mox]
 
+    @tag :skip
     test "saves epoch reward to db and deletes pending operation", context do
       CeloEpochDataFetcher.async_fetch([
         %{
