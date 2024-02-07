@@ -143,6 +143,7 @@ defmodule Explorer.Chain.Token do
   end
 
   def set_uncatalogued_token(%{gas_currency_hash: nil}), do: :ok
+
   def set_uncatalogued_token(%{gas_currency_hash: address}) do
     %Token{}
     |> changeset(%{contract_address_hash: address, type: "ERC-20"})

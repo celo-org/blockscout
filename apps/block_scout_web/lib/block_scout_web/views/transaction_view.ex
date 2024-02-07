@@ -505,7 +505,9 @@ defmodule BlockScoutWeb.TransactionView do
     token = Transaction.get_fee_token_name(transaction)
 
     case token do
-      {:ok, address} -> address
+      {:ok, address} ->
+        address
+
       {:error, :not_found} ->
         Logger.info("Found unknown gas token at #{inspect(gch)}")
         ChainToken.set_uncatalogued_token(transaction)
