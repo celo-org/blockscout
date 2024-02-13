@@ -750,6 +750,10 @@ jobs:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
     needs: [set-docker-vars]
+    permissions:
+      contents: read
+      id-token: write
+      security-events: write
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v4
@@ -779,6 +783,10 @@ jobs:
       image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
       options: --user root
     needs: [set-docker-vars]
+    permissions:
+      contents: read
+      id-token: write
+      security-events: write
     steps:
       - name: 'Checkout'
         uses: actions/checkout@v4
