@@ -25,7 +25,10 @@ env:
 jobs:
   build-and-cache:
     name: Build and Cache deps
-    runs-on: [ '8-cpu','self-hosted', 'blockscout']
+    runs-on: [ '8-cpu', 'self-hosted', 'blockscout']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     steps:
       - uses: actions/checkout@v3
       - uses: erlef/setup-beam@v1
@@ -92,6 +95,9 @@ jobs:
   credo:
     name: Credo
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -116,6 +122,9 @@ jobs:
   check_formatted:
     name: Code formatting checks
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -139,6 +148,9 @@ jobs:
   dialyzer:
     name: Dialyzer static analysis
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -179,6 +191,9 @@ jobs:
   gettext:
     name: Missing translation keys check
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -205,6 +220,9 @@ jobs:
   sobelow:
     name: Sobelow security analysis
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -233,6 +251,9 @@ jobs:
   eslint:
     name: ESLint
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -287,6 +308,9 @@ jobs:
   jest:
     name: JS Tests
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -332,6 +356,9 @@ jobs:
   test_nethermind_mox_ethereum_jsonrpc:
     name: EthereumJSONRPC Tests
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     services:
       postgres:
@@ -397,6 +424,9 @@ jobs:
   test_nethermind_mox_explorer:
     name: Explorer Tests
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     services:
       postgres:
@@ -483,6 +513,9 @@ jobs:
   test_nethermind_mox_indexer:
     name: Indexer Tests
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     services:
       postgres:
@@ -553,6 +586,9 @@ jobs:
   test_nethermind_mox_block_scout_web:
     name: Blockscout Web Tests
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: build-and-cache
     env:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/explorer_test
@@ -663,7 +699,6 @@ jobs:
           name: Wallaby screenshots
           path: apps/block_scout_web/screenshots/*.png
 
-
   publish-test-results:
     name: "Publish Unit Tests Results"
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
@@ -711,6 +746,9 @@ jobs:
 
   build-blockscout-container:
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: [set-docker-vars]
     steps:
       - name: 'Checkout'
@@ -737,6 +775,9 @@ jobs:
 
   build-blockscout-api-container:
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
+    container:
+      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
+      options: --user root
     needs: [set-docker-vars]
     steps:
       - name: 'Checkout'
