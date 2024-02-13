@@ -26,9 +26,6 @@ jobs:
   build-and-cache:
     name: Build and Cache deps
     runs-on: [ '8-cpu','self-hosted', 'blockscout']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
-      options: --user root
     steps:
       - uses: actions/checkout@v3
       - uses: erlef/setup-beam@v1
@@ -95,9 +92,6 @@ jobs:
   credo:
     name: Credo
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
-      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -122,9 +116,6 @@ jobs:
   check_formatted:
     name: Code formatting checks
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
-      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -148,9 +139,6 @@ jobs:
   dialyzer:
     name: Dialyzer static analysis
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
-      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -191,9 +179,6 @@ jobs:
   gettext:
     name: Missing translation keys check
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
-      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -220,9 +205,6 @@ jobs:
   sobelow:
     name: Sobelow security analysis
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
-      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -251,9 +233,6 @@ jobs:
   eslint:
     name: ESLint
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
-      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -308,9 +287,6 @@ jobs:
   jest:
     name: JS Tests
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
-      options: --user root
     needs: build-and-cache
     steps:
       - uses: actions/checkout@v3
@@ -356,9 +332,6 @@ jobs:
   test_nethermind_mox_ethereum_jsonrpc:
     name: EthereumJSONRPC Tests
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
-      options: --user root
     needs: build-and-cache
     services:
       postgres:
@@ -424,9 +397,6 @@ jobs:
   test_nethermind_mox_explorer:
     name: Explorer Tests
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
-      options: --user root
     needs: build-and-cache
     services:
       postgres:
@@ -513,9 +483,6 @@ jobs:
   test_nethermind_mox_indexer:
     name: Indexer Tests
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
-      options: --user root
     needs: build-and-cache
     services:
       postgres:
@@ -586,9 +553,6 @@ jobs:
   test_nethermind_mox_block_scout_web:
     name: Blockscout Web Tests
     runs-on: ['self-hosted', '8-cpu', 'blockscout']
-    container:
-      image: us-west1-docker.pkg.dev/devopsre/actions-runner-controller/blockscout:latest
-      options: --user root
     needs: build-and-cache
     env:
       DATABASE_URL: postgres://postgres:postgres@postgres:5432/explorer_test
@@ -745,35 +709,57 @@ jobs:
           echo "tag=${{ github.ref != 'ref/heads/main' && 'testing' || 'latest' }}" >> $GITHUB_OUTPUT
           echo "sha=${{ github.ref != 'ref/heads/main' && github.event.pull_request.head.sha || github.sha }}" >> $GITHUB_OUTPUT
 
-
-  Build-Blockscout:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.0
+  build-blockscout-container:
+    runs-on: ['self-hosted', '8-cpu', 'blockscout']
     needs: [set-docker-vars]
-    with:
-      workload-id-provider: ${{  needs.set-docker-vars.outputs.workload-id-provider }}
-      service-account: ${{ needs.set-docker-vars.outputs.service-account }}
-      artifact-registry: "${{ needs.set-docker-vars.outputs.artifact-registry }}/blockscout"
-      tags: ${{ needs.set-docker-vars.outputs.tag }}
-      context: .
-      file: docker/Dockerfile
-      build-args: |
-        "FORCE_MIX_COMPILE_CACHE_MISS=${{ needs.set-docker-vars.outputs.sha }}"
-      trivy: true
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v4
+      - name: Authenticate to Google Cloud
+        uses: celo-org/reusable-workflows/.github/actions/auth-gcp-artifact-registry@v2.0.1
+        with:
+          workload-id-provider: ${{ needs.set-docker-vars.outputs.workload-id-provider }}
+          service-account: ${{ needs.set-docker-vars.outputs.service-account }}
+          access-token-lifetime: "20m"
+          docker-gcp-registries: "us-west1-docker.pkg.dev"
+      - name: Build, push and scan the container
+        uses: celo-org/reusable-workflows/.github/actions/build-container@main
+        with:
+          platforms: linux/amd64
+          registry: "${{ needs.set-docker-vars.outputs.artifact-registry }}/blockscout"
+          tags: ${{ needs.set-docker-vars.outputs.tag }}
+          context: .
+          dockerfile: docker/Dockerfile
+          build-args: |
+            "FORCE_MIX_COMPILE_CACHE_MISS=${{ needs.set-docker-vars.outputs.sha }}"
+          push: true
+          trivy: true
 
-
-  Build-Blockscout-api:
-    uses: celo-org/reusable-workflows/.github/workflows/container-cicd.yaml@v2.0
+  build-blockscout-api-container:
+    runs-on: ['self-hosted', '8-cpu', 'blockscout']
     needs: [set-docker-vars]
-    with:
-      workload-id-provider: ${{  needs.set-docker-vars.outputs.workload-id-provider }}
-      service-account: ${{ needs.set-docker-vars.outputs.service-account }}
-      artifact-registry: "${{ needs.set-docker-vars.outputs.artifact-registry }}/blockscout-api"
-      tags: ${{ needs.set-docker-vars.outputs.tag }}
-      context: .
-      file: docker/Dockerfile
-      build-args: |
-        "FORCE_MIX_COMPILE_CACHE_MISS=${{ needs.set-docker-vars.outputs.sha }}"
-        "DISABLE_WRITE_API=true",
-        "DISABLE_INDEXER=true",
-        "DISABLE_WEBAPP=true",
-      trivy: true
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@v4
+      - name: Authenticate to Google Cloud
+        uses: celo-org/reusable-workflows/.github/actions/auth-gcp-artifact-registry@v2.0.1
+        with:
+          workload-id-provider: ${{ needs.set-docker-vars.outputs.workload-id-provider }}
+          service-account: ${{ needs.set-docker-vars.outputs.service-account }}
+          access-token-lifetime: "20m"
+          docker-gcp-registries: "us-west1-docker.pkg.dev"
+      - name: Build, push and scan the container
+        uses: celo-org/reusable-workflows/.github/actions/build-container@main
+        with:
+          platforms: linux/amd64
+          registry: "${{ needs.set-docker-vars.outputs.artifact-registry }}/blockscout"
+          tags: ${{ needs.set-docker-vars.outputs.tag }}
+          context: .
+          dockerfile: docker/Dockerfile
+          build-args: |
+            "FORCE_MIX_COMPILE_CACHE_MISS=${{ needs.set-docker-vars.outputs.sha }}"
+            "DISABLE_WRITE_API=true",
+            "DISABLE_INDEXER=true",
+            "DISABLE_WEBAPP=true",
+          push: true
+          trivy: true
