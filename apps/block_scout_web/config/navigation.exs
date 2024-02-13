@@ -16,11 +16,11 @@ config :block_scout_web,
   wallet_list: [
     %{title: "Valora", url: "https://valoraapp.com/"},
     %{title: "Celo Terminal", url: "https://celoterminal.com/"},
-    %{title: "Celo Wallet", url: "https://celowallet.app/"},
+    %{title: "Celo Wallet", url: "https://celowallet.app/"}
   ],
   nft_list: [
     %{title: "NFT Viewer", url: "https://nfts.valoraapp.com/"},
-    %{title: "Nomspace", url: "https://nom.space/"},
+    %{title: "Nomspace", url: "https://nom.space/"}
   ],
   connect_list: [
     %{title: "impactMarket", url: "https://impactmarket.com/"},
