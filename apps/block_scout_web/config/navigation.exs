@@ -33,8 +33,7 @@ config :block_scout_web,
     %{title: "ChiSpend", url: "https://chispend.com/"}
   ],
   finance_tools_list: [
-    %{title: "Celo Tracker", url: "https://celotracker.com/"},
-    %{title: "Trelis", url: "https://trelis.com/"}
+    %{title: "Celo Tracker", url: "https://celotracker.com/"}
   ],
   resources: [
     %{title: "Celo Vote", url: "https://celovote.com/"},
