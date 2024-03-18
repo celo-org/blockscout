@@ -218,6 +218,10 @@ defmodule BlockScoutWeb.LayoutView do
     list(:finance_tools_list)
   end
 
+  def derivates_platforms_list do
+    list(:derivates_platforms_list)
+  end
+
   def resources_list do
     list(:resources)
   end

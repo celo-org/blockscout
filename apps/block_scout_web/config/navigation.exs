@@ -35,6 +35,9 @@ config :block_scout_web,
   finance_tools_list: [
     %{title: "Celo Tracker", url: "https://celotracker.com/"}
   ],
+  derivates_platforms_list: [
+    %{title: "ImmortalX", url: "https://www.immortalx.io/"}
+  ],
   resources: [
     %{title: "Celo Vote", url: "https://celovote.com/"},
     %{title: "Celo Forum", url: "https://forum.celo.org/"},

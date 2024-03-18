@@ -204,6 +204,12 @@
                     <% end %>
                   </div>
                   <div class="col-xs-12 col-md-3 col-lg-3">
+                    <h3 class="apps-menu-header pl-2"><b><%= gettext("Derivates Platforms") %></b></h3>
+                    <%= for %{url: url, title: title} <- derivates_platforms_list() do %>
+                    <a href="<%= url%>" class="dropdown-item" target="_blank" data-selector="app-url"><%= title %></a>
+                    <% end %>
+                  </div>
+                  <div class="col-xs-12 col-md-3 col-lg-3">
                     <%= if Application.get_env(:block_scout_web, :gas_tracker)[:enabled_in_menu] == true do %>
                     <a class="dropdown-item" href="/gas-tracker-consumers-3hrs">
                       <%= gettext("Gas Tracker") %>
