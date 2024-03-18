@@ -3519,7 +3519,7 @@ msgstr ""
 msgid "Finance Tools"
 msgstr ""
 
-#: lib/block_scout_web/templates/layout/_topnav.html.eex:209
+#: lib/block_scout_web/templates/layout/_topnav.html.eex:215
 #, elixir-autogen, elixir-format, fuzzy
 msgid "Gas Tracker"
 msgstr ""
@@ -3929,4 +3929,9 @@ msgstr ""
 #: lib/block_scout_web/templates/stats/_notification_mento.html.eex:5
 #, elixir-autogen, elixir-format
 msgid "dune.com/mento-labs-eng"
+msgstr ""
+
+#: lib/block_scout_web/templates/layout/_topnav.html.eex:207
+#, elixir-autogen, elixir-format
+msgid "Derivates Platforms"
 msgstr ""
