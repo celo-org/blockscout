@@ -8,7 +8,7 @@ defmodule Explorer.Etherscan do
   alias Explorer.Etherscan.Logs
   alias Explorer.{Chain, Repo}
   alias Explorer.Chain.Address.{CurrentTokenBalance, TokenBalance}
-  alias Explorer.Chain.{Address, Block, CeloParams, Hash, InternalTransaction, Log, Token, TokenTransfer, Transaction}
+  alias Explorer.Chain.{Address, Block, Hash, InternalTransaction, Log, Token, TokenTransfer, Transaction}
   alias Explorer.Chain.Transaction.History.TransactionStats
 
   @default_options %{
