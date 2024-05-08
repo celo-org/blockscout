@@ -79,13 +79,10 @@ defmodule Explorer.Celo.Util do
     Map.values(@celo_token_contract_symbols)
   end
 
-  def contract_name_to_symbol(name, use_celo_instead_cgld?) do
+  def fee_currency_token_symbol(name) do
     case name do
-      n when n in [nil, "goldToken"] ->
-        if(use_celo_instead_cgld?, do: "CELO", else: "cGLD")
-
-      _ ->
-        @celo_token_contract_symbols[name]
+      n when n in [nil, "cGLD"] -> "CELO"
+      _ -> name
     end
   end
 end
