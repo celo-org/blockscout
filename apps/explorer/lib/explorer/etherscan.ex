@@ -8,7 +8,7 @@ defmodule Explorer.Etherscan do
   alias Explorer.Etherscan.Logs
   alias Explorer.{Chain, Repo}
   alias Explorer.Chain.Address.{CurrentTokenBalance, TokenBalance}
-  alias Explorer.Chain.{Address, Block, CeloParams, Hash, InternalTransaction, Log, TokenTransfer, Transaction}
+  alias Explorer.Chain.{Address, Block, CeloParams, Hash, InternalTransaction, Log, Token, TokenTransfer, Transaction}
   alias Explorer.Chain.Transaction.History.TransactionStats
 
   @default_options %{
@@ -490,8 +490,8 @@ defmodule Explorer.Etherscan do
         t in Transaction,
         join: a in ^addresses_wrapped_subquery,
         on: t.hash == a.hash,
-        left_join: p in CeloParams,
-        on: t.gas_currency_hash == p.address_value,
+        left_join: k in Token,
+        on: t.gas_currency_hash == k.contract_address_hash,
         inner_join: b in Block,
         on: b.number == t.block_number,
         order_by: [{^options.order_by_direction, t.block_number}],
@@ -499,7 +499,7 @@ defmodule Explorer.Etherscan do
         offset: ^offset(options),
         select:
           merge(map(t, ^@transaction_fields), %{
-            fee_currency: p.name,
+            fee_currency: k.symbol,
             block_timestamp: b.timestamp,
             confirmations: fragment("? - ?", ^max_block_number, t.block_number)
           })
