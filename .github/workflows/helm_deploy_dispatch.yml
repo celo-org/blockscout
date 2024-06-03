@@ -26,10 +26,10 @@ on:
           - diff
           - apply
       use-branch-commit:
-        description: 'Select to use the commit of the branch as the container image tag'
+        description: 'Deploy branch HEAD? (instead of values.yaml sha)'
         required: true
         type: boolean
-        default: false
+        default: true
       change-cause:
         description: 'The change cause to use for the deployment'
         required: false
