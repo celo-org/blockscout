@@ -3,8 +3,7 @@ import Config
 config :block_scout_web,
   defi: [
     %{title: "Moola", url: "https://moola.market/"},
-    %{title: "Revo", url: "https://revo.market/"},
-    %{title: "ImmortalDao Finance", url: "https://www.immortaldao.finance"}
+    %{title: "Revo", url: "https://revo.market/"}
   ],
   swap: [
     %{title: "Ubeswap", url: "https://ubeswap.org/"},
@@ -34,6 +33,9 @@ config :block_scout_web,
   ],
   finance_tools_list: [
     %{title: "Celo Tracker", url: "https://celotracker.com/"}
+  ],
+  derivates_platforms_list: [
+    %{title: "ImmortalX", url: "https://www.immortalx.io/"}
   ],
   resources: [
     %{title: "Celo Vote", url: "https://celovote.com/"},

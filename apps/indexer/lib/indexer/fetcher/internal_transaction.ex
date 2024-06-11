@@ -89,24 +89,7 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
     json_rpc_named_arguments
     |> Keyword.fetch!(:variant)
-    |> case do
-      EthereumJSONRPC.Nethermind ->
-        EthereumJSONRPC.fetch_block_internal_transactions(filtered_unique_numbers, json_rpc_named_arguments)
-
-      EthereumJSONRPC.Erigon ->
-        EthereumJSONRPC.fetch_block_internal_transactions(filtered_unique_numbers, json_rpc_named_arguments)
-
-      EthereumJSONRPC.Besu ->
-        EthereumJSONRPC.fetch_block_internal_transactions(filtered_unique_numbers, json_rpc_named_arguments)
-
-      _jsonrpc_variant ->
-        try do
-          fetch_block_internal_transactions_by_transactions(filtered_unique_numbers, json_rpc_named_arguments)
-        rescue
-          error ->
-            {:error, error}
-        end
-    end
+    |> fetch_internal_transactions(filtered_unique_numbers, json_rpc_named_arguments)
     |> case do
       {:ok, internal_transactions_params} ->
         import_internal_transaction(internal_transactions_params, filtered_unique_numbers)
@@ -123,6 +106,33 @@ defmodule Indexer.Fetcher.InternalTransaction do
 
       :ignore ->
         :ok
+    end
+  end
+
+  defp fetch_internal_transactions(variant, block_numbers, json_rpc_named_arguments) do
+    if variant in block_traceable_variants() do
+      EthereumJSONRPC.fetch_block_internal_transactions(block_numbers, json_rpc_named_arguments)
+    else
+      try do
+        fetch_block_internal_transactions_by_transactions(block_numbers, json_rpc_named_arguments)
+      rescue
+        error ->
+          {:error, error, __STACKTRACE__}
+      end
+    end
+  end
+
+  @default_block_traceable_variants [
+    EthereumJSONRPC.Nethermind,
+    EthereumJSONRPC.Erigon,
+    EthereumJSONRPC.Besu,
+    EthereumJSONRPC.RSK
+  ]
+  defp block_traceable_variants do
+    if Application.get_env(:ethereum_jsonrpc, EthereumJSONRPC.Geth)[:block_traceable?] do
+      [EthereumJSONRPC.Geth | @default_block_traceable_variants]
+    else
+      @default_block_traceable_variants
     end
   end
 
@@ -232,7 +242,28 @@ defmodule Indexer.Fetcher.InternalTransaction do
   end
 
   defp import_internal_transaction(internal_transactions_params, unique_numbers) do
-    internal_transactions_params_without_failed_creations = remove_failed_creations(internal_transactions_params)
+    unique_hashes =
+      unique_numbers
+      |> Enum.map(fn block_number ->
+        case Chain.number_to_any_block(block_number) do
+          {:ok, block} -> block.hash
+          {:error, :not_found} -> nil
+        end
+      end)
+
+    block_number_to_hash_map =
+      unique_numbers
+      |> Enum.zip(unique_hashes)
+      |> Map.new()
+
+    # enrich internal TXs with block hashes
+    enriched_itx_params =
+      internal_transactions_params
+      |> Enum.map(fn itx ->
+        Map.put(itx, :block_hash, block_number_to_hash_map[itx.block_number])
+      end)
+
+    internal_transactions_params_without_failed_creations = remove_failed_creations(enriched_itx_params)
 
     addresses_params =
       Addresses.extract_addresses(%{
