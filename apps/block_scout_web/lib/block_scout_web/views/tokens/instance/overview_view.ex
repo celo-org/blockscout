@@ -104,6 +104,7 @@ defmodule BlockScoutWeb.Tokens.Instance.OverviewView do
 
   def external_url("http" <> _rest = external_url) do
     sanitised = external_url |> html_escape() |> safe_to_string()
+
     if sanitised != external_url do
       nil
     else
