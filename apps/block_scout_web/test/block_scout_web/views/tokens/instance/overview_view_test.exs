@@ -139,16 +139,9 @@ defmodule BlockScoutWeb.Tokens.Instance.OverviewViewTest do
     end
 
     test "does not return html escape" do
-      json = """
-        {
-          "name": "CELO XSS",
-          "image": "https://0-a.nl/nft/nft.jpg",
-          "description": "CELO XSS",
-          "external_url": "https\" id=x tabindex=1 onfocusin=eval(atob('KGZ1bmN0aW9uKCl7d2luZG93LmV0aG'))"
-        }
-      """
-
-      data = Jason.decode!(json)
+      data = %{
+        "external_url" => "https\" id=x tabindex=1 onfocusin=eval(atob('KGZ1bmN0aW9uKCl7d2luZG93LmV0aG'))"
+      }
 
       result = OverviewView.external_url(%{metadata: data})
 
@@ -170,6 +163,7 @@ defmodule BlockScoutWeb.Tokens.Instance.OverviewViewTest do
       result = OverviewView.external_url(%{metadata: data})
 
       assert String.starts_with?(result, "http"), "Valid url should be returned"
+      assert result == "https://happyland.nft"
     end
   end
 end
