@@ -300,7 +300,7 @@ jobs:
 
       - name: Upload Unit Test Results
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ESLint Test Results
           path: apps/block_scout_web/assets/test/eslint/*.xml
@@ -348,7 +348,7 @@ jobs:
 
       - name: Upload Unit Test Results
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: Jest JUnit Test Results
           path: apps/block_scout_web/assets/junit.xml
@@ -417,7 +417,7 @@ jobs:
           ETHEREUM_JSONRPC_WEB_SOCKET_CASE: "EthereumJSONRPC.WebSocket.Case.Mox"
       - name: Upload Unit Test Results
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: EthereumJSONRPC Test Results
           path: _build/test/junit/ethereum_jsonrpc/*.xml
@@ -506,7 +506,7 @@ jobs:
           ETHEREUM_JSONRPC_WEB_SOCKET_CASE: "EthereumJSONRPC.WebSocket.Case.Mox"
       - name: Upload Unit Test Results
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: Explorer Test Results
           path: _build/test/junit/explorer/*.xml
@@ -578,7 +578,7 @@ jobs:
           ETHEREUM_JSONRPC_WEB_SOCKET_CASE: "EthereumJSONRPC.WebSocket.Case.Mox"
       - name: Upload Unit Test Results
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: Indexer Test Results
           path: _build/test/junit/indexer/*.xml
@@ -687,14 +687,14 @@ jobs:
           API_V2_ENABLED: "true"
       - name: Upload Unit Test Results
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: Blockscout Web Test Results
           path: _build/test/junit/block_scout_web/*.xml
 
       - name: Upload Wallaby screenshots
         if: always()
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: Wallaby screenshots
           path: apps/block_scout_web/screenshots/*.png
