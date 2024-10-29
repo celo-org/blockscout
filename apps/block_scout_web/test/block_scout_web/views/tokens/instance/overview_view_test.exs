@@ -138,6 +138,23 @@ defmodule BlockScoutWeb.Tokens.Instance.OverviewViewTest do
       assert result == nil, "non http url schemes should be stripped from external_url and treated as missing"
     end
 
+    test "does not return html escape" do
+      json = """
+        {
+          "name": "CELO XSS",
+          "image": "https://0-a.nl/nft/nft.jpg",
+          "description": "CELO XSS",
+          "external_url": "https\" id=x tabindex=1 onfocusin=eval(atob('KGZ1bmN0aW9uKCl7d2luZG93LmV0aG'))"
+        }
+      """
+
+      data = Jason.decode!(json)
+
+      result = OverviewView.external_url(%{metadata: data})
+
+      assert result == nil, "non http url schemes should be stripped from external_url and treated as missing"
+    end
+
     test "Returns valid uri scheme" do
       json = """
         {
