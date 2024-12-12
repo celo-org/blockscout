@@ -34,6 +34,11 @@ on:
         description: 'The change cause to use for the deployment'
         required: false
         type: string
+env:
+  ACTION: "${{ github.event.inputs.action }}"
+  DEPLOYMENT: "${{ github.event.inputs.deployment }}"
+  CHANGE-CAUSE: "${{ github.event.inputs.change-cause }}"
+  USE-BRANCH-COMMIT: "${{ github.event.inputs.use-branch-commit }}"
 
 jobs:
   set-config:
@@ -47,12 +52,6 @@ jobs:
       service-account: ${{ steps.set-config.outputs.service-account }}
     steps:
       - id: set-config
-        env:
-          ACTION: "${{ github.event.inputs.action }}"
-          DEPLOYMENT: "${{ github.event.inputs.deployment }}"
-          CHANGE-CAUSE: "${{ github.event.inputs.change-cause }}"
-          USE-BRANCH-COMMIT: "${{ github.event.inputs.use-branch-commit }}"
-
         run: |
           # SERVICE_ACCOUNT_SUFFIX="-ro"
           SERVICE_ACCOUNT_SUFFIX=""
