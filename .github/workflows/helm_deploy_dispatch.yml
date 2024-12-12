@@ -34,6 +34,11 @@ on:
         description: 'The change cause to use for the deployment'
         required: false
         type: string
+env:
+  ACTION: "${{ github.event.inputs.action }}"
+  DEPLOYMENT: "${{ github.event.inputs.deployment }}"
+  CHANGE-CAUSE: "${{ github.event.inputs.change-cause }}"
+  USE-BRANCH-COMMIT: "${{ github.event.inputs.use-branch-commit }}"
 
 jobs:
   set-config:
@@ -51,42 +56,42 @@ jobs:
           # SERVICE_ACCOUNT_SUFFIX="-ro"
           SERVICE_ACCOUNT_SUFFIX=""
           [ "${{ github.ref_name }}" == master ] && SERVICE_ACCOUNT_SUFFIX=""
-          if [ "${{ github.event.inputs.action }}" == apply ] && [ "${{ github.event.inputs.deployment }}" != rc1staging ] && [ "${{ github.ref_name }}" != master ]; then
+          if [ "${{ env.ACTION }}" == apply ] && [ "${{ env.DEPLOYMENT }}" != rc1staging ] && [ "${{ github.ref_name }}" != master ]; then
             echo "ERROR: Only the master branch can be deployed to non-rc1staging environments"
             exit 1
           fi
-          if [ "${{ github.event.inputs.deployment }}" == "cannoli" ]; then
+          if [ "${{ env.DEPLOYMENT }}" == "cannoli" ]; then
             echo "cluster=cannoli" >> "$GITHUB_OUTPUT"
             echo "project=cannoli-380909" >> "$GITHUB_OUTPUT"
             echo "cluster-location=us-west1-a" >> "$GITHUB_OUTPUT"
             echo "service-account=deploy-helm-cannoli${SERVICE_ACCOUNT_SUFFIX}@cannoli-380909.iam.gserviceaccount.com" >> "$GITHUB_OUTPUT"
-          elif [ "${{ github.event.inputs.deployment }}" == "rc1staging" ]; then
+          elif [ "${{ env.DEPLOYMENT }}" == "rc1staging" ]; then
             echo "cluster=rc1staging" >> "$GITHUB_OUTPUT"
             echo "project=celo-testnet-production" >> "$GITHUB_OUTPUT"
             echo "cluster-location=us-west1-a" >> "$GITHUB_OUTPUT"
             echo "service-account=deploy-helm-celo-prod${SERVICE_ACCOUNT_SUFFIX}@celo-testnet-production.iam.gserviceaccount.com" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.inputs.deployment }}" =~ ^alfajores[2-3]$ ]]; then
+          elif [[ "${{ env.DEPLOYMENT }}" =~ ^alfajores[2-3]$ ]]; then
             echo "cluster=alfajores" >> "$GITHUB_OUTPUT"
             echo "project=celo-testnet-production" >> "$GITHUB_OUTPUT"
             echo "cluster-location=us-west1-a" >> "$GITHUB_OUTPUT"
             echo "service-account=deploy-helm-celo-prod${SERVICE_ACCOUNT_SUFFIX}@celo-testnet-production.iam.gserviceaccount.com" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.inputs.deployment }}" =~ ^baklava[2-3]$ ]]; then
+          elif [[ "${{ env.DEPLOYMENT }}" =~ ^baklava[2-3]$ ]]; then
             echo "cluster=baklavastaging" >> "$GITHUB_OUTPUT"
             echo "project=celo-testnet-production" >> "$GITHUB_OUTPUT"
             echo "cluster-location=us-west1-a" >> "$GITHUB_OUTPUT"
             echo "service-account=deploy-helm-celo-prod${SERVICE_ACCOUNT_SUFFIX}@celo-testnet-production.iam.gserviceaccount.com" >> "$GITHUB_OUTPUT"
-          elif [[ "${{ github.event.inputs.deployment }}" =~ ^rc1[1|3]$ ]]; then
+          elif [[ "${{ env.DEPLOYMENT }}" =~ ^rc1[1|3]$ ]]; then
             echo "cluster=mainnet" >> "$GITHUB_OUTPUT"
             echo "project=celo-testnet-production" >> "$GITHUB_OUTPUT"
             echo "cluster-location=us-west1-a" >> "$GITHUB_OUTPUT"
             echo "service-account=deploy-helm-celo-prod${SERVICE_ACCOUNT_SUFFIX}@celo-testnet-production.iam.gserviceaccount.com" >> "$GITHUB_OUTPUT"
           fi
-          if [ -z "${{ github.event.inputs.change-cause }}" ]; then
+          if [ -z "${{ env.CHANGE-CAUSE }}" ]; then
             echo "change-cause=\"Deployment ${{ github.sha }} triggered by ${{ github.triggering_actor }} on ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"" >> "$GITHUB_OUTPUT"
           else
-            echo "change-cause=\"${{ github.event.inputs.change-cause }}\"" >> "$GITHUB_OUTPUT"
+            echo "change-cause=\"${{ env.CHANGE-CAUSE }}\"" >> "$GITHUB_OUTPUT"
           fi
-          if [ "${{ github.event.inputs.use-branch-commit }}" == "true" ]; then
+          if [ "${{ env.USE-BRANCH-COMMIT }}" == "true" ]; then
             echo "image-commit=${{ github.sha }}" >> "$GITHUB_OUTPUT"
           else
             echo "image-commit=" >> "$GITHUB_OUTPUT"
@@ -95,10 +100,10 @@ jobs:
   helmfile-run:
     uses: ./.github/workflows/helm_deploy_call.yml
     needs: set-config
-    name: "helmfile ${{ github.event.inputs.action }}"
+    name: "helmfile ${{ env.ACTION }}"
     with:
-      helmfile: helm/helmfiles/${{ github.event.inputs.deployment }}.yaml
-      action: ${{ github.event.inputs.action }}
+      helmfile: helm/helmfiles/${{ env.DEPLOYMENT }}.yaml
+      action: ${{ env.ACTION }}
       image-commit: ${{ needs.set-config.outputs.image-commit }}
       change-cause: ${{ needs.set-config.outputs.change-cause }}
       cluster-name: ${{ needs.set-config.outputs.cluster }}
